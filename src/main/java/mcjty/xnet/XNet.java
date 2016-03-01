@@ -2,17 +2,19 @@ package mcjty.xnet;
 
 
 import mcjty.lib.base.ModBase;
+import mcjty.lib.compat.MainCompatHandler;
 import mcjty.xnet.blocks.NetCableSetup;
+import mcjty.xnet.multiblock.CableNetwork;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
-import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Logger;
@@ -62,11 +64,18 @@ public class XNet implements ModBase {
         proxy.postInit(e);
     }
 
+    @Mod.EventHandler
+    public void serverStopped(FMLServerStoppedEvent event) {
+        CableNetwork.clearInstance();
+    }
+
+
     public static class CommonProxy {
         public void preInit(FMLPreInitializationEvent e) {
             // Initialize our packet handler. Make sure the name is
             // 20 characters or less!
 //            PacketHandler.registerMessages("xnet");
+            MainCompatHandler.registerWaila();
 
             // Initialization of blocks and items typically goes here:
             ModBlocks.init();
