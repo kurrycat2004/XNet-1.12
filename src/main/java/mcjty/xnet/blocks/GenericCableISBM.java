@@ -36,7 +36,7 @@ public class GenericCableISBM implements ISmartBlockModel {
         east = extendedBlockState.getValue(GenericCableBlock.EAST);
         up = extendedBlockState.getValue(GenericCableBlock.UP);
         down = extendedBlockState.getValue(GenericCableBlock.DOWN);
-        return new BakedModel(north, south, west, east, up, down);
+        return new BakedModel(north, south, west, east, up, down, (GenericCableBlock) state.getBlock());
     }
 
     @Override
@@ -76,7 +76,7 @@ public class GenericCableISBM implements ISmartBlockModel {
 
     public class BakedModel implements IBakedModel {
         private TextureAtlasSprite spriteCable;
-        private TextureAtlasSprite spriteConnector;
+        private TextureAtlasSprite spriteEnergy;
         private TextureAtlasSprite spriteSide;
 
         private final ConnectorType north;
@@ -86,10 +86,14 @@ public class GenericCableISBM implements ISmartBlockModel {
         private final ConnectorType up;
         private final ConnectorType down;
 
-        public BakedModel(ConnectorType north, ConnectorType south, ConnectorType west, ConnectorType east, ConnectorType up, ConnectorType down) {
+        public BakedModel(ConnectorType north, ConnectorType south, ConnectorType west, ConnectorType east, ConnectorType up, ConnectorType down, GenericCableBlock block) {
             spriteCable = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(XNet.MODID + ":blocks/netcable");
-            spriteConnector = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(XNet.MODID + ":blocks/energyConnector");
-            spriteSide = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(XNet.MODID + ":blocks/machineTop");
+            String connectorTexture = block.getConnectorTexture();
+            if (connectorTexture != null) {
+                spriteEnergy = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(connectorTexture);
+            }
+            spriteSide = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(XNet.MODID + ":blocks/connectorSide");
+
             this.north = north;
             this.south = south;
             this.west = west;
@@ -129,6 +133,8 @@ public class GenericCableISBM implements ISmartBlockModel {
 
         @Override
         public List<BakedQuad> getGeneralQuads() {
+
+
             List<BakedQuad> quads = new ArrayList<>();
             double o = .4;      // Thickness of the cable. .0 would be full block, .5 is infinitely thin.
             double p = .1;      // Thickness of the connector as it is put on the connecting block
@@ -153,7 +159,7 @@ public class GenericCableISBM implements ISmartBlockModel {
                 quads.add(createQuad(new Vec3(q,     1,     q),     new Vec3(1 - q, 1,     q),     new Vec3(1 - q, 1 - p, q),     new Vec3(q,     1 - p, q), spriteSide));
                 quads.add(createQuad(new Vec3(q,     1 - p, 1 - q), new Vec3(1 - q, 1 - p, 1 - q), new Vec3(1 - q, 1,     1 - q), new Vec3(q,     1,     1 - q), spriteSide));
 
-                quads.add(createQuad(new Vec3(q,     1 - p, q),     new Vec3(1 - q, 1 - p, q),     new Vec3(1 - q, 1 - p, 1 - q), new Vec3(q,     1 - p, 1 - q), spriteConnector));
+                quads.add(createQuad(new Vec3(q,     1 - p, q),     new Vec3(1 - q, 1 - p, q),     new Vec3(1 - q, 1 - p, 1 - q), new Vec3(q,     1 - p, 1 - q), spriteEnergy));
             } else {
                 quads.add(createQuad(new Vec3(o,     1 - o, 1 - o), new Vec3(1 - o, 1 - o, 1 - o), new Vec3(1 - o, 1 - o, o),     new Vec3(o,     1 - o, o), spriteCable));
             }
@@ -174,7 +180,7 @@ public class GenericCableISBM implements ISmartBlockModel {
                 quads.add(createQuad(new Vec3(q,     p, q),     new Vec3(1 - q, p, q),     new Vec3(1 - q, 0, q),     new Vec3(q,     0, q), spriteSide));
                 quads.add(createQuad(new Vec3(q,     0, 1 - q), new Vec3(1 - q, 0, 1 - q), new Vec3(1 - q, p, 1 - q), new Vec3(q,     p, 1 - q), spriteSide));
 
-                quads.add(createQuad(new Vec3(q,     p, 1 - q), new Vec3(1 - q, p, 1 - q), new Vec3(1 - q, p, q),     new Vec3(q,     p, q), spriteConnector));
+                quads.add(createQuad(new Vec3(q,     p, 1 - q), new Vec3(1 - q, p, 1 - q), new Vec3(1 - q, p, q),     new Vec3(q,     p, q), spriteEnergy));
             } else {
                 quads.add(createQuad(new Vec3(o, o, o), new Vec3(1 - o, o, o), new Vec3(1 - o, o, 1 - o), new Vec3(o, o, 1 - o), spriteCable));
             }
@@ -195,7 +201,7 @@ public class GenericCableISBM implements ISmartBlockModel {
                 quads.add(createQuad(new Vec3(1 - p, 1 - q, q),     new Vec3(1, 1 - q, q),     new Vec3(1, q,     q),     new Vec3(1 - p, q,     q), spriteSide));
                 quads.add(createQuad(new Vec3(1 - p, q,     1 - q), new Vec3(1, q,     1 - q), new Vec3(1, 1 - q, 1 - q), new Vec3(1 - p, 1 - q, 1 - q), spriteSide));
 
-                quads.add(createQuad(new Vec3(1 - p, q, 1 - q), new Vec3(1 - p, 1 - q, 1 - q), new Vec3(1 - p, 1 - q, q), new Vec3(1 - p, q, q), spriteConnector));
+                quads.add(createQuad(new Vec3(1 - p, q, 1 - q), new Vec3(1 - p, 1 - q, 1 - q), new Vec3(1 - p, 1 - q, q), new Vec3(1 - p, q, q), spriteEnergy));
             } else {
                 quads.add(createQuad(new Vec3(1 - o, o, o), new Vec3(1 - o, 1 - o, o), new Vec3(1 - o, 1 - o, 1 - o), new Vec3(1 - o, o, 1 - o), spriteCable));
             }
@@ -216,7 +222,7 @@ public class GenericCableISBM implements ISmartBlockModel {
                 quads.add(createQuad(new Vec3(0, 1 - q, q),     new Vec3(p, 1 - q, q),     new Vec3(p, q,     q),     new Vec3(0, q,     q), spriteSide));
                 quads.add(createQuad(new Vec3(0, q,     1 - q), new Vec3(p, q,     1 - q), new Vec3(p, 1 - q, 1 - q), new Vec3(0, 1 - q, 1 - q), spriteSide));
 
-                quads.add(createQuad(new Vec3(p, q, q), new Vec3(p, 1 - q, q), new Vec3(p, 1 - q, 1 - q), new Vec3(p, q, 1 - q), spriteConnector));
+                quads.add(createQuad(new Vec3(p, q, q), new Vec3(p, 1 - q, q), new Vec3(p, 1 - q, 1 - q), new Vec3(p, q, 1 - q), spriteEnergy));
             } else {
                 quads.add(createQuad(new Vec3(o, o, 1 - o), new Vec3(o, 1 - o, 1 - o), new Vec3(o, 1 - o, o), new Vec3(o, o, o), spriteCable));
             }
@@ -237,7 +243,7 @@ public class GenericCableISBM implements ISmartBlockModel {
                 quads.add(createQuad(new Vec3(1 - q, q,     0), new Vec3(1 - q, 1 - q, 0), new Vec3(1 - q, 1 - q, p), new Vec3(1 - q, q,     p), spriteSide));
                 quads.add(createQuad(new Vec3(q,     q,     p), new Vec3(q,     1 - q, p), new Vec3(q,     1 - q, 0), new Vec3(q,     q,     0), spriteSide));
 
-                quads.add(createQuad(new Vec3(q, q, p), new Vec3(1 - q, q, p), new Vec3(1 - q, 1 - q, p), new Vec3(q, 1 - q, p), spriteConnector));
+                quads.add(createQuad(new Vec3(q, q, p), new Vec3(1 - q, q, p), new Vec3(1 - q, 1 - q, p), new Vec3(q, 1 - q, p), spriteEnergy));
             } else {
                 quads.add(createQuad(new Vec3(o, 1 - o, o), new Vec3(1 - o, 1 - o, o), new Vec3(1 - o, o, o), new Vec3(o, o, o), spriteCable));
             }
@@ -258,7 +264,7 @@ public class GenericCableISBM implements ISmartBlockModel {
                 quads.add(createQuad(new Vec3(1 - q, q,     1 - p), new Vec3(1 - q, 1 - q, 1 - p), new Vec3(1 - q, 1 - q, 1),     new Vec3(1 - q, q,     1), spriteSide));
                 quads.add(createQuad(new Vec3(q,     q,     1),     new Vec3(q,     1 - q, 1),     new Vec3(q,     1 - q, 1 - p), new Vec3(q,     q,     1 - p), spriteSide));
 
-                quads.add(createQuad(new Vec3(q, 1 - q, 1 - p), new Vec3(1 - q, 1 - q, 1 - p), new Vec3(1 - q, q, 1 - p), new Vec3(q, q, 1 - p), spriteConnector));
+                quads.add(createQuad(new Vec3(q, 1 - q, 1 - p), new Vec3(1 - q, 1 - q, 1 - p), new Vec3(1 - q, q, 1 - p), new Vec3(q, q, 1 - p), spriteEnergy));
             } else {
                 quads.add(createQuad(new Vec3(o, o, 1 - o), new Vec3(1 - o, o, 1 - o), new Vec3(1 - o, 1 - o, 1 - o), new Vec3(o, 1 - o, 1 - o), spriteCable));
             }

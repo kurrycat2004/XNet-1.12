@@ -1,3 +1,4 @@
 tile.netcable.name=Network Cable
 tile.energy_connector.name=Energy Connector
+tile.item_connector.name=Item Connector
 itemGroup.XNet=XNet

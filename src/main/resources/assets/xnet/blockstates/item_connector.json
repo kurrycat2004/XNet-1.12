@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "normal": { "model": "xnet:item_connector" }
+  }
+}
