@@ -2,7 +2,6 @@ package mcjty.xnet.blocks;
 
 import mcjty.lib.container.EmptyContainer;
 import mcjty.xnet.XNet;
-import mcjty.xnet.varia.GenericXNetBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -26,28 +25,10 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class NetCableBlock extends GenericXNetBlock<NetCableTileEntity, EmptyContainer> {
-
-    // Properties that indicate if there is the same block in a certain direction.
-    public static final UnlistedPropertyBlockAvailable NORTH = new UnlistedPropertyBlockAvailable("north");
-    public static final UnlistedPropertyBlockAvailable SOUTH = new UnlistedPropertyBlockAvailable("south");
-    public static final UnlistedPropertyBlockAvailable WEST = new UnlistedPropertyBlockAvailable("west");
-    public static final UnlistedPropertyBlockAvailable EAST = new UnlistedPropertyBlockAvailable("east");
-    public static final UnlistedPropertyBlockAvailable UP = new UnlistedPropertyBlockAvailable("up");
-    public static final UnlistedPropertyBlockAvailable DOWN = new UnlistedPropertyBlockAvailable("down");
+public class NetCableBlock extends GenericCableBlock<NetCableTileEntity, EmptyContainer> {
 
     public NetCableBlock() {
-        super(Material.cloth, NetCableTileEntity.class, EmptyContainer.class, "netcable", false);
-    }
-
-    @Override
-    public boolean hasNoRotation() {
-        return true;
-    }
-
-    @Override
-    public int getGuiID() {
-        return -1;
+        super(Material.cloth, NetCableTileEntity.class, EmptyContainer.class, "netcable");
     }
 
     @Override
@@ -57,7 +38,7 @@ public class NetCableBlock extends GenericXNetBlock<NetCableTileEntity, EmptyCon
         StateMapperBase ignoreState = new StateMapperBase() {
             @Override
             protected ModelResourceLocation getModelResourceLocation(IBlockState iBlockState) {
-                return NetCableISBM.modelResourceLocation;
+                return GenericCableISBM.modelResourceLocation;
             }
         };
         ModelLoader.setCustomStateMapper(this, ignoreState);
@@ -106,12 +87,12 @@ public class NetCableBlock extends GenericXNetBlock<NetCableTileEntity, EmptyCon
     public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
 
-        boolean north = isSameBlock(world, pos.north());
-        boolean south = isSameBlock(world, pos.south());
-        boolean west = isSameBlock(world, pos.west());
-        boolean east = isSameBlock(world, pos.east());
-        boolean up = isSameBlock(world, pos.up());
-        boolean down = isSameBlock(world, pos.down());
+        ConnectorType north = getConnectorType(world, pos.north());
+        ConnectorType south = getConnectorType(world, pos.south());
+        ConnectorType west = getConnectorType(world, pos.west());
+        ConnectorType east = getConnectorType(world, pos.east());
+        ConnectorType up = getConnectorType(world, pos.up());
+        ConnectorType down = getConnectorType(world, pos.down());
 
         return extendedBlockState
                 .withProperty(NORTH, north)
@@ -122,9 +103,14 @@ public class NetCableBlock extends GenericXNetBlock<NetCableTileEntity, EmptyCon
                 .withProperty(DOWN, down);
     }
 
-    private boolean isSameBlock(IBlockAccess world, BlockPos pos) {
+    private ConnectorType getConnectorType(IBlockAccess world, BlockPos pos) {
         Block block = world.getBlockState(pos).getBlock();
-        return block == NetCableSetup.netCableBlock || block == NetCableSetup.energyConnectorBlock;
+        // @todo
+        if (block == NetCableSetup.energyConnectorBlock || block == this) {
+            return ConnectorType.CABLE;
+        } else {
+            return ConnectorType.NONE;
+        }
     }
 
 }

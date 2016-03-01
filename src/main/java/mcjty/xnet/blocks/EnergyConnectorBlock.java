@@ -2,7 +2,6 @@ package mcjty.xnet.blocks;
 
 import mcjty.lib.container.EmptyContainer;
 import mcjty.xnet.XNet;
-import mcjty.xnet.varia.GenericXNetBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -26,28 +25,10 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class EnergyConnectorBlock extends GenericXNetBlock<EnergyConnectorTileEntity, EmptyContainer> {
-
-    // Properties that indicate if there is the same block in a certain direction.
-    public static final UnlistedPropertyBlockType NORTH = new UnlistedPropertyBlockType("north");
-    public static final UnlistedPropertyBlockType SOUTH = new UnlistedPropertyBlockType("south");
-    public static final UnlistedPropertyBlockType WEST = new UnlistedPropertyBlockType("west");
-    public static final UnlistedPropertyBlockType EAST = new UnlistedPropertyBlockType("east");
-    public static final UnlistedPropertyBlockType UP = new UnlistedPropertyBlockType("up");
-    public static final UnlistedPropertyBlockType DOWN = new UnlistedPropertyBlockType("down");
+public class EnergyConnectorBlock extends GenericCableBlock<EnergyConnectorTileEntity, EmptyContainer> {
 
     public EnergyConnectorBlock() {
-        super(Material.iron, EnergyConnectorTileEntity.class, EmptyContainer.class, "energy_connector", false);
-    }
-
-    @Override
-    public boolean hasNoRotation() {
-        return true;
-    }
-
-    @Override
-    public int getGuiID() {
-        return -1;
+        super(Material.iron, EnergyConnectorTileEntity.class, EmptyContainer.class, "energy_connector");
     }
 
     @Override
@@ -57,7 +38,7 @@ public class EnergyConnectorBlock extends GenericXNetBlock<EnergyConnectorTileEn
         StateMapperBase ignoreState = new StateMapperBase() {
             @Override
             protected ModelResourceLocation getModelResourceLocation(IBlockState iBlockState) {
-                return EnergyConnectorISBM.modelResourceLocation;
+                return GenericCableISBM.modelResourceLocation;
             }
         };
         ModelLoader.setCustomStateMapper(this, ignoreState);

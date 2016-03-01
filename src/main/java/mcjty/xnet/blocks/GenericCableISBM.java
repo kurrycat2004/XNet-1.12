@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class EnergyConnectorISBM implements ISmartBlockModel {
+public class GenericCableISBM implements ISmartBlockModel {
 
     public static final ModelResourceLocation modelResourceLocation = new ModelResourceLocation(XNet.MODID + ":energy_connector");
 
@@ -29,12 +29,13 @@ public class EnergyConnectorISBM implements ISmartBlockModel {
         // our baked model implementation.
 
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
-        ConnectorType north = extendedBlockState.getValue(EnergyConnectorBlock.NORTH);
-        ConnectorType south = extendedBlockState.getValue(EnergyConnectorBlock.SOUTH);
-        ConnectorType west = extendedBlockState.getValue(EnergyConnectorBlock.WEST);
-        ConnectorType east = extendedBlockState.getValue(EnergyConnectorBlock.EAST);
-        ConnectorType up = extendedBlockState.getValue(EnergyConnectorBlock.UP);
-        ConnectorType down = extendedBlockState.getValue(EnergyConnectorBlock.DOWN);
+        ConnectorType north, south, west, east, up, down;
+        north = extendedBlockState.getValue(GenericCableBlock.NORTH);
+        south = extendedBlockState.getValue(GenericCableBlock.SOUTH);
+        west = extendedBlockState.getValue(GenericCableBlock.WEST);
+        east = extendedBlockState.getValue(GenericCableBlock.EAST);
+        up = extendedBlockState.getValue(GenericCableBlock.UP);
+        down = extendedBlockState.getValue(GenericCableBlock.DOWN);
         return new BakedModel(north, south, west, east, up, down);
     }
 
