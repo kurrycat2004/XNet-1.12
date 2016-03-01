@@ -1,0 +1,17 @@
+tile.firstblock.name=First Block
+tile.simpletexturedblock.name=Simple Textured Block
+tile.multitexturedblock.name=Multi Textured Block
+tile.statetexturedblock.name=State Textured Block
+tile.modelblock.name=Model Block
+tile.isbmblock.name=ISBM Block
+tile.datablock.name=Data Block
+tile.blinkingblock.name=Blinking Block
+tile.blinkingblock_lit.name=Blinking Block
+tile.pedestalblock.name=Pedestal Block
+
+item.firstitem.name=First Item
+item.simpletextureditem.name=Simple Textured Item
+item.multimodelitem.name=Multi Model Item
+
+key.categories.modtut=Mod Tutorials
+key.tutorial=Tutorial Key
