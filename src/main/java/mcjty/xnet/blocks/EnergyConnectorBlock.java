@@ -2,6 +2,7 @@ package mcjty.xnet.blocks;
 
 import mcjty.lib.container.EmptyContainer;
 import mcjty.xnet.XNet;
+import mcjty.xnet.client.CableISBM;
 import mcjty.xnet.varia.EnergyTools;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -33,7 +34,7 @@ public class EnergyConnectorBlock extends GenericCableBlock<EnergyConnectorTileE
         StateMapperBase ignoreState = new StateMapperBase() {
             @Override
             protected ModelResourceLocation getModelResourceLocation(IBlockState iBlockState) {
-                return GenericCableISBM.modelResourceLocation;
+                return CableISBM.modelResourceLocation;
             }
         };
         ModelLoader.setCustomStateMapper(this, ignoreState);

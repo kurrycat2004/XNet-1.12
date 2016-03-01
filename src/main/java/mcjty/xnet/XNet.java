@@ -1,13 +1,23 @@
 package mcjty.xnet;
 
 
+import elec332.core.client.IIconRegistrar;
+import elec332.core.client.ITextureLoader;
+import elec332.core.client.model.RenderingRegistry;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.compat.MainCompatHandler;
-import mcjty.xnet.blocks.NetCableSetup;
+import mcjty.xnet.client.CableISBM;
+import mcjty.xnet.init.ModBlocks;
+import mcjty.xnet.init.ModItems;
 import mcjty.xnet.multiblock.CableNetwork;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -15,6 +25,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Logger;
@@ -35,7 +46,7 @@ public class XNet implements ModBase {
     @SidedProxy
     public static CommonProxy proxy;
 
-    @Mod.Instance
+    @Mod.Instance(value = MODID)
     public static XNet instance;
 
     public static Logger logger;
@@ -44,7 +55,7 @@ public class XNet implements ModBase {
         @Override
         @SideOnly(Side.CLIENT)
         public Item getTabIconItem() {
-            return Item.getItemFromBlock(NetCableSetup.netCableBlock);
+            return Item.getItemFromBlock(Blocks.anvil);
         }
     };
 
@@ -92,16 +103,16 @@ public class XNet implements ModBase {
         }
     }
 
+    @SideOnly(Side.CLIENT)
+    public static class ClientProxy extends CommonProxy implements ITextureLoader {
 
-    public static class ClientProxy extends CommonProxy {
+        public static TextureAtlasSprite spriteSide, spriteCable;
+
         @Override
         public void preInit(FMLPreInitializationEvent e) {
             super.preInit(e);
-
-            MinecraftForge.EVENT_BUS.register(new ClientEventHandlers());
-//            OBJLoader.instance.addDomain(MODID);
-
-            // Typically initialization of models and such goes here:
+            RenderingRegistry.instance().registerLoader(this);
+            MinecraftForge.EVENT_BUS.register(this);
             ModBlocks.initModels();
             ModItems.initModels();
         }
@@ -111,6 +122,22 @@ public class XNet implements ModBase {
             super.init(e);
 
             ModBlocks.initItemModels();
+        }
+
+        @SubscribeEvent
+        public void onModelBakeEvent(ModelBakeEvent event) {
+            event.modelRegistry.putObject(new ModelResourceLocation("xnet:i-aint-making-jsons#multipart"), new CableISBM());
+        }
+
+        /**
+         * Use this to register your textures.
+         *
+         * @param iconRegistrar The IIconRegistrar.
+         */
+        @Override
+        public void registerTextures(IIconRegistrar iconRegistrar) {
+            spriteSide = iconRegistrar.registerSprite(new ResourceLocation(XNet.MODID + ":blocks/connectorSide"));
+            spriteCable = iconRegistrar.registerSprite(new ResourceLocation(XNet.MODID + ":blocks/netcable"));
         }
     }
 
@@ -127,4 +154,5 @@ public class XNet implements ModBase {
     public void openManual(EntityPlayer entityPlayer, int i, String s) {
         // @todo
     }
+
 }

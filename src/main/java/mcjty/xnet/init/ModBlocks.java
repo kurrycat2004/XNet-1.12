@@ -1,33 +1,32 @@
-package mcjty.xnet;
+package mcjty.xnet.init;
 
-import mcjty.xnet.blocks.DummyBlock;
-import mcjty.xnet.blocks.NetCableSetup;
+import mcjty.xnet.multipart.XNetCableMultiPart;
+import mcmultipart.multipart.MultipartRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ModBlocks {
 
-    public static DummyBlock dummyBlock;
 
     public static void init() {
-        dummyBlock = new DummyBlock();
+        MultipartRegistry.registerPart(XNetCableMultiPart.class, "name");
 
-        NetCableSetup.init();
+        //NetCableSetup.init();
     }
 
     @SideOnly(Side.CLIENT)
     public static void initModels() {
-        dummyBlock.initModel();
 
-        NetCableSetup.initClient();
+        //NetCableSetup.initClient();
     }
 
     @SideOnly(Side.CLIENT)
     public static void initItemModels() {
-        NetCableSetup.initItemModels();
+        //NetCableSetup.initItemModels();
     }
 
     public static void initCrafting() {
-        NetCableSetup.initCrafting();
+        //NetCableSetup.initCrafting();
     }
+
 }
