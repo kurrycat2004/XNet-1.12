@@ -1,8 +1,8 @@
 package mcjty.xnet.init;
 
-import elec332.eflux.items.ItemEFluxMultiPart;
 import mcjty.xnet.XNet;
 import mcjty.xnet.multipart.XNetCableMultiPart;
+import mcmultipart.item.ItemMultiPart;
 import mcmultipart.multipart.IMultipart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -17,12 +17,12 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ModItems {
 
     public static void init() {
-        new ItemEFluxMultiPart("xnetmp") {
+        GameRegistry.registerItem(new ItemMultiPart() {
             @Override
             public IMultipart createPart(World world, BlockPos pos, EnumFacing side, Vec3 hit, ItemStack stack, EntityPlayer player) {
                 return new XNetCableMultiPart();
             }
-        }.register().setCreativeTab(XNet.tabXNet);
+        }.setCreativeTab(XNet.tabXNet), "xnetmp");
 
     }
 

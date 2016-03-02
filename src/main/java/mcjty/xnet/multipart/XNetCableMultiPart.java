@@ -1,12 +1,8 @@
 package mcjty.xnet.multipart;
 
-import elec332.core.world.WorldHelper;
-import mcjty.xnet.XNet;
 import mcjty.xnet.api.IXNetComponent;
 import mcjty.xnet.api.XNetAPI;
 import mcjty.xnet.api.XNetAPIHelper;
-import mcjty.xnet.blocks.ConnectorType;
-import mcjty.xnet.blocks.UnlistedPropertyBlockType;
 import mcjty.xnet.varia.UnlistedPropertyBoolean;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.multipart.*;

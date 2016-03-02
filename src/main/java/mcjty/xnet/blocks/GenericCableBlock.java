@@ -31,6 +31,7 @@ import java.util.Set;
 
 import static net.minecraft.util.EnumFacing.VALUES;
 
+@Deprecated
 public abstract class GenericCableBlock<T extends GenericTileEntity, C extends Container> extends GenericXNetBlock<T, C> {
 
 

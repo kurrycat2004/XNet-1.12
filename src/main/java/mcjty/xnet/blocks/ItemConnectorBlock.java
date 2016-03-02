@@ -23,6 +23,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 
+@Deprecated
 public class ItemConnectorBlock extends GenericCableBlock<ItemConnectorTileEntity, EmptyContainer> {
 
     public ItemConnectorBlock() {

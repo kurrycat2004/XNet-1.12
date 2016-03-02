@@ -1,7 +1,8 @@
 package mcjty.xnet.multipart;
 
-import elec332.eflux.items.ItemEFluxMultiPart;
+import mcjty.xnet.XNet;
 import mcjty.xnet.api.IXNetComponent;
+import mcmultipart.item.ItemMultiPart;
 import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.Multipart;
@@ -63,8 +64,8 @@ public abstract class AbstractConnectorPart extends Multipart implements ISlotte
         markDirty();
     }
 
-    public static Item generateItem(String name, final Class<? extends AbstractConnectorPart> clazz){
-        return new ItemEFluxMultiPart(name) {
+    public static Item generateItem(final Class<? extends AbstractConnectorPart> clazz){
+        return new ItemMultiPart() {
             @Override
             public IMultipart createPart(World world, BlockPos pos, EnumFacing side, Vec3 hit, ItemStack stack, EntityPlayer player) {
                 try {
@@ -73,7 +74,7 @@ public abstract class AbstractConnectorPart extends Multipart implements ISlotte
                     throw new RuntimeException("Error creating part, couldn't find a constructor with an EnumFacing argument...", e);
                 }
             }
-        };
+        }.setCreativeTab(XNet.tabXNet);
     }
 
 }

@@ -3,6 +3,7 @@ package mcjty.xnet.blocks;
 import mcjty.lib.entity.GenericTileEntity;
 import net.minecraft.nbt.NBTTagCompound;
 
+@Deprecated
 public class GenericCableTileEntity extends GenericTileEntity {
 
     private int id = -1;

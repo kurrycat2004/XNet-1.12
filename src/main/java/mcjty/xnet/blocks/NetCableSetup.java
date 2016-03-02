@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Deprecated
 public class NetCableSetup {
     public static NetCableBlock netCableBlock;
     public static EnergyConnectorBlock energyConnectorBlock;
