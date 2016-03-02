@@ -25,6 +25,9 @@ repositories {
     maven { // JEI
         url "http://dvs1.progwml6.com/files/maven"
     }
+	maven {
+		url "http://maven.amadornes.com/"
+	}
 }
 
 version = "0.1.0"
@@ -44,6 +47,7 @@ minecraft {
 dependencies {
     deobfCompile "mcp.mobius.waila:Waila:1.6.0-B3_1.8.8"
     deobfCompile "mezz.jei:jei_1.8.9:2.25.2.130"
+	deobfCompile "MCMultiPart:MCMultiPart-experimental:1.0.7_36:universal"
 }
 
 processResources
