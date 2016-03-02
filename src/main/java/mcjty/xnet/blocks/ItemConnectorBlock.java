@@ -2,6 +2,7 @@ package mcjty.xnet.blocks;
 
 import mcjty.lib.container.EmptyContainer;
 import mcjty.xnet.XNet;
+import mcjty.xnet.client.CableISBM;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -22,6 +23,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 
+@Deprecated
 public class ItemConnectorBlock extends GenericCableBlock<ItemConnectorTileEntity, EmptyContainer> {
 
     public ItemConnectorBlock() {
@@ -35,7 +37,7 @@ public class ItemConnectorBlock extends GenericCableBlock<ItemConnectorTileEntit
         StateMapperBase ignoreState = new StateMapperBase() {
             @Override
             protected ModelResourceLocation getModelResourceLocation(IBlockState iBlockState) {
-                return GenericCableISBM.modelResourceLocation;
+                return CableISBM.modelResourceLocation;
             }
         };
         ModelLoader.setCustomStateMapper(this, ignoreState);

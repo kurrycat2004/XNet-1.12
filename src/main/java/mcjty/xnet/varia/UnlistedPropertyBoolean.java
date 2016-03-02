@@ -1,14 +1,14 @@
-package mcjty.xnet.blocks;
+package mcjty.xnet.varia;
 
 import net.minecraftforge.common.property.IUnlistedProperty;
 
-public class UnlistedPropertyBlockAvailable implements IUnlistedProperty<Boolean> {
+public class UnlistedPropertyBoolean implements IUnlistedProperty<Boolean> {
 
-    private final String name;
-
-    public UnlistedPropertyBlockAvailable(String name) {
+    public UnlistedPropertyBoolean(String name) {
         this.name = name;
     }
+
+    private final String name;
 
     @Override
     public String getName() {
@@ -29,4 +29,5 @@ public class UnlistedPropertyBlockAvailable implements IUnlistedProperty<Boolean
     public String valueToString(Boolean value) {
         return value.toString();
     }
+
 }

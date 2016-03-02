@@ -23,6 +23,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.lang.reflect.Constructor;
 
+@Deprecated
 public abstract class GenericXNetBlock<T extends GenericTileEntity, C extends Container> extends GenericBlock {
 
     private final Class<? extends C> containerClass;

@@ -31,15 +31,10 @@ import java.util.Set;
 
 import static net.minecraft.util.EnumFacing.VALUES;
 
+@Deprecated
 public abstract class GenericCableBlock<T extends GenericTileEntity, C extends Container> extends GenericXNetBlock<T, C> {
 
-    // Properties that indicate if there is the same block in a certain direction.
-    public static final UnlistedPropertyBlockType NORTH = new UnlistedPropertyBlockType("north");
-    public static final UnlistedPropertyBlockType SOUTH = new UnlistedPropertyBlockType("south");
-    public static final UnlistedPropertyBlockType WEST = new UnlistedPropertyBlockType("west");
-    public static final UnlistedPropertyBlockType EAST = new UnlistedPropertyBlockType("east");
-    public static final UnlistedPropertyBlockType UP = new UnlistedPropertyBlockType("up");
-    public static final UnlistedPropertyBlockType DOWN = new UnlistedPropertyBlockType("down");
+
 
 
     public GenericCableBlock(Material material, Class<? extends T> tileEntityClass, Class<? extends C> containerClass, String name) {
@@ -198,33 +193,6 @@ public abstract class GenericCableBlock<T extends GenericTileEntity, C extends C
     @Override
     public boolean isOpaqueCube() {
         return false;
-    }
-
-    @Override
-    protected BlockState createBlockState() {
-        IProperty[] listedProperties = new IProperty[0]; // no listed properties
-        IUnlistedProperty[] unlistedProperties = new IUnlistedProperty[] { NORTH, SOUTH, WEST, EAST, UP, DOWN };
-        return new ExtendedBlockState(this, listedProperties, unlistedProperties);
-    }
-
-    @Override
-    public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
-        IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
-
-        ConnectorType north = getConnectorType(world, pos.north());
-        ConnectorType south = getConnectorType(world, pos.south());
-        ConnectorType west = getConnectorType(world, pos.west());
-        ConnectorType east = getConnectorType(world, pos.east());
-        ConnectorType up = getConnectorType(world, pos.up());
-        ConnectorType down = getConnectorType(world, pos.down());
-
-        return extendedBlockState
-                .withProperty(NORTH, north)
-                .withProperty(SOUTH, south)
-                .withProperty(WEST, west)
-                .withProperty(EAST, east)
-                .withProperty(UP, up)
-                .withProperty(DOWN, down);
     }
 
     protected abstract ConnectorType getConnectorType(IBlockAccess world, BlockPos pos);
