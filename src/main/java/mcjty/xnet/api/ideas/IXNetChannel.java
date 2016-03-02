@@ -39,7 +39,7 @@ public interface IXNetChannel<C> {
 
     public interface Factory<C> {
 
-        public IXNetChannel<C> createNewChannel(C firstConnector);
+        public IXNetChannel<C> createNewChannel();
 
     }
 
