@@ -36,7 +36,6 @@ import java.util.List;
 /**
  * Created by Elec332 on 1-3-2016.
  */
-@SuppressWarnings("all")
 public class XNetCableMultiPart extends Multipart implements ISlottedPart, IXNetComponent, IOccludingPart, ICustomHighlightPart {
 
     // Properties that indicate if there is a connection to certain direction.
