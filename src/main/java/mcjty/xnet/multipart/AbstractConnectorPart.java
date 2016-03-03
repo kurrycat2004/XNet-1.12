@@ -2,6 +2,7 @@ package mcjty.xnet.multipart;
 
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.IXNetComponent;
+import mcjty.xnet.api.XNetAPI;
 import mcjty.xnet.varia.UnlistedPropertySide;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.item.ItemMultiPart;
@@ -20,6 +21,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
@@ -83,6 +85,17 @@ public abstract class AbstractConnectorPart extends Multipart implements ISlotte
     public void setId(int id) {
         this.id = id;
         markDirty();
+    }
+
+    @Override
+    public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+        return capability == XNetAPI.XNET_CAPABILITY && facing == side.getOpposite() || super.hasCapability(capability, facing);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+        return capability == XNetAPI.XNET_CAPABILITY && facing == side.getOpposite() ? (T)this :super.getCapability(capability, facing);
     }
 
     public static Item generateItem(final Class<? extends AbstractConnectorPart> clazz){
