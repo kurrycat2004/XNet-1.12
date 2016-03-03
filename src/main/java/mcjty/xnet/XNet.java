@@ -7,6 +7,7 @@ import elec332.core.client.model.RenderingRegistry;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.compat.MainCompatHandler;
 import mcjty.xnet.client.CableISBM;
+import mcjty.xnet.client.ConnectorISBM;
 import mcjty.xnet.init.ModBlocks;
 import mcjty.xnet.init.ModItems;
 import mcjty.xnet.multiblock.CableNetwork;
@@ -106,7 +107,10 @@ public class XNet implements ModBase {
     @SideOnly(Side.CLIENT)
     public static class ClientProxy extends CommonProxy implements ITextureLoader {
 
-        public static TextureAtlasSprite spriteSide, spriteCable;
+        public static TextureAtlasSprite spriteSide;
+        public static TextureAtlasSprite spriteCable;
+        public static TextureAtlasSprite spriteEnergy;
+        public static TextureAtlasSprite spriteItem;
 
         @Override
         public void preInit(FMLPreInitializationEvent e) {
@@ -126,7 +130,8 @@ public class XNet implements ModBase {
 
         @SubscribeEvent
         public void onModelBakeEvent(ModelBakeEvent event) {
-            event.modelRegistry.putObject(new ModelResourceLocation("xnet:i-aint-making-jsons#multipart"), new CableISBM());
+            event.modelRegistry.putObject(new ModelResourceLocation("xnet:netcable#multipart"), new CableISBM());
+            event.modelRegistry.putObject(new ModelResourceLocation("xnet:connector#multipart"), new ConnectorISBM());
         }
 
         /**
@@ -138,6 +143,8 @@ public class XNet implements ModBase {
         public void registerTextures(IIconRegistrar iconRegistrar) {
             spriteSide = iconRegistrar.registerSprite(new ResourceLocation(XNet.MODID + ":blocks/connectorSide"));
             spriteCable = iconRegistrar.registerSprite(new ResourceLocation(XNet.MODID + ":blocks/netcable"));
+            spriteEnergy = iconRegistrar.registerSprite(new ResourceLocation(XNet.MODID + ":blocks/energyConnector"));
+            spriteItem = iconRegistrar.registerSprite(new ResourceLocation(XNet.MODID + ":blocks/itemConnector"));
         }
     }
 

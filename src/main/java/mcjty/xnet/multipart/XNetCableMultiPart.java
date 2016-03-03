@@ -63,7 +63,7 @@ public class XNetCableMultiPart extends Multipart implements ISlottedPart, IXNet
 
     @Override
     public String getModelPath() {
-        return "xnet:i-aint-making-jsons";
+        return "xnet:netcable";
     }
 
     @Override
@@ -128,7 +128,6 @@ public class XNetCableMultiPart extends Multipart implements ISlottedPart, IXNet
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
         return capability == XNetAPI.XNET_CAPABILITY ? (T) this : super.getCapability(capability, facing);
     }

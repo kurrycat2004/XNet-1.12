@@ -1,4 +1,4 @@
-tile.netcable.name=Network Cable
-tile.energy_connector.name=Energy Connector
-tile.item_connector.name=Item Connector
+item.netcable.name=Network Cable
+item.energy_connector.name=Energy Connector
+item.item_connector.name=Item Connector
 itemGroup.XNet=XNet
