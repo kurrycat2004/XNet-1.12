@@ -7,4 +7,9 @@ public class RFConnectorPart extends AbstractConnectorPart {
     public RFConnectorPart(EnumFacing side) {
         super(side);
     }
+
+    public RFConnectorPart(){
+        super();
+    }
+
 }

@@ -1,8 +1,10 @@
 package mcjty.xnet.multipart;
 
+import elec332.core.world.WorldHelper;
 import mcjty.xnet.api.IXNetComponent;
 import mcjty.xnet.api.XNetAPI;
 import mcjty.xnet.api.XNetAPIHelper;
+import mcjty.xnet.init.ModItems;
 import mcjty.xnet.varia.UnlistedPropertyBoolean;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.client.multipart.ICustomHighlightPart;
@@ -70,6 +72,7 @@ public class XNetCableMultiPart extends Multipart implements ISlottedPart, IXNet
     public void onNeighborBlockChange(Block block) {
         super.onNeighborBlockChange(block);
         checkConnections();
+        WorldHelper.markBlockForRenderUpdate(getWorld(), getPos());
     }
 
     @Override
@@ -112,6 +115,11 @@ public class XNetCableMultiPart extends Multipart implements ISlottedPart, IXNet
     }
 
     @Override
+    public ItemStack getPickBlock(EntityPlayer player, PartMOP hit) {
+        return new ItemStack(ModItems.cable);
+    }
+
+    @Override
     public int getId() {
         return id;
     }
@@ -128,6 +136,7 @@ public class XNetCableMultiPart extends Multipart implements ISlottedPart, IXNet
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
         return capability == XNetAPI.XNET_CAPABILITY ? (T) this : super.getCapability(capability, facing);
     }

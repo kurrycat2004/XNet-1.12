@@ -1,5 +1,6 @@
 package mcjty.xnet.init;
 
+import mcjty.xnet.multipart.RFConnectorPart;
 import mcjty.xnet.multipart.XNetCableMultiPart;
 import mcmultipart.multipart.MultipartRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -10,7 +11,7 @@ public class ModBlocks {
 
     public static void init() {
         MultipartRegistry.registerPart(XNetCableMultiPart.class, "name");
-
+        MultipartRegistry.registerPart(RFConnectorPart.class, "nametest2");
         //NetCableSetup.init();
     }
 
