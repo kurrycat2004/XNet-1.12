@@ -25,27 +25,26 @@ public class ModItems {
 
 
     public static void init() {
-        cable = new ItemMultiPart() {
+        cable = registerPartItem(new ItemMultiPart() {
             @Override
             public IMultipart createPart(World world, BlockPos pos, EnumFacing side, Vec3 hit, ItemStack stack, EntityPlayer player) {
                 return new XNetCableMultiPart();
             }
-        };
-        registerPartItem(cable, "netcable");
-        energyConnector = new ItemMultiPart() {
+        }, "netcable");
+        energyConnector = registerPartItem(new ItemMultiPart() {
             @Override
             public IMultipart createPart(World world, BlockPos pos, EnumFacing side, Vec3 hit, ItemStack stack, EntityPlayer player) {
                 return new RFConnectorPart();
             }
-        };
-        registerPartItem(energyConnector, "energy_connector");
+        }, "energy_connector");
     }
 
-    private static void registerPartItem(ItemMultiPart partItem, String name) {
+    private static ItemMultiPart registerPartItem(ItemMultiPart partItem, String name) {
         partItem.setCreativeTab(XNet.tabXNet);
         partItem.setRegistryName(name);
         partItem.setUnlocalizedName(name);
         GameRegistry.registerItem(partItem);
+        return partItem;
     }
 
     @SideOnly(Side.CLIENT)
