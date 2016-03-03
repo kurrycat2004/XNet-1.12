@@ -34,7 +34,7 @@ public class ModItems {
         energyConnector = registerPartItem(new ItemMultiPart() {
             @Override
             public IMultipart createPart(World world, BlockPos pos, EnumFacing side, Vec3 hit, ItemStack stack, EntityPlayer player) {
-                return new RFConnectorPart();
+                return new RFConnectorPart(side);
             }
         }, "energy_connector");
     }

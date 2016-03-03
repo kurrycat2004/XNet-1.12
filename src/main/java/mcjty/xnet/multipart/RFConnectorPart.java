@@ -1,9 +1,10 @@
 package mcjty.xnet.multipart;
 
-import mcjty.xnet.varia.UnlistedPropertySide;
+import net.minecraft.util.EnumFacing;
 
 public class RFConnectorPart extends AbstractConnectorPart {
 
-    public static final UnlistedPropertySide SIDE = new UnlistedPropertySide("side");
-
+    public RFConnectorPart(EnumFacing side) {
+        super(side);
+    }
 }
