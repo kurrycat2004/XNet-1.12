@@ -2,14 +2,13 @@ package mcjty.xnet.client;
 
 import com.google.common.primitives.Ints;
 import mcjty.xnet.XNet;
-import mcjty.xnet.multipart.RFConnectorPart;
+import mcjty.xnet.multipart.AbstractConnectorPart;
 import mcmultipart.client.multipart.ISmartMultipartModel;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.IBakedModel;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.client.model.pipeline.LightUtil;
@@ -21,14 +20,12 @@ import java.util.List;
 
 public class ConnectorISBM implements ISmartMultipartModel {
 
-    public static final ModelResourceLocation modelResourceLocation = new ModelResourceLocation(XNet.MODID + ":energy_connector");
-
     @Override
     public IBakedModel handlePartState(IBlockState state) {
         // Called with the blockstate from our block. Here we get the values of the six properties and pass that to
         // our baked model implementation.
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
-        EnumFacing side = extendedBlockState.getValue(RFConnectorPart.SIDE);
+        EnumFacing side = extendedBlockState.getValue(AbstractConnectorPart.SIDE);
         return new BakedModel(side);
     }
 
@@ -74,8 +71,8 @@ public class ConnectorISBM implements ISmartMultipartModel {
             this.side = side;
         }
 
-        private static final TextureAtlasSprite spriteFace = XNet.ClientProxy.spriteEnergy;//, spriteSide = XNet.ClientProxy.spriteSide;
-        private static final TextureAtlasSprite spriteSide = XNet.ClientProxy.spriteSide;//, spriteSide = XNet.ClientProxy.spriteSide;
+        private static final TextureAtlasSprite spriteFace = XNet.ClientProxy.spriteEnergy;
+        private static final TextureAtlasSprite spriteSide = XNet.ClientProxy.spriteSide;
         private final EnumFacing side;
 
         private int[] vertexToInts(double x, double y, double z, float u, float v, TextureAtlasSprite sprite) {
@@ -109,8 +106,6 @@ public class ConnectorISBM implements ISmartMultipartModel {
 
         @Override
         public List<BakedQuad> getGeneralQuads() {
-
-
             List<BakedQuad> quads = new ArrayList<>();
             double o = .4;      // Thickness of the cable. .0 would be full block, .5 is infinitely thin.
             double p = .1;      // Thickness of the connector as it is put on the connecting block
@@ -160,11 +155,6 @@ public class ConnectorISBM implements ISmartMultipartModel {
                     quads.add(createQuad(new Vec3(1 - p, q, 1 - q), new Vec3(1 - p, 1 - q, 1 - q), new Vec3(1 - p, 1 - q, q), new Vec3(1 - p, q, q), spriteFace));
                     break;
             }
-
-
-
-
-//                quads.add(createQuad(new Vec3(1 - o, 1 - o, o),     new Vec3(1 - o, 1,     o),     new Vec3(1 - o, 1,     1 - o), new Vec3(1 - o, 1 - o, 1 - o), spriteCable));
 
             return quads;
         }

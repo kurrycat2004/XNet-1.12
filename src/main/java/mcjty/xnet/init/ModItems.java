@@ -7,7 +7,6 @@ import mcmultipart.item.ItemMultiPart;
 import mcmultipart.multipart.IMultipart;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -22,6 +21,7 @@ public class ModItems {
 
     public static ItemMultiPart cable;
     public static ItemMultiPart energyConnector;
+    public static ItemMultiPart itemConnector;
 
 
     public static void init() {
@@ -37,6 +37,12 @@ public class ModItems {
                 return new RFConnectorPart(side);
             }
         }, "energy_connector");
+        itemConnector = registerPartItem(new ItemMultiPart() {
+            @Override
+            public IMultipart createPart(World world, BlockPos pos, EnumFacing side, Vec3 hit, ItemStack stack, EntityPlayer player) {
+                return new RFConnectorPart(side);
+            }
+        }, "item_connector");
     }
 
     private static ItemMultiPart registerPartItem(ItemMultiPart partItem, String name) {
@@ -51,6 +57,7 @@ public class ModItems {
     public static void initModels() {
         ModelLoader.setCustomModelResourceLocation(cable, 0, new ModelResourceLocation(cable.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(energyConnector, 0, new ModelResourceLocation(energyConnector.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(itemConnector, 0, new ModelResourceLocation(itemConnector.getRegistryName(), "inventory"));
     }
 
 }
