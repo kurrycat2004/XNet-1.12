@@ -1,14 +1,11 @@
 package mcjty.xnet.multiblock;
 
-import mcjty.xnet.blocks.GenericCableTileEntity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSavedData;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.HashMap;
@@ -86,12 +83,12 @@ public class CableNetwork extends WorldSavedData {
         Network fromNetwork = networks.get(fromId);
         for (BlockPos pos : fromNetwork.blocks) {
             TileEntity te = world.getTileEntity(pos);
-            if (te instanceof GenericCableTileEntity) {
-                GenericCableTileEntity genericCableTileEntity = (GenericCableTileEntity) te;
-                genericCableTileEntity.setId(toId);
-                toNetwork.add(pos);
-                fromNetwork.remove(pos);
-            }
+//            if (te instanceof GenericCableTileEntity) {
+//                GenericCableTileEntity genericCableTileEntity = (GenericCableTileEntity) te;
+//                genericCableTileEntity.setId(toId);
+//                toNetwork.add(pos);
+//                fromNetwork.remove(pos);
+//            }
         }
         save(world);
     }
