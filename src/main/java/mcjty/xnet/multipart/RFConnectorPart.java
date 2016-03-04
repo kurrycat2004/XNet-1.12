@@ -12,4 +12,8 @@ public class RFConnectorPart extends AbstractConnectorPart {
         super();
     }
 
+    @Override
+    public String getModelPath() {
+        return "xnet:connector";
+    }
 }
