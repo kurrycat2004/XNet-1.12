@@ -92,8 +92,8 @@ public class CableISBM implements ISmartMultipartModel {
             this.advanced = advanced;
         }
 
-        private static final TextureAtlasSprite spriteCable = XNet.ClientProxy.spriteCable;
-        private static final TextureAtlasSprite spriteAdvancedCable = XNet.ClientProxy.spriteAdvancedCable;
+        private static final TextureAtlasSprite spriteCable = XNetClientModelLoader.spriteCable;
+        private static final TextureAtlasSprite spriteAdvancedCable = XNetClientModelLoader.spriteAdvancedCable;
 
         private final boolean north, east, south, west, up, down;
 

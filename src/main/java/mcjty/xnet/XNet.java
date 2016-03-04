@@ -8,8 +8,10 @@ import mcjty.lib.base.ModBase;
 import mcjty.lib.compat.MainCompatHandler;
 import mcjty.xnet.client.CableISBM;
 import mcjty.xnet.client.ConnectorISBM;
+import mcjty.xnet.client.XNetClientModelLoader;
 import mcjty.xnet.init.ModBlocks;
 import mcjty.xnet.init.ModItems;
+import mcjty.xnet.init.ModRecipes;
 import mcjty.xnet.multiblock.CableNetwork;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.ModelResourceLocation;
@@ -92,7 +94,7 @@ public class XNet implements ModBase {
             // Initialization of blocks and items typically goes here:
             ModBlocks.init();
             ModItems.init();
-            ModBlocks.initCrafting();
+            ModRecipes.init();
         }
 
         public void init(FMLInitializationEvent e) {
@@ -105,55 +107,22 @@ public class XNet implements ModBase {
     }
 
     @SideOnly(Side.CLIENT)
-    public static class ClientProxy extends CommonProxy implements ITextureLoader {
+    public static class ClientProxy extends CommonProxy {
 
-        public static TextureAtlasSprite spriteSide;
-        public static TextureAtlasSprite spriteCable;
-        public static TextureAtlasSprite spriteAdvancedCable;
-        public static TextureAtlasSprite spriteEnergy;
-        public static TextureAtlasSprite spriteItem;
+        private static XNetClientModelLoader modelLoader;
 
         @Override
         public void preInit(FMLPreInitializationEvent e) {
             super.preInit(e);
-            RenderingRegistry.instance().registerLoader(this);
-            MinecraftForge.EVENT_BUS.register(this);
-            ModBlocks.initModels();
-            ModItems.initModels();
+            modelLoader = new XNetClientModelLoader();
+            modelLoader.setModelLocations();
+            RenderingRegistry.instance().registerLoader(modelLoader);
+            MinecraftForge.EVENT_BUS.register(modelLoader);
         }
 
-        @Override
-        public void init(FMLInitializationEvent e) {
-            super.init(e);
-
-            ModBlocks.initItemModels();
-        }
-
-        @SubscribeEvent
-        public void onModelBakeEvent(ModelBakeEvent event) {
-            event.modelRegistry.putObject(new ModelResourceLocation("xnet:netcable#multipart"), new CableISBM(false));
-            event.modelRegistry.putObject(new ModelResourceLocation("xnet:advanced_netcable#multipart"), new CableISBM(true));
-            event.modelRegistry.putObject(new ModelResourceLocation("xnet:rfconnector#multipart"), new ConnectorISBM(ClientProxy.spriteEnergy));
-            event.modelRegistry.putObject(new ModelResourceLocation("xnet:itemconnector#multipart"), new ConnectorISBM(ClientProxy.spriteItem));
-        }
-
-        /**
-         * Use this to register your textures.
-         *
-         * @param iconRegistrar The IIconRegistrar.
-         */
-        @Override
-        public void registerTextures(IIconRegistrar iconRegistrar) {
-            spriteSide = iconRegistrar.registerSprite(new ResourceLocation(XNet.MODID + ":blocks/connectorSide"));
-            spriteCable = iconRegistrar.registerSprite(new ResourceLocation(XNet.MODID + ":blocks/netcable"));
-            spriteAdvancedCable = iconRegistrar.registerSprite(new ResourceLocation(XNet.MODID + ":blocks/advancedNetcable"));
-            spriteEnergy = iconRegistrar.registerSprite(new ResourceLocation(XNet.MODID + ":blocks/energyConnector"));
-            spriteItem = iconRegistrar.registerSprite(new ResourceLocation(XNet.MODID + ":blocks/itemConnector"));
-        }
     }
 
     public static class ServerProxy extends CommonProxy {
-
     }
 
     @Override

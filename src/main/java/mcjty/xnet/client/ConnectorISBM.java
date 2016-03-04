@@ -80,7 +80,7 @@ public class ConnectorISBM implements ISmartMultipartModel {
             this.spriteFace = spriteFace;
         }
 
-        private static final TextureAtlasSprite spriteSide = XNet.ClientProxy.spriteSide;
+        private static final TextureAtlasSprite spriteSide = XNetClientModelLoader.spriteSide;
         private final EnumFacing side;
 
         private int[] vertexToInts(double x, double y, double z, float u, float v, TextureAtlasSprite sprite) {
