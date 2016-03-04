@@ -1,7 +1,6 @@
 package mcjty.xnet.client;
 
 import com.google.common.primitives.Ints;
-import mcjty.xnet.XNet;
 import mcjty.xnet.multipart.AbstractConnectorPart;
 import mcmultipart.client.multipart.ISmartMultipartModel;
 import net.minecraft.block.state.IBlockState;

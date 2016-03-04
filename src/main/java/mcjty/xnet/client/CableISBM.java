@@ -1,7 +1,6 @@
 package mcjty.xnet.client;
 
 import com.google.common.primitives.Ints;
-import mcjty.xnet.XNet;
 import mcmultipart.client.multipart.ISmartMultipartModel;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.BakedQuad;

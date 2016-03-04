@@ -5,8 +5,6 @@ import mcjty.xnet.multipart.RFConnectorPart;
 import mcjty.xnet.multipart.XNetAdvancedCableMultiPart;
 import mcjty.xnet.multipart.XNetCableMultiPart;
 import mcmultipart.multipart.MultipartRegistry;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ModBlocks {
 
