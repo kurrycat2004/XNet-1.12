@@ -120,20 +120,8 @@ public class AdvancedCableISBM implements ISmartMultipartModel {
 
                 Pattern pattern = (Pattern) o;
 
-                if (s1 != pattern.s1) {
-                    return false;
-                }
-                if (s2 != pattern.s2) {
-                    return false;
-                }
-                if (s3 != pattern.s3) {
-                    return false;
-                }
-                if (s4 != pattern.s4) {
-                    return false;
-                }
+                return s1 == pattern.s1 && s2 == pattern.s2 && s3 == pattern.s3 && s4 == pattern.s4;
 
-                return true;
             }
 
             @Override
@@ -279,7 +267,7 @@ public class AdvancedCableISBM implements ISmartMultipartModel {
             // or else we extend so that we touch the adjacent block:
 
             TextureAtlasSprite sprite = advanced ? XNetClientModelLoader.spriteAdvancedCable : XNetClientModelLoader.spriteCable;
-            Function<SpriteIdx, TextureAtlasSprite> getSprite = advanced ? (SpriteIdx a) -> getSpriteAdvanced(a) : (SpriteIdx a) -> getSpriteNormal(a);
+            Function<SpriteIdx, TextureAtlasSprite> getSprite = advanced ? BakedModel::getSpriteAdvanced : BakedModel::getSpriteNormal;
 
             if (up) {
                 quads.add(createQuad(new Vec3(1 - o, 1,     o),     new Vec3(1 - o, 1,     1 - o), new Vec3(1 - o, 1 - o, 1 - o), new Vec3(1 - o, 1 - o, o),     sprite));
@@ -369,5 +357,6 @@ public class AdvancedCableISBM implements ISmartMultipartModel {
         public ItemCameraTransforms getItemCameraTransforms() {
             return ItemCameraTransforms.DEFAULT;
         }
+
     }
 }
