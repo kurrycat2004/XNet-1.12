@@ -5,10 +5,9 @@ import elec332.core.client.model.ElecModelBakery;
 import elec332.core.client.model.ElecQuadBakery;
 import elec332.core.client.model.model.IModelAndTextureLoader;
 import elec332.core.client.model.template.ElecTemplateBakery;
-import mcjty.xnet.XNet;
+import mcjty.xnet.varia.XNetResourceLocation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -46,11 +45,11 @@ public class XNetClientModelLoader implements IModelAndTextureLoader {
      */
     @Override
     public void registerTextures(IIconRegistrar iconRegistrar) {
-        spriteSide = iconRegistrar.registerSprite(new ResourceLocation(XNet.MODID + ":blocks/connectorSide"));
-        spriteCable = iconRegistrar.registerSprite(new ResourceLocation(XNet.MODID + ":blocks/netcable"));
-        spriteAdvancedCable = iconRegistrar.registerSprite(new ResourceLocation(XNet.MODID + ":blocks/advancedNetcable"));
-        spriteEnergy = iconRegistrar.registerSprite(new ResourceLocation(XNet.MODID + ":blocks/energyConnector"));
-        spriteItem = iconRegistrar.registerSprite(new ResourceLocation(XNet.MODID + ":blocks/itemConnector"));
+        spriteSide = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/connectorSide"));
+        spriteCable = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/netcable"));
+        spriteAdvancedCable = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/advancedNetcable"));
+        spriteEnergy = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/energyConnector"));
+        spriteItem = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/itemConnector"));
     }
 
     @SubscribeEvent
