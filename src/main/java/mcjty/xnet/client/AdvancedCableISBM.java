@@ -26,13 +26,12 @@ public class AdvancedCableISBM implements ISmartMultipartModel {
         // Called with the blockstate from our block. Here we get the values of the six properties and pass that to
         // our baked model implementation.
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
-        boolean north, south, west, east, up, down;
-        north = extendedBlockState.getValue(NORTH);
-        south = extendedBlockState.getValue(SOUTH);
-        west = extendedBlockState.getValue(WEST);
-        east = extendedBlockState.getValue(EAST);
-        up = extendedBlockState.getValue(UP);
-        down = extendedBlockState.getValue(DOWN);
+        boolean north = extendedBlockState.getValue(NORTH);
+        boolean south = extendedBlockState.getValue(SOUTH);
+        boolean west = extendedBlockState.getValue(WEST);
+        boolean east = extendedBlockState.getValue(EAST);
+        boolean up = extendedBlockState.getValue(UP);
+        boolean down = extendedBlockState.getValue(DOWN);
         return new BakedModel(north, south, west, east, up, down);
     }
 
@@ -84,8 +83,8 @@ public class AdvancedCableISBM implements ISmartMultipartModel {
         }
 
         public static class QuadSetting {
-            final SpriteIdx sprite;
-            final int rotation;
+            private final SpriteIdx sprite;
+            private final int rotation;
 
             public QuadSetting(SpriteIdx sprite, int rotation) {
                 this.rotation = rotation;
@@ -94,10 +93,10 @@ public class AdvancedCableISBM implements ISmartMultipartModel {
         }
 
         public static class Pattern {
-            final boolean s1;
-            final boolean s2;
-            final boolean s3;
-            final boolean s4;
+            private final boolean s1;
+            private final boolean s2;
+            private final boolean s3;
+            private final boolean s4;
 
             public Pattern(boolean s1, boolean s2, boolean s3, boolean s4) {
                 this.s1 = s1;
@@ -143,29 +142,29 @@ public class AdvancedCableISBM implements ISmartMultipartModel {
             }
         }
 
-        private static final Map<Pattern, QuadSetting> patterns = new HashMap<>();
+        private static final Map<Pattern, QuadSetting> PATTERNS = new HashMap<>();
 
         static {
-            patterns.put(new Pattern(false, false, false, false), new QuadSetting(SpriteIdx.SPRITE_NONE, 0));
-            patterns.put(new Pattern(true, false, false, false), new QuadSetting(SpriteIdx.SPRITE_END, 3));
-            patterns.put(new Pattern(false, true, false, false), new QuadSetting(SpriteIdx.SPRITE_END, 0));
-            patterns.put(new Pattern(false, false, true, false), new QuadSetting(SpriteIdx.SPRITE_END, 1));
-            patterns.put(new Pattern(false, false, false, true), new QuadSetting(SpriteIdx.SPRITE_END, 2));
-            patterns.put(new Pattern(true, true, false, false), new QuadSetting(SpriteIdx.SPRITE_CORNER, 0));
-            patterns.put(new Pattern(false, true, true, false), new QuadSetting(SpriteIdx.SPRITE_CORNER, 1));
-            patterns.put(new Pattern(false, false, true, true), new QuadSetting(SpriteIdx.SPRITE_CORNER, 2));
-            patterns.put(new Pattern(true, false, false, true), new QuadSetting(SpriteIdx.SPRITE_CORNER, 3));
-            patterns.put(new Pattern(false, true, false, true), new QuadSetting(SpriteIdx.SPRITE_STRAIGHT, 0));
-            patterns.put(new Pattern(true, false, true, false), new QuadSetting(SpriteIdx.SPRITE_STRAIGHT, 1));
-            patterns.put(new Pattern(true, true, true, false), new QuadSetting(SpriteIdx.SPRITE_THREE, 0));
-            patterns.put(new Pattern(false, true, true, true), new QuadSetting(SpriteIdx.SPRITE_THREE, 1));
-            patterns.put(new Pattern(true, false, true, true), new QuadSetting(SpriteIdx.SPRITE_THREE, 2));
-            patterns.put(new Pattern(true, true, false, true), new QuadSetting(SpriteIdx.SPRITE_THREE, 3));
-            patterns.put(new Pattern(true, true, true, true), new QuadSetting(SpriteIdx.SPRITE_CROSS, 0));
+            PATTERNS.put(new Pattern(false, false, false, false), new QuadSetting(SpriteIdx.SPRITE_NONE, 0));
+            PATTERNS.put(new Pattern(true, false, false, false), new QuadSetting(SpriteIdx.SPRITE_END, 3));
+            PATTERNS.put(new Pattern(false, true, false, false), new QuadSetting(SpriteIdx.SPRITE_END, 0));
+            PATTERNS.put(new Pattern(false, false, true, false), new QuadSetting(SpriteIdx.SPRITE_END, 1));
+            PATTERNS.put(new Pattern(false, false, false, true), new QuadSetting(SpriteIdx.SPRITE_END, 2));
+            PATTERNS.put(new Pattern(true, true, false, false), new QuadSetting(SpriteIdx.SPRITE_CORNER, 0));
+            PATTERNS.put(new Pattern(false, true, true, false), new QuadSetting(SpriteIdx.SPRITE_CORNER, 1));
+            PATTERNS.put(new Pattern(false, false, true, true), new QuadSetting(SpriteIdx.SPRITE_CORNER, 2));
+            PATTERNS.put(new Pattern(true, false, false, true), new QuadSetting(SpriteIdx.SPRITE_CORNER, 3));
+            PATTERNS.put(new Pattern(false, true, false, true), new QuadSetting(SpriteIdx.SPRITE_STRAIGHT, 0));
+            PATTERNS.put(new Pattern(true, false, true, false), new QuadSetting(SpriteIdx.SPRITE_STRAIGHT, 1));
+            PATTERNS.put(new Pattern(true, true, true, false), new QuadSetting(SpriteIdx.SPRITE_THREE, 0));
+            PATTERNS.put(new Pattern(false, true, true, true), new QuadSetting(SpriteIdx.SPRITE_THREE, 1));
+            PATTERNS.put(new Pattern(true, false, true, true), new QuadSetting(SpriteIdx.SPRITE_THREE, 2));
+            PATTERNS.put(new Pattern(true, true, false, true), new QuadSetting(SpriteIdx.SPRITE_THREE, 3));
+            PATTERNS.put(new Pattern(true, true, true, true), new QuadSetting(SpriteIdx.SPRITE_CROSS, 0));
         }
 
         private static QuadSetting findPattern(boolean s1, boolean s2, boolean s3, boolean s4) {
-            return patterns.get(new Pattern(s1, s2, s3, s4));
+            return PATTERNS.get(new Pattern(s1, s2, s3, s4));
         }
 
         private static TextureAtlasSprite getSprite(SpriteIdx idx) {
@@ -195,7 +194,12 @@ public class AdvancedCableISBM implements ISmartMultipartModel {
             this.down = down;
         }
 
-        private final boolean north, east, south, west, up, down;
+        private final boolean north;
+        private final boolean south;
+        private final boolean west;
+        private final boolean east;
+        private final boolean up;
+        private final boolean down;
 
         private int[] vertexToInts(double x, double y, double z, float u, float v, TextureAtlasSprite sprite) {
             return new int[] {

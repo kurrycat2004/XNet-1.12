@@ -79,7 +79,6 @@ public class ConnectorISBM implements ISmartMultipartModel {
             this.spriteFace = spriteFace;
         }
 
-        private static final TextureAtlasSprite spriteSide = XNetClientModelLoader.spriteSide;
         private final EnumFacing side;
 
         private int[] vertexToInts(double x, double y, double z, float u, float v, TextureAtlasSprite sprite) {
@@ -114,51 +113,50 @@ public class ConnectorISBM implements ISmartMultipartModel {
         @Override
         public List<BakedQuad> getGeneralQuads() {
             List<BakedQuad> quads = new ArrayList<>();
-            double o = .4;      // Thickness of the cable. .0 would be full block, .5 is infinitely thin.
             double p = .1;      // Thickness of the connector as it is put on the connecting block
             double q = .2;      // The wideness of the connector
 
             switch (side) {
                 case DOWN:
-                    quads.add(createQuad(new Vec3(1 - q, 0, q),     new Vec3(1 - q, p, q),     new Vec3(1 - q, p, 1 - q), new Vec3(1 - q, 0, 1 - q), spriteSide));
-                    quads.add(createQuad(new Vec3(q,     0, 1 - q), new Vec3(q,     p, 1 - q), new Vec3(q,     p, q),     new Vec3(q,     0, q), spriteSide));
-                    quads.add(createQuad(new Vec3(q,     p, q),     new Vec3(1 - q, p, q),     new Vec3(1 - q, 0, q),     new Vec3(q,     0, q), spriteSide));
-                    quads.add(createQuad(new Vec3(q,     0, 1 - q), new Vec3(1 - q, 0, 1 - q), new Vec3(1 - q, p, 1 - q), new Vec3(q,     p, 1 - q), spriteSide));
+                    quads.add(createQuad(new Vec3(1 - q, 0, q),     new Vec3(1 - q, p, q),     new Vec3(1 - q, p, 1 - q), new Vec3(1 - q, 0, 1 - q), XNetClientModelLoader.spriteSide));
+                    quads.add(createQuad(new Vec3(q,     0, 1 - q), new Vec3(q,     p, 1 - q), new Vec3(q,     p, q),     new Vec3(q,     0, q), XNetClientModelLoader.spriteSide));
+                    quads.add(createQuad(new Vec3(q,     p, q),     new Vec3(1 - q, p, q),     new Vec3(1 - q, 0, q),     new Vec3(q,     0, q), XNetClientModelLoader.spriteSide));
+                    quads.add(createQuad(new Vec3(q,     0, 1 - q), new Vec3(1 - q, 0, 1 - q), new Vec3(1 - q, p, 1 - q), new Vec3(q,     p, 1 - q), XNetClientModelLoader.spriteSide));
                     quads.add(createQuad(new Vec3(q,     p, 1 - q), new Vec3(1 - q, p, 1 - q), new Vec3(1 - q, p, q),     new Vec3(q,     p, q), spriteFace));
                     break;
                 case UP:
-                    quads.add(createQuad(new Vec3(1 - q, 1 - p, q),     new Vec3(1 - q, 1,     q),     new Vec3(1 - q, 1,     1 - q), new Vec3(1 - q, 1 - p, 1 - q), spriteSide));
-                    quads.add(createQuad(new Vec3(q,     1 - p, 1 - q), new Vec3(q,     1,     1 - q), new Vec3(q,     1,     q),     new Vec3(q,     1 - p, q), spriteSide));
-                    quads.add(createQuad(new Vec3(q,     1,     q),     new Vec3(1 - q, 1,     q),     new Vec3(1 - q, 1 - p, q),     new Vec3(q,     1 - p, q), spriteSide));
-                    quads.add(createQuad(new Vec3(q,     1 - p, 1 - q), new Vec3(1 - q, 1 - p, 1 - q), new Vec3(1 - q, 1,     1 - q), new Vec3(q,     1,     1 - q), spriteSide));
+                    quads.add(createQuad(new Vec3(1 - q, 1 - p, q),     new Vec3(1 - q, 1,     q),     new Vec3(1 - q, 1,     1 - q), new Vec3(1 - q, 1 - p, 1 - q), XNetClientModelLoader.spriteSide));
+                    quads.add(createQuad(new Vec3(q,     1 - p, 1 - q), new Vec3(q,     1,     1 - q), new Vec3(q,     1,     q),     new Vec3(q,     1 - p, q), XNetClientModelLoader.spriteSide));
+                    quads.add(createQuad(new Vec3(q,     1,     q),     new Vec3(1 - q, 1,     q),     new Vec3(1 - q, 1 - p, q),     new Vec3(q,     1 - p, q), XNetClientModelLoader.spriteSide));
+                    quads.add(createQuad(new Vec3(q,     1 - p, 1 - q), new Vec3(1 - q, 1 - p, 1 - q), new Vec3(1 - q, 1,     1 - q), new Vec3(q,     1,     1 - q), XNetClientModelLoader.spriteSide));
                     quads.add(createQuad(new Vec3(q,     1 - p, q),     new Vec3(1 - q, 1 - p, q),     new Vec3(1 - q, 1 - p, 1 - q), new Vec3(q,     1 - p, 1 - q), spriteFace));
                     break;
                 case NORTH:
-                    quads.add(createQuad(new Vec3(q,     1 - q, p), new Vec3(1 - q, 1 - q, p), new Vec3(1 - q, 1 - q, 0), new Vec3(q,     1 - q, 0), spriteSide));
-                    quads.add(createQuad(new Vec3(q,     q,     0), new Vec3(1 - q, q,     0), new Vec3(1 - q, q,     p), new Vec3(q,     q,     p), spriteSide));
-                    quads.add(createQuad(new Vec3(1 - q, q,     0), new Vec3(1 - q, 1 - q, 0), new Vec3(1 - q, 1 - q, p), new Vec3(1 - q, q,     p), spriteSide));
-                    quads.add(createQuad(new Vec3(q,     q,     p), new Vec3(q,     1 - q, p), new Vec3(q,     1 - q, 0), new Vec3(q,     q,     0), spriteSide));
+                    quads.add(createQuad(new Vec3(q,     1 - q, p), new Vec3(1 - q, 1 - q, p), new Vec3(1 - q, 1 - q, 0), new Vec3(q,     1 - q, 0), XNetClientModelLoader.spriteSide));
+                    quads.add(createQuad(new Vec3(q,     q,     0), new Vec3(1 - q, q,     0), new Vec3(1 - q, q,     p), new Vec3(q,     q,     p), XNetClientModelLoader.spriteSide));
+                    quads.add(createQuad(new Vec3(1 - q, q,     0), new Vec3(1 - q, 1 - q, 0), new Vec3(1 - q, 1 - q, p), new Vec3(1 - q, q,     p), XNetClientModelLoader.spriteSide));
+                    quads.add(createQuad(new Vec3(q,     q,     p), new Vec3(q,     1 - q, p), new Vec3(q,     1 - q, 0), new Vec3(q,     q,     0), XNetClientModelLoader.spriteSide));
                     quads.add(createQuad(new Vec3(q, q, p), new Vec3(1 - q, q, p), new Vec3(1 - q, 1 - q, p), new Vec3(q, 1 - q, p), spriteFace));
                     break;
                 case SOUTH:
-                    quads.add(createQuad(new Vec3(q,     1 - q, 1),     new Vec3(1 - q, 1 - q, 1),     new Vec3(1 - q, 1 - q, 1 - p), new Vec3(q,     1 - q, 1 - p), spriteSide));
-                    quads.add(createQuad(new Vec3(q,     q,     1 - p), new Vec3(1 - q, q,     1 - p), new Vec3(1 - q, q,     1),     new Vec3(q,     q,     1), spriteSide));
-                    quads.add(createQuad(new Vec3(1 - q, q,     1 - p), new Vec3(1 - q, 1 - q, 1 - p), new Vec3(1 - q, 1 - q, 1),     new Vec3(1 - q, q,     1), spriteSide));
-                    quads.add(createQuad(new Vec3(q,     q,     1),     new Vec3(q,     1 - q, 1),     new Vec3(q,     1 - q, 1 - p), new Vec3(q,     q,     1 - p), spriteSide));
+                    quads.add(createQuad(new Vec3(q,     1 - q, 1),     new Vec3(1 - q, 1 - q, 1),     new Vec3(1 - q, 1 - q, 1 - p), new Vec3(q,     1 - q, 1 - p), XNetClientModelLoader.spriteSide));
+                    quads.add(createQuad(new Vec3(q,     q,     1 - p), new Vec3(1 - q, q,     1 - p), new Vec3(1 - q, q,     1),     new Vec3(q,     q,     1), XNetClientModelLoader.spriteSide));
+                    quads.add(createQuad(new Vec3(1 - q, q,     1 - p), new Vec3(1 - q, 1 - q, 1 - p), new Vec3(1 - q, 1 - q, 1),     new Vec3(1 - q, q,     1), XNetClientModelLoader.spriteSide));
+                    quads.add(createQuad(new Vec3(q,     q,     1),     new Vec3(q,     1 - q, 1),     new Vec3(q,     1 - q, 1 - p), new Vec3(q,     q,     1 - p), XNetClientModelLoader.spriteSide));
                     quads.add(createQuad(new Vec3(q, 1 - q, 1 - p), new Vec3(1 - q, 1 - q, 1 - p), new Vec3(1 - q, q, 1 - p), new Vec3(q, q, 1 - p), spriteFace));
                     break;
                 case WEST:
-                    quads.add(createQuad(new Vec3(0, 1 - q, 1 - q), new Vec3(p, 1 - q, 1 - q), new Vec3(p, 1 - q, q),     new Vec3(0, 1 - q, q), spriteSide));
-                    quads.add(createQuad(new Vec3(0, q,     q),     new Vec3(p, q,     q),     new Vec3(p, q,     1 - q), new Vec3(0, q,     1 - q), spriteSide));
-                    quads.add(createQuad(new Vec3(0, 1 - q, q),     new Vec3(p, 1 - q, q),     new Vec3(p, q,     q),     new Vec3(0, q,     q), spriteSide));
-                    quads.add(createQuad(new Vec3(0, q,     1 - q), new Vec3(p, q,     1 - q), new Vec3(p, 1 - q, 1 - q), new Vec3(0, 1 - q, 1 - q), spriteSide));
+                    quads.add(createQuad(new Vec3(0, 1 - q, 1 - q), new Vec3(p, 1 - q, 1 - q), new Vec3(p, 1 - q, q),     new Vec3(0, 1 - q, q), XNetClientModelLoader.spriteSide));
+                    quads.add(createQuad(new Vec3(0, q,     q),     new Vec3(p, q,     q),     new Vec3(p, q,     1 - q), new Vec3(0, q,     1 - q), XNetClientModelLoader.spriteSide));
+                    quads.add(createQuad(new Vec3(0, 1 - q, q),     new Vec3(p, 1 - q, q),     new Vec3(p, q,     q),     new Vec3(0, q,     q), XNetClientModelLoader.spriteSide));
+                    quads.add(createQuad(new Vec3(0, q,     1 - q), new Vec3(p, q,     1 - q), new Vec3(p, 1 - q, 1 - q), new Vec3(0, 1 - q, 1 - q), XNetClientModelLoader.spriteSide));
                     quads.add(createQuad(new Vec3(p, q, q), new Vec3(p, 1 - q, q), new Vec3(p, 1 - q, 1 - q), new Vec3(p, q, 1 - q), spriteFace));
                     break;
                 case EAST:
-                    quads.add(createQuad(new Vec3(1 - p, 1 - q, 1 - q), new Vec3(1, 1 - q, 1 - q), new Vec3(1, 1 - q, q),     new Vec3(1 - p, 1 - q, q), spriteSide));
-                    quads.add(createQuad(new Vec3(1 - p, q,     q),     new Vec3(1, q,     q),     new Vec3(1, q,     1 - q), new Vec3(1 - p, q,     1 - q), spriteSide));
-                    quads.add(createQuad(new Vec3(1 - p, 1 - q, q),     new Vec3(1, 1 - q, q),     new Vec3(1, q,     q),     new Vec3(1 - p, q,     q), spriteSide));
-                    quads.add(createQuad(new Vec3(1 - p, q,     1 - q), new Vec3(1, q,     1 - q), new Vec3(1, 1 - q, 1 - q), new Vec3(1 - p, 1 - q, 1 - q), spriteSide));
+                    quads.add(createQuad(new Vec3(1 - p, 1 - q, 1 - q), new Vec3(1, 1 - q, 1 - q), new Vec3(1, 1 - q, q),     new Vec3(1 - p, 1 - q, q), XNetClientModelLoader.spriteSide));
+                    quads.add(createQuad(new Vec3(1 - p, q,     q),     new Vec3(1, q,     q),     new Vec3(1, q,     1 - q), new Vec3(1 - p, q,     1 - q), XNetClientModelLoader.spriteSide));
+                    quads.add(createQuad(new Vec3(1 - p, 1 - q, q),     new Vec3(1, 1 - q, q),     new Vec3(1, q,     q),     new Vec3(1 - p, q,     q), XNetClientModelLoader.spriteSide));
+                    quads.add(createQuad(new Vec3(1 - p, q,     1 - q), new Vec3(1, q,     1 - q), new Vec3(1, 1 - q, 1 - q), new Vec3(1 - p, 1 - q, 1 - q), XNetClientModelLoader.spriteSide));
                     quads.add(createQuad(new Vec3(1 - p, q, 1 - q), new Vec3(1 - p, 1 - q, 1 - q), new Vec3(1 - p, 1 - q, q), new Vec3(1 - p, q, q), spriteFace));
                     break;
             }
@@ -183,7 +181,7 @@ public class ConnectorISBM implements ISmartMultipartModel {
 
         @Override
         public TextureAtlasSprite getParticleTexture() {
-            return spriteSide;
+            return XNetClientModelLoader.spriteSide;
         }
 
         @Override

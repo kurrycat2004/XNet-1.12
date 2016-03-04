@@ -19,16 +19,26 @@ import static mcjty.xnet.init.ModItems.*;
  */
 public class XNetClientModelLoader implements IModelAndTextureLoader {
 
+    @SuppressWarnings("PublicField")
     public static TextureAtlasSprite spriteSide;
+    @SuppressWarnings("PublicField")
     public static TextureAtlasSprite spriteCable;
+    @SuppressWarnings("PublicField")
     public static TextureAtlasSprite spriteEnergy;
+    @SuppressWarnings("PublicField")
     public static TextureAtlasSprite spriteItem;
 
+    @SuppressWarnings("PublicField")
     public static TextureAtlasSprite spriteAdvancedCable;
+    @SuppressWarnings("PublicField")
     public static TextureAtlasSprite spriteAdvancedCornerCable;
+    @SuppressWarnings("PublicField")
     public static TextureAtlasSprite spriteAdvancedEndCable;
+    @SuppressWarnings("PublicField")
     public static TextureAtlasSprite spriteAdvancedThreeCable;
+    @SuppressWarnings("PublicField")
     public static TextureAtlasSprite spriteAdvancedCrossCable;
+    @SuppressWarnings("PublicField")
     public static TextureAtlasSprite spriteAdvancedNoneCable;
 
     /**
@@ -63,6 +73,7 @@ public class XNetClientModelLoader implements IModelAndTextureLoader {
         spriteItem = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/itemConnector"));
     }
 
+    @SuppressWarnings("unused")
     @SubscribeEvent
     public void onModelBakeEvent(ModelBakeEvent event) {
         event.modelRegistry.putObject(new ModelResourceLocation("xnet:netcable#multipart"), new CableISBM());

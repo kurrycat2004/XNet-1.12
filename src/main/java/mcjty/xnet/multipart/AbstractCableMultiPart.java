@@ -4,7 +4,6 @@ import elec332.core.world.WorldHelper;
 import mcjty.xnet.api.IXNetComponent;
 import mcjty.xnet.api.XNetAPI;
 import mcjty.xnet.api.XNetAPIHelper;
-import mcjty.xnet.init.ModItems;
 import mcjty.xnet.varia.UnlistedPropertyBoolean;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.client.multipart.ICustomHighlightPart;
@@ -120,12 +119,13 @@ public abstract class AbstractCableMultiPart extends Multipart implements ISlott
 
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+        //noinspection ObjectEquality
         return capability == XNetAPI.XNET_CAPABILITY || super.hasCapability(capability, facing);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+        //noinspection ObjectEquality
         return capability == XNetAPI.XNET_CAPABILITY ? (T) this : super.getCapability(capability, facing);
     }
 

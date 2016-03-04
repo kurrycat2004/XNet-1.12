@@ -17,9 +17,13 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ModItems {
 
+    @SuppressWarnings("PublicField")
     public static ItemMultiPart cable;
+    @SuppressWarnings("PublicField")
     public static ItemMultiPart advancedCable;
+    @SuppressWarnings("PublicField")
     public static ItemMultiPart energyConnector;
+    @SuppressWarnings("PublicField")
     public static ItemMultiPart itemConnector;
 
 

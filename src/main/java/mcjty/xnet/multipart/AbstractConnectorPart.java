@@ -1,13 +1,14 @@
 package mcjty.xnet.multipart;
 
-import mcjty.xnet.XNet;
 import mcjty.xnet.api.IXNetComponent;
 import mcjty.xnet.api.XNetAPI;
 import mcjty.xnet.varia.UnlistedPropertySide;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.client.multipart.ICustomHighlightPart;
-import mcmultipart.item.ItemMultiPart;
-import mcmultipart.multipart.*;
+import mcmultipart.multipart.IOccludingPart;
+import mcmultipart.multipart.ISlottedPart;
+import mcmultipart.multipart.Multipart;
+import mcmultipart.multipart.PartSlot;
 import mcmultipart.raytrace.PartMOP;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockState;
@@ -16,12 +17,12 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.*;
-import net.minecraft.world.World;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
@@ -108,26 +109,15 @@ public abstract class AbstractConnectorPart extends Multipart implements ISlotte
 
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+        //noinspection ObjectEquality
         return capability == XNetAPI.XNET_CAPABILITY && facing == side.getOpposite() || super.hasCapability(capability, facing);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+        //noinspection ObjectEquality
         return capability == XNetAPI.XNET_CAPABILITY && facing == side.getOpposite() ? (T)this :super.getCapability(capability, facing);
-    }
-
-    public static Item generateItem(final Class<? extends AbstractConnectorPart> clazz){
-        return new ItemMultiPart() {
-            @Override
-            public IMultipart createPart(World world, BlockPos pos, EnumFacing side, Vec3 hit, ItemStack stack, EntityPlayer player) {
-                try {
-                    return clazz.getConstructor(EnumFacing.class).newInstance(side);
-                } catch (Exception e){
-                    throw new RuntimeException("Error creating part, couldn't find a constructor with an EnumFacing argument...", e);
-                }
-            }
-        }.setCreativeTab(XNet.tabXNet);
     }
 
     @Override

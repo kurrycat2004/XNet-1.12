@@ -28,13 +28,12 @@ public class CableISBM implements ISmartMultipartModel {
         // Called with the blockstate from our block. Here we get the values of the six properties and pass that to
         // our baked model implementation.
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
-        boolean north, south, west, east, up, down;
-        north = extendedBlockState.getValue(NORTH);
-        south = extendedBlockState.getValue(SOUTH);
-        west = extendedBlockState.getValue(WEST);
-        east = extendedBlockState.getValue(EAST);
-        up = extendedBlockState.getValue(UP);
-        down = extendedBlockState.getValue(DOWN);
+        boolean north = extendedBlockState.getValue(NORTH);
+        boolean south = extendedBlockState.getValue(SOUTH);
+        boolean west = extendedBlockState.getValue(WEST);
+        boolean east = extendedBlockState.getValue(EAST);
+        boolean up = extendedBlockState.getValue(UP);
+        boolean down = extendedBlockState.getValue(DOWN);
         return new BakedModel(north, south, west, east, up, down);
     }
 
@@ -85,9 +84,12 @@ public class CableISBM implements ISmartMultipartModel {
             this.down = down;
         }
 
-        private static final TextureAtlasSprite spriteCable = XNetClientModelLoader.spriteCable;
-
-        private final boolean north, east, south, west, up, down;
+        private final boolean north;
+        private final boolean south;
+        private final boolean west;
+        private final boolean east;
+        private final boolean up;
+        private final boolean down;
 
         private int[] vertexToInts(double x, double y, double z, float u, float v, TextureAtlasSprite sprite) {
             return new int[] {
@@ -128,7 +130,7 @@ public class CableISBM implements ISmartMultipartModel {
             // For each side we either cap it off if there is no similar block adjacent on that side
             // or else we extend so that we touch the adjacent block:
 
-            TextureAtlasSprite sprite = BakedModel.spriteCable;
+            TextureAtlasSprite sprite = XNetClientModelLoader.spriteCable;
 
             if (up) {
                 quads.add(createQuad(new Vec3(1 - o, 1 - o, o),     new Vec3(1 - o, 1,     o),     new Vec3(1 - o, 1,     1 - o), new Vec3(1 - o, 1 - o, 1 - o), sprite));
@@ -204,7 +206,7 @@ public class CableISBM implements ISmartMultipartModel {
 
         @Override
         public TextureAtlasSprite getParticleTexture() {
-            return spriteCable;
+            return XNetClientModelLoader.spriteCable;
         }
 
         @Override
