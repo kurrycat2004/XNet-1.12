@@ -1,6 +1,7 @@
 package mcjty.xnet.init;
 
 import mcjty.xnet.XNet;
+import mcjty.xnet.multipart.ItemConnectorPart;
 import mcjty.xnet.multipart.RFConnectorPart;
 import mcjty.xnet.multipart.XNetCableMultiPart;
 import mcmultipart.item.ItemMultiPart;
@@ -40,7 +41,7 @@ public class ModItems {
         itemConnector = registerPartItem(new ItemMultiPart() {
             @Override
             public IMultipart createPart(World world, BlockPos pos, EnumFacing side, Vec3 hit, ItemStack stack, EntityPlayer player) {
-                return new RFConnectorPart(side);
+                return new ItemConnectorPart(side);
             }
         }, "item_connector");
     }

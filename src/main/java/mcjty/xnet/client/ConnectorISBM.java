@@ -20,13 +20,19 @@ import java.util.List;
 
 public class ConnectorISBM implements ISmartMultipartModel {
 
+    private final TextureAtlasSprite spriteFace;
+
+    public ConnectorISBM(TextureAtlasSprite spriteFace) {
+        this.spriteFace = spriteFace;
+    }
+
     @Override
     public IBakedModel handlePartState(IBlockState state) {
         // Called with the blockstate from our block. Here we get the values of the six properties and pass that to
         // our baked model implementation.
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
         EnumFacing side = extendedBlockState.getValue(AbstractConnectorPart.SIDE);
-        return new BakedModel(side);
+        return new BakedModel(side, spriteFace);
     }
 
     @Override
@@ -67,11 +73,13 @@ public class ConnectorISBM implements ISmartMultipartModel {
 
     private static class BakedModel implements IBakedModel {
 
-        public BakedModel(EnumFacing side) {
+        private final TextureAtlasSprite spriteFace;
+
+        public BakedModel(EnumFacing side, TextureAtlasSprite spriteFace) {
             this.side = side;
+            this.spriteFace = spriteFace;
         }
 
-        private static final TextureAtlasSprite spriteFace = XNet.ClientProxy.spriteEnergy;
         private static final TextureAtlasSprite spriteSide = XNet.ClientProxy.spriteSide;
         private final EnumFacing side;
 

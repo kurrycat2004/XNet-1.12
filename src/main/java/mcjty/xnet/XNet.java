@@ -131,7 +131,8 @@ public class XNet implements ModBase {
         @SubscribeEvent
         public void onModelBakeEvent(ModelBakeEvent event) {
             event.modelRegistry.putObject(new ModelResourceLocation("xnet:netcable#multipart"), new CableISBM());
-            event.modelRegistry.putObject(new ModelResourceLocation("xnet:connector#multipart"), new ConnectorISBM());
+            event.modelRegistry.putObject(new ModelResourceLocation("xnet:rfconnector#multipart"), new ConnectorISBM(ClientProxy.spriteEnergy));
+            event.modelRegistry.putObject(new ModelResourceLocation("xnet:itemconnector#multipart"), new ConnectorISBM(ClientProxy.spriteItem));
         }
 
         /**
