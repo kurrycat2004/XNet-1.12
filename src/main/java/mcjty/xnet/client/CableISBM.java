@@ -20,10 +20,7 @@ import static mcjty.xnet.multipart.AbstractCableMultiPart.*;
 
 public class CableISBM implements ISmartMultipartModel {
 
-    private final boolean advanced;
-
-    public CableISBM(boolean advanced) {
-        this.advanced = advanced;
+    public CableISBM() {
     }
 
     @Override
@@ -38,7 +35,7 @@ public class CableISBM implements ISmartMultipartModel {
         east = extendedBlockState.getValue(EAST);
         up = extendedBlockState.getValue(UP);
         down = extendedBlockState.getValue(DOWN);
-        return new BakedModel(north, south, west, east, up, down, advanced);
+        return new BakedModel(north, south, west, east, up, down);
     }
 
     @Override
@@ -79,20 +76,16 @@ public class CableISBM implements ISmartMultipartModel {
 
     private static class BakedModel implements IBakedModel {
 
-        private final boolean advanced;
-
-        public BakedModel(boolean north, boolean south, boolean west, boolean east, boolean up, boolean down, boolean advanced) {
+        public BakedModel(boolean north, boolean south, boolean west, boolean east, boolean up, boolean down) {
             this.north = north;
             this.south = south;
             this.west = west;
             this.east = east;
             this.up = up;
             this.down = down;
-            this.advanced = advanced;
         }
 
         private static final TextureAtlasSprite spriteCable = XNetClientModelLoader.spriteCable;
-        private static final TextureAtlasSprite spriteAdvancedCable = XNetClientModelLoader.spriteAdvancedCable;
 
         private final boolean north, east, south, west, up, down;
 
@@ -130,22 +123,12 @@ public class CableISBM implements ISmartMultipartModel {
 
 
             List<BakedQuad> quads = new ArrayList<>();
-            double o;      // Thickness of the cable. .0 would be full block, .5 is infinitely thin.
-
-           // double p = .1;      // Thickness of the connector as it is put on the connecting block
-           // double q = .2;      // The wideness of the connector
+            double o = .4;      // Thickness of the cable. .0 would be full block, .5 is infinitely thin.
 
             // For each side we either cap it off if there is no similar block adjacent on that side
             // or else we extend so that we touch the adjacent block:
 
-            TextureAtlasSprite sprite;
-            if (advanced) {
-                sprite = BakedModel.spriteAdvancedCable;
-                o = .3;
-            } else {
-                sprite = BakedModel.spriteCable;
-                o = .4;
-            }
+            TextureAtlasSprite sprite = BakedModel.spriteCable;
 
             if (up) {
                 quads.add(createQuad(new Vec3(1 - o, 1 - o, o),     new Vec3(1 - o, 1,     o),     new Vec3(1 - o, 1,     1 - o), new Vec3(1 - o, 1 - o, 1 - o), sprite));

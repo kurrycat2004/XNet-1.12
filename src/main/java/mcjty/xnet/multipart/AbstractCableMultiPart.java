@@ -38,7 +38,7 @@ import java.util.List;
 /**
  * Created by Elec332 on 1-3-2016.
  */
-public class AbstractCableMultiPart extends Multipart implements ISlottedPart, IXNetComponent, IOccludingPart, ICustomHighlightPart {
+public abstract class AbstractCableMultiPart extends Multipart implements ISlottedPart, IXNetComponent, IOccludingPart, ICustomHighlightPart {
 
     // Properties that indicate if there is a connection to certain direction.
     public static final UnlistedPropertyBoolean NORTH = new UnlistedPropertyBoolean("north");
@@ -47,8 +47,6 @@ public class AbstractCableMultiPart extends Multipart implements ISlottedPart, I
     public static final UnlistedPropertyBoolean EAST = new UnlistedPropertyBoolean("east");
     public static final UnlistedPropertyBoolean UP = new UnlistedPropertyBoolean("up");
     public static final UnlistedPropertyBoolean DOWN = new UnlistedPropertyBoolean("down");
-
-    private static final AxisAlignedBB[] HITBOXES;
 
     public AbstractCableMultiPart(){
         this.connectedSides = EnumSet.noneOf(EnumFacing.class);
@@ -110,11 +108,6 @@ public class AbstractCableMultiPart extends Multipart implements ISlottedPart, I
     }
 
     @Override
-    public ItemStack getPickBlock(EntityPlayer player, PartMOP hit) {
-        return new ItemStack(ModItems.cable);
-    }
-
-    @Override
     public int getId() {
         return id;
     }
@@ -150,12 +143,15 @@ public class AbstractCableMultiPart extends Multipart implements ISlottedPart, I
         return Material.glass;
     }
 
+    protected abstract AxisAlignedBB[] getHitBoxes();
+
     @Override
     public void addSelectionBoxes(List<AxisAlignedBB> list) {
-        list.add(HITBOXES[6]);
+        AxisAlignedBB[] hitBoxes = getHitBoxes();
+        list.add(hitBoxes[6]);
         for (EnumFacing facing : EnumFacing.VALUES){
             if (connected(facing)){
-                list.add(HITBOXES[facing.ordinal()]);
+                list.add(hitBoxes[facing.ordinal()]);
             }
         }
     }
@@ -167,25 +163,33 @@ public class AbstractCableMultiPart extends Multipart implements ISlottedPart, I
 
     @Override
     public void addCollisionBoxes(AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
-        if (mask.intersectsWith(HITBOXES[6])){
-            list.add(HITBOXES[6]);
+        AxisAlignedBB[] hitBoxes = getHitBoxes();
+        if (mask.intersectsWith(hitBoxes[6])){
+            list.add(hitBoxes[6]);
         }
         for (EnumFacing facing : EnumFacing.VALUES){
             int i = facing.ordinal();
-            if (connected(facing) && mask.intersectsWith(HITBOXES[i])){
-                list.add(HITBOXES[i]);
+            if (connected(facing) && mask.intersectsWith(hitBoxes[i])){
+                list.add(hitBoxes[i]);
             }
         }
     }
 
     @Override
     public void addOcclusionBoxes(List<AxisAlignedBB> list) {
-        list.add(HITBOXES[6]);
+        list.add(getHitBoxes()[6]);
     }
 
     @Override
     @SideOnly(Side.CLIENT)
     public boolean drawHighlight(PartMOP hit, EntityPlayer player, ItemStack stack, float partialTicks) {
+        drawHighlight(getHitBoxes());
+        return true;
+    }
+
+
+    @SideOnly(Side.CLIENT)
+    private void drawHighlight(AxisAlignedBB[] hitboxes) {
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         GlStateManager.color(0.0F, 0.0F, 0.0F, 0.4F);
@@ -194,15 +198,14 @@ public class AbstractCableMultiPart extends Multipart implements ISlottedPart, I
         GlStateManager.depthMask(false);
         AxisAlignedBB aabb;
         for (EnumFacing facing : connectedSides) {
-            aabb = HITBOXES[facing.ordinal()];
+            aabb = hitboxes[facing.ordinal()];
             RenderGlobal.drawSelectionBoundingBox(aabb.expand(0.0020000000949949026D, 0.0020000000949949026D, 0.0020000000949949026D)/*.offset(-d0, -d1, -d2)*/);
         }
-        aabb = HITBOXES[6];
+        aabb = hitboxes[6];
         RenderGlobal.drawSelectionBoundingBox(aabb.expand(0.0020000000949949026D, 0.0020000000949949026D, 0.0020000000949949026D)/*.offset(-d0, -d1, -d2)*/);
         GlStateManager.depthMask(true);
         GlStateManager.enableTexture2D();
         GlStateManager.disableBlend();
-        return true;//return false;
     }
 
     private boolean connected(EnumFacing side){
@@ -213,19 +216,4 @@ public class AbstractCableMultiPart extends Multipart implements ISlottedPart, I
     public boolean canRenderInLayer(EnumWorldBlockLayer layer) {
         return layer == EnumWorldBlockLayer.CUTOUT;
     }
-
-    static {
-        HITBOXES = new AxisAlignedBB[7];
-        float thickness = .2f;
-        float heightStuff = (1 - thickness)/2;
-        float f1 = thickness + heightStuff;
-        HITBOXES[EnumFacing.DOWN.ordinal()] = new AxisAlignedBB(heightStuff, heightStuff, heightStuff, f1, 0, f1);
-        HITBOXES[EnumFacing.UP.ordinal()] = new AxisAlignedBB(heightStuff, 1, heightStuff, f1, f1, f1);
-        HITBOXES[EnumFacing.NORTH.ordinal()] = new AxisAlignedBB(heightStuff, heightStuff, heightStuff, f1, f1, 0);
-        HITBOXES[EnumFacing.SOUTH.ordinal()] = new AxisAlignedBB(heightStuff, heightStuff, 1, f1, f1, f1);
-        HITBOXES[EnumFacing.WEST.ordinal()] = new AxisAlignedBB(heightStuff, heightStuff, heightStuff, 0, f1, f1);
-        HITBOXES[EnumFacing.EAST.ordinal()] = new AxisAlignedBB(1, heightStuff, heightStuff, f1, f1, f1);
-        HITBOXES[6] = new AxisAlignedBB(heightStuff, heightStuff, heightStuff, f1, f1, f1);
-    }
-
 }

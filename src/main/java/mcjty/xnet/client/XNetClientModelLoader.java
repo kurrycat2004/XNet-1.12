@@ -21,9 +21,15 @@ public class XNetClientModelLoader implements IModelAndTextureLoader {
 
     public static TextureAtlasSprite spriteSide;
     public static TextureAtlasSprite spriteCable;
-    public static TextureAtlasSprite spriteAdvancedCable;
     public static TextureAtlasSprite spriteEnergy;
     public static TextureAtlasSprite spriteItem;
+
+    public static TextureAtlasSprite spriteAdvancedCable;
+    public static TextureAtlasSprite spriteAdvancedCornerCable;
+    public static TextureAtlasSprite spriteAdvancedEndCable;
+    public static TextureAtlasSprite spriteAdvancedThreeCable;
+    public static TextureAtlasSprite spriteAdvancedCrossCable;
+    public static TextureAtlasSprite spriteAdvancedNoneCable;
 
     /**
      * A helper method to prevent you from having to hook into the event,
@@ -48,14 +54,19 @@ public class XNetClientModelLoader implements IModelAndTextureLoader {
         spriteSide = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/connectorSide"));
         spriteCable = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/netcable"));
         spriteAdvancedCable = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/advancedNetcable"));
+        spriteAdvancedCornerCable = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/advancedCornerNetcable"));
+        spriteAdvancedEndCable = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/advancedEndNetcable"));
+        spriteAdvancedThreeCable = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/advancedThreeNetcable"));
+        spriteAdvancedCrossCable = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/advancedCrossNetcable"));
+        spriteAdvancedNoneCable = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/advancedNoneNetcable"));
         spriteEnergy = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/energyConnector"));
         spriteItem = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/itemConnector"));
     }
 
     @SubscribeEvent
     public void onModelBakeEvent(ModelBakeEvent event) {
-        event.modelRegistry.putObject(new ModelResourceLocation("xnet:netcable#multipart"), new CableISBM(false));
-        event.modelRegistry.putObject(new ModelResourceLocation("xnet:advanced_netcable#multipart"), new CableISBM(true));
+        event.modelRegistry.putObject(new ModelResourceLocation("xnet:netcable#multipart"), new CableISBM());
+        event.modelRegistry.putObject(new ModelResourceLocation("xnet:advanced_netcable#multipart"), new AdvancedCableISBM());
         event.modelRegistry.putObject(new ModelResourceLocation("xnet:rfconnector#multipart"), new ConnectorISBM(spriteEnergy));
         event.modelRegistry.putObject(new ModelResourceLocation("xnet:itemconnector#multipart"), new ConnectorISBM(spriteItem));
     }
