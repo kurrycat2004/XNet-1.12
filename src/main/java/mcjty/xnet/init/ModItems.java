@@ -3,6 +3,7 @@ package mcjty.xnet.init;
 import mcjty.xnet.XNet;
 import mcjty.xnet.multipart.ItemConnectorPart;
 import mcjty.xnet.multipart.RFConnectorPart;
+import mcjty.xnet.multipart.XNetAdvancedCableMultiPart;
 import mcjty.xnet.multipart.XNetCableMultiPart;
 import mcmultipart.item.ItemMultiPart;
 import mcmultipart.multipart.IMultipart;
@@ -21,6 +22,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ModItems {
 
     public static ItemMultiPart cable;
+    public static ItemMultiPart advancedCable;
     public static ItemMultiPart energyConnector;
     public static ItemMultiPart itemConnector;
 
@@ -32,6 +34,12 @@ public class ModItems {
                 return new XNetCableMultiPart();
             }
         }, "netcable");
+        advancedCable = registerPartItem(new ItemMultiPart() {
+            @Override
+            public IMultipart createPart(World world, BlockPos pos, EnumFacing side, Vec3 hit, ItemStack stack, EntityPlayer player) {
+                return new XNetAdvancedCableMultiPart();
+            }
+        }, "advanced_netcable");
         energyConnector = registerPartItem(new ItemMultiPart() {
             @Override
             public IMultipart createPart(World world, BlockPos pos, EnumFacing side, Vec3 hit, ItemStack stack, EntityPlayer player) {
@@ -57,6 +65,7 @@ public class ModItems {
     @SideOnly(Side.CLIENT)
     public static void initModels() {
         ModelLoader.setCustomModelResourceLocation(cable, 0, new ModelResourceLocation(cable.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(advancedCable, 0, new ModelResourceLocation(advancedCable.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(energyConnector, 0, new ModelResourceLocation(energyConnector.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(itemConnector, 0, new ModelResourceLocation(itemConnector.getRegistryName(), "inventory"));
     }

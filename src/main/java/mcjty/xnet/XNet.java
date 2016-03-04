@@ -109,6 +109,7 @@ public class XNet implements ModBase {
 
         public static TextureAtlasSprite spriteSide;
         public static TextureAtlasSprite spriteCable;
+        public static TextureAtlasSprite spriteAdvancedCable;
         public static TextureAtlasSprite spriteEnergy;
         public static TextureAtlasSprite spriteItem;
 
@@ -130,7 +131,8 @@ public class XNet implements ModBase {
 
         @SubscribeEvent
         public void onModelBakeEvent(ModelBakeEvent event) {
-            event.modelRegistry.putObject(new ModelResourceLocation("xnet:netcable#multipart"), new CableISBM());
+            event.modelRegistry.putObject(new ModelResourceLocation("xnet:netcable#multipart"), new CableISBM(false));
+            event.modelRegistry.putObject(new ModelResourceLocation("xnet:advanced_netcable#multipart"), new CableISBM(true));
             event.modelRegistry.putObject(new ModelResourceLocation("xnet:rfconnector#multipart"), new ConnectorISBM(ClientProxy.spriteEnergy));
             event.modelRegistry.putObject(new ModelResourceLocation("xnet:itemconnector#multipart"), new ConnectorISBM(ClientProxy.spriteItem));
         }
@@ -144,6 +146,7 @@ public class XNet implements ModBase {
         public void registerTextures(IIconRegistrar iconRegistrar) {
             spriteSide = iconRegistrar.registerSprite(new ResourceLocation(XNet.MODID + ":blocks/connectorSide"));
             spriteCable = iconRegistrar.registerSprite(new ResourceLocation(XNet.MODID + ":blocks/netcable"));
+            spriteAdvancedCable = iconRegistrar.registerSprite(new ResourceLocation(XNet.MODID + ":blocks/advancedNetcable"));
             spriteEnergy = iconRegistrar.registerSprite(new ResourceLocation(XNet.MODID + ":blocks/energyConnector"));
             spriteItem = iconRegistrar.registerSprite(new ResourceLocation(XNet.MODID + ":blocks/itemConnector"));
         }
