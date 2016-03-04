@@ -177,14 +177,16 @@ public abstract class AbstractConnectorPart extends Multipart implements ISlotte
 
     static {
         HITBOXES = new AxisAlignedBB[6];
-        float thickness = .2f;
-        float f1 = (1 - thickness);
-        HITBOXES[EnumFacing.DOWN.ordinal()] = new AxisAlignedBB(0, 0, 0, 1, thickness, 1);
-        HITBOXES[EnumFacing.UP.ordinal()] = new AxisAlignedBB(1, 1, 1, 0, f1, 0);
-        HITBOXES[EnumFacing.NORTH.ordinal()] = new AxisAlignedBB(0, 0, 0, 1, 1, thickness);
-        HITBOXES[EnumFacing.SOUTH.ordinal()] = new AxisAlignedBB(1, 1, 1, 0, 0, f1);
-        HITBOXES[EnumFacing.WEST.ordinal()] = new AxisAlignedBB(0, 0, 0, thickness, 1, 1);
-        HITBOXES[EnumFacing.EAST.ordinal()] = new AxisAlignedBB(1, 1, 1, f1, 0, 0);
+        float thickness = .1f;
+        float dfl = .2f;
+        float f1 = 1 - thickness;
+        float dflf1 = 1 - dfl;
+        HITBOXES[EnumFacing.DOWN.ordinal()] = new AxisAlignedBB(dflf1, 0, dflf1, dfl, thickness, dfl);
+        HITBOXES[EnumFacing.UP.ordinal()] = new AxisAlignedBB(dflf1, 1, dflf1, dfl, f1, dfl);
+        HITBOXES[EnumFacing.NORTH.ordinal()] = new AxisAlignedBB(dflf1, dflf1, 0, dfl, dfl, thickness);
+        HITBOXES[EnumFacing.SOUTH.ordinal()] = new AxisAlignedBB(dflf1, dflf1, 1, dfl, dfl, f1);
+        HITBOXES[EnumFacing.WEST.ordinal()] = new AxisAlignedBB(0, dflf1, dflf1, thickness, dfl, dfl);
+        HITBOXES[EnumFacing.EAST.ordinal()] = new AxisAlignedBB(1, dflf1, dflf1, f1, dfl, dfl);
     }
 
 }
