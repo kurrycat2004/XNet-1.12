@@ -13,12 +13,16 @@ import net.minecraftforge.client.model.pipeline.LightUtil;
 import net.minecraftforge.common.property.IExtendedBlockState;
 
 import java.util.*;
+import java.util.function.Function;
 
 import static mcjty.xnet.multipart.AbstractCableMultiPart.*;
 
 public class AdvancedCableISBM implements ISmartMultipartModel {
 
-    public AdvancedCableISBM() {
+    private final boolean advanced;
+
+    public AdvancedCableISBM(boolean advanced) {
+        this.advanced = advanced;
     }
 
     @Override
@@ -32,7 +36,7 @@ public class AdvancedCableISBM implements ISmartMultipartModel {
         boolean east = extendedBlockState.getValue(EAST);
         boolean up = extendedBlockState.getValue(UP);
         boolean down = extendedBlockState.getValue(DOWN);
-        return new BakedModel(north, south, west, east, up, down);
+        return new BakedModel(north, south, west, east, up, down, advanced);
     }
 
     @Override
@@ -167,7 +171,7 @@ public class AdvancedCableISBM implements ISmartMultipartModel {
             return PATTERNS.get(new Pattern(s1, s2, s3, s4));
         }
 
-        private static TextureAtlasSprite getSprite(SpriteIdx idx) {
+        private static TextureAtlasSprite getSpriteAdvanced(SpriteIdx idx) {
             switch (idx) {
                 case SPRITE_NONE:
                     return XNetClientModelLoader.spriteAdvancedNoneCable;
@@ -185,13 +189,32 @@ public class AdvancedCableISBM implements ISmartMultipartModel {
             return XNetClientModelLoader.spriteAdvancedNoneCable;
         }
 
-        public BakedModel(boolean north, boolean south, boolean west, boolean east, boolean up, boolean down) {
+        private static TextureAtlasSprite getSpriteNormal(SpriteIdx idx) {
+            switch (idx) {
+                case SPRITE_NONE:
+                    return XNetClientModelLoader.spriteNoneCable;
+                case SPRITE_END:
+                    return XNetClientModelLoader.spriteEndCable;
+                case SPRITE_STRAIGHT:
+                    return XNetClientModelLoader.spriteCable;
+                case SPRITE_CORNER:
+                    return XNetClientModelLoader.spriteCornerCable;
+                case SPRITE_THREE:
+                    return XNetClientModelLoader.spriteThreeCable;
+                case SPRITE_CROSS:
+                    return XNetClientModelLoader.spriteCrossCable;
+            }
+            return XNetClientModelLoader.spriteNoneCable;
+        }
+
+        public BakedModel(boolean north, boolean south, boolean west, boolean east, boolean up, boolean down, boolean advanced) {
             this.north = north;
             this.south = south;
             this.west = west;
             this.east = east;
             this.up = up;
             this.down = down;
+            this.advanced = advanced;
         }
 
         private final boolean north;
@@ -200,6 +223,7 @@ public class AdvancedCableISBM implements ISmartMultipartModel {
         private final boolean east;
         private final boolean up;
         private final boolean down;
+        private final boolean advanced;
 
         private int[] vertexToInts(double x, double y, double z, float u, float v, TextureAtlasSprite sprite) {
             return new int[] {
@@ -249,12 +273,13 @@ public class AdvancedCableISBM implements ISmartMultipartModel {
 
 
             List<BakedQuad> quads = new ArrayList<>();
-            double o = .3;      // Thickness of the cable. .0 would be full block, .5 is infinitely thin.
+            double o = advanced ? .3 : .4;      // Thickness of the cable. .0 would be full block, .5 is infinitely thin.
 
             // For each side we either cap it off if there is no similar block adjacent on that side
             // or else we extend so that we touch the adjacent block:
 
-            TextureAtlasSprite sprite = XNetClientModelLoader.spriteAdvancedCable;
+            TextureAtlasSprite sprite = advanced ? XNetClientModelLoader.spriteAdvancedCable : XNetClientModelLoader.spriteCable;
+            Function<SpriteIdx, TextureAtlasSprite> getSprite = advanced ? (SpriteIdx a) -> getSpriteAdvanced(a) : (SpriteIdx a) -> getSpriteNormal(a);
 
             if (up) {
                 quads.add(createQuad(new Vec3(1 - o, 1,     o),     new Vec3(1 - o, 1,     1 - o), new Vec3(1 - o, 1 - o, 1 - o), new Vec3(1 - o, 1 - o, o),     sprite));
@@ -263,7 +288,7 @@ public class AdvancedCableISBM implements ISmartMultipartModel {
                 quads.add(createQuad(new Vec3(o,     1 - o, 1 - o), new Vec3(1 - o, 1 - o, 1 - o), new Vec3(1 - o, 1,     1 - o), new Vec3(o,     1,     1 - o), sprite));
             } else {
                 QuadSetting pattern = findPattern(west, south, east, north);
-                quads.add(createQuad(new Vec3(o,     1 - o, 1 - o), new Vec3(1 - o, 1 - o, 1 - o), new Vec3(1 - o, 1 - o, o),     new Vec3(o,     1 - o, o), getSprite(pattern.sprite), pattern.rotation));
+                quads.add(createQuad(new Vec3(o,     1 - o, 1 - o), new Vec3(1 - o, 1 - o, 1 - o), new Vec3(1 - o, 1 - o, o),     new Vec3(o,     1 - o, o), getSprite.apply(pattern.sprite), pattern.rotation));
             }
 
             if (down) {
@@ -273,7 +298,7 @@ public class AdvancedCableISBM implements ISmartMultipartModel {
                 quads.add(createQuad(new Vec3(o,     0, 1 - o), new Vec3(1 - o, 0, 1 - o), new Vec3(1 - o, o, 1 - o), new Vec3(o,     o, 1 - o), sprite));
             } else {
                 QuadSetting pattern = findPattern(west, north, east, south);
-                quads.add(createQuad(new Vec3(o, o, o), new Vec3(1 - o, o, o), new Vec3(1 - o, o, 1 - o), new Vec3(o, o, 1 - o), getSprite(pattern.sprite), pattern.rotation));
+                quads.add(createQuad(new Vec3(o, o, o), new Vec3(1 - o, o, o), new Vec3(1 - o, o, 1 - o), new Vec3(o, o, 1 - o), getSprite.apply(pattern.sprite), pattern.rotation));
             }
 
             if (east) {
@@ -283,7 +308,7 @@ public class AdvancedCableISBM implements ISmartMultipartModel {
                 quads.add(createQuad(new Vec3(1, o,     1 - o), new Vec3(1, 1 - o, 1 - o), new Vec3(1 - o, 1 - o, 1 - o), new Vec3(1 - o, o,     1 - o), sprite));
             } else {
                 QuadSetting pattern = findPattern(down, north, up, south);
-                quads.add(createQuad(new Vec3(1 - o, o, o), new Vec3(1 - o, 1 - o, o), new Vec3(1 - o, 1 - o, 1 - o), new Vec3(1 - o, o, 1 - o), getSprite(pattern.sprite), pattern.rotation));
+                quads.add(createQuad(new Vec3(1 - o, o, o), new Vec3(1 - o, 1 - o, o), new Vec3(1 - o, 1 - o, 1 - o), new Vec3(1 - o, o, 1 - o), getSprite.apply(pattern.sprite), pattern.rotation));
             }
 
             if (west) {
@@ -293,7 +318,7 @@ public class AdvancedCableISBM implements ISmartMultipartModel {
                 quads.add(createQuad(new Vec3(o, o,     1 - o), new Vec3(o, 1 - o, 1 - o), new Vec3(0, 1 - o, 1 - o), new Vec3(0, o,     1 - o), sprite));
             } else {
                 QuadSetting pattern = findPattern(down, south, up, north);
-                quads.add(createQuad(new Vec3(o, o, 1 - o), new Vec3(o, 1 - o, 1 - o), new Vec3(o, 1 - o, o), new Vec3(o, o, o), getSprite(pattern.sprite), pattern.rotation));
+                quads.add(createQuad(new Vec3(o, o, 1 - o), new Vec3(o, 1 - o, 1 - o), new Vec3(o, 1 - o, o), new Vec3(o, o, o), getSprite.apply(pattern.sprite), pattern.rotation));
             }
 
             if (north) {
@@ -303,7 +328,7 @@ public class AdvancedCableISBM implements ISmartMultipartModel {
                 quads.add(createQuad(new Vec3(o,     o,     o), new Vec3(o,     1 - o, o), new Vec3(o,     1 - o, 0), new Vec3(o,     o,     0), sprite));
             } else {
                 QuadSetting pattern = findPattern(west, up, east, down);
-                quads.add(createQuad(new Vec3(o, 1 - o, o), new Vec3(1 - o, 1 - o, o), new Vec3(1 - o, o, o), new Vec3(o, o, o), getSprite(pattern.sprite), pattern.rotation));
+                quads.add(createQuad(new Vec3(o, 1 - o, o), new Vec3(1 - o, 1 - o, o), new Vec3(1 - o, o, o), new Vec3(o, o, o), getSprite.apply(pattern.sprite), pattern.rotation));
             }
 
             if (south) {
@@ -313,7 +338,7 @@ public class AdvancedCableISBM implements ISmartMultipartModel {
                 quads.add(createQuad(new Vec3(o,     o,     1),     new Vec3(o,     1 - o, 1),     new Vec3(o,     1 - o, 1 - o), new Vec3(o,     o,     1 - o), sprite));
             } else {
                 QuadSetting pattern = findPattern(west, down, east, up);
-                quads.add(createQuad(new Vec3(o, o, 1 - o), new Vec3(1 - o, o, 1 - o), new Vec3(1 - o, 1 - o, 1 - o), new Vec3(o, 1 - o, 1 - o), getSprite(pattern.sprite), pattern.rotation));
+                quads.add(createQuad(new Vec3(o, o, 1 - o), new Vec3(1 - o, o, 1 - o), new Vec3(1 - o, 1 - o, 1 - o), new Vec3(o, 1 - o, 1 - o), getSprite.apply(pattern.sprite), pattern.rotation));
             }
 
             return quads;

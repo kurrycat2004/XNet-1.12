@@ -22,8 +22,6 @@ public class XNetClientModelLoader implements IModelAndTextureLoader {
     @SuppressWarnings("PublicField")
     public static TextureAtlasSprite spriteSide;
     @SuppressWarnings("PublicField")
-    public static TextureAtlasSprite spriteCable;
-    @SuppressWarnings("PublicField")
     public static TextureAtlasSprite spriteEnergy;
     @SuppressWarnings("PublicField")
     public static TextureAtlasSprite spriteItem;
@@ -40,6 +38,19 @@ public class XNetClientModelLoader implements IModelAndTextureLoader {
     public static TextureAtlasSprite spriteAdvancedCrossCable;
     @SuppressWarnings("PublicField")
     public static TextureAtlasSprite spriteAdvancedNoneCable;
+
+    @SuppressWarnings("PublicField")
+    public static TextureAtlasSprite spriteCable;
+    @SuppressWarnings("PublicField")
+    public static TextureAtlasSprite spriteCornerCable;
+    @SuppressWarnings("PublicField")
+    public static TextureAtlasSprite spriteEndCable;
+    @SuppressWarnings("PublicField")
+    public static TextureAtlasSprite spriteThreeCable;
+    @SuppressWarnings("PublicField")
+    public static TextureAtlasSprite spriteCrossCable;
+    @SuppressWarnings("PublicField")
+    public static TextureAtlasSprite spriteNoneCable;
 
     /**
      * A helper method to prevent you from having to hook into the event,
@@ -62,7 +73,12 @@ public class XNetClientModelLoader implements IModelAndTextureLoader {
     @Override
     public void registerTextures(IIconRegistrar iconRegistrar) {
         spriteSide = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/connectorSide"));
-        spriteCable = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/netcable"));
+        spriteCable = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/normalNetcable"));
+        spriteCornerCable = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/normalCornerNetcable"));
+        spriteEndCable = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/normalEndNetcable"));
+        spriteThreeCable = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/normalThreeNetcable"));
+        spriteCrossCable = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/normalCrossNetcable"));
+        spriteNoneCable = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/normalNoneNetcable"));
         spriteAdvancedCable = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/advancedNetcable"));
         spriteAdvancedCornerCable = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/advancedCornerNetcable"));
         spriteAdvancedEndCable = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/advancedEndNetcable"));
@@ -76,8 +92,8 @@ public class XNetClientModelLoader implements IModelAndTextureLoader {
     @SuppressWarnings("unused")
     @SubscribeEvent
     public void onModelBakeEvent(ModelBakeEvent event) {
-        event.modelRegistry.putObject(new ModelResourceLocation("xnet:netcable#multipart"), new CableISBM());
-        event.modelRegistry.putObject(new ModelResourceLocation("xnet:advanced_netcable#multipart"), new AdvancedCableISBM());
+        event.modelRegistry.putObject(new ModelResourceLocation("xnet:netcable#multipart"), new AdvancedCableISBM(false));
+        event.modelRegistry.putObject(new ModelResourceLocation("xnet:advanced_netcable#multipart"), new AdvancedCableISBM(true));
         event.modelRegistry.putObject(new ModelResourceLocation("xnet:rfconnector#multipart"), new ConnectorISBM(spriteEnergy));
         event.modelRegistry.putObject(new ModelResourceLocation("xnet:itemconnector#multipart"), new ConnectorISBM(spriteItem));
     }
