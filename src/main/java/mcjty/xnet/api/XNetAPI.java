@@ -15,6 +15,9 @@ public class XNetAPI {
     @CapabilityInject(IXNetComponent.class)
     public static Capability<IXNetComponent> XNET_CAPABILITY;
 
+    @CapabilityInject(IXNetComponent.class)
+    public static Capability<IXNetCable> XNET_CABLE_CAPABILITY;
+
     static {
         registerCapability(IXNetComponent.class);
     }
@@ -31,6 +34,19 @@ public class XNetAPI {
             @Override
             public void readNBT(Capability<C> capability, C instance, EnumFacing side, NBTBase nbt) {
                 instance.setId(((NBTTagCompound)nbt).getInteger("net_ID"));
+            }
+        }, () -> {
+            throw new UnsupportedOperationException();
+        });
+        CapabilityManager.INSTANCE.register(IXNetCable.class, new Capability.IStorage<IXNetCable>() {
+            @Override
+            public NBTBase writeNBT(Capability<IXNetCable> capability, IXNetCable instance, EnumFacing side) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void readNBT(Capability<IXNetCable> capability, IXNetCable instance, EnumFacing side, NBTBase nbt) {
+                throw new UnsupportedOperationException();
             }
         }, () -> {
             throw new UnsupportedOperationException();

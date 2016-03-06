@@ -8,7 +8,6 @@ import mcjty.xnet.client.XNetClientModelLoader;
 import mcjty.xnet.init.ModBlocks;
 import mcjty.xnet.init.ModItems;
 import mcjty.xnet.init.ModRecipes;
-import mcjty.xnet.multiblock.CableNetwork;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -71,7 +70,7 @@ public class XNet implements ModBase {
 
     @Mod.EventHandler
     public void serverStopped(FMLServerStoppedEvent event) {
-        CableNetwork.clearInstance();
+       //Nothing yet
     }
 
 
