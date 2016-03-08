@@ -47,7 +47,7 @@ minecraft {
 dependencies {
     deobfCompile "mcp.mobius.waila:Waila:1.6.0-B3_1.8.8"
     deobfCompile "mezz.jei:jei_1.8.9:2.25.2.130"
-	deobfCompile "MCMultiPart:MCMultiPart-experimental:1.0.7_36:universal"
+	deobfCompile "MCMultiPart:MCMultiPart-experimental:1.0.9_45:universal"
 }
 
 processResources

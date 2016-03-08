@@ -27,7 +27,7 @@ public class XNetWorldGridRegistry extends AbstractWorldGridHolder<XNetTileData,
 
     @Override
     protected boolean isValidTile(TileEntity tile) {
-        return false;//tile.hasCapability(XNetAPI.XNET_CAPABILITY, null);
+        return tile.hasCapability(XNetAPI.XNET_CAPABILITY, null);
     }
 
     @Override
