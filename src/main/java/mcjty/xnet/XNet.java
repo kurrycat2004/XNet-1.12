@@ -58,8 +58,8 @@ public class XNet implements ModBase {
     public void preInit(FMLPreInitializationEvent event){
         logger = event.getModLog();
         proxy.preInit(event);
-        MinecraftForge.EVENT_BUS.register(new EventHandler());
-        WorldHandler.init();
+//        MinecraftForge.EVENT_BUS.register(new EventHandler());
+//        WorldHandler.init();
     }
 
     @Mod.EventHandler

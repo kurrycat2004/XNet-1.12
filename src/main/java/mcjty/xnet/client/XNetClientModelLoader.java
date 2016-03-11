@@ -26,6 +26,10 @@ public class XNetClientModelLoader implements IModelAndTextureLoader {
     @SuppressWarnings("PublicField")
     public static TextureAtlasSprite spriteItem;
 
+
+    @SuppressWarnings("PublicField")
+    public static TextureAtlasSprite spriteTerminal;
+
     @SuppressWarnings("PublicField")
     public static TextureAtlasSprite spriteAdvancedCable;
     @SuppressWarnings("PublicField")
@@ -87,6 +91,7 @@ public class XNetClientModelLoader implements IModelAndTextureLoader {
         spriteAdvancedNoneCable = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/advancedNoneNetcable"));
         spriteEnergy = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/energyConnector"));
         spriteItem = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/itemConnector"));
+        spriteTerminal = iconRegistrar.registerSprite(new XNetResourceLocation("blocks/terminal"));
     }
 
     @SuppressWarnings("unused")
@@ -96,6 +101,7 @@ public class XNetClientModelLoader implements IModelAndTextureLoader {
         event.modelRegistry.putObject(new ModelResourceLocation("xnet:advanced_netcable#multipart"), new AdvancedCableISBM(true));
         event.modelRegistry.putObject(new ModelResourceLocation("xnet:rfconnector#multipart"), new ConnectorISBM(spriteEnergy));
         event.modelRegistry.putObject(new ModelResourceLocation("xnet:itemconnector#multipart"), new ConnectorISBM(spriteItem));
+        event.modelRegistry.putObject(new ModelResourceLocation("xnet:terminal#multipart"), new TerminalISBM(spriteTerminal));
     }
 
     public void setModelLocations(){
@@ -103,6 +109,7 @@ public class XNetClientModelLoader implements IModelAndTextureLoader {
         ModelLoader.setCustomModelResourceLocation(advancedCable, 0, new ModelResourceLocation(advancedCable.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(energyConnector, 0, new ModelResourceLocation(energyConnector.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(itemConnector, 0, new ModelResourceLocation(itemConnector.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(terminal, 0, new ModelResourceLocation(terminal.getRegistryName(), "inventory"));
     }
 
 }

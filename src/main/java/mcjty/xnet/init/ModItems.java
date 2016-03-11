@@ -1,10 +1,7 @@
 package mcjty.xnet.init;
 
 import mcjty.xnet.XNet;
-import mcjty.xnet.multipart.ItemConnectorPart;
-import mcjty.xnet.multipart.RFConnectorPart;
-import mcjty.xnet.multipart.XNetAdvancedCableMultiPart;
-import mcjty.xnet.multipart.XNetCableMultiPart;
+import mcjty.xnet.multipart.*;
 import mcmultipart.item.ItemMultiPart;
 import mcmultipart.multipart.IMultipart;
 import net.minecraft.entity.player.EntityPlayer;
@@ -25,6 +22,8 @@ public class ModItems {
     public static ItemMultiPart energyConnector;
     @SuppressWarnings("PublicField")
     public static ItemMultiPart itemConnector;
+    @SuppressWarnings("PublicField")
+    public static ItemMultiPart terminal;
 
 
     public static void init() {
@@ -52,6 +51,12 @@ public class ModItems {
                 return new ItemConnectorPart(side);
             }
         }, "item_connector");
+        terminal = registerPartItem(new ItemMultiPart() {
+            @Override
+            public IMultipart createPart(World world, BlockPos pos, EnumFacing side, Vec3 hit, ItemStack stack, EntityPlayer player) {
+                return new TerminalPart(side);
+            }
+        }, "terminal");
     }
 
     private static ItemMultiPart registerPartItem(ItemMultiPart partItem, String name) {

@@ -2,4 +2,5 @@ item.netcable.name=Network Cable
 item.advanced_netcable.name=Advanced Network Cable
 item.energy_connector.name=Energy Connector
 item.item_connector.name=Item Connector
+item.terminal.name=Terminal
 itemGroup.XNet=XNet

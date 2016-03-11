@@ -1,18 +1,16 @@
 package mcjty.xnet.init;
 
-import mcjty.xnet.multipart.ItemConnectorPart;
-import mcjty.xnet.multipart.RFConnectorPart;
-import mcjty.xnet.multipart.XNetAdvancedCableMultiPart;
-import mcjty.xnet.multipart.XNetCableMultiPart;
+import mcjty.xnet.multipart.*;
 import mcmultipart.multipart.MultipartRegistry;
 
 public class ModBlocks {
 
     public static void init() {
-        MultipartRegistry.registerPart(XNetCableMultiPart.class, "name");
-        MultipartRegistry.registerPart(XNetAdvancedCableMultiPart.class, "name2");
-        MultipartRegistry.registerPart(RFConnectorPart.class, "nametest2");
-        MultipartRegistry.registerPart(ItemConnectorPart.class, "nametest3");
+        MultipartRegistry.registerPart(XNetCableMultiPart.class, "cable");
+        MultipartRegistry.registerPart(XNetAdvancedCableMultiPart.class, "advanced_cable");
+        MultipartRegistry.registerPart(RFConnectorPart.class, "rfconnector");
+        MultipartRegistry.registerPart(ItemConnectorPart.class, "itemconnector");
+        MultipartRegistry.registerPart(TerminalPart.class, "terminal");
         //NetCableSetup.init();
     }
 
