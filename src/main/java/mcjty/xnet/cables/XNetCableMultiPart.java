@@ -1,4 +1,4 @@
-package mcjty.xnet.multipart;
+package mcjty.xnet.cables;
 
 import mcjty.xnet.init.ModItems;
 import mcmultipart.raytrace.PartMOP;

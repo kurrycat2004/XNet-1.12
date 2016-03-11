@@ -1,7 +1,11 @@
 package mcjty.xnet.init;
 
 import mcjty.xnet.XNet;
-import mcjty.xnet.multipart.*;
+import mcjty.xnet.cables.XNetAdvancedCableMultiPart;
+import mcjty.xnet.cables.XNetCableMultiPart;
+import mcjty.xnet.connectors.ItemConnectorPart;
+import mcjty.xnet.connectors.RFConnectorPart;
+import mcjty.xnet.terminal.TerminalPart;
 import mcmultipart.item.ItemMultiPart;
 import mcmultipart.multipart.IMultipart;
 import net.minecraft.entity.player.EntityPlayer;

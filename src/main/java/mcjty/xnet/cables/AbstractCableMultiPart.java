@@ -1,4 +1,4 @@
-package mcjty.xnet.multipart;
+package mcjty.xnet.cables;
 
 import elec332.core.world.WorldHelper;
 import mcjty.xnet.api.IXNetComponent;

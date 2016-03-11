@@ -5,8 +5,7 @@ import elec332.core.client.model.RenderingRegistry;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.compat.MainCompatHandler;
 import mcjty.xnet.client.XNetClientModelLoader;
-import mcjty.xnet.handler.EventHandler;
-import mcjty.xnet.handler.WorldHandler;
+import mcjty.xnet.client.GuiProxy;
 import mcjty.xnet.init.ModBlocks;
 import mcjty.xnet.init.ModItems;
 import mcjty.xnet.init.ModRecipes;
@@ -21,6 +20,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Logger;
@@ -92,7 +92,7 @@ public class XNet implements ModBase {
         }
 
         public void init(FMLInitializationEvent e) {
-
+            NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiProxy());
         }
 
         public void postInit(FMLPostInitializationEvent e) {

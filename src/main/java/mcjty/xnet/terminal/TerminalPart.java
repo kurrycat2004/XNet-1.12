@@ -1,7 +1,8 @@
-package mcjty.xnet.multipart;
+package mcjty.xnet.terminal;
 
 import mcjty.xnet.api.IXNetComponent;
 import mcjty.xnet.api.XNetAPI;
+import mcjty.xnet.init.ModItems;
 import mcjty.xnet.varia.UnlistedPropertySide;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.client.multipart.ICustomHighlightPart;
@@ -34,26 +35,34 @@ import org.lwjgl.opengl.GL11;
 import java.util.EnumSet;
 import java.util.List;
 
-/**
- * Created by Elec332 on 1-3-2016.
- */
-public abstract class AbstractConnectorPart extends Multipart implements ISlottedPart, IXNetComponent, IOccludingPart, ICustomHighlightPart {
+public class TerminalPart extends Multipart implements ISlottedPart, IXNetComponent, IOccludingPart, ICustomHighlightPart {
 
     public static final UnlistedPropertySide SIDE = new UnlistedPropertySide("side");
 
     private static final AxisAlignedBB[] HITBOXES;
 
-    public AbstractConnectorPart(EnumFacing side){
+    public TerminalPart(EnumFacing side){
         this();
         this.side = side;
     }
 
-    public AbstractConnectorPart(){
+    public TerminalPart(){
         this.id = -1;
     }
 
     private EnumFacing side;
     private int id;
+
+
+    @Override
+    public String getModelPath() {
+        return "xnet:terminal";
+    }
+
+    @Override
+    public ItemStack getPickBlock(EntityPlayer player, PartMOP hit) {
+        return new ItemStack(ModItems.terminal);
+    }
 
     @Override
     public void writeToNBT(NBTTagCompound tag) {
@@ -142,6 +151,16 @@ public abstract class AbstractConnectorPart extends Multipart implements ISlotte
     public void addOcclusionBoxes(List<AxisAlignedBB> list) {
         list.add(HITBOXES[side.ordinal()]);
     }
+
+//    @Override
+//    public boolean onActivated(EntityPlayer player, ItemStack stack, PartMOP hit) {
+//        if (!getWorld().isRemote) {
+//            player.openGui(XNet.instance, GuiProxy.GUI_TERMINAL, getWorld(), getPos().getX(), getPos().getY(), getPos().getZ());
+//            return true;
+//        } else {
+//            return true;
+//        }
+//    }
 
     @Override
     @SideOnly(Side.CLIENT)

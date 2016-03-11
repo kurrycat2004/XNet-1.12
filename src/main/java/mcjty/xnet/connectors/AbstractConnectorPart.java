@@ -1,8 +1,7 @@
-package mcjty.xnet.multipart;
+package mcjty.xnet.connectors;
 
 import mcjty.xnet.api.IXNetComponent;
 import mcjty.xnet.api.XNetAPI;
-import mcjty.xnet.init.ModItems;
 import mcjty.xnet.varia.UnlistedPropertySide;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.client.multipart.ICustomHighlightPart;
@@ -35,34 +34,26 @@ import org.lwjgl.opengl.GL11;
 import java.util.EnumSet;
 import java.util.List;
 
-public class TerminalPart extends Multipart implements ISlottedPart, IXNetComponent, IOccludingPart, ICustomHighlightPart {
+/**
+ * Created by Elec332 on 1-3-2016.
+ */
+public abstract class AbstractConnectorPart extends Multipart implements ISlottedPart, IXNetComponent, IOccludingPart, ICustomHighlightPart {
 
     public static final UnlistedPropertySide SIDE = new UnlistedPropertySide("side");
 
     private static final AxisAlignedBB[] HITBOXES;
 
-    public TerminalPart(EnumFacing side){
+    public AbstractConnectorPart(EnumFacing side){
         this();
         this.side = side;
     }
 
-    public TerminalPart(){
+    public AbstractConnectorPart(){
         this.id = -1;
     }
 
     private EnumFacing side;
     private int id;
-
-
-    @Override
-    public String getModelPath() {
-        return "xnet:terminal";
-    }
-
-    @Override
-    public ItemStack getPickBlock(EntityPlayer player, PartMOP hit) {
-        return new ItemStack(ModItems.terminal);
-    }
 
     @Override
     public void writeToNBT(NBTTagCompound tag) {

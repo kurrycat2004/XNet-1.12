@@ -1,6 +1,7 @@
-package mcjty.xnet.client;
+package mcjty.xnet.cables;
 
 import com.google.common.primitives.Ints;
+import mcjty.xnet.client.XNetClientModelLoader;
 import mcmultipart.client.multipart.ISmartMultipartModel;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -15,7 +16,7 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 import java.util.*;
 import java.util.function.Function;
 
-import static mcjty.xnet.multipart.AbstractCableMultiPart.*;
+import static mcjty.xnet.cables.AbstractCableMultiPart.*;
 
 public class AdvancedCableISBM implements ISmartMultipartModel {
 
