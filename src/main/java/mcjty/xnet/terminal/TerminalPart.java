@@ -1,7 +1,9 @@
 package mcjty.xnet.terminal;
 
+import mcjty.xnet.XNet;
 import mcjty.xnet.api.IXNetComponent;
 import mcjty.xnet.api.XNetAPI;
+import mcjty.xnet.client.GuiProxy;
 import mcjty.xnet.init.ModItems;
 import mcjty.xnet.varia.UnlistedPropertySide;
 import mcmultipart.MCMultiPartMod;
@@ -152,15 +154,15 @@ public class TerminalPart extends Multipart implements ISlottedPart, IXNetCompon
         list.add(HITBOXES[side.ordinal()]);
     }
 
-//    @Override
-//    public boolean onActivated(EntityPlayer player, ItemStack stack, PartMOP hit) {
-//        if (!getWorld().isRemote) {
-//            player.openGui(XNet.instance, GuiProxy.GUI_TERMINAL, getWorld(), getPos().getX(), getPos().getY(), getPos().getZ());
-//            return true;
-//        } else {
-//            return true;
-//        }
-//    }
+    @Override
+    public boolean onActivated(EntityPlayer player, ItemStack stack, PartMOP hit) {
+        if (!getWorld().isRemote) {
+            player.openGui(XNet.instance, GuiProxy.GUI_TERMINAL, getWorld(), getPos().getX(), getPos().getY(), getPos().getZ());
+            return true;
+        } else {
+            return true;
+        }
+    }
 
     @Override
     @SideOnly(Side.CLIENT)

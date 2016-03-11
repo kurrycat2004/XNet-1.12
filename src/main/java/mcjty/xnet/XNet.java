@@ -4,11 +4,13 @@ package mcjty.xnet;
 import elec332.core.client.model.RenderingRegistry;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.compat.MainCompatHandler;
+import mcjty.lib.network.PacketHandler;
 import mcjty.xnet.client.XNetClientModelLoader;
 import mcjty.xnet.client.GuiProxy;
 import mcjty.xnet.init.ModBlocks;
 import mcjty.xnet.init.ModItems;
 import mcjty.xnet.init.ModRecipes;
+import mcjty.xnet.network.XNetMessages;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -21,6 +23,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Logger;
@@ -82,7 +85,9 @@ public class XNet implements ModBase {
         public void preInit(FMLPreInitializationEvent e) {
             // Initialize our packet handler. Make sure the name is
             // 20 characters or less!
-//            PacketHandler.registerMessages("xnet");
+            SimpleNetworkWrapper network = PacketHandler.registerMessages(MODID, "xnet");
+            XNetMessages.registerNetworkMessages(network);
+
             MainCompatHandler.registerWaila();
 
             // Initialization of blocks and items typically goes here:
