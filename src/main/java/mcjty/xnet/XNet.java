@@ -7,6 +7,8 @@ import mcjty.lib.compat.MainCompatHandler;
 import mcjty.lib.network.PacketHandler;
 import mcjty.xnet.client.XNetClientModelLoader;
 import mcjty.xnet.client.GuiProxy;
+import mcjty.xnet.handler.EventHandler;
+import mcjty.xnet.handler.WorldHandler;
 import mcjty.xnet.init.ModBlocks;
 import mcjty.xnet.init.ModItems;
 import mcjty.xnet.init.ModRecipes;
@@ -61,8 +63,8 @@ public class XNet implements ModBase {
     public void preInit(FMLPreInitializationEvent event){
         logger = event.getModLog();
         proxy.preInit(event);
-//        MinecraftForge.EVENT_BUS.register(new EventHandler());
-//        WorldHandler.init();
+        MinecraftForge.EVENT_BUS.register(new EventHandler());
+        WorldHandler.init();
     }
 
     @Mod.EventHandler

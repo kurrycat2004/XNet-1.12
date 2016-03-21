@@ -1,6 +1,7 @@
 package mcjty.xnet.cables;
 
 import elec332.core.world.WorldHelper;
+import mcjty.xnet.api.IXNetCable;
 import mcjty.xnet.api.IXNetComponent;
 import mcjty.xnet.api.XNetAPI;
 import mcjty.xnet.api.XNetAPIHelper;
@@ -37,7 +38,7 @@ import java.util.List;
 /**
  * Created by Elec332 on 1-3-2016.
  */
-public abstract class AbstractCableMultiPart extends Multipart implements ISlottedPart, IXNetComponent, IOccludingPart, ICustomHighlightPart {
+public abstract class AbstractCableMultiPart extends Multipart implements ISlottedPart, IXNetComponent, IXNetCable, IOccludingPart, ICustomHighlightPart {
 
     // Properties that indicate if there is a connection to certain direction.
     public static final UnlistedPropertyBoolean NORTH = new UnlistedPropertyBoolean("north");
@@ -215,5 +216,15 @@ public abstract class AbstractCableMultiPart extends Multipart implements ISlott
     @Override
     public boolean canRenderInLayer(EnumWorldBlockLayer layer) {
         return layer == EnumWorldBlockLayer.CUTOUT;
+    }
+
+    @Override
+    public boolean canConnectTo(IXNetCable otherCable) {
+        return true;
+    }
+
+    @Override
+    public boolean canConnectToSide(EnumFacing facing) {
+        return true;
     }
 }

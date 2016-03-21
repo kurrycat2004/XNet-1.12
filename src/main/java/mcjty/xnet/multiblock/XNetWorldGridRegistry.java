@@ -37,7 +37,7 @@ public class XNetWorldGridRegistry extends AbstractWorldGridHolder<XNetTileData,
 
     @Override
     protected void add(XNetTileData xNetTileData) {
-
+        System.out.println("XNetWorldGridRegistry.add");
     }
 
     /**
@@ -48,7 +48,7 @@ public class XNetWorldGridRegistry extends AbstractWorldGridHolder<XNetTileData,
      */
     @Override
     protected void onExtraMultiPartAdded(XNetTileData xNetTileData, IMultipart multiPart) {
-
+        System.out.println("XNetWorldGridRegistry.onExtraMultiPartAdded");
     }
 
     @Override
@@ -64,7 +64,7 @@ public class XNetWorldGridRegistry extends AbstractWorldGridHolder<XNetTileData,
      */
     @Override
     protected void onMultiPartRemoved(XNetTileData xNetTileData, IMultipart multiPart) {
-
+        System.out.println("XNetWorldGridRegistry.onMultiPartRemoved");
     }
 
     @Override
