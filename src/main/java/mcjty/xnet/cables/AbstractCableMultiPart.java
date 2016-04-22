@@ -38,7 +38,7 @@ import java.util.List;
 /**
  * Created by Elec332 on 1-3-2016.
  */
-public abstract class AbstractCableMultiPart extends Multipart implements ISlottedPart, IXNetComponent, IXNetCable, IOccludingPart, ICustomHighlightPart {
+public abstract class AbstractCableMultiPart extends Multipart implements ISlottedPart, IXNetComponent, IXNetCable, INormallyOccludingPart, ICustomHighlightPart {
 
     // Properties that indicate if there is a connection to certain direction.
     public static final UnlistedPropertyBoolean NORTH = new UnlistedPropertyBoolean("north");
@@ -181,9 +181,9 @@ public abstract class AbstractCableMultiPart extends Multipart implements ISlott
         list.add(getHitBoxes()[6]);
     }
 
-    @Override
     @SideOnly(Side.CLIENT)
-    public boolean drawHighlight(PartMOP hit, EntityPlayer player, ItemStack stack, float partialTicks) {
+    @Override
+    public boolean drawHighlight(PartMOP hit, EntityPlayer player, float partialTicks) {
         drawHighlight(getHitBoxes());
         return true;
     }

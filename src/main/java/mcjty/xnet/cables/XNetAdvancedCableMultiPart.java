@@ -4,8 +4,8 @@ import mcjty.xnet.init.ModItems;
 import mcmultipart.raytrace.PartMOP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
 
 public class XNetAdvancedCableMultiPart extends AbstractCableMultiPart {
 

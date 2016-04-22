@@ -5,6 +5,7 @@ import mcjty.xnet.api.XNetAPI;
 import mcjty.xnet.varia.UnlistedPropertySide;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.client.multipart.ICustomHighlightPart;
+import mcmultipart.multipart.INormallyOccludingPart;
 import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.Multipart;
 import mcmultipart.multipart.PartSlot;
@@ -36,7 +37,7 @@ import java.util.List;
 /**
  * Created by Elec332 on 1-3-2016.
  */
-public abstract class AbstractConnectorPart extends Multipart implements ISlottedPart, IXNetComponent, IOccludingPart, ICustomHighlightPart {
+public abstract class AbstractConnectorPart extends Multipart implements ISlottedPart, IXNetComponent, INormallyOccludingPart, ICustomHighlightPart {
 
     public static final UnlistedPropertySide SIDE = new UnlistedPropertySide("side");
 

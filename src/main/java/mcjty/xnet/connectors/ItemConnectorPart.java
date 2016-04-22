@@ -16,6 +16,7 @@ public class ItemConnectorPart extends AbstractConnectorPart {
         super();
     }
 
+
     @Override
     public String getModelPath() {
         return "xnet:itemconnector";
