@@ -13,7 +13,7 @@ import mcmultipart.raytrace.PartMOP;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderGlobal;
@@ -21,9 +21,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumWorldBlockLayer;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
@@ -75,7 +75,7 @@ public abstract class AbstractCableMultiPart extends Multipart implements ISlott
     }
 
     @Override
-    public BlockState createBlockState() {
+    public BlockStateContainer createBlockState() {
         return new ExtendedBlockState(MCMultiPartMod.multipart, new IProperty[0], new IUnlistedProperty[] { NORTH, SOUTH, WEST, EAST, UP, DOWN });
     }
 
@@ -141,7 +141,7 @@ public abstract class AbstractCableMultiPart extends Multipart implements ISlott
 
     @Override
     public Material getMaterial() {
-        return Material.glass;
+        return Material.GLASS;
     }
 
     protected abstract AxisAlignedBB[] getHitBoxes();
@@ -214,8 +214,8 @@ public abstract class AbstractCableMultiPart extends Multipart implements ISlott
     }
 
     @Override
-    public boolean canRenderInLayer(EnumWorldBlockLayer layer) {
-        return layer == EnumWorldBlockLayer.CUTOUT;
+    public boolean canRenderInLayer(BlockRenderLayer layer) {
+        return layer == BlockRenderLayer.CUTOUT;
     }
 
     @Override

@@ -9,8 +9,8 @@ import mcjty.xnet.cables.AdvancedCableISBM;
 import mcjty.xnet.connectors.ConnectorISBM;
 import mcjty.xnet.terminal.TerminalISBM;
 import mcjty.xnet.varia.XNetResourceLocation;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -100,11 +100,11 @@ public class XNetClientModelLoader implements IModelAndTextureLoader {
     @SuppressWarnings("unused")
     @SubscribeEvent
     public void onModelBakeEvent(ModelBakeEvent event) {
-        event.modelRegistry.putObject(new ModelResourceLocation("xnet:netcable#multipart"), new AdvancedCableISBM(false));
-        event.modelRegistry.putObject(new ModelResourceLocation("xnet:advanced_netcable#multipart"), new AdvancedCableISBM(true));
-        event.modelRegistry.putObject(new ModelResourceLocation("xnet:rfconnector#multipart"), new ConnectorISBM(spriteEnergy));
-        event.modelRegistry.putObject(new ModelResourceLocation("xnet:itemconnector#multipart"), new ConnectorISBM(spriteItem));
-        event.modelRegistry.putObject(new ModelResourceLocation("xnet:terminal#multipart"), new TerminalISBM(spriteTerminal));
+        event.getModelRegistry().putObject(new ModelResourceLocation("xnet:netcable#multipart"), new AdvancedCableISBM(false));
+        event.getModelRegistry().putObject(new ModelResourceLocation("xnet:advanced_netcable#multipart"), new AdvancedCableISBM(true));
+        event.getModelRegistry().putObject(new ModelResourceLocation("xnet:rfconnector#multipart"), new ConnectorISBM(spriteEnergy));
+        event.getModelRegistry().putObject(new ModelResourceLocation("xnet:itemconnector#multipart"), new ConnectorISBM(spriteItem));
+        event.getModelRegistry().putObject(new ModelResourceLocation("xnet:terminal#multipart"), new TerminalISBM(spriteTerminal));
     }
 
     public void setModelLocations(){

@@ -8,13 +8,12 @@ import mcjty.xnet.init.ModItems;
 import mcjty.xnet.varia.UnlistedPropertySide;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.client.multipart.ICustomHighlightPart;
-import mcmultipart.multipart.IOccludingPart;
 import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.Multipart;
 import mcmultipart.multipart.PartSlot;
 import mcmultipart.raytrace.PartMOP;
 import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderGlobal;
@@ -23,9 +22,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumWorldBlockLayer;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
@@ -80,7 +79,7 @@ public class TerminalPart extends Multipart implements ISlottedPart, IXNetCompon
     }
 
     @Override
-    public BlockState createBlockState() {
+    public BlockStateContainer createBlockState() {
         return new ExtendedBlockState(MCMultiPartMod.multipart, new IProperty[0], new IUnlistedProperty[] { SIDE });
     }
 
@@ -182,8 +181,8 @@ public class TerminalPart extends Multipart implements ISlottedPart, IXNetCompon
     }
 
     @Override
-    public boolean canRenderInLayer(EnumWorldBlockLayer layer) {
-        return layer == EnumWorldBlockLayer.CUTOUT;
+    public boolean canRenderInLayer(BlockRenderLayer layer) {
+        return layer == BlockRenderLayer.CUTOUT;
     }
 
     static {

@@ -1,13 +1,12 @@
 package mcjty.xnet.multiblock;
 
 import elec332.core.world.WorldHelper;
-import mcjty.xnet.api.XNetAPI;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import static mcjty.xnet.api.XNetAPI.*;
+import static mcjty.xnet.api.XNetAPI.XNET_CABLE_CAPABILITY;
 
 /**
  * Created by Elec332 on 6-3-2016.

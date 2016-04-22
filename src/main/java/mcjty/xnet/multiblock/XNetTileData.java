@@ -2,7 +2,7 @@ package mcjty.xnet.multiblock;
 
 import elec332.core.grid.capability.ITileData;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * Created by Elec332 on 6-3-2016.

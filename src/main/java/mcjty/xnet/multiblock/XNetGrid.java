@@ -1,7 +1,7 @@
 package mcjty.xnet.multiblock;
 
 import com.google.common.collect.Sets;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.Set;
 
