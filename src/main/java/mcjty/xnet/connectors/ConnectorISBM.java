@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ConnectorISBM implements ISmartMultipartModel {
+public class ConnectorISBM implements IBakedModel {
 
     private final TextureAtlasSprite spriteFace;
 

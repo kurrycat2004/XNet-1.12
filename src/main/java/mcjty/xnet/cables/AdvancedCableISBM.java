@@ -16,7 +16,7 @@ import java.util.function.Function;
 
 import static mcjty.xnet.cables.AbstractCableMultiPart.*;
 
-public class AdvancedCableISBM implements ISmartMultipartModel {
+public class AdvancedCableISBM implements IBakedModel {
 
     private final boolean advanced;
 

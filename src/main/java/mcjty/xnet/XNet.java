@@ -46,7 +46,7 @@ public class XNet implements ModBase {
     @SidedProxy
     public static CommonProxy proxy;
 
-    @Mod.Instance(value = MODID)
+    @Mod.Instance(MODID)
     public static XNet instance;
 
     public static Logger logger;
