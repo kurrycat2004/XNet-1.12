@@ -5,8 +5,8 @@ import elec332.core.client.model.RenderingRegistry;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.compat.MainCompatHandler;
 import mcjty.lib.network.PacketHandler;
-import mcjty.xnet.client.XNetClientModelLoader;
 import mcjty.xnet.client.GuiProxy;
+import mcjty.xnet.client.XNetClientModelLoader;
 import mcjty.xnet.handler.EventHandler;
 import mcjty.xnet.handler.WorldHandler;
 import mcjty.xnet.init.ModBlocks;
@@ -55,7 +55,7 @@ public class XNet implements ModBase {
         @Override
         @SideOnly(Side.CLIENT)
         public Item getTabIconItem() {
-            return Item.getItemFromBlock(Blocks.anvil);
+            return Item.getItemFromBlock(Blocks.ANVIL);
         }
     };
 

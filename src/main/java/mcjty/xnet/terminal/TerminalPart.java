@@ -6,8 +6,10 @@ import mcjty.xnet.api.XNetAPI;
 import mcjty.xnet.client.GuiProxy;
 import mcjty.xnet.init.ModItems;
 import mcjty.xnet.varia.UnlistedPropertySide;
+import mcjty.xnet.varia.XNetResourceLocation;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.client.multipart.ICustomHighlightPart;
+import mcmultipart.multipart.INormallyOccludingPart;
 import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.Multipart;
 import mcmultipart.multipart.PartSlot;
@@ -24,6 +26,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.property.ExtendedBlockState;
@@ -36,7 +40,7 @@ import org.lwjgl.opengl.GL11;
 import java.util.EnumSet;
 import java.util.List;
 
-public class TerminalPart extends Multipart implements ISlottedPart, IXNetComponent, IOccludingPart, ICustomHighlightPart {
+public class TerminalPart extends Multipart implements ISlottedPart, IXNetComponent, INormallyOccludingPart, ICustomHighlightPart {
 
     public static final UnlistedPropertySide SIDE = new UnlistedPropertySide("side");
 
@@ -56,8 +60,8 @@ public class TerminalPart extends Multipart implements ISlottedPart, IXNetCompon
 
 
     @Override
-    public String getModelPath() {
-        return "xnet:terminal";
+    public ResourceLocation getModelPath() {
+        return new XNetResourceLocation("terminal");
     }
 
     @Override
@@ -154,18 +158,16 @@ public class TerminalPart extends Multipart implements ISlottedPart, IXNetCompon
     }
 
     @Override
-    public boolean onActivated(EntityPlayer player, ItemStack stack, PartMOP hit) {
+    public boolean onActivated(EntityPlayer player, EnumHand hand, ItemStack heldItem, PartMOP hit) {
         if (!getWorld().isRemote) {
             player.openGui(XNet.instance, GuiProxy.GUI_TERMINAL, getWorld(), getPos().getX(), getPos().getY(), getPos().getZ());
-            return true;
-        } else {
-            return true;
         }
+        return true;
     }
 
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean drawHighlight(PartMOP hit, EntityPlayer player, ItemStack stack, float partialTicks) {
+    public boolean drawHighlight(PartMOP hit, EntityPlayer player, float partialTicks) {
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         GlStateManager.color(0.0F, 0.0F, 0.0F, 0.4F);

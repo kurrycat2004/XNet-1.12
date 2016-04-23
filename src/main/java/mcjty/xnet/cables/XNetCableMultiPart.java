@@ -1,10 +1,12 @@
 package mcjty.xnet.cables;
 
 import mcjty.xnet.init.ModItems;
+import mcjty.xnet.varia.XNetResourceLocation;
 import mcmultipart.raytrace.PartMOP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 
 /**
@@ -15,8 +17,8 @@ public class XNetCableMultiPart extends AbstractCableMultiPart {
     private static final AxisAlignedBB[] HITBOXES;
 
     @Override
-    public String getModelPath() {
-        return "xnet:netcable";
+    public ResourceLocation getModelPath() {
+        return new XNetResourceLocation("netcable");
     }
 
     @Override
