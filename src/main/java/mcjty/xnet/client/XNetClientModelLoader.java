@@ -5,21 +5,24 @@ import elec332.core.client.model.ElecModelBakery;
 import elec332.core.client.model.ElecQuadBakery;
 import elec332.core.client.model.model.IModelAndTextureLoader;
 import elec332.core.client.model.template.ElecTemplateBakery;
-import mcjty.xnet.cables.AdvancedCableISBM;
-import mcjty.xnet.connectors.ConnectorISBM;
-import mcjty.xnet.terminal.TerminalISBM;
+import mcjty.xnet.client.model.AdvancedCableISBM;
+import mcjty.xnet.client.model.ConnectorISBM;
+import mcjty.xnet.client.model.TerminalISBM;
 import mcjty.xnet.varia.XNetResourceLocation;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static mcjty.xnet.init.ModItems.*;
 
 /**
  * Created by Elec332 on 4-3-2016.
  */
+@SideOnly(Side.CLIENT)
 public class XNetClientModelLoader implements IModelAndTextureLoader {
 
     @SuppressWarnings("PublicField")

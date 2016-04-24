@@ -53,7 +53,7 @@ public class XNetWorldGridRegistry extends AbstractWorldGridHolder<XNetTileData,
 
     @Override
     protected void remove(XNetTileData xNetTileData) {
-
+        System.out.println("XNetWorldGridRegistry.remove");
     }
 
     /**

@@ -5,7 +5,7 @@ import mcjty.xnet.api.IXNetComponent;
 import mcjty.xnet.api.XNetAPI;
 import mcjty.xnet.client.GuiProxy;
 import mcjty.xnet.init.ModItems;
-import mcjty.xnet.varia.UnlistedPropertySide;
+import mcjty.xnet.varia.UniversalUnlistedProperty;
 import mcjty.xnet.varia.XNetResourceLocation;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.client.multipart.ICustomHighlightPart;
@@ -42,7 +42,7 @@ import java.util.List;
 
 public class TerminalPart extends Multipart implements ISlottedPart, IXNetComponent, INormallyOccludingPart, ICustomHighlightPart {
 
-    public static final UnlistedPropertySide SIDE = new UnlistedPropertySide("side");
+    public static final IUnlistedProperty<EnumFacing> SIDE = new UniversalUnlistedProperty<>("side", EnumFacing.class);
 
     private static final AxisAlignedBB[] HITBOXES;
 

@@ -1,7 +1,8 @@
-package mcjty.xnet.connectors;
+package mcjty.xnet.client.model;
 
 import com.google.common.primitives.Ints;
 import mcjty.xnet.client.XNetClientModelLoader;
+import mcjty.xnet.connectors.AbstractConnectorPart;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
@@ -13,10 +14,13 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.model.pipeline.LightUtil;
 import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@SideOnly(Side.CLIENT)
 public class ConnectorISBM implements IBakedModel {
 
     private final TextureAtlasSprite spriteFace;

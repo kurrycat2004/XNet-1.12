@@ -2,7 +2,7 @@ package mcjty.xnet.connectors;
 
 import mcjty.xnet.api.IXNetComponent;
 import mcjty.xnet.api.XNetAPI;
-import mcjty.xnet.varia.UnlistedPropertySide;
+import mcjty.xnet.varia.UniversalUnlistedProperty;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.client.multipart.ICustomHighlightPart;
 import mcmultipart.multipart.INormallyOccludingPart;
@@ -38,7 +38,7 @@ import java.util.List;
  */
 public abstract class AbstractConnectorPart extends Multipart implements ISlottedPart, IXNetComponent, INormallyOccludingPart, ICustomHighlightPart {
 
-    public static final UnlistedPropertySide SIDE = new UnlistedPropertySide("side");
+    public static final IUnlistedProperty<EnumFacing> SIDE = new UniversalUnlistedProperty<>("side", EnumFacing.class);
 
     private static final AxisAlignedBB[] HITBOXES;
 

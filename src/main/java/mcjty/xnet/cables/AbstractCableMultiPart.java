@@ -5,7 +5,7 @@ import mcjty.xnet.api.IXNetCable;
 import mcjty.xnet.api.IXNetComponent;
 import mcjty.xnet.api.XNetAPI;
 import mcjty.xnet.api.XNetAPIHelper;
-import mcjty.xnet.varia.UnlistedPropertyBoolean;
+import mcjty.xnet.varia.UniversalUnlistedProperty;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.client.multipart.ICustomHighlightPart;
 import mcmultipart.multipart.*;
@@ -40,12 +40,12 @@ import java.util.List;
 public abstract class AbstractCableMultiPart extends Multipart implements ISlottedPart, IXNetComponent, IXNetCable, INormallyOccludingPart, ICustomHighlightPart {
 
     // Properties that indicate if there is a connection to certain direction.
-    public static final UnlistedPropertyBoolean NORTH = new UnlistedPropertyBoolean("north");
-    public static final UnlistedPropertyBoolean SOUTH = new UnlistedPropertyBoolean("south");
-    public static final UnlistedPropertyBoolean WEST = new UnlistedPropertyBoolean("west");
-    public static final UnlistedPropertyBoolean EAST = new UnlistedPropertyBoolean("east");
-    public static final UnlistedPropertyBoolean UP = new UnlistedPropertyBoolean("up");
-    public static final UnlistedPropertyBoolean DOWN = new UnlistedPropertyBoolean("down");
+    public static final IUnlistedProperty<Boolean> NORTH = new UniversalUnlistedProperty<>("north", Boolean.class);
+    public static final IUnlistedProperty<Boolean> SOUTH = new UniversalUnlistedProperty<>("south", Boolean.class);
+    public static final IUnlistedProperty<Boolean> WEST = new UniversalUnlistedProperty<>("west", Boolean.class);
+    public static final IUnlistedProperty<Boolean> EAST = new UniversalUnlistedProperty<>("east", Boolean.class);
+    public static final IUnlistedProperty<Boolean> UP = new UniversalUnlistedProperty<>("up", Boolean.class);
+    public static final IUnlistedProperty<Boolean> DOWN = new UniversalUnlistedProperty<>("down", Boolean.class);
 
     public AbstractCableMultiPart(){
         this.connectedSides = EnumSet.noneOf(EnumFacing.class);

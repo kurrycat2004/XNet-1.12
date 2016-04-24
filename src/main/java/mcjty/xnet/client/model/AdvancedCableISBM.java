@@ -1,4 +1,4 @@
-package mcjty.xnet.cables;
+package mcjty.xnet.client.model;
 
 import com.google.common.primitives.Ints;
 import mcjty.xnet.client.XNetClientModelLoader;
@@ -13,6 +13,8 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.model.pipeline.LightUtil;
 import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,6 +24,7 @@ import java.util.function.Function;
 
 import static mcjty.xnet.cables.AbstractCableMultiPart.*;
 
+@SideOnly(Side.CLIENT)
 public class AdvancedCableISBM implements IBakedModel {
 
     private final boolean advanced;

@@ -9,6 +9,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class GuiProxy implements IGuiHandler {
 
@@ -32,6 +34,7 @@ public class GuiProxy implements IGuiHandler {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public Object getClientGuiElement(int guiid, EntityPlayer entityPlayer, World world, int x, int y, int z) {
         if (guiid == GUI_TERMINAL) {
             return new GuiTerminal();
@@ -46,4 +49,5 @@ public class GuiProxy implements IGuiHandler {
         }
         return null;
     }
+
 }

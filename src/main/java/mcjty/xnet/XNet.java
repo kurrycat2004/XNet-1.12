@@ -2,6 +2,7 @@ package mcjty.xnet;
 
 
 import elec332.core.client.model.RenderingRegistry;
+import elec332.core.network.NetworkHandler;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.compat.MainCompatHandler;
 import mcjty.lib.network.PacketHandler;
@@ -48,8 +49,8 @@ public class XNet implements ModBase {
 
     @Mod.Instance(MODID)
     public static XNet instance;
-
     public static Logger logger;
+    public static NetworkHandler networkHandler;
 
     public static CreativeTabs tabXNet = new CreativeTabs("XNet") {
         @Override
@@ -62,6 +63,9 @@ public class XNet implements ModBase {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event){
         logger = event.getModLog();
+        networkHandler = new NetworkHandler(MODID);
+        PacketHandler.registerMessages(networkHandler.getNetworkWrapper());
+        networkHandler.setMessageIndex(12);
         proxy.preInit(event);
         MinecraftForge.EVENT_BUS.register(new EventHandler());
         WorldHandler.init();
