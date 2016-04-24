@@ -10,7 +10,7 @@ public class EventHandler {
 
     @SubscribeEvent
     public void onWorldLoad(WorldEvent.Load event){
-        WorldHandler.instance.get(event.world); //Initialize handler for the specific world
+        WorldHandler.instance.get(event.getWorld()); //Initialize handler for the specific world
     }
 
 }

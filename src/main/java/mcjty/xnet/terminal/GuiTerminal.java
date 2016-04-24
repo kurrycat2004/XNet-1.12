@@ -68,11 +68,11 @@ public class GuiTerminal extends GuiItemScreen {
         channelList.addChild(getChannelLine("Main energy", true));
 
         connectorList.removeChildren();
-        connectorList.addChild(getConnectorLine(new ItemStack(Blocks.chest, 0, 0), false));
-        connectorList.addChild(getConnectorLine(new ItemStack(Block.blockRegistry.getObject(new ResourceLocation("rftools", "modular_storage")), 0, 0), false));
-        connectorList.addChild(getConnectorLine(new ItemStack(Blocks.ender_chest, 0, 0), false));
-        connectorList.addChild(getConnectorLine(new ItemStack(Blocks.furnace, 0, 0), true));
-        connectorList.addChild(getConnectorLine(new ItemStack(Block.blockRegistry.getObject(new ResourceLocation("rftools", "builder")), 0, 0), true));
+        connectorList.addChild(getConnectorLine(new ItemStack(Blocks.CHEST, 0, 0), false));
+        connectorList.addChild(getConnectorLine(new ItemStack(Block.REGISTRY.getObject(new ResourceLocation("rftools", "modular_storage")), 0, 0), false));
+        connectorList.addChild(getConnectorLine(new ItemStack(Blocks.ENDER_CHEST, 0, 0), false));
+        connectorList.addChild(getConnectorLine(new ItemStack(Blocks.FURNACE, 0, 0), true));
+        connectorList.addChild(getConnectorLine(new ItemStack(Block.REGISTRY.getObject(new ResourceLocation("rftools", "builder")), 0, 0), true));
     }
 
 
