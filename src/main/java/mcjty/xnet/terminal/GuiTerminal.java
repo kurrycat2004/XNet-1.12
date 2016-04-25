@@ -12,7 +12,6 @@ import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.gui.widgets.TextField;
 import mcjty.xnet.XNet;
 import mcjty.xnet.client.GuiProxy;
-import mcjty.xnet.network.XNetMessages;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -28,7 +27,7 @@ public class GuiTerminal extends GuiItemScreen {
     private WidgetList connectorList;
 
     public GuiTerminal() {
-        super(XNet.instance, XNetMessages.INSTANCE, 390, 230, GuiProxy.GUI_TERMINAL, "terminal");
+        super(XNet.instance, XNet.networkHandler.getNetworkWrapper(), 390, 230, GuiProxy.GUI_TERMINAL, "terminal");
     }
 
     @Override
