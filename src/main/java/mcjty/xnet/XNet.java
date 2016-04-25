@@ -8,6 +8,7 @@ import mcjty.lib.compat.MainCompatHandler;
 import mcjty.lib.network.PacketHandler;
 import mcjty.xnet.client.GuiProxy;
 import mcjty.xnet.client.XNetClientModelLoader;
+import mcjty.xnet.client.model.ModelLoader;
 import mcjty.xnet.handler.EventHandler;
 import mcjty.xnet.handler.WorldHandler;
 import mcjty.xnet.init.ModBlocks;
@@ -17,6 +18,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -115,6 +117,7 @@ public class XNet implements ModBase {
             super.preInit(e);
             modelLoader = new XNetClientModelLoader();
             modelLoader.setModelLocations();
+            ModelLoaderRegistry.registerLoader(new ModelLoader());
             RenderingRegistry.instance().registerLoader(modelLoader);
             MinecraftForge.EVENT_BUS.register(modelLoader);
         }

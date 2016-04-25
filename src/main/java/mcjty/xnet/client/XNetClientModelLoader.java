@@ -5,9 +5,6 @@ import elec332.core.client.model.ElecModelBakery;
 import elec332.core.client.model.ElecQuadBakery;
 import elec332.core.client.model.model.IModelAndTextureLoader;
 import elec332.core.client.model.template.ElecTemplateBakery;
-import mcjty.xnet.client.model.AdvancedCableISBM;
-import mcjty.xnet.client.model.ConnectorISBM;
-import mcjty.xnet.client.model.TerminalISBM;
 import mcjty.xnet.varia.XNetResourceLocation;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -103,11 +100,11 @@ public class XNetClientModelLoader implements IModelAndTextureLoader {
     @SuppressWarnings("unused")
     @SubscribeEvent
     public void onModelBakeEvent(ModelBakeEvent event) {
-        event.getModelRegistry().putObject(new ModelResourceLocation("xnet:netcable#multipart"), new AdvancedCableISBM(false));
-        event.getModelRegistry().putObject(new ModelResourceLocation("xnet:advanced_netcable#multipart"), new AdvancedCableISBM(true));
-        event.getModelRegistry().putObject(new ModelResourceLocation("xnet:rfconnector#multipart"), new ConnectorISBM(spriteEnergy));
-        event.getModelRegistry().putObject(new ModelResourceLocation("xnet:itemconnector#multipart"), new ConnectorISBM(spriteItem));
-        event.getModelRegistry().putObject(new ModelResourceLocation("xnet:terminal#multipart"), new TerminalISBM(spriteTerminal));
+//        event.getModelRegistry().putObject(new ModelResourceLocation("xnet:netcable#multipart"), new AdvancedCableISBM(false));
+//        event.getModelRegistry().putObject(new ModelResourceLocation("xnet:advanced_netcable#multipart"), new AdvancedCableISBM(true));
+//        event.getModelRegistry().putObject(new ModelResourceLocation("xnet:rfconnector#multipart"), new ConnectorISBM(spriteEnergy));
+//        event.getModelRegistry().putObject(new ModelResourceLocation("xnet:itemconnector#multipart"), new ConnectorISBM(spriteItem));
+//        event.getModelRegistry().putObject(new ModelResourceLocation("xnet:terminal#multipart"), new TerminalISBM(spriteTerminal));
     }
 
     public void setModelLocations(){

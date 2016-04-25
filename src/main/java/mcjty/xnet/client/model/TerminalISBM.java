@@ -1,18 +1,14 @@
 package mcjty.xnet.client.model;
 
-import com.google.common.primitives.Ints;
 import mcjty.xnet.client.XNetClientModelLoader;
 import mcjty.xnet.terminal.TerminalPart;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
-import net.minecraft.client.renderer.block.model.ItemOverrideList;
+import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.client.model.pipeline.LightUtil;
+import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -24,9 +20,13 @@ import java.util.List;
 public class TerminalISBM implements IBakedModel {
 
     private final TextureAtlasSprite spriteFace;
+    private final VertexFormat format;
 
-    public TerminalISBM(TextureAtlasSprite spriteFace) {
+    public static final ModelResourceLocation TERMINAL_MODEL = new ModelResourceLocation("xnet:terminal#multipart");
+
+    public TerminalISBM(TextureAtlasSprite spriteFace, VertexFormat format) {
         this.spriteFace = spriteFace;
+        this.format = format;
     }
 
     @Override
@@ -100,31 +100,46 @@ public class TerminalISBM implements IBakedModel {
         return quads;
     }
 
-    private static int[] vertexToInts(double x, double y, double z, float u, float v, TextureAtlasSprite sprite) {
-        return new int[] {
-                Float.floatToRawIntBits((float) x),
-                Float.floatToRawIntBits((float) y),
-                Float.floatToRawIntBits((float) z),
-                -1,
-                Float.floatToRawIntBits(sprite.getInterpolatedU(u)),
-                Float.floatToRawIntBits(sprite.getInterpolatedV(v)),
-                0
-        };
-    }
-
-    private static BakedQuad createQuad(Vec3d v1, Vec3d v2, Vec3d v3, Vec3d v4, TextureAtlasSprite sprite) {
+    private BakedQuad createQuad(Vec3d v1, Vec3d v2, Vec3d v3, Vec3d v4, TextureAtlasSprite sprite) {
         Vec3d normal = v1.subtract(v2).crossProduct(v3.subtract(v2));
-        EnumFacing side = LightUtil.toSide((float) normal.xCoord, (float) normal.yCoord, (float) normal.zCoord);
 
-        return new BakedQuad(Ints.concat(
-                vertexToInts(v1.xCoord, v1.yCoord, v1.zCoord, 0, 0, sprite),
-                vertexToInts(v2.xCoord, v2.yCoord, v2.zCoord, 0, 16, sprite),
-                vertexToInts(v3.xCoord, v3.yCoord, v3.zCoord, 16, 16, sprite),
-                vertexToInts(v4.xCoord, v4.yCoord, v4.zCoord, 16, 0, sprite)
-        ), -1, side, sprite, true, DefaultVertexFormats.ITEM);
+        UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(format);
+        builder.setTexture(sprite);
+        putVertex(builder, normal, v1.xCoord, v1.yCoord, v1.zCoord, 0, 0, sprite);
+        putVertex(builder, normal, v2.xCoord, v2.yCoord, v2.zCoord, 0, 16, sprite);
+        putVertex(builder, normal, v3.xCoord, v3.yCoord, v3.zCoord, 16, 16, sprite);
+        putVertex(builder, normal, v4.xCoord, v4.yCoord, v4.zCoord, 16, 0, sprite);
+        return builder.build();
     }
 
-    private static BakedQuad createQuadOpp(Vec3d v1, Vec3d v2, Vec3d v3, Vec3d v4, TextureAtlasSprite sprite) {
+
+    private void putVertex(UnpackedBakedQuad.Builder builder, Vec3d normal, double x, double y, double z, float u, float v, TextureAtlasSprite sprite) {
+        for (int e = 0; e < format.getElementCount(); e++) {
+            switch (format.getElement(e).getUsage()) {
+                case POSITION:
+                    builder.put(e, (float)x, (float)y, (float)z, 1.0f);
+                    break;
+                case COLOR:
+                    builder.put(e, 1.0f, 1.0f, 1.0f, 1.0f);
+                    break;
+                case UV:
+                    if (format.getElement(e).getIndex() == 0) {
+                        u = sprite.getInterpolatedU(u);
+                        v = sprite.getInterpolatedV(v);
+                        builder.put(e, u, v, 0f, 1f);
+                        break;
+                    }
+                case NORMAL:
+                    builder.put(e, (float) normal.xCoord, (float) normal.yCoord, (float) normal.zCoord, 0f);
+                    break;
+                default:
+                    builder.put(e);
+                    break;
+            }
+        }
+    }
+
+    private BakedQuad createQuadOpp(Vec3d v1, Vec3d v2, Vec3d v3, Vec3d v4, TextureAtlasSprite sprite) {
         return createQuad(v4, v3, v2, v1, sprite);
     }
 
