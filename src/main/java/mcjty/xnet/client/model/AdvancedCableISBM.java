@@ -38,6 +38,7 @@ public class AdvancedCableISBM implements IBakedModel {
     public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
         // Called with the blockstate from our block. Here we get the values of the six properties and pass that to
         // our baked model implementation.
+        System.out.println("Render");
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
         boolean north = extendedBlockState.getValue(NORTH);
         boolean south = extendedBlockState.getValue(SOUTH);

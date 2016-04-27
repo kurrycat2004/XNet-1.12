@@ -1,131 +1,63 @@
 package mcjty.xnet.client.model;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import elec332.core.client.RenderHelper;
 import mcjty.xnet.client.XNetClientModelLoader;
-import mcjty.xnet.connectors.AbstractConnectorPart;
+import mcjty.xnet.varia.CommonProperties;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
+import net.minecraftforge.common.model.ITransformation;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.util.vector.Vector3f;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import static mcjty.xnet.client.XNetClientModelLoader.quadBakery;
 
 @SideOnly(Side.CLIENT)
 public class ConnectorISBM implements IBakedModel {
 
-    private final TextureAtlasSprite spriteFace;
-    private final VertexFormat format;
-
-    public static final ModelResourceLocation RFCONNECTOR_MODEL = new ModelResourceLocation("xnet:rfconnector#multipart");
-    public static final ModelResourceLocation ITEMCONNECTOR_MODEL = new ModelResourceLocation("xnet:itemconnector#multipart");
-
-    public ConnectorISBM(TextureAtlasSprite spriteFace, VertexFormat format) {
-        this.spriteFace = spriteFace;
-        this.format = format;
+    public ConnectorISBM(IConnectorRenderable renderObject) {
+        this.spriteFront = renderObject.getTexture(true);
+        this.spriteBack = renderObject.getTexture(false);
+        this.front = renderObject.renderFront();
     }
 
+    private final TextureAtlasSprite spriteFront, spriteBack;
+    private final boolean front;
+    private static final float p = 1.6f; // (.1 * 16)      Thickness of the connector as it is put on the connecting block
+    private static final float q = 3.2f; // (.2 * 16)      The wideness of the connector
+
     @Override
-    public List<BakedQuad> getQuads(IBlockState state, EnumFacing sidex, long rand) {
+    public List<BakedQuad> getQuads(IBlockState state, EnumFacing facing, long rand) {
         // Called with the blockstate from our block. Here we get the values of the six properties and pass that to
         // our baked model implementation.
-        IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
-        EnumFacing side = extendedBlockState.getValue(AbstractConnectorPart.SIDE);
-        List<BakedQuad> quads = new ArrayList<>();
-        double p = .1;      // Thickness of the connector as it is put on the connecting block
-        double q = .2;      // The wideness of the connector
-
-        switch (side) {
-            case DOWN:
-                quads.add(createQuad(new Vec3d(1 - q, 0, q),     new Vec3d(1 - q, p, q),     new Vec3d(1 - q, p, 1 - q), new Vec3d(1 - q, 0, 1 - q), XNetClientModelLoader.spriteSide));
-                quads.add(createQuad(new Vec3d(q,     0, 1 - q), new Vec3d(q,     p, 1 - q), new Vec3d(q,     p, q),     new Vec3d(q,     0, q), XNetClientModelLoader.spriteSide));
-                quads.add(createQuad(new Vec3d(q,     p, q),     new Vec3d(1 - q, p, q),     new Vec3d(1 - q, 0, q),     new Vec3d(q,     0, q), XNetClientModelLoader.spriteSide));
-                quads.add(createQuad(new Vec3d(q,     0, 1 - q), new Vec3d(1 - q, 0, 1 - q), new Vec3d(1 - q, p, 1 - q), new Vec3d(q,     p, 1 - q), XNetClientModelLoader.spriteSide));
-                quads.add(createQuad(new Vec3d(q,     p, 1 - q), new Vec3d(1 - q, p, 1 - q), new Vec3d(1 - q, p, q),     new Vec3d(q,     p, q), spriteFace));
-                break;
-            case UP:
-                quads.add(createQuad(new Vec3d(1 - q, 1 - p, q),     new Vec3d(1 - q, 1,     q),     new Vec3d(1 - q, 1,     1 - q), new Vec3d(1 - q, 1 - p, 1 - q), XNetClientModelLoader.spriteSide));
-                quads.add(createQuad(new Vec3d(q,     1 - p, 1 - q), new Vec3d(q,     1,     1 - q), new Vec3d(q,     1,     q),     new Vec3d(q,     1 - p, q), XNetClientModelLoader.spriteSide));
-                quads.add(createQuad(new Vec3d(q,     1,     q),     new Vec3d(1 - q, 1,     q),     new Vec3d(1 - q, 1 - p, q),     new Vec3d(q,     1 - p, q), XNetClientModelLoader.spriteSide));
-                quads.add(createQuad(new Vec3d(q,     1 - p, 1 - q), new Vec3d(1 - q, 1 - p, 1 - q), new Vec3d(1 - q, 1,     1 - q), new Vec3d(q,     1,     1 - q), XNetClientModelLoader.spriteSide));
-                quads.add(createQuad(new Vec3d(q,     1 - p, q),     new Vec3d(1 - q, 1 - p, q),     new Vec3d(1 - q, 1 - p, 1 - q), new Vec3d(q,     1 - p, 1 - q), spriteFace));
-                break;
-            case NORTH:
-                quads.add(createQuad(new Vec3d(q,     1 - q, p), new Vec3d(1 - q, 1 - q, p), new Vec3d(1 - q, 1 - q, 0), new Vec3d(q,     1 - q, 0), XNetClientModelLoader.spriteSide));
-                quads.add(createQuad(new Vec3d(q,     q,     0), new Vec3d(1 - q, q,     0), new Vec3d(1 - q, q,     p), new Vec3d(q,     q,     p), XNetClientModelLoader.spriteSide));
-                quads.add(createQuad(new Vec3d(1 - q, q,     0), new Vec3d(1 - q, 1 - q, 0), new Vec3d(1 - q, 1 - q, p), new Vec3d(1 - q, q,     p), XNetClientModelLoader.spriteSide));
-                quads.add(createQuad(new Vec3d(q,     q,     p), new Vec3d(q,     1 - q, p), new Vec3d(q,     1 - q, 0), new Vec3d(q,     q,     0), XNetClientModelLoader.spriteSide));
-                quads.add(createQuad(new Vec3d(q, q, p), new Vec3d(1 - q, q, p), new Vec3d(1 - q, 1 - q, p), new Vec3d(q, 1 - q, p), spriteFace));
-                break;
-            case SOUTH:
-                quads.add(createQuad(new Vec3d(q,     1 - q, 1),     new Vec3d(1 - q, 1 - q, 1),     new Vec3d(1 - q, 1 - q, 1 - p), new Vec3d(q,     1 - q, 1 - p), XNetClientModelLoader.spriteSide));
-                quads.add(createQuad(new Vec3d(q,     q,     1 - p), new Vec3d(1 - q, q,     1 - p), new Vec3d(1 - q, q,     1),     new Vec3d(q,     q,     1), XNetClientModelLoader.spriteSide));
-                quads.add(createQuad(new Vec3d(1 - q, q,     1 - p), new Vec3d(1 - q, 1 - q, 1 - p), new Vec3d(1 - q, 1 - q, 1),     new Vec3d(1 - q, q,     1), XNetClientModelLoader.spriteSide));
-                quads.add(createQuad(new Vec3d(q,     q,     1),     new Vec3d(q,     1 - q, 1),     new Vec3d(q,     1 - q, 1 - p), new Vec3d(q,     q,     1 - p), XNetClientModelLoader.spriteSide));
-                quads.add(createQuad(new Vec3d(q, 1 - q, 1 - p), new Vec3d(1 - q, 1 - q, 1 - p), new Vec3d(1 - q, q, 1 - p), new Vec3d(q, q, 1 - p), spriteFace));
-                break;
-            case WEST:
-                quads.add(createQuad(new Vec3d(0, 1 - q, 1 - q), new Vec3d(p, 1 - q, 1 - q), new Vec3d(p, 1 - q, q),     new Vec3d(0, 1 - q, q), XNetClientModelLoader.spriteSide));
-                quads.add(createQuad(new Vec3d(0, q,     q),     new Vec3d(p, q,     q),     new Vec3d(p, q,     1 - q), new Vec3d(0, q,     1 - q), XNetClientModelLoader.spriteSide));
-                quads.add(createQuad(new Vec3d(0, 1 - q, q),     new Vec3d(p, 1 - q, q),     new Vec3d(p, q,     q),     new Vec3d(0, q,     q), XNetClientModelLoader.spriteSide));
-                quads.add(createQuad(new Vec3d(0, q,     1 - q), new Vec3d(p, q,     1 - q), new Vec3d(p, 1 - q, 1 - q), new Vec3d(0, 1 - q, 1 - q), XNetClientModelLoader.spriteSide));
-                quads.add(createQuad(new Vec3d(p, q, q), new Vec3d(p, 1 - q, q), new Vec3d(p, 1 - q, 1 - q), new Vec3d(p, q, 1 - q), spriteFace));
-                break;
-            case EAST:
-                quads.add(createQuad(new Vec3d(1 - p, 1 - q, 1 - q), new Vec3d(1, 1 - q, 1 - q), new Vec3d(1, 1 - q, q),     new Vec3d(1 - p, 1 - q, q), XNetClientModelLoader.spriteSide));
-                quads.add(createQuad(new Vec3d(1 - p, q,     q),     new Vec3d(1, q,     q),     new Vec3d(1, q,     1 - q), new Vec3d(1 - p, q,     1 - q), XNetClientModelLoader.spriteSide));
-                quads.add(createQuad(new Vec3d(1 - p, 1 - q, q),     new Vec3d(1, 1 - q, q),     new Vec3d(1, q,     q),     new Vec3d(1 - p, q,     q), XNetClientModelLoader.spriteSide));
-                quads.add(createQuad(new Vec3d(1 - p, q,     1 - q), new Vec3d(1, q,     1 - q), new Vec3d(1, 1 - q, 1 - q), new Vec3d(1 - p, 1 - q, 1 - q), XNetClientModelLoader.spriteSide));
-                quads.add(createQuad(new Vec3d(1 - p, q, 1 - q), new Vec3d(1 - p, 1 - q, 1 - q), new Vec3d(1 - p, 1 - q, q), new Vec3d(1 - p, q, q), spriteFace));
-                break;
+        if (facing != null){
+            return ImmutableList.of();
         }
-
+        IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
+        EnumFacing side = extendedBlockState.getValue(CommonProperties.FACING_PROPERTY);
+        List<BakedQuad> quads = Lists.newArrayList();
+        createQuads(quads, side);
         return quads;
     }
 
-    private BakedQuad createQuad(Vec3d v1, Vec3d v2, Vec3d v3, Vec3d v4, TextureAtlasSprite sprite) {
-        Vec3d normal = v1.subtract(v2).crossProduct(v3.subtract(v2));
-
-        UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(format);
-        builder.setTexture(sprite);
-        putVertex(builder, normal, v1.xCoord, v1.yCoord, v1.zCoord, 0, 0, sprite);
-        putVertex(builder, normal, v2.xCoord, v2.yCoord, v2.zCoord, 0, 16, sprite);
-        putVertex(builder, normal, v3.xCoord, v3.yCoord, v3.zCoord, 16, 16, sprite);
-        putVertex(builder, normal, v4.xCoord, v4.yCoord, v4.zCoord, 16, 0, sprite);
-        return builder.build();
-    }
-
-
-    private void putVertex(UnpackedBakedQuad.Builder builder, Vec3d normal, double x, double y, double z, float u, float v, TextureAtlasSprite sprite) {
-        for (int e = 0; e < format.getElementCount(); e++) {
-            switch (format.getElement(e).getUsage()) {
-                case POSITION:
-                    builder.put(e, (float)x, (float)y, (float)z, 1.0f);
-                    break;
-                case COLOR:
-                    builder.put(e, 1.0f, 1.0f, 1.0f, 1.0f);
-                    break;
-                case UV:
-                    if (format.getElement(e).getIndex() == 0) {
-                        u = sprite.getInterpolatedU(u);
-                        v = sprite.getInterpolatedV(v);
-                        builder.put(e, u, v, 0f, 1f);
-                        break;
-                    }
-                case NORMAL:
-                    builder.put(e, (float) normal.xCoord, (float) normal.yCoord, (float) normal.zCoord, 0f);
-                    break;
-                default:
-                    builder.put(e);
-                    break;
-            }
+    private void createQuads(List<BakedQuad> quads, EnumFacing facing){
+        ModelRotation rot = RenderHelper.defaultFor(facing);
+        quads.add(quadBakery.bakeQuad(new Vector3f(16 - q, 16 - q,  p), new Vector3f(q, q, p), spriteBack, EnumFacing.SOUTH, rot));
+        if (front){
+            quads.add(quadBakery.bakeQuad(new Vector3f(16 - q, q,  0), new Vector3f(q, 16 - q, 0), spriteFront, EnumFacing.SOUTH, rot));
+        }
+        for (ITransformation mr : RenderHelper.getTranformationsFor(facing)){
+            quads.add(quadBakery.bakeQuad(new Vector3f(16 - q, 16-q, p), new Vector3f(q, 16-q, 0), XNetClientModelLoader.spriteSide, EnumFacing.UP, mr));
         }
     }
+
     @Override
     public ItemOverrideList getOverrides() {
         return null;
@@ -157,4 +89,5 @@ public class ConnectorISBM implements IBakedModel {
     public ItemCameraTransforms getItemCameraTransforms() {
         throw new UnsupportedOperationException();
     }
+
 }

@@ -2,7 +2,8 @@ package mcjty.xnet.connectors;
 
 import mcjty.xnet.api.IXNetComponent;
 import mcjty.xnet.api.XNetAPI;
-import mcjty.xnet.varia.UniversalUnlistedProperty;
+import mcjty.xnet.client.model.IConnectorRenderable;
+import mcjty.xnet.varia.CommonProperties;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.client.multipart.ICustomHighlightPart;
 import mcmultipart.multipart.INormallyOccludingPart;
@@ -36,11 +37,7 @@ import java.util.List;
 /**
  * Created by Elec332 on 1-3-2016.
  */
-public abstract class AbstractConnectorPart extends Multipart implements ISlottedPart, IXNetComponent, INormallyOccludingPart, ICustomHighlightPart {
-
-    public static final IUnlistedProperty<EnumFacing> SIDE = new UniversalUnlistedProperty<>("side", EnumFacing.class);
-
-    private static final AxisAlignedBB[] HITBOXES;
+public abstract class AbstractConnectorPart extends Multipart implements ISlottedPart, IXNetComponent, INormallyOccludingPart, ICustomHighlightPart, IConnectorRenderable {
 
     public AbstractConnectorPart(EnumFacing side){
         this();
@@ -51,6 +48,7 @@ public abstract class AbstractConnectorPart extends Multipart implements ISlotte
         this.id = -1;
     }
 
+    private static final AxisAlignedBB[] HITBOXES;
     private EnumFacing side;
     private int id;
 
@@ -69,13 +67,19 @@ public abstract class AbstractConnectorPart extends Multipart implements ISlotte
 
     @Override
     public BlockStateContainer createBlockState() {
-        return new ExtendedBlockState(MCMultiPartMod.multipart, new IProperty[0], new IUnlistedProperty[] { SIDE });
+        return new ExtendedBlockState(MCMultiPartMod.multipart, new IProperty[0], new IUnlistedProperty[] {CommonProperties.FACING_PROPERTY});
     }
 
     @Override
     public IBlockState getExtendedState(IBlockState state) {
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
-        return extendedBlockState.withProperty(SIDE, side);
+        return extendedBlockState.withProperty(CommonProperties.FACING_PROPERTY, side);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean renderFront() {
+        return false;
     }
 
     @Override

@@ -59,6 +59,8 @@ public class XNetClientModelLoader implements IModelAndTextureLoader {
     @SuppressWarnings("PublicField")
     public static TextureAtlasSprite spriteNoneCable;
 
+    public static ElecQuadBakery quadBakery;
+
     /**
      * A helper method to prevent you from having to hook into the event,
      * use this to make your quads. (This always comes AFTER the textures are loaded)
@@ -69,7 +71,7 @@ public class XNetClientModelLoader implements IModelAndTextureLoader {
      */
     @Override
     public void registerModels(ElecQuadBakery quadBakery, ElecModelBakery modelBakery, ElecTemplateBakery templateBakery) {
-
+        XNetClientModelLoader.quadBakery = quadBakery;
     }
 
     /**

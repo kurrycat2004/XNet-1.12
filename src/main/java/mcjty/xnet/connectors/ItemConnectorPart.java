@@ -1,12 +1,14 @@
 package mcjty.xnet.connectors;
 
+import mcjty.xnet.client.XNetClientModelLoader;
 import mcjty.xnet.init.ModItems;
-import mcjty.xnet.varia.XNetResourceLocation;
 import mcmultipart.raytrace.PartMOP;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemConnectorPart extends AbstractConnectorPart {
 
@@ -18,14 +20,15 @@ public class ItemConnectorPart extends AbstractConnectorPart {
         super();
     }
 
-
-    @Override
-    public ResourceLocation getModelPath() {
-        return new XNetResourceLocation("itemconnector");
-    }
-
     @Override
     public ItemStack getPickBlock(EntityPlayer player, PartMOP hit) {
         return new ItemStack(ModItems.itemConnector);
     }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public TextureAtlasSprite getTexture(boolean front) {
+        return XNetClientModelLoader.spriteItem;
+    }
+
 }

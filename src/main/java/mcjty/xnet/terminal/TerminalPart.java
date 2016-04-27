@@ -4,9 +4,10 @@ import mcjty.xnet.XNet;
 import mcjty.xnet.api.IXNetComponent;
 import mcjty.xnet.api.XNetAPI;
 import mcjty.xnet.client.GuiProxy;
+import mcjty.xnet.client.XNetClientModelLoader;
+import mcjty.xnet.client.model.IConnectorRenderable;
 import mcjty.xnet.init.ModItems;
-import mcjty.xnet.varia.UniversalUnlistedProperty;
-import mcjty.xnet.varia.XNetResourceLocation;
+import mcjty.xnet.varia.CommonProperties;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.client.multipart.ICustomHighlightPart;
 import mcmultipart.multipart.INormallyOccludingPart;
@@ -19,6 +20,7 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -27,7 +29,6 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.property.ExtendedBlockState;
@@ -40,11 +41,7 @@ import org.lwjgl.opengl.GL11;
 import java.util.EnumSet;
 import java.util.List;
 
-public class TerminalPart extends Multipart implements ISlottedPart, IXNetComponent, INormallyOccludingPart, ICustomHighlightPart {
-
-    public static final IUnlistedProperty<EnumFacing> SIDE = new UniversalUnlistedProperty<>("side", EnumFacing.class);
-
-    private static final AxisAlignedBB[] HITBOXES;
+public class TerminalPart extends Multipart implements ISlottedPart, IXNetComponent, INormallyOccludingPart, ICustomHighlightPart, IConnectorRenderable {
 
     public TerminalPart(EnumFacing side){
         this();
@@ -55,14 +52,9 @@ public class TerminalPart extends Multipart implements ISlottedPart, IXNetCompon
         this.id = -1;
     }
 
+    private static final AxisAlignedBB[] HITBOXES;
     private EnumFacing side;
     private int id;
-
-
-    @Override
-    public ResourceLocation getModelPath() {
-        return new XNetResourceLocation("terminal");
-    }
 
     @Override
     public ItemStack getPickBlock(EntityPlayer player, PartMOP hit) {
@@ -84,13 +76,13 @@ public class TerminalPart extends Multipart implements ISlottedPart, IXNetCompon
 
     @Override
     public BlockStateContainer createBlockState() {
-        return new ExtendedBlockState(MCMultiPartMod.multipart, new IProperty[0], new IUnlistedProperty[] { SIDE });
+        return new ExtendedBlockState(MCMultiPartMod.multipart, new IProperty[0], new IUnlistedProperty[] {CommonProperties.FACING_PROPERTY});
     }
 
     @Override
     public IBlockState getExtendedState(IBlockState state) {
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
-        return extendedBlockState.withProperty(SIDE, side);
+        return extendedBlockState.withProperty(CommonProperties.FACING_PROPERTY, side);
     }
 
     @Override
@@ -199,6 +191,18 @@ public class TerminalPart extends Multipart implements ISlottedPart, IXNetCompon
         HITBOXES[EnumFacing.SOUTH.ordinal()] = new AxisAlignedBB(dflf1, dflf1, 1, dfl, dfl, f1);
         HITBOXES[EnumFacing.WEST.ordinal()] = new AxisAlignedBB(0, dflf1, dflf1, thickness, dfl, dfl);
         HITBOXES[EnumFacing.EAST.ordinal()] = new AxisAlignedBB(1, dflf1, dflf1, f1, dfl, dfl);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public TextureAtlasSprite getTexture(boolean front) {
+        return front ? XNetClientModelLoader.spriteTerminal : XNetClientModelLoader.spriteSide;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean renderFront() {
+        return true;
     }
 
 }

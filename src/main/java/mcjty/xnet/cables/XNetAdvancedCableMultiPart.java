@@ -1,12 +1,10 @@
 package mcjty.xnet.cables;
 
 import mcjty.xnet.init.ModItems;
-import mcjty.xnet.varia.XNetResourceLocation;
 import mcmultipart.raytrace.PartMOP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 
 public class XNetAdvancedCableMultiPart extends AbstractCableMultiPart {
@@ -14,13 +12,13 @@ public class XNetAdvancedCableMultiPart extends AbstractCableMultiPart {
     private static final AxisAlignedBB[] HITBOXES;
 
     @Override
-    public ResourceLocation getModelPath() {
-        return new XNetResourceLocation("advanced_netcable");
+    public ItemStack getPickBlock(EntityPlayer player, PartMOP hit) {
+        return new ItemStack(ModItems.advancedCable);
     }
 
     @Override
-    public ItemStack getPickBlock(EntityPlayer player, PartMOP hit) {
-        return new ItemStack(ModItems.advancedCable);
+    public boolean isAdvanced() {
+        return true;
     }
 
     @Override

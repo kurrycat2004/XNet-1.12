@@ -55,6 +55,8 @@ public abstract class AbstractCableMultiPart extends Multipart implements ISlott
     private int id;
     private final EnumSet<EnumFacing> connectedSides;
 
+    public abstract boolean isAdvanced();
+
     @Override
     public EnumSet<PartSlot> getSlotMask() {
         return EnumSet.of(PartSlot.CENTER);
