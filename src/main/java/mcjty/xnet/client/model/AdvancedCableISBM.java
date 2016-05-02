@@ -1,5 +1,6 @@
 package mcjty.xnet.client.model;
 
+import com.google.common.collect.ImmutableList;
 import mcjty.xnet.client.XNetClientModelLoader;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.*;
@@ -11,6 +12,7 @@ import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.util.vector.Vector3f;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,6 +21,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static mcjty.xnet.cables.AbstractCableMultiPart.*;
+import static mcjty.xnet.client.XNetClientModelLoader.quadBakery;
 
 @SideOnly(Side.CLIENT)
 public class AdvancedCableISBM implements IBakedModel {
@@ -35,10 +38,12 @@ public class AdvancedCableISBM implements IBakedModel {
     }
 
     @Override
-    public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
+    public List<BakedQuad> getQuads(IBlockState state, EnumFacing facing, long rand) {
         // Called with the blockstate from our block. Here we get the values of the six properties and pass that to
         // our baked model implementation.
-        System.out.println("Render");
+        if (facing != null){
+            return ImmutableList.of();
+        }
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
         boolean north = extendedBlockState.getValue(NORTH);
         boolean south = extendedBlockState.getValue(SOUTH);
@@ -56,78 +61,83 @@ public class AdvancedCableISBM implements IBakedModel {
         Function<SpriteIdx, TextureAtlasSprite> getSprite = advanced ? AdvancedCableISBM::getSpriteAdvanced : AdvancedCableISBM::getSpriteNormal;
 
         if (up) {
-            quads.add(createQuad(new Vec3d(1 - o, 1,     o),     new Vec3d(1 - o, 1,     1 - o), new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(1 - o, 1 - o, o),     sprite));
-            quads.add(createQuad(new Vec3d(o,     1,     1 - o), new Vec3d(o,     1,     o),     new Vec3d(o,     1 - o, o),     new Vec3d(o,     1 - o, 1 - o), sprite));
-            quads.add(createQuad(new Vec3d(o,     1,     o),     new Vec3d(1 - o, 1,     o),     new Vec3d(1 - o, 1 - o, o),     new Vec3d(o,     1 - o, o), sprite));
-            quads.add(createQuad(new Vec3d(o,     1 - o, 1 - o), new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(1 - o, 1,     1 - o), new Vec3d(o,     1,     1 - o), sprite));
+            quads.add(createQuad(new Vec3d(1 - o, 1,     o),     new Vec3d(1 - o, 1,     1 - o), new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(1 - o, 1 - o, o),     sprite, EnumFacing.EAST));
+            quads.add(createQuad(new Vec3d(o,     1,     1 - o), new Vec3d(o,     1,     o),     new Vec3d(o,     1 - o, o),     new Vec3d(o,     1 - o, 1 - o), sprite, EnumFacing.WEST));
+            quads.add(createQuad(new Vec3d(o,     1,     o),     new Vec3d(1 - o, 1,     o),     new Vec3d(1 - o, 1 - o, o),     new Vec3d(o,     1 - o, o), sprite, EnumFacing.NORTH));
+            quads.add(createQuad(new Vec3d(o,     1 - o, 1 - o), new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(1 - o, 1,     1 - o), new Vec3d(o,     1,     1 - o), sprite, EnumFacing.SOUTH));
         } else {
             QuadSetting pattern = findPattern(west, south, east, north);
-            quads.add(createQuad(new Vec3d(o,     1 - o, 1 - o), new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(1 - o, 1 - o, o),     new Vec3d(o,     1 - o, o), getSprite.apply(pattern.sprite), pattern.rotation));
+            quads.add(createQuad(new Vec3d(o,     1 - o, 1 - o), new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(1 - o, 1 - o, o),     new Vec3d(o,     1 - o, o), getSprite.apply(pattern.sprite), pattern.rotation, EnumFacing.UP));
         }
 
         if (down) {
-            quads.add(createQuad(new Vec3d(1 - o, o, o),     new Vec3d(1 - o, o, 1 - o), new Vec3d(1 - o, 0, 1 - o), new Vec3d(1 - o, 0, o),     sprite));
-            quads.add(createQuad(new Vec3d(o,     o, 1 - o), new Vec3d(o,     o, o),     new Vec3d(o,     0, o),     new Vec3d(o,     0, 1 - o), sprite));
-            quads.add(createQuad(new Vec3d(o,     o, o),     new Vec3d(1 - o, o, o),     new Vec3d(1 - o, 0, o),     new Vec3d(o,     0, o), sprite));
-            quads.add(createQuad(new Vec3d(o,     0, 1 - o), new Vec3d(1 - o, 0, 1 - o), new Vec3d(1 - o, o, 1 - o), new Vec3d(o,     o, 1 - o), sprite));
+            quads.add(createQuad(new Vec3d(1 - o, o, o),     new Vec3d(1 - o, o, 1 - o), new Vec3d(1 - o, 0, 1 - o), new Vec3d(1 - o, 0, o),     sprite, EnumFacing.EAST));
+            quads.add(createQuad(new Vec3d(o,     o, 1 - o), new Vec3d(o,     o, o),     new Vec3d(o,     0, o),     new Vec3d(o,     0, 1 - o), sprite, EnumFacing.WEST));
+            quads.add(createQuad(new Vec3d(o,     o, o),     new Vec3d(1 - o, o, o),     new Vec3d(1 - o, 0, o),     new Vec3d(o,     0, o), sprite, EnumFacing.NORTH));
+            quads.add(createQuad(new Vec3d(o,     0, 1 - o), new Vec3d(1 - o, 0, 1 - o), new Vec3d(1 - o, o, 1 - o), new Vec3d(o,     o, 1 - o), sprite, EnumFacing.SOUTH));
         } else {
             QuadSetting pattern = findPattern(west, north, east, south);
-            quads.add(createQuad(new Vec3d(o, o, o), new Vec3d(1 - o, o, o), new Vec3d(1 - o, o, 1 - o), new Vec3d(o, o, 1 - o), getSprite.apply(pattern.sprite), pattern.rotation));
+            quads.add(createQuad(new Vec3d(o, o, o), new Vec3d(1 - o, o, o), new Vec3d(1 - o, o, 1 - o), new Vec3d(o, o, 1 - o), getSprite.apply(pattern.sprite), pattern.rotation, EnumFacing.DOWN));
         }
 
         if (east) {
-            quads.add(createQuad(new Vec3d(1, 1 - o, 1 - o), new Vec3d(1, 1 - o, o),     new Vec3d(1 - o, 1 - o, o), new Vec3d(1 - o, 1 - o, 1 - o), sprite));
-            quads.add(createQuad(new Vec3d(1, o,     o),     new Vec3d(1, o,     1 - o), new Vec3d(1 - o, o,     1 - o), new Vec3d(1 - o, o,     o),     sprite));
-            quads.add(createQuad(new Vec3d(1, 1 - o, o),     new Vec3d(1, o,     o),     new Vec3d(1 - o, o,     o), new Vec3d(1 - o, 1 - o, o),     sprite));
-            quads.add(createQuad(new Vec3d(1, o,     1 - o), new Vec3d(1, 1 - o, 1 - o), new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(1 - o, o,     1 - o), sprite));
+            quads.add(createQuad(new Vec3d(1, 1 - o, 1 - o), new Vec3d(1, 1 - o, o),     new Vec3d(1 - o, 1 - o, o), new Vec3d(1 - o, 1 - o, 1 - o), sprite, EnumFacing.UP));
+            quads.add(createQuad(new Vec3d(1, o,     o),     new Vec3d(1, o,     1 - o), new Vec3d(1 - o, o,     1 - o), new Vec3d(1 - o, o,     o),     sprite, EnumFacing.DOWN));
+            quads.add(createQuad(new Vec3d(1, 1 - o, o),     new Vec3d(1, o,     o),     new Vec3d(1 - o, o,     o), new Vec3d(1 - o, 1 - o, o),     sprite, EnumFacing.NORTH));
+            quads.add(createQuad(new Vec3d(1, o,     1 - o), new Vec3d(1, 1 - o, 1 - o), new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(1 - o, o,     1 - o), sprite, EnumFacing.SOUTH));
         } else {
             QuadSetting pattern = findPattern(down, north, up, south);
-            quads.add(createQuad(new Vec3d(1 - o, o, o), new Vec3d(1 - o, 1 - o, o), new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(1 - o, o, 1 - o), getSprite.apply(pattern.sprite), pattern.rotation));
+            quads.add(createQuad(new Vec3d(1 - o, o, o), new Vec3d(1 - o, 1 - o, o), new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(1 - o, o, 1 - o), getSprite.apply(pattern.sprite), pattern.rotation, EnumFacing.EAST));
         }
 
         if (west) {
-            quads.add(createQuad(new Vec3d(o, 1 - o, 1 - o), new Vec3d(o, 1 - o, o),     new Vec3d(0, 1 - o, o), new Vec3d(0, 1 - o, 1 - o), sprite));
-            quads.add(createQuad(new Vec3d(o, o,     o),     new Vec3d(o, o,     1 - o), new Vec3d(0, o,     1 - o), new Vec3d(0, o,     o),     sprite));
-            quads.add(createQuad(new Vec3d(o, 1 - o, o),     new Vec3d(o, o,     o),     new Vec3d(0, o,     o), new Vec3d(0, 1 - o, o),     sprite));
-            quads.add(createQuad(new Vec3d(o, o,     1 - o), new Vec3d(o, 1 - o, 1 - o), new Vec3d(0, 1 - o, 1 - o), new Vec3d(0, o,     1 - o), sprite));
+            quads.add(createQuad(new Vec3d(o, 1 - o, 1 - o), new Vec3d(o, 1 - o, o),     new Vec3d(0, 1 - o, o), new Vec3d(0, 1 - o, 1 - o), sprite, EnumFacing.UP));
+            quads.add(createQuad(new Vec3d(o, o,     o),     new Vec3d(o, o,     1 - o), new Vec3d(0, o,     1 - o), new Vec3d(0, o,     o),     sprite, EnumFacing.DOWN));
+            quads.add(createQuad(new Vec3d(o, 1 - o, o),     new Vec3d(o, o,     o),     new Vec3d(0, o,     o), new Vec3d(0, 1 - o, o),     sprite, EnumFacing.NORTH));
+            quads.add(createQuad(new Vec3d(o, o,     1 - o), new Vec3d(o, 1 - o, 1 - o), new Vec3d(0, 1 - o, 1 - o), new Vec3d(0, o,     1 - o), sprite, EnumFacing.SOUTH));
         } else {
             QuadSetting pattern = findPattern(down, south, up, north);
-            quads.add(createQuad(new Vec3d(o, o, 1 - o), new Vec3d(o, 1 - o, 1 - o), new Vec3d(o, 1 - o, o), new Vec3d(o, o, o), getSprite.apply(pattern.sprite), pattern.rotation));
+            quads.add(createQuad(new Vec3d(o, o, 1 - o), new Vec3d(o, 1 - o, 1 - o), new Vec3d(o, 1 - o, o), new Vec3d(o, o, o), getSprite.apply(pattern.sprite), pattern.rotation, EnumFacing.WEST));
         }
 
         if (north) {
-            quads.add(createQuad(new Vec3d(o,     1 - o, o), new Vec3d(1 - o, 1 - o, o), new Vec3d(1 - o, 1 - o, 0), new Vec3d(o,     1 - o, 0), sprite));
-            quads.add(createQuad(new Vec3d(o,     o,     0), new Vec3d(1 - o, o,     0), new Vec3d(1 - o, o,     o), new Vec3d(o,     o,     o), sprite));
-            quads.add(createQuad(new Vec3d(1 - o, o,     0), new Vec3d(1 - o, 1 - o, 0), new Vec3d(1 - o, 1 - o, o), new Vec3d(1 - o, o,     o), sprite));
-            quads.add(createQuad(new Vec3d(o,     o,     o), new Vec3d(o,     1 - o, o), new Vec3d(o,     1 - o, 0), new Vec3d(o,     o,     0), sprite));
+            quads.add(createQuad(new Vec3d(o,     1 - o, o), new Vec3d(1 - o, 1 - o, o), new Vec3d(1 - o, 1 - o, 0), new Vec3d(o,     1 - o, 0), sprite, EnumFacing.UP));
+            quads.add(createQuad(new Vec3d(o,     o,     0), new Vec3d(1 - o, o,     0), new Vec3d(1 - o, o,     o), new Vec3d(o,     o,     o), sprite, EnumFacing.DOWN));
+            quads.add(createQuad(new Vec3d(1 - o, o,     0), new Vec3d(1 - o, 1 - o, 0), new Vec3d(1 - o, 1 - o, o), new Vec3d(1 - o, o,     o), sprite, EnumFacing.EAST));
+            quads.add(createQuad(new Vec3d(o,     o,     o), new Vec3d(o,     1 - o, o), new Vec3d(o,     1 - o, 0), new Vec3d(o,     o,     0), sprite, EnumFacing.WEST));
         } else {
             QuadSetting pattern = findPattern(west, up, east, down);
-            quads.add(createQuad(new Vec3d(o, 1 - o, o), new Vec3d(1 - o, 1 - o, o), new Vec3d(1 - o, o, o), new Vec3d(o, o, o), getSprite.apply(pattern.sprite), pattern.rotation));
+            quads.add(createQuad(new Vec3d(o, 1 - o, o), new Vec3d(1 - o, 1 - o, o), new Vec3d(1 - o, o, o), new Vec3d(o, o, o), getSprite.apply(pattern.sprite), pattern.rotation, EnumFacing.NORTH));
         }
 
         if (south) {
-            quads.add(createQuad(new Vec3d(o,     1 - o, 1),     new Vec3d(1 - o, 1 - o, 1),     new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(o,     1 - o, 1 - o), sprite));
-            quads.add(createQuad(new Vec3d(o,     o,     1 - o), new Vec3d(1 - o, o,     1 - o), new Vec3d(1 - o, o,     1),     new Vec3d(o,     o,     1), sprite));
-            quads.add(createQuad(new Vec3d(1 - o, o,     1 - o), new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(1 - o, 1 - o, 1),     new Vec3d(1 - o, o,     1), sprite));
-            quads.add(createQuad(new Vec3d(o,     o,     1),     new Vec3d(o,     1 - o, 1),     new Vec3d(o,     1 - o, 1 - o), new Vec3d(o,     o,     1 - o), sprite));
+            quads.add(createQuad(new Vec3d(o,     1 - o, 1),     new Vec3d(1 - o, 1 - o, 1),     new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(o,     1 - o, 1 - o), sprite, EnumFacing.UP));
+            quads.add(createQuad(new Vec3d(o,     o,     1 - o), new Vec3d(1 - o, o,     1 - o), new Vec3d(1 - o, o,     1),     new Vec3d(o,     o,     1), sprite, EnumFacing.DOWN));
+            quads.add(createQuad(new Vec3d(1 - o, o,     1 - o), new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(1 - o, 1 - o, 1),     new Vec3d(1 - o, o,     1), sprite, EnumFacing.EAST));
+            quads.add(createQuad(new Vec3d(o,     o,     1),     new Vec3d(o,     1 - o, 1),     new Vec3d(o,     1 - o, 1 - o), new Vec3d(o,     o,     1 - o), sprite, EnumFacing.WEST));
         } else {
             QuadSetting pattern = findPattern(west, down, east, up);
-            quads.add(createQuad(new Vec3d(o, o, 1 - o), new Vec3d(1 - o, o, 1 - o), new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(o, 1 - o, 1 - o), getSprite.apply(pattern.sprite), pattern.rotation));
+            quads.add(createQuad(new Vec3d(o, o, 1 - o), new Vec3d(1 - o, o, 1 - o), new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(o, 1 - o, 1 - o), getSprite.apply(pattern.sprite), pattern.rotation, EnumFacing.SOUTH));
         }
 
         return quads;
     }
 
-    private BakedQuad createQuad(Vec3d v1, Vec3d v2, Vec3d v3, Vec3d v4, TextureAtlasSprite sprite) {
+    private BakedQuad createQuad(Vec3d v1, Vec3d v2, Vec3d v3, Vec3d v4, TextureAtlasSprite sprite, EnumFacing side) {
         Vec3d normal = v1.subtract(v2).crossProduct(v3.subtract(v2));
 
-        UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(format);
-        builder.setTexture(sprite);
-        putVertex(builder, normal, v1.xCoord, v1.yCoord, v1.zCoord, 0, 0, sprite);
-        putVertex(builder, normal, v2.xCoord, v2.yCoord, v2.zCoord, 0, 16, sprite);
-        putVertex(builder, normal, v3.xCoord, v3.yCoord, v3.zCoord, 16, 16, sprite);
-        putVertex(builder, normal, v4.xCoord, v4.yCoord, v4.zCoord, 16, 0, sprite);
-        return builder.build();
+        Vector3f v1f = new Vector3f((float)v1.xCoord, (float)v1.yCoord, (float)v1.zCoord);
+        Vector3f v3f = new Vector3f((float)v3.xCoord, (float)v3.yCoord, (float)v3.zCoord);
+        return quadBakery.bakeQuad(v1f, v3f, sprite, side);
+//
+//
+//        UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(format);
+//        builder.setTexture(sprite);
+//        putVertex(builder, normal, v1.xCoord, v1.yCoord, v1.zCoord, 0, 0, sprite);
+//        putVertex(builder, normal, v2.xCoord, v2.yCoord, v2.zCoord, 0, 16, sprite);
+//        putVertex(builder, normal, v3.xCoord, v3.yCoord, v3.zCoord, 16, 16, sprite);
+//        putVertex(builder, normal, v4.xCoord, v4.yCoord, v4.zCoord, 16, 0, sprite);
+//        return builder.build();
     }
 
 
@@ -157,18 +167,18 @@ public class AdvancedCableISBM implements IBakedModel {
         }
     }
 
-    private BakedQuad createQuad(Vec3d v1, Vec3d v2, Vec3d v3, Vec3d v4, TextureAtlasSprite sprite, int rotation) {
+    private BakedQuad createQuad(Vec3d v1, Vec3d v2, Vec3d v3, Vec3d v4, TextureAtlasSprite sprite, int rotation, EnumFacing side) {
         switch (rotation) {
             case 0:
-                return createQuad(v1, v2, v3, v4, sprite);
+                return createQuad(v1, v2, v3, v4, sprite, side);
             case 1:
-                return createQuad(v2, v3, v4, v1, sprite);
+                return createQuad(v2, v3, v4, v1, sprite, side);
             case 2:
-                return createQuad(v3, v4, v1, v2, sprite);
+                return createQuad(v3, v4, v1, v2, sprite, side);
             case 3:
-                return createQuad(v4, v1, v2, v3, sprite);
+                return createQuad(v4, v1, v2, v3, sprite, side);
         }
-        return createQuad(v1, v2, v3, v4, sprite);
+        return createQuad(v1, v2, v3, v4, sprite, side);
     }
 
     public enum SpriteIdx {
