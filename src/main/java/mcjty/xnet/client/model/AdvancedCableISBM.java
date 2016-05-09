@@ -12,7 +12,6 @@ import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.util.vector.Vector3f;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,7 +20,6 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static mcjty.xnet.cables.AbstractCableMultiPart.*;
-import static mcjty.xnet.client.XNetClientModelLoader.quadBakery;
 
 @SideOnly(Side.CLIENT)
 public class AdvancedCableISBM implements IBakedModel {
@@ -125,19 +123,15 @@ public class AdvancedCableISBM implements IBakedModel {
 
     private BakedQuad createQuad(Vec3d v1, Vec3d v2, Vec3d v3, Vec3d v4, TextureAtlasSprite sprite, EnumFacing side) {
         Vec3d normal = v1.subtract(v2).crossProduct(v3.subtract(v2));
+        normal = normal.normalize();
 
-        Vector3f v1f = new Vector3f((float)v1.xCoord, (float)v1.yCoord, (float)v1.zCoord);
-        Vector3f v3f = new Vector3f((float)v3.xCoord, (float)v3.yCoord, (float)v3.zCoord);
-        return quadBakery.bakeQuad(v1f, v3f, sprite, side);
-//
-//
-//        UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(format);
-//        builder.setTexture(sprite);
-//        putVertex(builder, normal, v1.xCoord, v1.yCoord, v1.zCoord, 0, 0, sprite);
-//        putVertex(builder, normal, v2.xCoord, v2.yCoord, v2.zCoord, 0, 16, sprite);
-//        putVertex(builder, normal, v3.xCoord, v3.yCoord, v3.zCoord, 16, 16, sprite);
-//        putVertex(builder, normal, v4.xCoord, v4.yCoord, v4.zCoord, 16, 0, sprite);
-//        return builder.build();
+        UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(format);
+        builder.setTexture(sprite);
+        putVertex(builder, normal, v1.xCoord, v1.yCoord, v1.zCoord, 0, 0, sprite);
+        putVertex(builder, normal, v2.xCoord, v2.yCoord, v2.zCoord, 0, 16, sprite);
+        putVertex(builder, normal, v3.xCoord, v3.yCoord, v3.zCoord, 16, 16, sprite);
+        putVertex(builder, normal, v4.xCoord, v4.yCoord, v4.zCoord, 16, 0, sprite);
+        return builder.build();
     }
 
 
@@ -155,8 +149,8 @@ public class AdvancedCableISBM implements IBakedModel {
                         u = sprite.getInterpolatedU(u);
                         v = sprite.getInterpolatedV(v);
                         builder.put(e, u, v, 0f, 1f);
-                        break;
                     }
+                    break;
                 case NORMAL:
                     builder.put(e, (float) normal.xCoord, (float) normal.yCoord, (float) normal.zCoord, 0f);
                     break;
