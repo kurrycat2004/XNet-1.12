@@ -14,6 +14,7 @@ public class XNetTileData implements ITileData {
     }
 
     private final TileEntity tile;
+    private XNetGrid grid;
 
     @Override
     public BlockPos getPos() {
@@ -23,6 +24,15 @@ public class XNetTileData implements ITileData {
     @Override
     public TileEntity getTile() {
         return tile;
+    }
+
+    public XNetGrid getCurrentGrid(){
+        return grid;
+    }
+
+    public XNetTileData setGrid(XNetGrid grid){
+        this.grid = grid;
+        return this;
     }
 
 }

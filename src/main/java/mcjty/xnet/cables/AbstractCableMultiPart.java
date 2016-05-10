@@ -1,5 +1,6 @@
 package mcjty.xnet.cables;
 
+import com.google.common.collect.Lists;
 import elec332.core.world.WorldHelper;
 import mcjty.xnet.api.IXNetCable;
 import mcjty.xnet.api.IXNetComponent;
@@ -37,7 +38,7 @@ import java.util.List;
 /**
  * Created by Elec332 on 1-3-2016.
  */
-public abstract class AbstractCableMultiPart extends Multipart implements ISlottedPart, IXNetComponent, IXNetCable, INormallyOccludingPart, ICustomHighlightPart {
+public abstract class AbstractCableMultiPart extends Multipart implements ISlottedPart, IXNetCable, INormallyOccludingPart, ICustomHighlightPart {
 
     // Properties that indicate if there is a connection to certain direction.
     public static final IUnlistedProperty<Boolean> NORTH = new UniversalUnlistedProperty<>("north", Boolean.class);
@@ -49,10 +50,8 @@ public abstract class AbstractCableMultiPart extends Multipart implements ISlott
 
     public AbstractCableMultiPart(){
         this.connectedSides = EnumSet.noneOf(EnumFacing.class);
-        this.id = -1;
     }
 
-    private int id;
     private final EnumSet<EnumFacing> connectedSides;
 
     public abstract boolean isAdvanced();
@@ -65,14 +64,25 @@ public abstract class AbstractCableMultiPart extends Multipart implements ISlott
     @Override
     public void onNeighborBlockChange(Block block) {
         super.onNeighborBlockChange(block);
-        checkConnections();
-        WorldHelper.markBlockForRenderUpdate(getWorld(), getPos());
+        if (checkConnections()) {
+            WorldHelper.markBlockForRenderUpdate(getWorld(), getPos());
+        }
     }
 
     @Override
     public void onPartChanged(IMultipart part) {
         super.onPartChanged(part);
-        checkConnections();
+        if (checkConnections()) {
+            WorldHelper.markBlockForRenderUpdate(getWorld(), getPos());
+        }
+    }
+
+    @Override
+    public void onNeighborTileChange(EnumFacing facing) {
+        super.onNeighborTileChange(facing);
+        if (checkConnections()) {
+            WorldHelper.markBlockForRenderUpdate(getWorld(), getPos());
+        }
     }
 
     @Override
@@ -83,7 +93,7 @@ public abstract class AbstractCableMultiPart extends Multipart implements ISlott
     @Override
     public IBlockState getExtendedState(IBlockState state) {
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
-        checkConnections();
+        //checkConnections();
         boolean north = isConnected(EnumFacing.NORTH);
         boolean south = isConnected(EnumFacing.SOUTH);
         boolean west = isConnected(EnumFacing.WEST);
@@ -98,37 +108,27 @@ public abstract class AbstractCableMultiPart extends Multipart implements ISlott
         return connectedSides.contains(facing);
     }
 
-    private void checkConnections(){ //TODO: Not check at rendering
+    private boolean checkConnections(){
         TileEntity me = getWorld().getTileEntity(getPos());
+        List<EnumFacing> old = Lists.newArrayList(connectedSides);
         connectedSides.clear();
         for (EnumFacing facing : EnumFacing.VALUES){
             if (XNetAPIHelper.getComponentAt(me, facing) != null){
                 connectedSides.add(facing);
             }
         }
-    }
-
-    @Override
-    public int getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(int id) {
-        this.id = id;
-        markDirty();
+        return connectedSides.containsAll(old) && old.containsAll(connectedSides);
     }
 
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-        //noinspection ObjectEquality
-        return capability == XNetAPI.XNET_CAPABILITY || super.hasCapability(capability, facing);
+        return capability == XNetAPI.XNET_CABLE_CAPABILITY || super.hasCapability(capability, facing);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-        //noinspection ObjectEquality
-        return capability == XNetAPI.XNET_CAPABILITY ? (T) this : super.getCapability(capability, facing);
+        return capability == XNetAPI.XNET_CABLE_CAPABILITY ? (T) this : super.getCapability(capability, facing);
     }
 
     /*
