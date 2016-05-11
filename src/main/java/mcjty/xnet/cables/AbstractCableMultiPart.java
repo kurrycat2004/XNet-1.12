@@ -115,6 +115,11 @@ public abstract class AbstractCableMultiPart extends Multipart implements ISlott
         for (EnumFacing facing : EnumFacing.VALUES){
             if (XNetAPIHelper.getComponentAt(me, facing) != null){
                 connectedSides.add(facing);
+                continue;
+            }
+            TileEntity tile = WorldHelper.getTileAt(getWorld(), getPos().offset(facing));
+            if (tile != null && tile.hasCapability(XNetAPI.XNET_CABLE_CAPABILITY, null)){
+                connectedSides.add(facing);
             }
         }
         return connectedSides.containsAll(old) && old.containsAll(connectedSides);

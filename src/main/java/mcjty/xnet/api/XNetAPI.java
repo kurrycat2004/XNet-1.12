@@ -18,6 +18,9 @@ public class XNetAPI {
     @CapabilityInject(IXNetComponent.class)
     public static Capability<IXNetCable> XNET_CABLE_CAPABILITY;
 
+    public static void dummyLoad(){
+    }
+
     static {
         registerCapability(IXNetComponent.class);
     }

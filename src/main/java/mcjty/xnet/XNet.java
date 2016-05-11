@@ -6,13 +6,17 @@ import elec332.core.network.NetworkHandler;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.compat.MainCompatHandler;
 import mcjty.lib.network.PacketHandler;
+import mcjty.xnet.api.XNetAPI;
+import mcjty.xnet.api.ideas.IXNetChannel;
 import mcjty.xnet.client.GuiProxy;
 import mcjty.xnet.client.XNetClientModelLoader;
 import mcjty.xnet.handler.EventHandler;
+import mcjty.xnet.handler.NetworkCallbacks;
 import mcjty.xnet.handler.WorldHandler;
 import mcjty.xnet.init.ModBlocks;
 import mcjty.xnet.init.ModItems;
 import mcjty.xnet.init.ModRecipes;
+import mcjty.xnet.varia.XNetResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -25,6 +29,8 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.registry.FMLControlledNamespacedRegistry;
+import net.minecraftforge.fml.common.registry.PersistentRegistryManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Logger;
@@ -49,6 +55,7 @@ public class XNet implements ModBase {
     public static XNet instance;
     public static Logger logger;
     public static NetworkHandler networkHandler;
+    public static FMLControlledNamespacedRegistry<IXNetChannel.Factory> networkRegistry;
 
     public static CreativeTabs tabXNet = new CreativeTabs("XNet") {
         @Override
@@ -64,8 +71,10 @@ public class XNet implements ModBase {
         networkHandler = new NetworkHandler(MODID);
         PacketHandler.registerMessages(networkHandler.getNetworkWrapper());
         networkHandler.setMessageIndex(12);
+        XNetAPI.dummyLoad();
         proxy.preInit(event);
         MinecraftForge.EVENT_BUS.register(new EventHandler());
+        networkRegistry = PersistentRegistryManager.createRegistry(new XNetResourceLocation("networkFactories"), IXNetChannel.Factory.class, null, 0, Byte.MAX_VALUE, false, NetworkCallbacks.INSTANCE, NetworkCallbacks.INSTANCE, NetworkCallbacks.INSTANCE);
         WorldHandler.init();
     }
 

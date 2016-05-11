@@ -112,15 +112,13 @@ public abstract class AbstractConnectorPart extends Multipart implements ISlotte
 
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-        //noinspection ObjectEquality
         return capability == XNetAPI.XNET_CAPABILITY && facing == side.getOpposite() || super.hasCapability(capability, facing);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-        //noinspection ObjectEquality
-        return capability == XNetAPI.XNET_CAPABILITY && facing == side.getOpposite() ? (T)this :super.getCapability(capability, facing);
+        return capability == XNetAPI.XNET_CAPABILITY && facing == side.getOpposite() ? (T)this : super.getCapability(capability, facing);
     }
 
     @Override

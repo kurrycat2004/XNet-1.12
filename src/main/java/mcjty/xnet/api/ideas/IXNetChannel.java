@@ -1,5 +1,7 @@
 package mcjty.xnet.api.ideas;
 
+import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
+
 /**
  * Created by Elec332 on 2-3-2016.
  */
@@ -37,9 +39,11 @@ public interface IXNetChannel<C> {
      */
     public void invalidate();
 
-    public interface Factory<C> {
+    public abstract class Factory extends IForgeRegistryEntry.Impl<Factory>{
 
-        public IXNetChannel<C> createNewChannel();
+        public abstract IXNetChannel createNewChannel();
+
+        public abstract Class<? extends IXNetChannel> getTypeClass();
 
     }
 
