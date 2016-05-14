@@ -93,7 +93,7 @@ public abstract class AbstractCableMultiPart extends Multipart implements ISlott
     @Override
     public IBlockState getExtendedState(IBlockState state) {
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
-        //checkConnections();
+        checkConnections();
         boolean north = isConnected(EnumFacing.NORTH);
         boolean south = isConnected(EnumFacing.SOUTH);
         boolean west = isConnected(EnumFacing.WEST);
