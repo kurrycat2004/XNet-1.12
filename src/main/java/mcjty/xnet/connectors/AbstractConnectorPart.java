@@ -53,10 +53,11 @@ public abstract class AbstractConnectorPart extends Multipart implements ISlotte
     private int id;
 
     @Override
-    public void writeToNBT(NBTTagCompound tag) {
+    public NBTTagCompound writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
         //If the side is null we'll have more issues upon load than a crash now...
         tag.setString("side", side.getName());
+        return tag;
     }
 
     @Override
