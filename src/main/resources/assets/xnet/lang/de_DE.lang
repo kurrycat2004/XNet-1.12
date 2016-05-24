@@ -1,0 +1,6 @@
+item.netcable.name=Netzwerkkabel
+item.advanced_netcable.name=Verbessertes Netzwerkkabel
+item.energy_connector.name=Energieverbidnung
+item.item_connector.name=Itemverbindung
+item.terminal.name=Terminal
+itemGroup.XNet=XNet
