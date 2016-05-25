@@ -1,9 +1,12 @@
 package mcjty.xnet.multiblock;
 
 import com.google.common.collect.Sets;
+import mcjty.xnet.api.IXNetComponent;
+import mcjty.xnet.api.XNetAPI;
 import mcmultipart.multipart.IMultipart;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -25,6 +28,14 @@ public class XNetGrid {
     private final Set<FacedPosition> allConnectors;
 
     public void tick(){
+        System.out.println("XNetGrid.tick");
+        for (BlockPos pos : allLocations) {
+            System.out.println("    pos = " + pos);
+        }
+        for (FacedPosition connector : allConnectors) {
+            System.out.println("connector = " + connector);
+        }
+
 
     }
 
@@ -44,11 +55,13 @@ public class XNetGrid {
         tile.setGrid(this);
     }
 
-    protected void onRemoved(XNetTileData tile){
+    protected void onRemoved(XNetTileData tile) {
     }
 
-    void change(XNetTileData tile, IMultipart multipart){
+    void change(XNetTileData tile, IMultipart multipart, EnumFacing facing){
+        IXNetComponent capability = ((ICapabilityProvider) multipart).getCapability(XNetAPI.XNET_CAPABILITY, facing);
         //TODO, called upon connactor added/removed
+        allConnectors.add(new FacedPosition(tile.getPos(), facing));
     }
 
     private class FacedPosition {

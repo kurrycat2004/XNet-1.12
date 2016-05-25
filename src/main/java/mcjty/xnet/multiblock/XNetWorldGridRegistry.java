@@ -80,7 +80,7 @@ public class XNetWorldGridRegistry extends AbstractWorldGridHolder<XNetTileData,
             for (EnumFacing facing : EnumFacing.VALUES) {
                 IMultipart multipart = ((IMultipartContainer) tile).getPartInSlot(PartSlot.getFaceSlot(facing));
                 if (multipart instanceof ICapabilityProvider && ((ICapabilityProvider) multipart).hasCapability(XNetAPI.XNET_CAPABILITY, facing.getOpposite())) {
-                    myGrid.change(xNetTileData, multipart);
+                    myGrid.change(xNetTileData, multipart, facing.getOpposite());
                 }
             }
         }
@@ -95,7 +95,7 @@ public class XNetWorldGridRegistry extends AbstractWorldGridHolder<XNetTileData,
     @Override
     protected void onExtraMultiPartAdded(XNetTileData xNetTileData, IMultipart multiPart) {
         System.out.println("XNetWorldGridRegistry.onExtraMultiPartAdded");
-        xNetTileData.getCurrentGrid().change(xNetTileData, multiPart);
+        xNetTileData.getCurrentGrid().change(xNetTileData, multiPart, null); // @todo
     }
 
     @Override
@@ -133,7 +133,7 @@ public class XNetWorldGridRegistry extends AbstractWorldGridHolder<XNetTileData,
     @Override
     protected void onMultiPartRemoved(XNetTileData xNetTileData, IMultipart multiPart) {
         System.out.println("XNetWorldGridRegistry.onMultiPartRemoved");
-        xNetTileData.getCurrentGrid().change(xNetTileData, multiPart);
+        xNetTileData.getCurrentGrid().change(xNetTileData, multiPart, null); //@todo
     }
 
     @Override
