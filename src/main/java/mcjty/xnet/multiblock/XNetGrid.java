@@ -1,12 +1,10 @@
 package mcjty.xnet.multiblock;
 
 import com.google.common.collect.Sets;
-import mcjty.xnet.api.IXNetComponent;
-import mcjty.xnet.api.XNetAPI;
+import mcjty.xnet.XNet;
 import mcmultipart.multipart.IMultipart;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -17,7 +15,8 @@ import java.util.Set;
  */
 public class XNetGrid {
 
-    public XNetGrid(){
+    public XNetGrid(XNetWorldGridRegistry registry){
+        this.worldGridRegistry = registry;
         allLocations = Sets.newHashSet();
         allLocations_ = Collections.unmodifiableSet(allLocations);
         allConnectors = Sets.newHashSet();
@@ -26,6 +25,7 @@ public class XNetGrid {
     private final Set<BlockPos> allLocations;
     private final Set<BlockPos> allLocations_;
     private final Set<FacedPosition> allConnectors;
+    private final XNetWorldGridRegistry worldGridRegistry;
 
     public void tick(){
         System.out.println("XNetGrid.tick");
@@ -47,7 +47,15 @@ public class XNetGrid {
     }
 
     protected void merge(XNetGrid grid){
-        this.allLocations.addAll(grid.allLocations);
+        for (BlockPos pos : grid.getAllLocations()){
+            XNetTileData tile = worldGridRegistry.getPowerTile(pos);
+            if (tile != null) {
+                addTile(tile);
+            } else {
+                XNet.logger.error("Null tile for pos: " + pos);
+            }
+            addTile(worldGridRegistry.getPowerTile(pos));
+        }
     }
 
     protected void addTile(XNetTileData tile){
@@ -58,10 +66,7 @@ public class XNetGrid {
     protected void onRemoved(XNetTileData tile) {
     }
 
-    void change(XNetTileData tile, IMultipart multipart, EnumFacing facing){
-        IXNetComponent capability = ((ICapabilityProvider) multipart).getCapability(XNetAPI.XNET_CAPABILITY, facing);
-        //TODO, called upon connactor added/removed
-        allConnectors.add(new FacedPosition(tile.getPos(), facing));
+    void change(XNetTileData tile, IMultipart multipart){
     }
 
     private class FacedPosition {

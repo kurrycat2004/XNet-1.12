@@ -50,27 +50,31 @@ public class XNetWorldGridRegistry extends AbstractWorldGridHolder<XNetTileData,
             XNetTileData neighbor = getPowerTile(pos);
             if (neighbor != null){
                 myGrid = xNetTileData.getCurrentGrid();
+                XNetGrid otherGrid = neighbor.getCurrentGrid();
+                if (otherGrid != null && myGrid != null && otherGrid == myGrid){
+                    continue;
+                }
                 if (myGrid == null){
-                    neighbor.getCurrentGrid().addTile(xNetTileData);
-                } else {
-                    XNetGrid otherGrid = neighbor.getCurrentGrid();
-                    myGrid.merge(otherGrid);
-                    for (BlockPos pos1 : otherGrid.getAllLocations()){
-                        XNetTileData tile = getPowerTile(pos1);
-                        if (tile != null){
-                            tile.setGrid(myGrid);
-                        } else {
-                            XNet.logger.error("Null tile for pos: "+pos1);
-                        }
+                    if (otherGrid == null){
+                        otherGrid = new XNetGrid(this);
+                        grids.add(otherGrid);
+                        otherGrid.addTile(neighbor);
                     }
-                    otherGrid.invalidate();
-                    grids.remove(otherGrid);
+                    otherGrid.addTile(xNetTileData);
+                } else {
+                    if (otherGrid != null) {
+                        myGrid.merge(otherGrid);
+                        otherGrid.invalidate();
+                        grids.remove(otherGrid);
+                    } else {
+                        myGrid.addTile(neighbor);
+                    }
                 }
             }
         }
         myGrid = xNetTileData.getCurrentGrid();
         if (myGrid == null){
-            XNetGrid newGrid = new XNetGrid();
+            XNetGrid newGrid = new XNetGrid(this);
             newGrid.addTile(xNetTileData);
             grids.add(newGrid);
         }
@@ -80,7 +84,7 @@ public class XNetWorldGridRegistry extends AbstractWorldGridHolder<XNetTileData,
             for (EnumFacing facing : EnumFacing.VALUES) {
                 IMultipart multipart = ((IMultipartContainer) tile).getPartInSlot(PartSlot.getFaceSlot(facing));
                 if (multipart instanceof ICapabilityProvider && ((ICapabilityProvider) multipart).hasCapability(XNetAPI.XNET_CAPABILITY, facing.getOpposite())) {
-                    myGrid.change(xNetTileData, multipart, facing.getOpposite());
+                    myGrid.change(xNetTileData, multipart);
                 }
             }
         }
@@ -95,7 +99,7 @@ public class XNetWorldGridRegistry extends AbstractWorldGridHolder<XNetTileData,
     @Override
     protected void onExtraMultiPartAdded(XNetTileData xNetTileData, IMultipart multiPart) {
         System.out.println("XNetWorldGridRegistry.onExtraMultiPartAdded");
-        xNetTileData.getCurrentGrid().change(xNetTileData, multiPart, null); // @todo
+        xNetTileData.getCurrentGrid().change(xNetTileData, multiPart);
     }
 
     @Override
@@ -114,6 +118,7 @@ public class XNetWorldGridRegistry extends AbstractWorldGridHolder<XNetTileData,
                 }
             }
         }
+        removeFromRegistry(xNetTileData);
         grid.invalidate();
         grids.remove(grid);
         for (XNetTileData tile : tiles){
@@ -133,7 +138,7 @@ public class XNetWorldGridRegistry extends AbstractWorldGridHolder<XNetTileData,
     @Override
     protected void onMultiPartRemoved(XNetTileData xNetTileData, IMultipart multiPart) {
         System.out.println("XNetWorldGridRegistry.onMultiPartRemoved");
-        xNetTileData.getCurrentGrid().change(xNetTileData, multiPart, null); //@todo
+        xNetTileData.getCurrentGrid().change(xNetTileData, multiPart);
     }
 
     @Override
@@ -145,6 +150,7 @@ public class XNetWorldGridRegistry extends AbstractWorldGridHolder<XNetTileData,
 
     @Override
     protected void onTick() {
+        System.out.println("Ticking "+grids.size()+" grids");
         for (XNetGrid grid : grids){
             grid.tick();
         }

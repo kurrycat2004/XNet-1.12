@@ -3,7 +3,6 @@ package mcjty.xnet.cables;
 import com.google.common.collect.Lists;
 import elec332.core.world.WorldHelper;
 import mcjty.xnet.api.IXNetCable;
-import mcjty.xnet.api.IXNetComponent;
 import mcjty.xnet.api.XNetAPI;
 import mcjty.xnet.api.XNetAPIHelper;
 import mcjty.xnet.varia.UniversalUnlistedProperty;
