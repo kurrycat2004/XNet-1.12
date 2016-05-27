@@ -17,6 +17,8 @@ import mcjty.xnet.handler.WorldHandler;
 import mcjty.xnet.init.ModBlocks;
 import mcjty.xnet.init.ModItems;
 import mcjty.xnet.init.ModRecipes;
+import mcjty.xnet.network.PacketConnectorsReady;
+import mcjty.xnet.network.PacketGetConnectors;
 import mcjty.xnet.varia.XNetResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -78,6 +80,12 @@ public class XNet implements ModBase {
         networkRegistry = PersistentRegistryManager.createRegistry(new XNetResourceLocation("networkFactories"), IXNetChannel.Factory.class, null, 0, Byte.MAX_VALUE, false, NetworkCallbacks.INSTANCE, NetworkCallbacks.INSTANCE, NetworkCallbacks.INSTANCE);
         WorldHandler.init();
         McJtyLib.preInit(event);
+        registerMessages();
+    }
+
+    private void registerMessages() {
+        networkHandler.registerPacket(PacketGetConnectors.Handler.class, PacketGetConnectors.class, Side.SERVER);
+        networkHandler.registerPacket(PacketConnectorsReady.Handler.class, PacketConnectorsReady.class, Side.CLIENT);
     }
 
     @Mod.EventHandler

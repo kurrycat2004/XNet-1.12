@@ -36,7 +36,15 @@ public class XNetGrid {
     private final List<FacedPosition> allConnectors;
     private final XNetWorldGridRegistry worldGridRegistry;
 
+
+    int counter = 10;
+
     public void tick(){
+        if (counter > 0) {
+            counter--;
+            return;
+        }
+        counter = 10;
         System.out.println("XNetGrid.tick");
         for (BlockPos pos : allLocations) {
             System.out.println("    pos = " + pos);
@@ -47,7 +55,6 @@ public class XNetGrid {
 
 
     }
-
     public void invalidate(){
     }
 
