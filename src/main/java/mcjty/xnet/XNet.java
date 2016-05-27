@@ -3,6 +3,7 @@ package mcjty.xnet;
 
 import elec332.core.client.model.RenderingRegistry;
 import elec332.core.network.NetworkHandler;
+import mcjty.lib.McJtyLib;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.compat.MainCompatHandler;
 import mcjty.lib.network.PacketHandler;
@@ -76,6 +77,7 @@ public class XNet implements ModBase {
         MinecraftForge.EVENT_BUS.register(new EventHandler());
         networkRegistry = PersistentRegistryManager.createRegistry(new XNetResourceLocation("networkFactories"), IXNetChannel.Factory.class, null, 0, Byte.MAX_VALUE, false, NetworkCallbacks.INSTANCE, NetworkCallbacks.INSTANCE, NetworkCallbacks.INSTANCE);
         WorldHandler.init();
+        McJtyLib.preInit(event);
     }
 
     @Mod.EventHandler

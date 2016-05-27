@@ -13,6 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -75,7 +76,7 @@ public class XNetGrid {
     protected void onRemoved(XNetTileData tile) {
     }
 
-    void change(XNetTileData tile, IMultipart multipart_){
+    void change(XNetTileData tile, @Nullable IMultipart multipart_){
         TileEntity tileEntity = tile.getTile();
         BlockPos pos = tile.getPos();
         FacedPosition faces = null;
@@ -96,6 +97,9 @@ public class XNetGrid {
                     faces.sides.add(facing);
                 }
             }
+        }
+        if (faces.sides.isEmpty()){
+            allConnectors.remove(faces);
         }
     }
 

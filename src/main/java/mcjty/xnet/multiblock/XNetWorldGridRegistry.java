@@ -119,6 +119,7 @@ public class XNetWorldGridRegistry extends AbstractWorldGridHolder<XNetTileData,
             }
         }
         removeFromRegistry(xNetTileData);
+        grid.change(xNetTileData, null);
         grid.invalidate();
         grids.remove(grid);
         for (XNetTileData tile : tiles){
