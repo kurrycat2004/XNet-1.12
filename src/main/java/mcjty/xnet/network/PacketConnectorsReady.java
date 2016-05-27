@@ -24,7 +24,7 @@ public class PacketConnectorsReady implements IMessage {
     public PacketConnectorsReady() {
     }
 
-    public PacketConnectorsReady(BlockPos pos, String command, List list) {
+    public PacketConnectorsReady(BlockPos pos, List<BlockPos> list) {
     }
 
     public static class Handler implements IMessageHandler<PacketConnectorsReady, IMessage> {

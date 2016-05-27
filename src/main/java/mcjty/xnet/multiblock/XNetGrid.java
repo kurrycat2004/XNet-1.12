@@ -62,6 +62,10 @@ public class XNetGrid {
         return allLocations_;
     }
 
+    public List<FacedPosition> getAllConnectors() {
+        return allConnectors;
+    }
+
     protected void merge(XNetGrid grid){
         for (BlockPos pos : grid.getAllLocations()){
             XNetTileData tile = worldGridRegistry.getPowerTile(pos);
@@ -110,7 +114,7 @@ public class XNetGrid {
         }
     }
 
-    private class FacedPosition {
+    public class FacedPosition {
 
         private FacedPosition(@Nonnull BlockPos pos){
             this.pos = pos;
@@ -130,6 +134,13 @@ public class XNetGrid {
             return "Pos: "+pos+" Sides: "+sides;
         }
 
+        public BlockPos getPos() {
+            return pos;
+        }
+
+        public Set<EnumFacing> getSides() {
+            return sides;
+        }
     }
 
 }
