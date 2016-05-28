@@ -1,11 +1,14 @@
-package mcjty.xnet.varia;
+package mcjty.xnet.blocks;
 
+import cofh.api.item.IToolHammer;
 import mcjty.lib.container.GenericBlock;
 import mcjty.lib.container.GenericGuiContainer;
 import mcjty.lib.container.GenericItemBlock;
+import mcjty.lib.container.WrenchUsage;
 import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.varia.Logging;
 import mcjty.xnet.XNet;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -14,7 +17,9 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -22,6 +27,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 public abstract class GenericXNetBlock<T extends GenericTileEntity, C extends Container> extends GenericBlock {
 
@@ -44,8 +50,22 @@ public abstract class GenericXNetBlock<T extends GenericTileEntity, C extends Co
         setUnlocalizedName(name);
         setRegistryName(name);
         setCreativeTab(XNet.tabXNet);
-        GameRegistry.registerBlock(this, itemBlockClass, name);
+        GameRegistry.register(this);
+        if (itemBlockClass != null) {
+            GameRegistry.register(createItemBlock(itemBlockClass), getRegistryName());
+        }
         GameRegistry.registerTileEntityWithAlternatives(tileEntityClass, XNet.MODID + "_" + name, name);
+    }
+
+    private ItemBlock createItemBlock(Class<? extends ItemBlock> itemBlockClass) {
+        try {
+            Class<?>[] ctorArgClasses = new Class<?>[1];
+            ctorArgClasses[0] = Block.class;
+            Constructor<? extends ItemBlock> itemCtor = itemBlockClass.getConstructor(ctorArgClasses);
+            return itemCtor.newInstance(this);
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @SideOnly(Side.CLIENT)
@@ -90,11 +110,11 @@ public abstract class GenericXNetBlock<T extends GenericTileEntity, C extends Co
         }
     }
 
-//    @Override
-//    protected WrenchUsage getWrenchUsage(BlockPos pos, EntityPlayer player, ItemStack itemStack, WrenchUsage wrenchUsed, Item item) {
-//        WrenchUsage usage = super.getWrenchUsage(pos, player, itemStack, wrenchUsed, item);
-//        if (item instanceof IToolHammer && usage == WrenchUsage.DISABLED) {
-//            // It is still possible it is a smart wrench.
+    @Override
+    protected WrenchUsage getWrenchUsage(BlockPos pos, EntityPlayer player, ItemStack itemStack, WrenchUsage wrenchUsed, Item item) {
+        WrenchUsage usage = super.getWrenchUsage(pos, player, itemStack, wrenchUsed, item);
+        if (item instanceof IToolHammer && usage == WrenchUsage.DISABLED) {
+            // It is still possible it is a smart wrench.
 //            if (item instanceof SmartWrench) {
 //                SmartWrench smartWrench = (SmartWrench) item;
 //                SmartWrenchMode mode = smartWrench.getMode(itemStack);
@@ -106,22 +126,23 @@ public abstract class GenericXNetBlock<T extends GenericTileEntity, C extends Co
 //                    }
 //                }
 //            }
-//        }
-//        return usage;
-//    }
-//
+            // @todo
+        }
+        return usage;
+    }
+
     @Override
     protected boolean checkAccess(World world, EntityPlayer player, TileEntity te) {
         if (te instanceof GenericTileEntity) {
 //            GenericTileEntity genericTileEntity = (GenericTileEntity) te;
-//            if ((!SecurityTools.isAdmin(player)) && (!player.getPersistentID().equals(genericTileEntity.getOwnerUUID()))) {
+//            if ((!OrphaningCardItem.isPrivileged(player, world)) && (!player.getPersistentID().equals(genericTileEntity.getOwnerUUID()))) {
 //                int securityChannel = genericTileEntity.getSecurityChannel();
 //                if (securityChannel != -1) {
 //                    SecurityChannels securityChannels = SecurityChannels.getChannels(world);
 //                    SecurityChannels.SecurityChannel channel = securityChannels.getChannel(securityChannel);
-//                    boolean playerListed = channel.getPlayers().contains(player.getDisplayName());
+//                    boolean playerListed = channel.getPlayers().contains(player.getDisplayNameString());
 //                    if (channel.isWhitelist() != playerListed) {
-//                        Logging.message(player, EnumChatFormatting.RED + "You have no permission to use this block!");
+//                        Logging.message(player, TextFormatting.RED + "You have no permission to use this block!");
 //                        return true;
 //                    }
 //                }

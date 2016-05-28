@@ -3,4 +3,5 @@ item.advanced_netcable.name=Verbessertes Netzwerkkabel
 item.energy_connector.name=Energieverbidnung
 item.item_connector.name=Itemverbindung
 item.terminal.name=Terminal
+tile.controller.name=Controller
 itemGroup.XNet=XNet

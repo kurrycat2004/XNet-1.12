@@ -136,6 +136,7 @@ public class XNet implements ModBase {
             modelLoader.setModelLocations();
             RenderingRegistry.instance().registerLoader(modelLoader);
             MinecraftForge.EVENT_BUS.register(modelLoader);
+            ModBlocks.initModels();
         }
 
     }
