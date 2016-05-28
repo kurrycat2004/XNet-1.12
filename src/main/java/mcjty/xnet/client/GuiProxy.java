@@ -36,11 +36,11 @@ public class GuiProxy implements IGuiHandler {
     @Override
     @SideOnly(Side.CLIENT)
     public Object getClientGuiElement(int guiid, EntityPlayer entityPlayer, World world, int x, int y, int z) {
+        BlockPos pos = new BlockPos(x, y, z);
         if (guiid == GUI_TERMINAL) {
-            return new GuiTerminal();
+            return new GuiTerminal(pos);
         }
 
-        BlockPos pos = new BlockPos(x, y, z);
         Block block = world.getBlockState(pos).getBlock();
         if (block instanceof GenericBlock) {
             GenericBlock genericBlock = (GenericBlock) block;

@@ -2,6 +2,7 @@ package mcjty.xnet.terminal;
 
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.GuiItemScreen;
+import mcjty.lib.gui.Window;
 import mcjty.lib.gui.layout.HorizontalAlignment;
 import mcjty.lib.gui.layout.HorizontalLayout;
 import mcjty.lib.gui.layout.VerticalLayout;
@@ -12,10 +13,14 @@ import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.gui.widgets.TextField;
 import mcjty.xnet.XNet;
 import mcjty.xnet.client.GuiProxy;
+import mcjty.xnet.network.PacketGetConnectors;
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 
 import java.awt.*;
 
@@ -26,8 +31,14 @@ public class GuiTerminal extends GuiItemScreen {
     private WidgetList channelList;
     private WidgetList connectorList;
 
-    public GuiTerminal() {
+    private BlockPos pos;
+
+    private int dirty = 10;
+    public static java.util.List<BlockPos> devicesFromServer;
+
+    public GuiTerminal(BlockPos pos) {
         super(XNet.instance, XNet.networkHandler.getNetworkWrapper(), 390, 230, GuiProxy.GUI_TERMINAL, "terminal");
+        this.pos = pos;
     }
 
     @Override
@@ -39,7 +50,10 @@ public class GuiTerminal extends GuiItemScreen {
                 .addChild(createListPanel());
         toplevel.setBounds(new Rectangle(guiLeft, guiTop, xSize, ySize));
 
-        window = new mcjty.lib.gui.Window(this, toplevel);
+        window = new Window(this, toplevel);
+        devicesFromServer = null;
+        dirty = 0;
+        requestListsFromServer();
     }
 
     private Panel createControlPanel() {
@@ -62,16 +76,39 @@ public class GuiTerminal extends GuiItemScreen {
     }
 
     private void populateLists() {
+        requestListsFromServer();
+
         channelList.removeChildren();
         channelList.addChild(getChannelLine("Quarry", false));
         channelList.addChild(getChannelLine("Main energy", true));
 
         connectorList.removeChildren();
-        connectorList.addChild(getConnectorLine(new ItemStack(Blocks.CHEST, 0, 0), false));
-        connectorList.addChild(getConnectorLine(new ItemStack(Block.REGISTRY.getObject(new ResourceLocation("rftools", "modular_storage")), 0, 0), false));
-        connectorList.addChild(getConnectorLine(new ItemStack(Blocks.ENDER_CHEST, 0, 0), false));
-        connectorList.addChild(getConnectorLine(new ItemStack(Blocks.FURNACE, 0, 0), true));
-        connectorList.addChild(getConnectorLine(new ItemStack(Block.REGISTRY.getObject(new ResourceLocation("rftools", "builder")), 0, 0), true));
+        if (devicesFromServer != null) {
+            for (BlockPos pos : devicesFromServer) {
+                WorldClient world = Minecraft.getMinecraft().theWorld;
+                IBlockState state = world.getBlockState(pos);
+                Block block = state.getBlock();
+                ItemStack stack = block.getPickBlock(state, null, world, pos, Minecraft.getMinecraft().thePlayer);
+                if (stack != null) {
+                    connectorList.addChild(getConnectorLine(stack, false));
+                }
+            }
+        }
+
+//        connectorList.addChild(getConnectorLine(new ItemStack(Blocks.CHEST, 0, 0), false));
+//        connectorList.addChild(getConnectorLine(new ItemStack(Block.REGISTRY.getObject(new ResourceLocation("rftools", "modular_storage")), 0, 0), false));
+//        connectorList.addChild(getConnectorLine(new ItemStack(Blocks.ENDER_CHEST, 0, 0), false));
+//        connectorList.addChild(getConnectorLine(new ItemStack(Blocks.FURNACE, 0, 0), true));
+//        connectorList.addChild(getConnectorLine(new ItemStack(Block.REGISTRY.getObject(new ResourceLocation("rftools", "builder")), 0, 0), true));
+    }
+
+    private void requestListsFromServer() {
+        if (dirty > 0) {
+            dirty--;
+            return;
+        }
+        dirty = 10;
+        XNet.networkHandler.getNetworkWrapper().sendToServer(new PacketGetConnectors(pos));
     }
 
 
