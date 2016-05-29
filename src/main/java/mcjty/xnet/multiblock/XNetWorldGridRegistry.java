@@ -151,7 +151,7 @@ public class XNetWorldGridRegistry extends AbstractWorldGridHolder<XNetTileData,
 
     @Override
     protected void onTick() {
-        System.out.println("Ticking "+grids.size()+" grids");
+//        System.out.println("Ticking "+grids.size()+" grids");
         for (XNetGrid grid : grids){
             grid.tick();
         }

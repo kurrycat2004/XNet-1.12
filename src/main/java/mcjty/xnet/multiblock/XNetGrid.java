@@ -40,21 +40,20 @@ public class XNetGrid {
     int counter = 10;
 
     public void tick(){
-        if (counter > 0) {
-            counter--;
-            return;
-        }
-        counter = 10;
-        System.out.println("XNetGrid.tick");
-        for (BlockPos pos : allLocations) {
-            System.out.println("    pos = " + pos);
-        }
-        for (FacedPosition connector : allConnectors) {
-            System.out.println("connector = " + connector);
-        }
-
-
+//        if (counter > 0) {
+//            counter--;
+//            return;
+//        }
+//        counter = 10;
+//        System.out.println("XNetGrid.tick");
+//        for (BlockPos pos : allLocations) {
+//            System.out.println("    pos = " + pos);
+//        }
+//        for (FacedPosition connector : allConnectors) {
+//            System.out.println("connector = " + connector);
+//        }
     }
+
     public void invalidate(){
     }
 
