@@ -89,6 +89,7 @@ public class XNet implements ModBase {
         networkHandler.registerPacket(PacketGetConnectors.Handler.class, PacketGetConnectors.class, Side.SERVER);
         networkHandler.registerPacket(PacketGetChannels.Handler.class, PacketGetChannels.class, Side.SERVER);
         networkHandler.registerPacket(PacketAddChannel.Handler.class, PacketAddChannel.class, Side.SERVER);
+        networkHandler.registerPacket(PacketRemoveChannel.Handler.class, PacketRemoveChannel.class, Side.SERVER);
     }
 
     @Mod.EventHandler

@@ -24,9 +24,32 @@ public class ControllerTE extends GenericTileEntity {
     }
 
     public void addChannel(String name) {
-        Channel channel = new Channel();
+        Channel channel = findChannel(name);
+        if (channel != null) {
+            // Already exists
+            return;
+        }
+        channel = new Channel();
         channel.setName(name);
         channels.add(channel);
+        markDirty();
+    }
+
+    private Channel findChannel(String name) {
+        for (Channel channel : channels) {
+            if (name.equals(channel.getName())) {
+                return channel;
+            }
+        }
+        return null;
+    }
+
+    public void removeChannel(String name) {
+        Channel channel = findChannel(name);
+        if (channel != null) {
+            channels.remove(channel);
+            markDirty();
+        }
     }
 
     @Override
