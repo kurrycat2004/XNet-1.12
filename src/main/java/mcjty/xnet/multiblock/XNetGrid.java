@@ -4,12 +4,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.XNetAPI;
+import mcjty.xnet.blocks.controller.ControllerTE;
 import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IMultipartContainer;
 import mcmultipart.multipart.PartSlot;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 import javax.annotation.Nonnull;
@@ -56,6 +58,19 @@ public class XNetGrid {
 
     }
     public void invalidate(){
+    }
+
+    /// @todo implement correctly
+    public ControllerTE getController(World world) {
+        for (BlockPos pos : allLocations) {
+            for (EnumFacing facing : EnumFacing.VALUES) {
+                TileEntity te = world.getTileEntity(pos.offset(facing));
+                if (te instanceof ControllerTE) {
+                    return (ControllerTE) te;
+                }
+            }
+        }
+        return null;
     }
 
     public Set<BlockPos> getAllLocations() {

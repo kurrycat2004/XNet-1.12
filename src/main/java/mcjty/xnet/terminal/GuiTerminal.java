@@ -13,6 +13,8 @@ import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.gui.widgets.TextField;
 import mcjty.xnet.XNet;
 import mcjty.xnet.client.GuiProxy;
+import mcjty.xnet.network.PacketAddChannel;
+import mcjty.xnet.network.PacketGetChannels;
 import mcjty.xnet.network.PacketGetConnectors;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -30,11 +32,13 @@ public class GuiTerminal extends GuiItemScreen {
 
     private WidgetList channelList;
     private WidgetList connectorList;
+    private TextField channelName;
 
     private BlockPos pos;
 
     private int dirty = 10;
     public static java.util.List<BlockPos> devicesFromServer;
+    public static java.util.List<String> channelsFromServer;
 
     public GuiTerminal(BlockPos pos) {
         super(XNet.instance, XNet.networkHandler.getNetworkWrapper(), 390, 230, GuiProxy.GUI_TERMINAL, "terminal");
@@ -52,14 +56,15 @@ public class GuiTerminal extends GuiItemScreen {
 
         window = new Window(this, toplevel);
         devicesFromServer = null;
+        channelsFromServer = null;
         dirty = 0;
         requestListsFromServer();
     }
 
     private Panel createControlPanel() {
-        Button plusButton = new Button(mc, this).setText("+").setTooltips("Add a new channel");
+        Button plusButton = new Button(mc, this).setText("+").setTooltips("Add a new channel").addButtonEvent(this::addChannel);
         Button minButton = new Button(mc, this).setText("-").setTooltips("Remove the selected channel");
-        TextField channelName = new TextField(mc, this).setTooltips("Name of the channel").setDesiredHeight(16);
+        channelName = new TextField(mc, this).setTooltips("Name of the channel").setDesiredHeight(16);
         return new Panel(mc, this)./*setFilledRectThickness(2).*/setLayout(new HorizontalLayout()).setDesiredHeight(23).addChild(plusButton).addChild(minButton).addChild(channelName);
     }
 
@@ -75,12 +80,20 @@ public class GuiTerminal extends GuiItemScreen {
         return new Panel(mc, this).setLayout(new HorizontalLayout().setSpacing(1).setHorizontalMargin(3)).addChild(channelPanel).addChild(connectorPanel);
     }
 
+    private void addChannel(Widget w) {
+        String name = channelName.getText();
+        XNet.networkHandler.getNetworkWrapper().sendToServer(new PacketAddChannel(pos, name));
+    }
+
     private void populateLists() {
         requestListsFromServer();
 
         channelList.removeChildren();
-        channelList.addChild(getChannelLine("Quarry", false));
-        channelList.addChild(getChannelLine("Main energy", true));
+        if (channelsFromServer != null) {
+            for (String name : channelsFromServer) {
+                channelList.addChild(getChannelLine(name, false));
+            }
+        }
 
         connectorList.removeChildren();
         if (devicesFromServer != null) {
@@ -94,12 +107,6 @@ public class GuiTerminal extends GuiItemScreen {
                 }
             }
         }
-
-//        connectorList.addChild(getConnectorLine(new ItemStack(Blocks.CHEST, 0, 0), false));
-//        connectorList.addChild(getConnectorLine(new ItemStack(Block.REGISTRY.getObject(new ResourceLocation("rftools", "modular_storage")), 0, 0), false));
-//        connectorList.addChild(getConnectorLine(new ItemStack(Blocks.ENDER_CHEST, 0, 0), false));
-//        connectorList.addChild(getConnectorLine(new ItemStack(Blocks.FURNACE, 0, 0), true));
-//        connectorList.addChild(getConnectorLine(new ItemStack(Block.REGISTRY.getObject(new ResourceLocation("rftools", "builder")), 0, 0), true));
     }
 
     private void requestListsFromServer() {
@@ -109,6 +116,7 @@ public class GuiTerminal extends GuiItemScreen {
         }
         dirty = 10;
         XNet.networkHandler.getNetworkWrapper().sendToServer(new PacketGetConnectors(pos));
+        XNet.networkHandler.getNetworkWrapper().sendToServer(new PacketGetChannels(pos));
     }
 
 
