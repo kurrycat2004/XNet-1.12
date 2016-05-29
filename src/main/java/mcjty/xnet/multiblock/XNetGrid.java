@@ -37,23 +37,24 @@ public class XNetGrid {
     private final XNetWorldGridRegistry worldGridRegistry;
 
 
-    int counter = 10;
+    int counter = 20;
 
     public void tick(){
-//        if (counter > 0) {
-//            counter--;
-//            return;
-//        }
-//        counter = 10;
-//        System.out.println("XNetGrid.tick");
-//        for (BlockPos pos : allLocations) {
-//            System.out.println("    pos = " + pos);
-//        }
-//        for (FacedPosition connector : allConnectors) {
-//            System.out.println("connector = " + connector);
-//        }
-    }
+        if (counter > 0) {
+            counter--;
+            return;
+        }
+        counter = 20;
+        System.out.println("XNetGrid.tick");
+        for (BlockPos pos : allLocations) {
+            System.out.println("    pos = " + pos);
+        }
+        for (FacedPosition connector : allConnectors) {
+            System.out.println("connector = " + connector);
+        }
 
+
+    }
     public void invalidate(){
     }
 
