@@ -4,14 +4,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.XNetAPI;
-import mcjty.xnet.blocks.controller.ControllerTE;
+import mcjty.xnet.api.IXNetController;
 import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IMultipartContainer;
 import mcmultipart.multipart.PartSlot;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 import javax.annotation.Nonnull;
@@ -38,8 +37,9 @@ public class XNetGrid {
     private final List<FacedPosition> allConnectors;
     private final XNetWorldGridRegistry worldGridRegistry;
 
+    private XNetTileData controller;
 
-    int counter = 20;
+    private int counter = 20;
 
     public void tick(){
         if (counter > 0) {
@@ -55,28 +55,22 @@ public class XNetGrid {
             System.out.println("connector = " + connector);
         }
 
-
     }
+
     public void invalidate(){
     }
 
-    /// @todo implement correctly
-    public ControllerTE getController(World world) {
-        for (BlockPos pos : allLocations) {
-            for (EnumFacing facing : EnumFacing.VALUES) {
-                TileEntity te = world.getTileEntity(pos.offset(facing));
-                if (te instanceof ControllerTE) {
-                    return (ControllerTE) te;
-                }
-            }
-        }
-        return null;
+    @Nullable
+    public IXNetController getController() {
+        return controller.getController();
     }
 
+    @Nonnull
     public Set<BlockPos> getAllLocations() {
         return allLocations_;
     }
 
+    @Nonnull
     public List<FacedPosition> getAllConnectors() {
         return allConnectors;
     }
@@ -92,14 +86,35 @@ public class XNetGrid {
             addTile(worldGridRegistry.getPowerTile(pos));
         }
         allConnectors.addAll(grid.allConnectors);
+        if (controller == null && grid.controller != null) {
+            this.controller = grid.controller;
+            grid.controller = null; //Just in  case
+            this.controller.setGrid(this);
+        } else if (controller != null && grid.controller != null){
+            final XNetTileData otherController = grid.controller;
+            grid.controller = null; //Just in  case
+            otherController.getController().removeController();
+        }
     }
 
     protected void addTile(XNetTileData tile){
-        allLocations.add(tile.getPos());
+        if (!tile.isController()) {
+            allLocations.add(tile.getPos());
+        } else {
+            if (controller != null){ //Make it go poof
+                tile.getController().removeController();
+                return;
+            } else {
+                this.controller = tile;
+            }
+        }
         tile.setGrid(this);
     }
 
     protected void onRemoved(XNetTileData tile) {
+        if (tile.isController()){
+            controller = null;
+        }
     }
 
     void change(XNetTileData tile, @Nullable IMultipart multipart_){

@@ -139,9 +139,9 @@ public abstract class GenericXNetBlock<T extends GenericTileEntity, C extends Co
 //                int securityChannel = genericTileEntity.getSecurityChannel();
 //                if (securityChannel != -1) {
 //                    SecurityChannels securityChannels = SecurityChannels.getChannels(world);
-//                    SecurityChannels.SecurityChannel channel = securityChannels.getChannel(securityChannel);
-//                    boolean playerListed = channel.getPlayers().contains(player.getDisplayNameString());
-//                    if (channel.isWhitelist() != playerListed) {
+//                    SecurityChannels.SecurityChannel channels = securityChannels.getChannel(securityChannel);
+//                    boolean playerListed = channels.getPlayers().contains(player.getDisplayNameString());
+//                    if (channels.isWhitelist() != playerListed) {
 //                        Logging.message(player, TextFormatting.RED + "You have no permission to use this block!");
 //                        return true;
 //                    }

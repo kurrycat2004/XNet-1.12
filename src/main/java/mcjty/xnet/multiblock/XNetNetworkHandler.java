@@ -3,7 +3,7 @@ package mcjty.xnet.multiblock;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import elec332.core.nbt.NBTMap;
-import mcjty.xnet.api.ideas.IXNetChannel;
+import mcjty.xnet.api.IXNetChannel;
 import mcjty.xnet.handler.NetworkCallbacks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;

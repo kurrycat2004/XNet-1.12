@@ -66,9 +66,9 @@ public class GuiTerminal extends GuiItemScreen {
     }
 
     private Panel createControlPanel() {
-        plusButton = new Button(mc, this).setText("+").setTooltips("Add a new channel").addButtonEvent(this::addChannel);
-        minButton = new Button(mc, this).setText("-").setTooltips("Remove the selected channel").addButtonEvent(this::removeChannel);
-        channelName = new TextField(mc, this).setTooltips("Name of the channel").setDesiredHeight(16);
+        plusButton = new Button(mc, this).setText("+").setTooltips("Add a new channels").addButtonEvent(this::addChannel);
+        minButton = new Button(mc, this).setText("-").setTooltips("Remove the selected channels").addButtonEvent(this::removeChannel);
+        channelName = new TextField(mc, this).setTooltips("Name of the channels").setDesiredHeight(16);
         return new Panel(mc, this)./*setFilledRectThickness(2).*/setLayout(new HorizontalLayout()).setDesiredHeight(23).addChild(plusButton).addChild(minButton).addChild(channelName);
     }
 

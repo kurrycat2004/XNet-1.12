@@ -2,6 +2,7 @@ package mcjty.xnet.connectors;
 
 import mcjty.xnet.api.IXNetComponent;
 import mcjty.xnet.api.XNetAPI;
+import mcjty.xnet.api.util.DefaultXNetComponent;
 import mcjty.xnet.client.model.IConnectorRenderable;
 import mcjty.xnet.varia.CommonProperties;
 import mcmultipart.MCMultiPartMod;
@@ -37,7 +38,7 @@ import java.util.List;
 /**
  * Created by Elec332 on 1-3-2016.
  */
-public abstract class AbstractConnectorPart extends Multipart implements ISlottedPart, IXNetComponent, INormallyOccludingPart, ICustomHighlightPart, IConnectorRenderable {
+public abstract class AbstractConnectorPart extends Multipart implements ISlottedPart, INormallyOccludingPart, ICustomHighlightPart, IConnectorRenderable {
 
     public AbstractConnectorPart(EnumFacing side){
         this();
@@ -45,18 +46,19 @@ public abstract class AbstractConnectorPart extends Multipart implements ISlotte
     }
 
     public AbstractConnectorPart(){
-        this.id = -1;
+        this.component = new DefaultXNetComponent();
     }
 
     private static final AxisAlignedBB[] HITBOXES;
+    private final IXNetComponent component;
     private EnumFacing side;
-    private int id;
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
         //If the side is null we'll have more issues upon load than a crash now...
         tag.setString("side", side.getName());
+        tag.setTag("componentData", component.serializeNBT());
         return tag;
     }
 
@@ -64,6 +66,7 @@ public abstract class AbstractConnectorPart extends Multipart implements ISlotte
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
         this.side = EnumFacing.byName(tag.getString("side"));
+        this.component.deserializeNBT(tag.getCompoundTag("componentData"));
     }
 
     @Override
@@ -89,17 +92,6 @@ public abstract class AbstractConnectorPart extends Multipart implements ISlotte
     }
 
     @Override
-    public int getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(int id) {
-        this.id = id;
-        markDirty();
-    }
-
-    @Override
     public void writeUpdatePacket(PacketBuffer buf) {
         super.writeUpdatePacket(buf);
         buf.writeByte(side.ordinal());
@@ -119,7 +111,7 @@ public abstract class AbstractConnectorPart extends Multipart implements ISlotte
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-        return capability == XNetAPI.XNET_CAPABILITY && facing == side.getOpposite() ? (T)this : super.getCapability(capability, facing);
+        return capability == XNetAPI.XNET_CAPABILITY && facing == side.getOpposite() ? (T)component : super.getCapability(capability, facing);
     }
 
     @Override

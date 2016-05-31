@@ -5,6 +5,7 @@ import com.google.common.collect.Sets;
 import elec332.core.grid.capability.AbstractWorldGridHolder;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.XNetAPI;
+import mcjty.xnet.blocks.controller.TileEntityController;
 import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IMultipartContainer;
 import mcmultipart.multipart.PartSlot;
@@ -12,6 +13,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 import javax.annotation.Nullable;
@@ -33,7 +36,7 @@ public class XNetWorldGridRegistry extends AbstractWorldGridHolder<XNetTileData,
 
     @Override
     protected boolean isValidTile(TileEntity tile) {
-        return tile.hasCapability(XNetAPI.XNET_CABLE_CAPABILITY, null);
+        return tile.hasCapability(XNetAPI.XNET_CABLE_CAPABILITY, null) || tile.getClass() == TileEntityController.class;
     }
 
     @Override

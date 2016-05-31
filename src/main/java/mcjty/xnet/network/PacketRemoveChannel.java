@@ -2,7 +2,7 @@ package mcjty.xnet.network;
 
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.network.NetworkTools;
-import mcjty.xnet.blocks.controller.ControllerTE;
+import mcjty.xnet.api.IXNetController;
 import mcjty.xnet.handler.WorldHandler;
 import mcjty.xnet.multiblock.XNetGrid;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -48,9 +48,9 @@ public class PacketRemoveChannel implements IMessage {
             EntityPlayerMP playerEntity = ctx.getServerHandler().playerEntity;
 
             XNetGrid grid = WorldHandler.instance.get(playerEntity.getEntityWorld()).xNetWorldGridRegistry.getPowerTile(message.pos).getCurrentGrid();
-            ControllerTE controllerTE = grid.getController(playerEntity.getEntityWorld());
-            if (controllerTE != null) {
-                controllerTE.removeChannel(message.name);
+            IXNetController controller = grid.getController();
+            if (controller != null) {
+                //controller.removeChannel(message.name); //TODO
             }
         }
     }

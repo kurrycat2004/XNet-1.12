@@ -23,6 +23,7 @@ public class XNetAPI {
 
     static {
         registerCapability(IXNetComponent.class);
+        register(IXNetCable.class);
     }
 
     private static <C extends IXNetComponent> void registerCapability(Class<C> clazz){
@@ -30,27 +31,33 @@ public class XNetAPI {
             @Override
             public NBTBase writeNBT(Capability<C> capability, C instance, EnumFacing side) {
                 NBTTagCompound tag = new NBTTagCompound(); //In case we need to store more than just an int later
-                tag.setInteger("net_ID", instance.getId());
+                //tag.setInteger("net_ID", instance.getId());
                 return null;
             }
 
             @Override
             public void readNBT(Capability<C> capability, C instance, EnumFacing side, NBTBase nbt) {
-                instance.setId(((NBTTagCompound)nbt).getInteger("net_ID"));
+                //instance.setId(((NBTTagCompound)nbt).getInteger("net_ID"));
             }
         }, () -> {
             throw new UnsupportedOperationException();
         });
-        CapabilityManager.INSTANCE.register(IXNetCable.class, new Capability.IStorage<IXNetCable>() {
+
+    }
+
+    public static void register(Class clazz){
+        CapabilityManager.INSTANCE.register(clazz, new Capability.IStorage() {
+
             @Override
-            public NBTBase writeNBT(Capability<IXNetCable> capability, IXNetCable instance, EnumFacing side) {
+            public NBTBase writeNBT(Capability capability, Object instance, EnumFacing side) {
                 throw new UnsupportedOperationException();
             }
 
             @Override
-            public void readNBT(Capability<IXNetCable> capability, IXNetCable instance, EnumFacing side, NBTBase nbt) {
+            public void readNBT(Capability capability, Object instance, EnumFacing side, NBTBase nbt) {
                 throw new UnsupportedOperationException();
             }
+
         }, () -> {
             throw new UnsupportedOperationException();
         });

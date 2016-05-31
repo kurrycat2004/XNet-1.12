@@ -2,7 +2,8 @@ package mcjty.xnet.network;
 
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.network.NetworkTools;
-import mcjty.xnet.blocks.controller.ControllerTE;
+import mcjty.xnet.api.IXNetController;
+import mcjty.xnet.blocks.controller.TileEntityController;
 import mcjty.xnet.handler.WorldHandler;
 import mcjty.xnet.multiblock.XNetGrid;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -48,9 +49,9 @@ public class PacketAddChannel implements IMessage {
             EntityPlayerMP playerEntity = ctx.getServerHandler().playerEntity;
 
             XNetGrid grid = WorldHandler.instance.get(playerEntity.getEntityWorld()).xNetWorldGridRegistry.getPowerTile(message.pos).getCurrentGrid();
-            ControllerTE controllerTE = grid.getController(playerEntity.getEntityWorld());
+            IXNetController controllerTE = grid.getController();
             if (controllerTE != null) {
-                controllerTE.addChannel(message.name);
+                //controllerTE.addChannel(message.name); TODO
             }
         }
     }

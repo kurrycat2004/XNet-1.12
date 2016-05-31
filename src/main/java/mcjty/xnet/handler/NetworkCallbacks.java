@@ -2,7 +2,7 @@ package mcjty.xnet.handler;
 
 import com.google.common.collect.Maps;
 import mcjty.xnet.XNet;
-import mcjty.xnet.api.ideas.IXNetChannel;
+import mcjty.xnet.api.IXNetChannel;
 import mcjty.xnet.varia.XNetResourceLocation;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.IForgeRegistry;
