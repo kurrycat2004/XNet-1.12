@@ -1,7 +1,6 @@
 package mcjty.xnet.blocks.controller;
 
 import elec332.core.api.annotations.RegisterTile;
-import elec332.core.tile.TileBase;
 import elec332.core.world.WorldHelper;
 import mcjty.lib.entity.GenericTileEntity;
 import mcjty.xnet.api.IXNetController;
@@ -15,7 +14,7 @@ import net.minecraft.world.World;
 import javax.annotation.Nonnull;
 
 @RegisterTile(name = "TileEntityXNetController")
-public final class TileEntityController extends TileBase {
+public final class TileEntityController extends GenericTileEntity {
 
     public TileEntityController(){
         controller = new XNetGridController(this);
@@ -27,7 +26,7 @@ public final class TileEntityController extends TileBase {
         final World world = worldObj;
         final BlockPos pos = this.pos;
         final NBTTagCompound nbt = new NBTTagCompound();
-        writeToItemStack(nbt);
+        writeRestorableToNBT(nbt);
         WorldHelper.setBlockState(world, pos, ModBlocks.controllerBlock.getDefaultState().withProperty(ControllerBlock.ACTIVE_PROPERTY, false), 3);
         TileEntity tile = WorldHelper.getTileAt(world, pos);
         if (tile instanceof TileEntityInactiveController){
@@ -36,14 +35,14 @@ public final class TileEntityController extends TileBase {
     }
 
     @Override
-    public void readItemStackNBT(NBTTagCompound tagCompound) {
-        super.readItemStackNBT(tagCompound);
+    public void readRestorableFromNBT(NBTTagCompound tagCompound) {
+        super.readRestorableFromNBT(tagCompound);
         controller.deserializeNBT(tagCompound.getCompoundTag("controllerData"));
     }
 
     @Override
-    public void writeToItemStack(NBTTagCompound tagCompound) {
-        super.writeToItemStack(tagCompound);
+    public void writeRestorableToNBT(NBTTagCompound tagCompound) {
+        super.writeRestorableToNBT(tagCompound);
         tagCompound.setTag("controllerData", controller.serializeNBT());
     }
 

@@ -3,6 +3,7 @@ package mcjty.xnet.blocks.controller;
 import elec332.core.tile.BlockTileBase;
 import elec332.core.world.WorldHelper;
 import mcjty.lib.entity.GenericTileEntity;
+import mcjty.xnet.blocks.GenericXNetBlock;
 import mcjty.xnet.varia.XNetResourceLocation;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
@@ -12,6 +13,7 @@ import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.Container;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -30,18 +32,23 @@ import java.util.List;
  * Created by Elec332 on 30-5-2016.
  */
 @SuppressWarnings("all")
-public class ControllerBlock extends BlockTileBase {
+public class ControllerBlock extends GenericXNetBlock<GenericTileEntity, Container> {
 
     public static final PropertyBool ACTIVE_PROPERTY = PropertyBool.create("active");
 
     public ControllerBlock(){
-        super(Material.ROCK, null, new XNetResourceLocation("controller"));
+        super(Material.ROCK, TileEntityController.class, null, "controller", false);
         this.setHardness(2.0F);
         this.setSoundType(SoundType.METAL);
         this.setHarvestLevel("pickaxe", 0);
         setDefaultState(blockState.getBaseState().withProperty(ACTIVE_PROPERTY, true));
     }
 
+    @Override
+    public int getGuiID() {
+        return 0;
+    }
+    /*
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (!state.getValue(ACTIVE_PROPERTY)){
@@ -55,6 +62,7 @@ public class ControllerBlock extends BlockTileBase {
         }
         return false;
     }
+
 
     @Override
     public boolean hasTileEntity(IBlockState state) {
@@ -100,5 +108,5 @@ public class ControllerBlock extends BlockTileBase {
     public int getMetaFromState(IBlockState state) {
         return state.getValue(ACTIVE_PROPERTY) ? 0 : 1;
     }
-
+*/
 }
