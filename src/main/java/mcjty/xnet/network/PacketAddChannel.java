@@ -3,7 +3,6 @@ package mcjty.xnet.network;
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.network.NetworkTools;
 import mcjty.xnet.api.IXNetController;
-import mcjty.xnet.blocks.controller.TileEntityController;
 import mcjty.xnet.handler.WorldHandler;
 import mcjty.xnet.multiblock.XNetGrid;
 import net.minecraft.entity.player.EntityPlayerMP;

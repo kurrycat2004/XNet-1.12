@@ -28,7 +28,7 @@ public class ModBlocks {
 
     @SideOnly(Side.CLIENT)
     public static void initModels() {
-        //controllerBlock.initModel();
+        controllerBlock.initModel();
     }
 
 }
