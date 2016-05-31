@@ -3,7 +3,6 @@ package mcjty.xnet.blocks.controller;
 import elec332.core.api.annotations.RegisterTile;
 import elec332.core.tile.TileBase;
 import elec332.core.world.WorldHelper;
-import mcjty.lib.entity.GenericTileEntity;
 import mcjty.xnet.init.ModBlocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -32,7 +31,7 @@ public final class TileEntityInactiveController extends TileBase {
         WorldHelper.setBlockState(world, pos, ModBlocks.controllerBlock.getDefaultState(), 3);
         TileEntity tile = WorldHelper.getTileAt(world, pos);
         if (tile instanceof TileEntityController){
-            ((TileEntityController) tile).readItemStackNBT(old);
+            ((TileEntityController) tile).readRestorableFromNBT(old);
         }
     }
 
