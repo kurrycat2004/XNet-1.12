@@ -2,7 +2,7 @@ package mcjty.xnet.multiblock;
 
 import elec332.core.grid.capability.ITileData;
 import mcjty.xnet.api.IXNetController;
-import mcjty.xnet.blocks.controller.ControllerTE;
+import mcjty.xnet.blocks.controller.TileEntityController;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 
@@ -15,7 +15,7 @@ public class XNetTileData implements ITileData {
 
     protected XNetTileData(TileEntity tile){
         this.tile = tile;
-        this.controller = tile.getClass() == ControllerTE.class;
+        this.controller = tile.getClass() == TileEntityController.class;
     }
 
     private final TileEntity tile;
@@ -50,7 +50,7 @@ public class XNetTileData implements ITileData {
         if (!controller){
             throw new IllegalStateException();
         }
-        return ((ControllerTE)tile).getController();
+        return ((TileEntityController)tile).getController();
     }
 
 }

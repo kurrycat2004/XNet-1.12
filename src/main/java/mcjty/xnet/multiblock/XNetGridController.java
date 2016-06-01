@@ -5,7 +5,7 @@ import elec332.core.util.NBT;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.IXNetChannel;
 import mcjty.xnet.api.IXNetController;
-import mcjty.xnet.blocks.controller.ControllerTE;
+import mcjty.xnet.blocks.controller.TileEntityController;
 import mcjty.xnet.handler.NetworkCallbacks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -18,13 +18,13 @@ import java.util.*;
  */
 public class XNetGridController implements IXNetController {
 
-    public XNetGridController(ControllerTE host){
+    public XNetGridController(TileEntityController host){
         this.channels = Maps.newHashMap();
         this.channels_ = Collections.unmodifiableMap(channels);
         this.host = host;
     }
 
-    private ControllerTE host;
+    private TileEntityController host;
     private final Map<UUID, IXNetChannel<?, ?>> channels;
     private final Map<UUID, IXNetChannel<?, ?>> channels_;
 
@@ -76,7 +76,7 @@ public class XNetGridController implements IXNetController {
 
     @Override
     public void removeController() {
-//        host.deactivate();
+        host.deactivate();
     }
 
     @Override

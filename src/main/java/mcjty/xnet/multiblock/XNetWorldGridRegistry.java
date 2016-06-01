@@ -5,7 +5,6 @@ import com.google.common.collect.Sets;
 import elec332.core.grid.capability.AbstractWorldGridHolder;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.XNetAPI;
-import mcjty.xnet.blocks.controller.ControllerTE;
 import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IMultipartContainer;
 import mcmultipart.multipart.PartSlot;
@@ -34,7 +33,7 @@ public class XNetWorldGridRegistry extends AbstractWorldGridHolder<XNetTileData,
 
     @Override
     protected boolean isValidTile(TileEntity tile) {
-        return tile.hasCapability(XNetAPI.XNET_CABLE_CAPABILITY, null) || tile.getClass() == ControllerTE.class;
+        return tile.hasCapability(XNetAPI.XNET_CABLE_CAPABILITY, null);
     }
 
     @Override
@@ -105,29 +104,31 @@ public class XNetWorldGridRegistry extends AbstractWorldGridHolder<XNetTileData,
 
     @Override
     protected void remove(XNetTileData xNetTileData) {
-        System.out.println("XNetWorldGridRegistry.remove");
-        XNetGrid grid = xNetTileData.getCurrentGrid();
-        grid.onRemoved(xNetTileData);
-        Set<XNetTileData> tiles = Sets.newHashSet();
-        for (BlockPos pos : grid.getAllLocations()){
-            if (!pos.equals(xNetTileData.getPos())){
-                XNetTileData tile = getPowerTile(pos);
-                if (tile != null){
-                    tiles.add(tile);
-                } else {
-                    XNet.logger.error("Null tile for pos: "+pos);
+        if (xNetTileData != null) {
+            System.out.println("XNetWorldGridRegistry.remove");
+            XNetGrid grid = xNetTileData.getCurrentGrid();
+            grid.onRemoved(xNetTileData);
+            Set<XNetTileData> tiles = Sets.newHashSet();
+            for (BlockPos pos : grid.getAllLocations()) {
+                if (!pos.equals(xNetTileData.getPos())) {
+                    XNetTileData tile = getPowerTile(pos);
+                    if (tile != null) {
+                        tiles.add(tile);
+                    } else {
+                        XNet.logger.error("Null tile for pos: " + pos);
+                    }
                 }
             }
-        }
-        removeFromRegistry(xNetTileData);
-        grid.change(xNetTileData, null);
-        grid.invalidate();
-        grids.remove(grid);
-        for (XNetTileData tile : tiles){
-            tile.setGrid(null);
-        }
-        for (XNetTileData tile : tiles){
-            add(tile);
+            removeFromRegistry(xNetTileData);
+            grid.change(xNetTileData, null);
+            grid.invalidate();
+            grids.remove(grid);
+            for (XNetTileData tile : tiles) {
+                tile.setGrid(null);
+            }
+            for (XNetTileData tile : tiles) {
+                add(tile);
+            }
         }
     }
 

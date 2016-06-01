@@ -37,6 +37,7 @@ public class XNetGrid {
     private final List<FacedPosition> allConnectors;
     private final XNetWorldGridRegistry worldGridRegistry;
 
+    @Nullable
     private XNetTileData controller;
 
     private int counter = 20;
@@ -49,7 +50,7 @@ public class XNetGrid {
         counter = 20;
         System.out.println("XNetGrid.tick");
         for (BlockPos pos : allLocations) {
-            System.out.println("    pos = " + pos);
+            System.out.println("pos = " + pos);
         }
         for (FacedPosition connector : allConnectors) {
             System.out.println("connector = " + connector);
@@ -62,7 +63,7 @@ public class XNetGrid {
 
     @Nullable
     public IXNetController getController() {
-        return controller.getController();
+        return controller != null ? controller.getController() : null;
     }
 
     @Nonnull
