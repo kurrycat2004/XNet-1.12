@@ -112,6 +112,7 @@ public class XNet implements ModBase {
         public void preInit(FMLPreInitializationEvent e) {
 
             MainCompatHandler.registerWaila();
+            MainCompatHandler.registerTOP();
 
             // Initialization of blocks and items typically goes here:
             ModBlocks.init();
