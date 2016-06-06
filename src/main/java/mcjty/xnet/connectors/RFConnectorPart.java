@@ -1,5 +1,7 @@
 package mcjty.xnet.connectors;
 
+import mcjty.xnet.XNet;
+import mcjty.xnet.client.GuiProxy;
 import mcjty.xnet.client.XNetClientModelLoader;
 import mcjty.xnet.init.ModItems;
 import mcmultipart.raytrace.PartMOP;
@@ -7,6 +9,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -29,6 +32,14 @@ public class RFConnectorPart extends AbstractConnectorPart {
     @SideOnly(Side.CLIENT)
     public TextureAtlasSprite getTexture(boolean front) {
         return XNetClientModelLoader.spriteEnergy;
+    }
+
+    @Override
+    public boolean onActivated(EntityPlayer player, EnumHand hand, ItemStack heldItem, PartMOP hit) {
+        if (!getWorld().isRemote) {
+            player.openGui(XNet.instance, GuiProxy.GUI_RFCONNECTOR, getWorld(), getPos().getX(), getPos().getY(), getPos().getZ());
+        }
+        return true;
     }
 
 }
