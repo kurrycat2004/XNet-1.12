@@ -99,14 +99,18 @@ public class XNetGrid {
     }
 
     protected void addTile(XNetTileData tile){
+        System.out.println("XNetGrid.addTile");
         if (!tile.isController()) {
+            System.out.println("XNetGrid.addTile: 1");
             allLocations.add(tile.getPos());
         } else {
+            System.out.println("XNetGrid.addTile: 2 controller=" + controller);
             if (controller != null){ //Make it go poof
                 tile.getController().removeController();
                 return;
             } else {
                 this.controller = tile;
+                tile.getController().addController();
             }
         }
         tile.setGrid(this);

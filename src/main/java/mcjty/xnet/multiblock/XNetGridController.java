@@ -75,6 +75,11 @@ public class XNetGridController implements IXNetController {
     }
 
     @Override
+    public void addController() {
+        host.activate();
+    }
+
+    @Override
     public void removeController() {
         host.deactivate();
     }

@@ -19,6 +19,7 @@ public interface IXNetController extends INBTSerializable<NBTTagCompound> {
 
     //INTERNAL
     public void removeController();
+    public void addController();
 
     public Collection<IXNetChannel<?, ?>> getChannels();
 

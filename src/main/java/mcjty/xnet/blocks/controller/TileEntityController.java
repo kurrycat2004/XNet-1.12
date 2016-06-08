@@ -25,9 +25,16 @@ public final class TileEntityController extends GenericTileEntity {
         return controller;
     }
 
+    public void activate() {
+        active = true;
+        WorldHandler.instance.get(worldObj).xNetWorldGridRegistry.addTile(this);
+        markDirty();
+    }
+
     public void deactivate(){
         active = false;
         WorldHandler.instance.get(worldObj).xNetWorldGridRegistry.removeTile(this);
+        markDirty();
     }
 
     @Override
