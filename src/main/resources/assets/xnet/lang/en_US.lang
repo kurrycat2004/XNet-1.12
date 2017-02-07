@@ -1,7 +1,3 @@
-item.netcable.name=Network Cable
-item.advanced_netcable.name=Advanced Network Cable
-item.energy_connector.name=Energy Connector
-item.item_connector.name=Item Connector
-item.terminal.name=Terminal
-tile.controller.name=Controller
+tile.xnet.netcable.name=Network Cable
+tile.xnet.controller.name=Controller
 itemGroup.XNet=XNet

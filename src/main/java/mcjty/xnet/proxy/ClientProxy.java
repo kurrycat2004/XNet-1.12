@@ -4,11 +4,13 @@ import com.google.common.util.concurrent.ListenableFuture;
 import mcjty.lib.McJtyLibClient;
 import mcjty.lib.font.TrueTypeFont;
 import mcjty.lib.tools.MinecraftTools;
+import mcjty.xnet.blocks.bakedmodel.BakedModelLoader;
 import mcjty.xnet.init.ModBlocks;
 import mcjty.xnet.init.ModItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -24,6 +26,7 @@ public class ClientProxy extends CommonProxy {
     public void preInit(FMLPreInitializationEvent e) {
         super.preInit(e);
 //        OBJLoader.INSTANCE.addDomain(RFTools.MODID);
+        ModelLoaderRegistry.registerLoader(new BakedModelLoader());
         ModItems.initModels();
         ModBlocks.initModels();
         McJtyLibClient.preInit(e);
@@ -38,6 +41,7 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void postInit(FMLPostInitializationEvent e) {
         super.postInit(e);
+        ModBlocks.initItemModels();
     }
 
     @Override
