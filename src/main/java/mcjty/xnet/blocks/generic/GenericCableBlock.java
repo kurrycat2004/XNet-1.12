@@ -1,6 +1,5 @@
 package mcjty.xnet.blocks.generic;
 
-import mcjty.lib.entity.GenericTileEntity;
 import mcjty.xnet.blocks.test.ConnectorType;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
@@ -9,12 +8,9 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
@@ -23,13 +19,9 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import static net.minecraft.util.EnumFacing.VALUES;
-
-public abstract class GenericCableBlock<T extends GenericTileEntity, C extends Container> extends GenericXNetBlock<T, C> {
+public abstract class GenericCableBlock extends GenericXNetBlock {
 
     // Properties that indicate if there is the same block in a certain direction.
     public static final UnlistedPropertyBlockType NORTH = new UnlistedPropertyBlockType("north");
@@ -40,30 +32,15 @@ public abstract class GenericCableBlock<T extends GenericTileEntity, C extends C
     public static final UnlistedPropertyBlockType DOWN = new UnlistedPropertyBlockType("down");
 
 
-    public GenericCableBlock(Material material, Class<? extends T> tileEntityClass, Class<? extends C> containerClass, String name) {
-        super(material, tileEntityClass, containerClass, name, false);
+    public GenericCableBlock(Material material, String name) {
+        super(material, name);
     }
 
     @Override
     @SideOnly(Side.CLIENT)
     public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
         super.getWailaBody(itemStack, currenttip, accessor, config);
-        TileEntity tileEntity = accessor.getTileEntity();
-        if (tileEntity instanceof GenericCableTileEntity) {
-            GenericCableTileEntity genericCableTileEntity = (GenericCableTileEntity) tileEntity;
-            currenttip.add(TextFormatting.GREEN + "ID: " + genericCableTileEntity.getId());
-        }
         return currenttip;
-    }
-
-    @Override
-    public boolean hasNoRotation() {
-        return true;
-    }
-
-    @Override
-    public int getGuiID() {
-        return -1;
     }
 
     public String getConnectorTexture() {
@@ -145,40 +122,6 @@ public abstract class GenericCableBlock<T extends GenericTileEntity, C extends C
         }
 
         super.breakBlock(world, pos, state);
-    }
-
-    private void connectNetwork(World world, Set<BlockPos> done, int id, BlockPos pos) {
-        if (done.contains(pos)) {
-            return;
-        }
-        done.add(pos);
-        TileEntity te = world.getTileEntity(pos);
-        GenericCableTileEntity gte = (GenericCableTileEntity) te;
-        if (gte.getId() != -1) {
-            return;
-        }
-        gte.setId(id);
-
-        for (EnumFacing facing : VALUES) {
-            BlockPos p = pos.offset(facing);
-            te = world.getTileEntity(p);
-            if (te instanceof GenericCableTileEntity) {
-                connectNetwork(world, done, id, p);
-            }
-        }
-    }
-
-    private Set<Integer> findAdjacentNetworks(World world, BlockPos pos) {
-        Set<Integer> networks = new HashSet<>();
-        for (EnumFacing facing : VALUES) {
-            BlockPos p = pos.offset(facing);
-            TileEntity te = world.getTileEntity(p);
-            if (te instanceof GenericCableTileEntity) {
-                GenericCableTileEntity genericCableTileEntity = (GenericCableTileEntity) te;
-                networks.add(genericCableTileEntity.getId());
-            }
-        }
-        return networks;
     }
 
     @Override

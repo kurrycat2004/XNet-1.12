@@ -23,12 +23,12 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class EnergyConnectorBlock extends GenericCableBlock<EnergyConnectorTileEntity, EmptyContainer> {
+public class EnergyConnectorBlock extends GenericCableBlock {
 
     public static final String ENERGY_CONNECTOR = "energy_connector";
 
     public EnergyConnectorBlock() {
-        super(Material.IRON, EnergyConnectorTileEntity.class, EmptyContainer.class, ENERGY_CONNECTOR);
+        super(Material.IRON, ENERGY_CONNECTOR);
     }
 
     @Override

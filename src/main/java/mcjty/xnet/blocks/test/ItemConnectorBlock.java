@@ -25,12 +25,12 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 
-public class ItemConnectorBlock extends GenericCableBlock<ItemConnectorTileEntity, EmptyContainer> {
+public class ItemConnectorBlock extends GenericCableBlock {
 
     public static final String ITEM_CONNECTOR = "item_connector";
 
     public ItemConnectorBlock() {
-        super(Material.IRON, ItemConnectorTileEntity.class, EmptyContainer.class, ITEM_CONNECTOR);
+        super(Material.IRON, ITEM_CONNECTOR);
     }
 
     @Override

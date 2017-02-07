@@ -1,6 +1,5 @@
 package mcjty.xnet.blocks.test;
 
-import mcjty.lib.container.EmptyContainer;
 import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.generic.GenericCableBlock;
 import mcjty.xnet.blocks.generic.GenericCableISBM;
@@ -22,12 +21,12 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class NetCableBlock extends GenericCableBlock<NetCableTileEntity, EmptyContainer> {
+public class NetCableBlock extends GenericCableBlock {
 
     public static final String NETCABLE = "netcable";
 
     public NetCableBlock() {
-        super(Material.CLOTH, NetCableTileEntity.class, EmptyContainer.class, NETCABLE);
+        super(Material.CLOTH, NETCABLE);
     }
 
     @Override
