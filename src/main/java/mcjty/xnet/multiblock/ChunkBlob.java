@@ -1,10 +1,11 @@
 package mcjty.xnet.multiblock;
 
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 import mcjty.lib.varia.BlockPosTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagIntArray;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 
 import java.util.*;
 
@@ -29,28 +30,57 @@ public class ChunkBlob {
     }
 
     public int createCableSegment(BlockPos pos) {
-        int posId = posToInt(pos);
-        if (idMappings.containsKey(posId)) {
-            throw new IllegalArgumentException("There is already a cablesegment here at " + BlockPosTools.toString(pos) + "!");
+        int posId = IntPosTools.posToInt(pos);
+        if (blobAllocations.containsKey(posId)) {
+            throw new IllegalArgumentException("There is already a cablesegment at " + BlockPosTools.toString(pos) + "!");
+        }
+
+        TIntSet ids = new TIntHashSet();
+        for (int p : IntPosTools.getSidePositions(posId)) {
+            if (blobAllocations.containsKey(p)) {
+                ids.add(blobAllocations.get(p));
+            }
+        }
+
+        if (ids.isEmpty()) {
+            // New id
+            lastId++;
+            blobAllocations.put(posId, lastId);
+            return lastId;
+        } else if (ids.size() == 1) {
+            // Merge with existing
+            int id = ids.iterator().next();
+            blobAllocations.put(posId, id);
+            return id;
+        } else {
+            // Merge several blobs
+            int id = ids.iterator().next();
+            blobAllocations.put(posId, id);
+            for (Map.Entry<Integer, Integer> entry : blobAllocations.entrySet()) {
+                if (ids.contains(entry.getValue())) {
+                    blobAllocations.put(entry.getKey(), id);
+                }
+            }
+            Set<Integer> networkIds = new HashSet<>();
+            for (Map.Entry<Integer, Set<Integer>> entry : idMappings.entrySet()) {
+                if (ids.contains(entry.getKey())) {
+                    networkIds.addAll(entry.getValue());
+                }
+            }
+            idMappings.put(id, networkIds);
+            return id;
+        }
+    }
+
+    public void removeCableSegment(BlockPos pos) {
+        int posId = IntPosTools.posToInt(pos);
+        if (!blobAllocations.containsKey(posId)) {
+            throw new IllegalArgumentException("There is no cablesegment at " + BlockPosTools.toString(pos) + "!");
         }
 
         // @todo
-        return -1;
     }
 
-    private static int posToInt(BlockPos pos) {
-        int dx = pos.getX() & 0xf;
-        int dy = pos.getY();
-        int dz = pos.getZ() & 0xf;
-        return dx << 12 | dy << 4 | dz;
-    }
-
-    private static BlockPos intToPos(ChunkPos cpos, int i) {
-        int dx = (i >> 12) & 0xf;
-        int dy = (i >> 4) & 0xff;
-        int dz = i & 0xf;
-        return new BlockPos(cpos.chunkXPos | dx, dy, cpos.chunkZPos | dz);
-    }
 
 
     public void readFromNBT(NBTTagCompound compound) {
