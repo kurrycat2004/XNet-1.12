@@ -4,7 +4,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import mcjty.lib.McJtyLibClient;
 import mcjty.lib.font.TrueTypeFont;
 import mcjty.lib.tools.MinecraftTools;
-import mcjty.xnet.blocks.bakedmodel.BakedModelLoader;
+import mcjty.xnet.blocks.generic.BakedModelLoader;
 import mcjty.xnet.init.ModBlocks;
 import mcjty.xnet.init.ModItems;
 import net.minecraft.client.Minecraft;

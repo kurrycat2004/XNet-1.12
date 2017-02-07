@@ -1,8 +1,9 @@
-package mcjty.xnet.blocks.bakedmodel;
+package mcjty.xnet.blocks.test;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 import mcjty.xnet.XNet;
+import mcjty.xnet.blocks.generic.GenericCableISBM;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
@@ -14,10 +15,10 @@ import net.minecraftforge.common.model.TRSRTransformation;
 import java.util.Collection;
 import java.util.Collections;
 
-public class ExampleModel implements IModel {
+public class GenericModel implements IModel {
     @Override
     public IBakedModel bake(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
-        return new CableBakedModel(state, format, bakedTextureGetter);
+        return new GenericCableISBM(state, format, bakedTextureGetter);
     }
 
     @Override
