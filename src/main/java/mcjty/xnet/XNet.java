@@ -3,6 +3,7 @@ package mcjty.xnet;
 
 import mcjty.lib.base.ModBase;
 import mcjty.lib.compat.CompatCreativeTabs;
+import mcjty.xnet.multiblock.XNetBlobData;
 import mcjty.xnet.proxy.CommonProxy;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -67,7 +68,7 @@ public class XNet implements ModBase {
 
     @Mod.EventHandler
     public void serverStopped(FMLServerStoppedEvent event) {
-       //Nothing yet
+        XNetBlobData.clearInstance();
     }
 
 
