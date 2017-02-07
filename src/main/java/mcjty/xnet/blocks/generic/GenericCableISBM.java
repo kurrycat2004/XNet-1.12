@@ -22,26 +22,84 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static mcjty.xnet.blocks.generic.CablePatterns.SpriteIdx.*;
+
 public class GenericCableISBM implements IBakedModel {
 
     public static final ModelResourceLocation modelEnergyConnector = new ModelResourceLocation(XNet.MODID + ":" + EnergyConnectorBlock.ENERGY_CONNECTOR);
     public static final ModelResourceLocation modelItemConnector = new ModelResourceLocation(XNet.MODID + ":" + ItemConnectorBlock.ITEM_CONNECTOR);
     public static final ModelResourceLocation modelCable = new ModelResourceLocation(XNet.MODID + ":" + NetCableBlock.NETCABLE);
 
-    private TextureAtlasSprite sprite;
-
     private TextureAtlasSprite spriteCable;
     private TextureAtlasSprite spriteEnergy;
-    private TextureAtlasSprite spriteSide;
+
+    private static TextureAtlasSprite spriteNoneCable;
+    private static TextureAtlasSprite spriteNormalCable;
+    private static TextureAtlasSprite spriteEndCable;
+    private static TextureAtlasSprite spriteCornerCable;
+    private static TextureAtlasSprite spriteThreeCable;
+    private static TextureAtlasSprite spriteCrossCable;
+    private static TextureAtlasSprite spriteSide;
 
     private VertexFormat format;
 
-    public GenericCableISBM(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
-        this.format = format;
-        sprite = bakedTextureGetter.apply(new ResourceLocation(XNet.MODID, "blocks/normal_netcable"));
+
+    static {
+        CablePatterns.PATTERNS.put(new CablePatterns.Pattern(false, false, false, false), new CablePatterns.QuadSetting(CablePatterns.SpriteIdx.SPRITE_NONE, 0));
+        CablePatterns.PATTERNS.put(new CablePatterns.Pattern(true, false, false, false), new CablePatterns.QuadSetting(CablePatterns.SpriteIdx.SPRITE_END, 3));
+        CablePatterns.PATTERNS.put(new CablePatterns.Pattern(false, true, false, false), new CablePatterns.QuadSetting(CablePatterns.SpriteIdx.SPRITE_END, 0));
+        CablePatterns.PATTERNS.put(new CablePatterns.Pattern(false, false, true, false), new CablePatterns.QuadSetting(CablePatterns.SpriteIdx.SPRITE_END, 1));
+        CablePatterns.PATTERNS.put(new CablePatterns.Pattern(false, false, false, true), new CablePatterns.QuadSetting(CablePatterns.SpriteIdx.SPRITE_END, 2));
+        CablePatterns.PATTERNS.put(new CablePatterns.Pattern(true, true, false, false), new CablePatterns.QuadSetting(SPRITE_CORNER, 0));
+        CablePatterns.PATTERNS.put(new CablePatterns.Pattern(false, true, true, false), new CablePatterns.QuadSetting(SPRITE_CORNER, 1));
+        CablePatterns.PATTERNS.put(new CablePatterns.Pattern(false, false, true, true), new CablePatterns.QuadSetting(SPRITE_CORNER, 2));
+        CablePatterns.PATTERNS.put(new CablePatterns.Pattern(true, false, false, true), new CablePatterns.QuadSetting(SPRITE_CORNER, 3));
+        CablePatterns.PATTERNS.put(new CablePatterns.Pattern(false, true, false, true), new CablePatterns.QuadSetting(SPRITE_STRAIGHT, 0));
+        CablePatterns.PATTERNS.put(new CablePatterns.Pattern(true, false, true, false), new CablePatterns.QuadSetting(SPRITE_STRAIGHT, 1));
+        CablePatterns.PATTERNS.put(new CablePatterns.Pattern(true, true, true, false), new CablePatterns.QuadSetting(SPRITE_THREE, 0));
+        CablePatterns.PATTERNS.put(new CablePatterns.Pattern(false, true, true, true), new CablePatterns.QuadSetting(SPRITE_THREE, 1));
+        CablePatterns.PATTERNS.put(new CablePatterns.Pattern(true, false, true, true), new CablePatterns.QuadSetting(SPRITE_THREE, 2));
+        CablePatterns.PATTERNS.put(new CablePatterns.Pattern(true, true, false, true), new CablePatterns.QuadSetting(SPRITE_THREE, 3));
+        CablePatterns.PATTERNS.put(new CablePatterns.Pattern(true, true, true, true), new CablePatterns.QuadSetting(SPRITE_CROSS, 0));
     }
 
-    private void putVertex(UnpackedBakedQuad.Builder builder, Vec3d normal, double x, double y, double z, float u, float v) {
+    private static void initTextures() {
+        if (spriteNormalCable == null) {
+            spriteNormalCable = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(XNet.MODID + ":blocks/normal_netcable");
+            spriteNoneCable = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(XNet.MODID + ":blocks/normal_none_netcable");
+            spriteEndCable = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(XNet.MODID + ":blocks/normal_end_netcable");
+            spriteCornerCable = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(XNet.MODID + ":blocks/normal_corner_netcable");
+            spriteThreeCable = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(XNet.MODID + ":blocks/normal_three_netcable");
+            spriteCrossCable = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(XNet.MODID + ":blocks/normal_cross_netcable");
+            spriteSide = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(XNet.MODID + ":blocks/connector_side");
+        }
+    }
+
+    private static TextureAtlasSprite getSpriteNormal(CablePatterns.SpriteIdx idx) {
+        initTextures();
+        switch (idx) {
+            case SPRITE_NONE:
+                return spriteNoneCable;
+            case SPRITE_END:
+                return spriteEndCable;
+            case SPRITE_STRAIGHT:
+                return spriteNormalCable;
+            case SPRITE_CORNER:
+                return spriteCornerCable;
+            case SPRITE_THREE:
+                return spriteThreeCable;
+            case SPRITE_CROSS:
+                return spriteCrossCable;
+        }
+        return spriteNoneCable;
+    }
+
+
+    public GenericCableISBM(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
+        this.format = format;
+    }
+
+    private void putVertex(UnpackedBakedQuad.Builder builder, Vec3d normal, double x, double y, double z, float u, float v, TextureAtlasSprite sprite) {
         for (int e = 0; e < format.getElementCount(); e++) {
             switch (format.getElement(e).getUsage()) {
                 case POSITION:
@@ -67,18 +125,35 @@ public class GenericCableISBM implements IBakedModel {
         }
     }
 
+    private BakedQuad createQuad(Vec3d v1, Vec3d v2, Vec3d v3, Vec3d v4, TextureAtlasSprite sprite, int rotation) {
+        switch (rotation) {
+            case 0:
+                return createQuad(v1, v2, v3, v4, sprite);
+            case 1:
+                return createQuad(v2, v3, v4, v1, sprite);
+            case 2:
+                return createQuad(v3, v4, v1, v2, sprite);
+            case 3:
+                return createQuad(v4, v1, v2, v3, sprite);
+        }
+        return createQuad(v1, v2, v3, v4, sprite);
+    }
+
     private BakedQuad createQuad(Vec3d v1, Vec3d v2, Vec3d v3, Vec3d v4, TextureAtlasSprite sprite) {
         Vec3d normal = v3.subtract(v2).crossProduct(v1.subtract(v2)).normalize();
 
         UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(format);
         builder.setTexture(sprite);
-        putVertex(builder, normal, v1.xCoord, v1.yCoord, v1.zCoord, 0, 0);
-        putVertex(builder, normal, v2.xCoord, v2.yCoord, v2.zCoord, 0, 16);
-        putVertex(builder, normal, v3.xCoord, v3.yCoord, v3.zCoord, 16, 16);
-        putVertex(builder, normal, v4.xCoord, v4.yCoord, v4.zCoord, 16, 0);
+        putVertex(builder, normal, v1.xCoord, v1.yCoord, v1.zCoord, 0, 0, sprite);
+        putVertex(builder, normal, v2.xCoord, v2.yCoord, v2.zCoord, 0, 16, sprite);
+        putVertex(builder, normal, v3.xCoord, v3.yCoord, v3.zCoord, 16, 16, sprite);
+        putVertex(builder, normal, v4.xCoord, v4.yCoord, v4.zCoord, 16, 0, sprite);
         return builder.build();
     }
 
+    private static Vec3d v(double x, double y, double z) {
+        return new Vec3d(x, y, z);
+    }
 
     @Override
     public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
@@ -90,21 +165,21 @@ public class GenericCableISBM implements IBakedModel {
         // Called with the blockstate from our block. Here we get the values of the six properties and pass that to
         // our baked model implementation.
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
-        ConnectorType north, south, west, east, up, down;
-        north = extendedBlockState.getValue(GenericCableBlock.NORTH);
-        south = extendedBlockState.getValue(GenericCableBlock.SOUTH);
-        west = extendedBlockState.getValue(GenericCableBlock.WEST);
-        east = extendedBlockState.getValue(GenericCableBlock.EAST);
-        up = extendedBlockState.getValue(GenericCableBlock.UP);
-        down = extendedBlockState.getValue(GenericCableBlock.DOWN);
+        ConnectorType north = extendedBlockState.getValue(GenericCableBlock.NORTH);
+        ConnectorType south = extendedBlockState.getValue(GenericCableBlock.SOUTH);
+        ConnectorType west = extendedBlockState.getValue(GenericCableBlock.WEST);
+        ConnectorType east = extendedBlockState.getValue(GenericCableBlock.EAST);
+        ConnectorType up = extendedBlockState.getValue(GenericCableBlock.UP);
+        ConnectorType down = extendedBlockState.getValue(GenericCableBlock.DOWN);
 
-        spriteCable = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(XNet.MODID + ":blocks/netcable");
+        initTextures();
+        spriteCable = spriteNormalCable; // Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(XNet.MODID + ":blocks/netcable");
         GenericCableBlock block = (GenericCableBlock) state.getBlock();
         String connectorTexture = block.getConnectorTexture();
         if (connectorTexture != null) {
             spriteEnergy = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(connectorTexture);
         }
-        spriteSide = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(XNet.MODID + ":blocks/connectorSide");
+        java.util.function.Function<CablePatterns.SpriteIdx, TextureAtlasSprite> getSprite = GenericCableISBM::getSpriteNormal;
 
         List<BakedQuad> quads = new ArrayList<>();
 
@@ -116,135 +191,140 @@ public class GenericCableISBM implements IBakedModel {
         // or else we extend so that we touch the adjacent block:
 
         if (up == ConnectorType.CABLE) {
-            quads.add(createQuad(new Vec3d(1 - o, 1 - o, o),     new Vec3d(1 - o, 1,     o),     new Vec3d(1 - o, 1,     1 - o), new Vec3d(1 - o, 1 - o, 1 - o), spriteCable));
-            quads.add(createQuad(new Vec3d(o,     1 - o, 1 - o), new Vec3d(o,     1,     1 - o), new Vec3d(o,     1,     o),     new Vec3d(o,     1 - o, o), spriteCable));
-            quads.add(createQuad(new Vec3d(o,     1,     o),     new Vec3d(1 - o, 1,     o),     new Vec3d(1 - o, 1 - o, o),     new Vec3d(o,     1 - o, o), spriteCable));
-            quads.add(createQuad(new Vec3d(o,     1 - o, 1 - o), new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(1 - o, 1,     1 - o), new Vec3d(o,     1,     1 - o), spriteCable));
+            quads.add(createQuad(v(1 - o, 1,     o),     v(1 - o, 1,     1 - o), v(1 - o, 1 - o, 1 - o), v(1 - o, 1 - o, o),     spriteCable));
+            quads.add(createQuad(v(o,     1,     1 - o), v(o,     1,     o),     v(o,     1 - o, o),     v(o,     1 - o, 1 - o), spriteCable));
+            quads.add(createQuad(v(o,     1,     o),     v(1 - o, 1,     o),     v(1 - o, 1 - o, o),     v(o,     1 - o, o), spriteCable));
+            quads.add(createQuad(v(o,     1 - o, 1 - o), v(1 - o, 1 - o, 1 - o), v(1 - o, 1,     1 - o), v(o,     1,     1 - o), spriteCable));
         } else if (up == ConnectorType.BLOCK) {
-            quads.add(createQuad(new Vec3d(1 - o, 1 - o, o),     new Vec3d(1 - o, 1 - p, o),     new Vec3d(1 - o, 1 - p, 1 - o), new Vec3d(1 - o, 1 - o, 1 - o), spriteCable));
-            quads.add(createQuad(new Vec3d(o,     1 - o, 1 - o), new Vec3d(o,     1 - p, 1 - o), new Vec3d(o,     1 - p, o),     new Vec3d(o,     1 - o, o), spriteCable));
-            quads.add(createQuad(new Vec3d(o,     1 - p, o),     new Vec3d(1 - o, 1 - p, o),     new Vec3d(1 - o, 1 - o, o),     new Vec3d(o,     1 - o, o), spriteCable));
-            quads.add(createQuad(new Vec3d(o,     1 - o, 1 - o), new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(1 - o, 1 - p, 1 - o), new Vec3d(o,     1 - p, 1 - o), spriteCable));
+            quads.add(createQuad(v(1 - o, 1 - p,     o),     v(1 - o, 1 - p,     1 - o), v(1 - o, 1 - o, 1 - o),     v(1 - o, 1 - o, o),     spriteCable));
+            quads.add(createQuad(v(o,     1 - p,     1 - o), v(o,     1 - p,     o),     v(o,     1 - o, o),         v(o,     1 - o, 1 - o), spriteCable));
+            quads.add(createQuad(v(o,     1 - p,     o),     v(1 - o, 1 - p,     o),     v(1 - o, 1 - o, o),         v(o,     1 - o, o), spriteCable));
+            quads.add(createQuad(v(o,     1 - o, 1 - o),     v(1 - o, 1 - o, 1 - o),     v(1 - o, 1 - p,     1 - o), v(o,     1 - p,     1 - o), spriteCable));
 
-            quads.add(createQuad(new Vec3d(1 - q, 1 - p, q),     new Vec3d(1 - q, 1,     q),     new Vec3d(1 - q, 1,     1 - q), new Vec3d(1 - q, 1 - p, 1 - q), spriteSide));
-            quads.add(createQuad(new Vec3d(q,     1 - p, 1 - q), new Vec3d(q,     1,     1 - q), new Vec3d(q,     1,     q),     new Vec3d(q,     1 - p, q), spriteSide));
-            quads.add(createQuad(new Vec3d(q,     1,     q),     new Vec3d(1 - q, 1,     q),     new Vec3d(1 - q, 1 - p, q),     new Vec3d(q,     1 - p, q), spriteSide));
-            quads.add(createQuad(new Vec3d(q,     1 - p, 1 - q), new Vec3d(1 - q, 1 - p, 1 - q), new Vec3d(1 - q, 1,     1 - q), new Vec3d(q,     1,     1 - q), spriteSide));
+            quads.add(createQuad(v(1 - q, 1 - p, q),     v(1 - q, 1,     q),     v(1 - q, 1,     1 - q), v(1 - q, 1 - p, 1 - q), spriteSide));
+            quads.add(createQuad(v(q,     1 - p, 1 - q), v(q,     1,     1 - q), v(q,     1,     q),     v(q,     1 - p, q), spriteSide));
+            quads.add(createQuad(v(q,     1,     q),     v(1 - q, 1,     q),     v(1 - q, 1 - p, q),     v(q,     1 - p, q), spriteSide));
+            quads.add(createQuad(v(q,     1 - p, 1 - q), v(1 - q, 1 - p, 1 - q), v(1 - q, 1,     1 - q), v(q,     1,     1 - q), spriteSide));
 
-            quads.add(createQuad(new Vec3d(q,     1 - p, q),     new Vec3d(1 - q, 1 - p, q),     new Vec3d(1 - q, 1 - p, 1 - q), new Vec3d(q,     1 - p, 1 - q), spriteEnergy));
+            quads.add(createQuad(v(q,     1 - p, q),     v(1 - q, 1 - p, q),     v(1 - q, 1 - p, 1 - q), v(q,     1 - p, 1 - q), spriteEnergy));
         } else {
-            quads.add(createQuad(new Vec3d(o,     1 - o, 1 - o), new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(1 - o, 1 - o, o),     new Vec3d(o,     1 - o, o), spriteCable));
+            CablePatterns.QuadSetting pattern = CablePatterns.findPattern(west, south, east, north);
+            quads.add(createQuad(v(o,     1 - o, 1 - o), v(1 - o, 1 - o, 1 - o), v(1 - o, 1 - o, o),     v(o,     1 - o, o), getSprite.apply(pattern.getSprite()), pattern.getRotation()));
         }
 
         if (down == ConnectorType.CABLE) {
-            quads.add(createQuad(new Vec3d(1 - o, 0, o),     new Vec3d(1 - o, o, o),     new Vec3d(1 - o, o, 1 - o), new Vec3d(1 - o, 0, 1 - o), spriteCable));
-            quads.add(createQuad(new Vec3d(o,     0, 1 - o), new Vec3d(o,     o, 1 - o), new Vec3d(o,     o, o),     new Vec3d(o,     0, o), spriteCable));
-            quads.add(createQuad(new Vec3d(o,     o, o),     new Vec3d(1 - o, o, o),     new Vec3d(1 - o, 0, o),     new Vec3d(o,     0, o), spriteCable));
-            quads.add(createQuad(new Vec3d(o,     0, 1 - o), new Vec3d(1 - o, 0, 1 - o), new Vec3d(1 - o, o, 1 - o), new Vec3d(o,     o, 1 - o), spriteCable));
+            quads.add(createQuad(v(1 - o, o, o),     v(1 - o, o, 1 - o), v(1 - o, 0, 1 - o), v(1 - o, 0, o),     spriteCable));
+            quads.add(createQuad(v(o,     o, 1 - o), v(o,     o, o),     v(o,     0, o),     v(o,     0, 1 - o), spriteCable));
+            quads.add(createQuad(v(o,     o, o),     v(1 - o, o, o),     v(1 - o, 0, o),     v(o,     0, o), spriteCable));
+            quads.add(createQuad(v(o,     0, 1 - o), v(1 - o, 0, 1 - o), v(1 - o, o, 1 - o), v(o,     o, 1 - o), spriteCable));
         } else if (down == ConnectorType.BLOCK) {
-            quads.add(createQuad(new Vec3d(1 - o, p, o),     new Vec3d(1 - o, o, o),     new Vec3d(1 - o, o, 1 - o), new Vec3d(1 - o, p, 1 - o), spriteCable));
-            quads.add(createQuad(new Vec3d(o,     p, 1 - o), new Vec3d(o,     o, 1 - o), new Vec3d(o,     o, o),     new Vec3d(o,     p, o), spriteCable));
-            quads.add(createQuad(new Vec3d(o,     o, o),     new Vec3d(1 - o, o, o),     new Vec3d(1 - o, p, o),     new Vec3d(o,     p, o), spriteCable));
-            quads.add(createQuad(new Vec3d(o,     p, 1 - o), new Vec3d(1 - o, p, 1 - o), new Vec3d(1 - o, o, 1 - o), new Vec3d(o,     o, 1 - o), spriteCable));
+            quads.add(createQuad(v(1 - o, o, o),     v(1 - o, o, 1 - o), v(1 - o, p, 1 - o), v(1 - o, p, o),     spriteCable));
+            quads.add(createQuad(v(o,     o, 1 - o), v(o,     o, o),     v(o,     p, o),     v(o,     p, 1 - o), spriteCable));
+            quads.add(createQuad(v(o,     o, o),     v(1 - o, o, o),     v(1 - o, p, o),     v(o,     p, o), spriteCable));
+            quads.add(createQuad(v(o,     p, 1 - o), v(1 - o, p, 1 - o), v(1 - o, o, 1 - o), v(o,     o, 1 - o), spriteCable));
 
-            quads.add(createQuad(new Vec3d(1 - q, 0, q),     new Vec3d(1 - q, p, q),     new Vec3d(1 - q, p, 1 - q), new Vec3d(1 - q, 0, 1 - q), spriteSide));
-            quads.add(createQuad(new Vec3d(q,     0, 1 - q), new Vec3d(q,     p, 1 - q), new Vec3d(q,     p, q),     new Vec3d(q,     0, q), spriteSide));
-            quads.add(createQuad(new Vec3d(q,     p, q),     new Vec3d(1 - q, p, q),     new Vec3d(1 - q, 0, q),     new Vec3d(q,     0, q), spriteSide));
-            quads.add(createQuad(new Vec3d(q,     0, 1 - q), new Vec3d(1 - q, 0, 1 - q), new Vec3d(1 - q, p, 1 - q), new Vec3d(q,     p, 1 - q), spriteSide));
+            quads.add(createQuad(v(1 - q, 0, q),     v(1 - q, p, q),     v(1 - q, p, 1 - q), v(1 - q, 0, 1 - q), spriteSide));
+            quads.add(createQuad(v(q,     0, 1 - q), v(q,     p, 1 - q), v(q,     p, q),     v(q,     0, q), spriteSide));
+            quads.add(createQuad(v(q,     p, q),     v(1 - q, p, q),     v(1 - q, 0, q),     v(q,     0, q), spriteSide));
+            quads.add(createQuad(v(q,     0, 1 - q), v(1 - q, 0, 1 - q), v(1 - q, p, 1 - q), v(q,     p, 1 - q), spriteSide));
 
-            quads.add(createQuad(new Vec3d(q,     p, 1 - q), new Vec3d(1 - q, p, 1 - q), new Vec3d(1 - q, p, q),     new Vec3d(q,     p, q), spriteEnergy));
+            quads.add(createQuad(v(q,     p, 1 - q), v(1 - q, p, 1 - q), v(1 - q, p, q),     v(q,     p, q), spriteEnergy));
         } else {
-            quads.add(createQuad(new Vec3d(o, o, o), new Vec3d(1 - o, o, o), new Vec3d(1 - o, o, 1 - o), new Vec3d(o, o, 1 - o), spriteCable));
+            CablePatterns.QuadSetting pattern = CablePatterns.findPattern(west, north, east, south);
+            quads.add(createQuad(v(o, o, o), v(1 - o, o, o), v(1 - o, o, 1 - o), v(o, o, 1 - o), getSprite.apply(pattern.getSprite()),pattern.getRotation()));
         }
 
         if (east == ConnectorType.CABLE) {
-            quads.add(createQuad(new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(1, 1 - o, 1 - o), new Vec3d(1, 1 - o, o),     new Vec3d(1 - o, 1 - o, o), spriteCable));
-            quads.add(createQuad(new Vec3d(1 - o, o,     o),     new Vec3d(1, o,     o),     new Vec3d(1, o,     1 - o), new Vec3d(1 - o, o,     1 - o), spriteCable));
-            quads.add(createQuad(new Vec3d(1 - o, 1 - o, o),     new Vec3d(1, 1 - o, o),     new Vec3d(1, o,     o),     new Vec3d(1 - o, o,     o), spriteCable));
-            quads.add(createQuad(new Vec3d(1 - o, o,     1 - o), new Vec3d(1, o,     1 - o), new Vec3d(1, 1 - o, 1 - o), new Vec3d(1 - o, 1 - o, 1 - o), spriteCable));
+            quads.add(createQuad(v(1, 1 - o, 1 - o), v(1, 1 - o, o),     v(1 - o, 1 - o, o), v(1 - o, 1 - o, 1 - o), spriteCable));
+            quads.add(createQuad(v(1, o,     o),     v(1, o,     1 - o), v(1 - o, o,     1 - o), v(1 - o, o,     o),     spriteCable));
+            quads.add(createQuad(v(1, 1 - o, o),     v(1, o,     o),     v(1 - o, o,     o), v(1 - o, 1 - o, o),     spriteCable));
+            quads.add(createQuad(v(1, o,     1 - o), v(1, 1 - o, 1 - o), v(1 - o, 1 - o, 1 - o), v(1 - o, o,     1 - o), spriteCable));
         } else if (east == ConnectorType.BLOCK) {
-            quads.add(createQuad(new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(1 - p, 1 - o, 1 - o), new Vec3d(1 - p, 1 - o, o),     new Vec3d(1 - o, 1 - o, o), spriteCable));
-            quads.add(createQuad(new Vec3d(1 - o, o,     o),     new Vec3d(1 - p, o,     o),     new Vec3d(1 - p, o,     1 - o), new Vec3d(1 - o, o,     1 - o), spriteCable));
-            quads.add(createQuad(new Vec3d(1 - o, 1 - o, o),     new Vec3d(1 - p, 1 - o, o),     new Vec3d(1 - p, o,     o),     new Vec3d(1 - o, o,     o), spriteCable));
-            quads.add(createQuad(new Vec3d(1 - o, o,     1 - o), new Vec3d(1 - p, o,     1 - o), new Vec3d(1 - p, 1 - o, 1 - o), new Vec3d(1 - o, 1 - o, 1 - o), spriteCable));
+            quads.add(createQuad(v(1 - p, 1 - o, 1 - o), v(1 - p, 1 - o, o),     v(1 - o, 1 - o, o), v(1 - o, 1 - o, 1 - o), spriteCable));
+            quads.add(createQuad(v(1 - p, o,     o),     v(1 - p, o,     1 - o), v(1 - o, o,     1 - o), v(1 - o, o,     o),     spriteCable));
+            quads.add(createQuad(v(1 - p, 1 - o, o),     v(1 - p, o,     o),     v(1 - o, o,     o), v(1 - o, 1 - o, o),     spriteCable));
+            quads.add(createQuad(v(1 - p, o,     1 - o), v(1 - p, 1 - o, 1 - o), v(1 - o, 1 - o, 1 - o), v(1 - o, o,     1 - o), spriteCable));
 
-            quads.add(createQuad(new Vec3d(1 - p, 1 - q, 1 - q), new Vec3d(1, 1 - q, 1 - q), new Vec3d(1, 1 - q, q),     new Vec3d(1 - p, 1 - q, q), spriteSide));
-            quads.add(createQuad(new Vec3d(1 - p, q,     q),     new Vec3d(1, q,     q),     new Vec3d(1, q,     1 - q), new Vec3d(1 - p, q,     1 - q), spriteSide));
-            quads.add(createQuad(new Vec3d(1 - p, 1 - q, q),     new Vec3d(1, 1 - q, q),     new Vec3d(1, q,     q),     new Vec3d(1 - p, q,     q), spriteSide));
-            quads.add(createQuad(new Vec3d(1 - p, q,     1 - q), new Vec3d(1, q,     1 - q), new Vec3d(1, 1 - q, 1 - q), new Vec3d(1 - p, 1 - q, 1 - q), spriteSide));
+            quads.add(createQuad(v(1 - p, 1 - q, 1 - q), v(1, 1 - q, 1 - q), v(1, 1 - q, q),     v(1 - p, 1 - q, q), spriteSide));
+            quads.add(createQuad(v(1 - p, q,     q),     v(1, q,     q),     v(1, q,     1 - q), v(1 - p, q,     1 - q), spriteSide));
+            quads.add(createQuad(v(1 - p, 1 - q, q),     v(1, 1 - q, q),     v(1, q,     q),     v(1 - p, q,     q), spriteSide));
+            quads.add(createQuad(v(1 - p, q,     1 - q), v(1, q,     1 - q), v(1, 1 - q, 1 - q), v(1 - p, 1 - q, 1 - q), spriteSide));
 
-            quads.add(createQuad(new Vec3d(1 - p, q, 1 - q), new Vec3d(1 - p, 1 - q, 1 - q), new Vec3d(1 - p, 1 - q, q), new Vec3d(1 - p, q, q), spriteEnergy));
+            quads.add(createQuad(v(1 - p, q, 1 - q), v(1 - p, 1 - q, 1 - q), v(1 - p, 1 - q, q), v(1 - p, q, q), spriteEnergy));
         } else {
-            quads.add(createQuad(new Vec3d(1 - o, o, o), new Vec3d(1 - o, 1 - o, o), new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(1 - o, o, 1 - o), spriteCable));
+            CablePatterns.QuadSetting pattern = CablePatterns.findPattern(down, north, up, south);
+            quads.add(createQuad(v(1 - o, o, o), v(1 - o, 1 - o, o), v(1 - o, 1 - o, 1 - o), v(1 - o, o, 1 - o), getSprite.apply(pattern.getSprite()), pattern.getRotation()));
         }
 
         if (west == ConnectorType.CABLE) {
-            quads.add(createQuad(new Vec3d(0, 1 - o, 1 - o), new Vec3d(o, 1 - o, 1 - o), new Vec3d(o, 1 - o, o),     new Vec3d(0, 1 - o, o), spriteCable));
-            quads.add(createQuad(new Vec3d(0, o,     o),     new Vec3d(o, o,     o),     new Vec3d(o, o,     1 - o), new Vec3d(0, o,     1 - o), spriteCable));
-            quads.add(createQuad(new Vec3d(0, 1 - o, o),     new Vec3d(o, 1 - o, o),     new Vec3d(o, o,     o),     new Vec3d(0, o,     o), spriteCable));
-            quads.add(createQuad(new Vec3d(0, o,     1 - o), new Vec3d(o, o,     1 - o), new Vec3d(o, 1 - o, 1 - o), new Vec3d(0, 1 - o, 1 - o), spriteCable));
+            quads.add(createQuad(v(o, 1 - o, 1 - o), v(o, 1 - o, o),     v(0, 1 - o, o), v(0, 1 - o, 1 - o), spriteCable));
+            quads.add(createQuad(v(o, o,     o),     v(o, o,     1 - o), v(0, o,     1 - o), v(0, o,     o),     spriteCable));
+            quads.add(createQuad(v(o, 1 - o, o),     v(o, o,     o),     v(0, o,     o), v(0, 1 - o, o),     spriteCable));
+            quads.add(createQuad(v(o, o,     1 - o), v(o, 1 - o, 1 - o), v(0, 1 - o, 1 - o), v(0, o,     1 - o), spriteCable));
         } else if (west == ConnectorType.BLOCK) {
-            quads.add(createQuad(new Vec3d(p, 1 - o, 1 - o), new Vec3d(o, 1 - o, 1 - o), new Vec3d(o, 1 - o, o),     new Vec3d(p, 1 - o, o), spriteCable));
-            quads.add(createQuad(new Vec3d(p, o,     o),     new Vec3d(o, o,     o),     new Vec3d(o, o,     1 - o), new Vec3d(p, o,     1 - o), spriteCable));
-            quads.add(createQuad(new Vec3d(p, 1 - o, o),     new Vec3d(o, 1 - o, o),     new Vec3d(o, o,     o),     new Vec3d(p, o,     o), spriteCable));
-            quads.add(createQuad(new Vec3d(p, o,     1 - o), new Vec3d(o, o,     1 - o), new Vec3d(o, 1 - o, 1 - o), new Vec3d(p, 1 - o, 1 - o), spriteCable));
+            quads.add(createQuad(v(o, 1 - o, 1 - o), v(o, 1 - o, o),     v(p, 1 - o, o), v(p, 1 - o, 1 - o), spriteCable));
+            quads.add(createQuad(v(o, o,     o),     v(o, o,     1 - o), v(p, o,     1 - o), v(p, o,     o),     spriteCable));
+            quads.add(createQuad(v(o, 1 - o, o),     v(o, o,     o),     v(p, o,     o), v(p, 1 - o, o),     spriteCable));
+            quads.add(createQuad(v(o, o,     1 - o), v(o, 1 - o, 1 - o), v(p, 1 - o, 1 - o), v(p, o,     1 - o), spriteCable));
 
-            quads.add(createQuad(new Vec3d(0, 1 - q, 1 - q), new Vec3d(p, 1 - q, 1 - q), new Vec3d(p, 1 - q, q),     new Vec3d(0, 1 - q, q), spriteSide));
-            quads.add(createQuad(new Vec3d(0, q,     q),     new Vec3d(p, q,     q),     new Vec3d(p, q,     1 - q), new Vec3d(0, q,     1 - q), spriteSide));
-            quads.add(createQuad(new Vec3d(0, 1 - q, q),     new Vec3d(p, 1 - q, q),     new Vec3d(p, q,     q),     new Vec3d(0, q,     q), spriteSide));
-            quads.add(createQuad(new Vec3d(0, q,     1 - q), new Vec3d(p, q,     1 - q), new Vec3d(p, 1 - q, 1 - q), new Vec3d(0, 1 - q, 1 - q), spriteSide));
+            quads.add(createQuad(v(0, 1 - q, 1 - q), v(p, 1 - q, 1 - q), v(p, 1 - q, q),     v(0, 1 - q, q), spriteSide));
+            quads.add(createQuad(v(0, q,     q),     v(p, q,     q),     v(p, q,     1 - q), v(0, q,     1 - q), spriteSide));
+            quads.add(createQuad(v(0, 1 - q, q),     v(p, 1 - q, q),     v(p, q,     q),     v(0, q,     q), spriteSide));
+            quads.add(createQuad(v(0, q,     1 - q), v(p, q,     1 - q), v(p, 1 - q, 1 - q), v(0, 1 - q, 1 - q), spriteSide));
 
-            quads.add(createQuad(new Vec3d(p, q, q), new Vec3d(p, 1 - q, q), new Vec3d(p, 1 - q, 1 - q), new Vec3d(p, q, 1 - q), spriteEnergy));
+            quads.add(createQuad(v(p, q, q), v(p, 1 - q, q), v(p, 1 - q, 1 - q), v(p, q, 1 - q), spriteEnergy));
         } else {
-            quads.add(createQuad(new Vec3d(o, o, 1 - o), new Vec3d(o, 1 - o, 1 - o), new Vec3d(o, 1 - o, o), new Vec3d(o, o, o), spriteCable));
+            CablePatterns.QuadSetting pattern = CablePatterns.findPattern(down, south, up, north);
+            quads.add(createQuad(v(o, o, 1 - o), v(o, 1 - o, 1 - o), v(o, 1 - o, o), v(o, o, o), getSprite.apply(pattern.getSprite()), pattern.getRotation()));
         }
 
         if (north == ConnectorType.CABLE) {
-            quads.add(createQuad(new Vec3d(o,     1 - o, o), new Vec3d(1 - o, 1 - o, o), new Vec3d(1 - o, 1 - o, 0), new Vec3d(o,     1 - o, 0), spriteCable));
-            quads.add(createQuad(new Vec3d(o,     o,     0), new Vec3d(1 - o, o,     0), new Vec3d(1 - o, o,     o), new Vec3d(o,     o,     o), spriteCable));
-            quads.add(createQuad(new Vec3d(1 - o, o,     0), new Vec3d(1 - o, 1 - o, 0), new Vec3d(1 - o, 1 - o, o), new Vec3d(1 - o, o,     o), spriteCable));
-            quads.add(createQuad(new Vec3d(o,     o,     o), new Vec3d(o,     1 - o, o), new Vec3d(o,     1 - o, 0), new Vec3d(o,     o,     0), spriteCable));
+            quads.add(createQuad(v(o,     1 - o, o), v(1 - o, 1 - o, o), v(1 - o, 1 - o, 0), v(o,     1 - o, 0), spriteCable));
+            quads.add(createQuad(v(o,     o,     0), v(1 - o, o,     0), v(1 - o, o,     o), v(o,     o,     o), spriteCable));
+            quads.add(createQuad(v(1 - o, o,     0), v(1 - o, 1 - o, 0), v(1 - o, 1 - o, o), v(1 - o, o,     o), spriteCable));
+            quads.add(createQuad(v(o,     o,     o), v(o,     1 - o, o), v(o,     1 - o, 0), v(o,     o,     0), spriteCable));
         } else if (north == ConnectorType.BLOCK) {
-            quads.add(createQuad(new Vec3d(o,     1 - o, o), new Vec3d(1 - o, 1 - o, o), new Vec3d(1 - o, 1 - o, p), new Vec3d(o,     1 - o, p), spriteCable));
-            quads.add(createQuad(new Vec3d(o,     o,     p), new Vec3d(1 - o, o,     p), new Vec3d(1 - o, o,     o), new Vec3d(o,     o,     o), spriteCable));
-            quads.add(createQuad(new Vec3d(1 - o, o,     p), new Vec3d(1 - o, 1 - o, p), new Vec3d(1 - o, 1 - o, o), new Vec3d(1 - o, o,     o), spriteCable));
-            quads.add(createQuad(new Vec3d(o,     o,     o), new Vec3d(o,     1 - o, o), new Vec3d(o,     1 - o, p), new Vec3d(o,     o,     p), spriteCable));
+            quads.add(createQuad(v(o,     1 - o, o), v(1 - o, 1 - o, o), v(1 - o, 1 - o, p), v(o,     1 - o, p), spriteCable));
+            quads.add(createQuad(v(o,     o,     p), v(1 - o, o,     p), v(1 - o, o,     o), v(o,     o,     o), spriteCable));
+            quads.add(createQuad(v(1 - o, o,     p), v(1 - o, 1 - o, p), v(1 - o, 1 - o, o), v(1 - o, o,     o), spriteCable));
+            quads.add(createQuad(v(o,     o,     o), v(o,     1 - o, o), v(o,     1 - o, p), v(o,     o,     p), spriteCable));
 
-            quads.add(createQuad(new Vec3d(q,     1 - q, p), new Vec3d(1 - q, 1 - q, p), new Vec3d(1 - q, 1 - q, 0), new Vec3d(q,     1 - q, 0), spriteSide));
-            quads.add(createQuad(new Vec3d(q,     q,     0), new Vec3d(1 - q, q,     0), new Vec3d(1 - q, q,     p), new Vec3d(q,     q,     p), spriteSide));
-            quads.add(createQuad(new Vec3d(1 - q, q,     0), new Vec3d(1 - q, 1 - q, 0), new Vec3d(1 - q, 1 - q, p), new Vec3d(1 - q, q,     p), spriteSide));
-            quads.add(createQuad(new Vec3d(q,     q,     p), new Vec3d(q,     1 - q, p), new Vec3d(q,     1 - q, 0), new Vec3d(q,     q,     0), spriteSide));
+            quads.add(createQuad(v(q,     1 - q, p), v(1 - q, 1 - q, p), v(1 - q, 1 - q, 0), v(q,     1 - q, 0), spriteSide));
+            quads.add(createQuad(v(q,     q,     0), v(1 - q, q,     0), v(1 - q, q,     p), v(q,     q,     p), spriteSide));
+            quads.add(createQuad(v(1 - q, q,     0), v(1 - q, 1 - q, 0), v(1 - q, 1 - q, p), v(1 - q, q,     p), spriteSide));
+            quads.add(createQuad(v(q,     q,     p), v(q,     1 - q, p), v(q,     1 - q, 0), v(q,     q,     0), spriteSide));
 
-            quads.add(createQuad(new Vec3d(q, q, p), new Vec3d(1 - q, q, p), new Vec3d(1 - q, 1 - q, p), new Vec3d(q, 1 - q, p), spriteEnergy));
+            quads.add(createQuad(v(q, q, p), v(1 - q, q, p), v(1 - q, 1 - q, p), v(q, 1 - q, p), spriteEnergy));
         } else {
-            quads.add(createQuad(new Vec3d(o, 1 - o, o), new Vec3d(1 - o, 1 - o, o), new Vec3d(1 - o, o, o), new Vec3d(o, o, o), spriteCable));
+            CablePatterns.QuadSetting pattern = CablePatterns.findPattern(west, up, east, down);
+            quads.add(createQuad(v(o, 1 - o, o), v(1 - o, 1 - o, o), v(1 - o, o, o), v(o, o, o), getSprite.apply(pattern.getSprite()), pattern.getRotation()));
         }
 
         if (south == ConnectorType.CABLE) {
-            quads.add(createQuad(new Vec3d(o,     1 - o, 1),     new Vec3d(1 - o, 1 - o, 1),     new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(o,     1 - o, 1 - o), spriteCable));
-            quads.add(createQuad(new Vec3d(o,     o,     1 - o), new Vec3d(1 - o, o,     1 - o), new Vec3d(1 - o, o,     1),     new Vec3d(o,     o,     1), spriteCable));
-            quads.add(createQuad(new Vec3d(1 - o, o,     1 - o), new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(1 - o, 1 - o, 1),     new Vec3d(1 - o, o,     1), spriteCable));
-            quads.add(createQuad(new Vec3d(o,     o,     1),     new Vec3d(o,     1 - o, 1),     new Vec3d(o,     1 - o, 1 - o), new Vec3d(o,     o,     1 - o), spriteCable));
+            quads.add(createQuad(v(o,     1 - o, 1),     v(1 - o, 1 - o, 1),     v(1 - o, 1 - o, 1 - o), v(o,     1 - o, 1 - o), spriteCable));
+            quads.add(createQuad(v(o,     o,     1 - o), v(1 - o, o,     1 - o), v(1 - o, o,     1),     v(o,     o,     1), spriteCable));
+            quads.add(createQuad(v(1 - o, o,     1 - o), v(1 - o, 1 - o, 1 - o), v(1 - o, 1 - o, 1),     v(1 - o, o,     1), spriteCable));
+            quads.add(createQuad(v(o,     o,     1),     v(o,     1 - o, 1),     v(o,     1 - o, 1 - o), v(o,     o,     1 - o), spriteCable));
         } else if (south == ConnectorType.BLOCK) {
-            quads.add(createQuad(new Vec3d(o,     1 - o, 1 - p), new Vec3d(1 - o, 1 - o, 1 - p), new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(o,     1 - o, 1 - o), spriteCable));
-            quads.add(createQuad(new Vec3d(o,     o,     1 - o), new Vec3d(1 - o, o,     1 - o), new Vec3d(1 - o, o,     1 - p), new Vec3d(o,     o,     1 - p), spriteCable));
-            quads.add(createQuad(new Vec3d(1 - o, o,     1 - o), new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(1 - o, 1 - o, 1 - p), new Vec3d(1 - o, o,     1 - p), spriteCable));
-            quads.add(createQuad(new Vec3d(o,     o,     1 - p), new Vec3d(o,     1 - o, 1 - p), new Vec3d(o,     1 - o, 1 - o), new Vec3d(o,     o,     1 - o), spriteCable));
+            quads.add(createQuad(v(o,     1 - o, 1 - p), v(1 - o, 1 - o, 1 - p), v(1 - o, 1 - o, 1 - o), v(o,     1 - o, 1 - o), spriteCable));
+            quads.add(createQuad(v(o,     o,     1 - o), v(1 - o, o,     1 - o), v(1 - o, o,     1 - p), v(o,     o,     1 - p), spriteCable));
+            quads.add(createQuad(v(1 - o, o,     1 - o), v(1 - o, 1 - o, 1 - o), v(1 - o, 1 - o, 1 - p), v(1 - o, o,     1 - p), spriteCable));
+            quads.add(createQuad(v(o,     o,     1 - p), v(o,     1 - o, 1 - p), v(o,     1 - o, 1 - o), v(o,     o,     1 - o), spriteCable));
 
-            quads.add(createQuad(new Vec3d(q,     1 - q, 1),     new Vec3d(1 - q, 1 - q, 1),     new Vec3d(1 - q, 1 - q, 1 - p), new Vec3d(q,     1 - q, 1 - p), spriteSide));
-            quads.add(createQuad(new Vec3d(q,     q,     1 - p), new Vec3d(1 - q, q,     1 - p), new Vec3d(1 - q, q,     1),     new Vec3d(q,     q,     1), spriteSide));
-            quads.add(createQuad(new Vec3d(1 - q, q,     1 - p), new Vec3d(1 - q, 1 - q, 1 - p), new Vec3d(1 - q, 1 - q, 1),     new Vec3d(1 - q, q,     1), spriteSide));
-            quads.add(createQuad(new Vec3d(q,     q,     1),     new Vec3d(q,     1 - q, 1),     new Vec3d(q,     1 - q, 1 - p), new Vec3d(q,     q,     1 - p), spriteSide));
+            quads.add(createQuad(v(q,     1 - q, 1),     v(1 - q, 1 - q, 1),     v(1 - q, 1 - q, 1 - p), v(q,     1 - q, 1 - p), spriteSide));
+            quads.add(createQuad(v(q,     q,     1 - p), v(1 - q, q,     1 - p), v(1 - q, q,     1),     v(q,     q,     1), spriteSide));
+            quads.add(createQuad(v(1 - q, q,     1 - p), v(1 - q, 1 - q, 1 - p), v(1 - q, 1 - q, 1),     v(1 - q, q,     1), spriteSide));
+            quads.add(createQuad(v(q,     q,     1),     v(q,     1 - q, 1),     v(q,     1 - q, 1 - p), v(q,     q,     1 - p), spriteSide));
 
-            quads.add(createQuad(new Vec3d(q, 1 - q, 1 - p), new Vec3d(1 - q, 1 - q, 1 - p), new Vec3d(1 - q, q, 1 - p), new Vec3d(q, q, 1 - p), spriteEnergy));
+            quads.add(createQuad(v(q, 1 - q, 1 - p), v(1 - q, 1 - q, 1 - p), v(1 - q, q, 1 - p), v(q, q, 1 - p), spriteEnergy));
         } else {
-            quads.add(createQuad(new Vec3d(o, o, 1 - o), new Vec3d(1 - o, o, 1 - o), new Vec3d(1 - o, 1 - o, 1 - o), new Vec3d(o, 1 - o, 1 - o), spriteCable));
+            CablePatterns.QuadSetting pattern = CablePatterns.findPattern(west, down, east, up);
+            quads.add(createQuad(v(o, o, 1 - o), v(1 - o, o, 1 - o), v(1 - o, 1 - o, 1 - o), v(o, 1 - o, 1 - o), getSprite.apply(pattern.getSprite()), pattern.getRotation()));
         }
 
 
 
         return quads;
-//        return new BakedModel(north, south, west, east, up, down, (GenericCableBlock) state.getBlock());
     }
 
 
@@ -265,7 +345,7 @@ public class GenericCableISBM implements IBakedModel {
 
     @Override
     public TextureAtlasSprite getParticleTexture() {
-        return sprite;
+        return spriteCable;
     }
 
     @Override

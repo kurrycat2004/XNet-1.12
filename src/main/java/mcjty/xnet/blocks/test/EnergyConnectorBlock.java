@@ -74,6 +74,6 @@ public class EnergyConnectorBlock extends GenericCableBlock<EnergyConnectorTileE
 
     @Override
     public String getConnectorTexture() {
-        return XNet.MODID + ":blocks/energyConnector";
+        return XNet.MODID + ":blocks/energy_connector";
     }
 }

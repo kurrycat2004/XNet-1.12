@@ -1,9 +1,8 @@
-package mcjty.xnet.blocks.test;
+package mcjty.xnet.blocks.generic;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 import mcjty.xnet.XNet;
-import mcjty.xnet.blocks.generic.GenericCableISBM;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
@@ -28,7 +27,17 @@ public class GenericModel implements IModel {
 
     @Override
     public Collection<ResourceLocation> getTextures() {
-        return ImmutableSet.of(new ResourceLocation(XNet.MODID, "blocks/normal_netcable"));
+        return ImmutableSet.of(
+                new ResourceLocation(XNet.MODID, "blocks/normal_netcable"),
+                new ResourceLocation(XNet.MODID, "blocks/normal_corner_netcable"),
+                new ResourceLocation(XNet.MODID, "blocks/normal_cross_netcable"),
+                new ResourceLocation(XNet.MODID, "blocks/normal_end_netcable"),
+                new ResourceLocation(XNet.MODID, "blocks/normal_none_netcable"),
+                new ResourceLocation(XNet.MODID, "blocks/normal_three_netcable"),
+                new ResourceLocation(XNet.MODID, "blocks/connector_side"),
+                new ResourceLocation(XNet.MODID, "blocks/energy_connector"),
+                new ResourceLocation(XNet.MODID, "blocks/item_connector")
+                );
     }
 
     @Override

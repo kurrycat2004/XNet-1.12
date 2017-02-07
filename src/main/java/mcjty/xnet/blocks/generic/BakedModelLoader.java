@@ -2,7 +2,6 @@ package mcjty.xnet.blocks.generic;
 
 import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.test.EnergyConnectorBlock;
-import mcjty.xnet.blocks.test.GenericModel;
 import mcjty.xnet.blocks.test.ItemConnectorBlock;
 import mcjty.xnet.blocks.test.NetCableBlock;
 import net.minecraft.client.resources.IResourceManager;

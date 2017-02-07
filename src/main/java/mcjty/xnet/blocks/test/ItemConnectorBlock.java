@@ -91,6 +91,6 @@ public class ItemConnectorBlock extends GenericCableBlock<ItemConnectorTileEntit
 
     @Override
     public String getConnectorTexture() {
-        return XNet.MODID + ":blocks/itemConnector";
+        return XNet.MODID + ":blocks/item_connector";
     }
 }
