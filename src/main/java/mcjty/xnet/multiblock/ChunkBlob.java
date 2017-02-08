@@ -16,7 +16,7 @@ public class ChunkBlob {
 
     private final ChunkPos chunkPos;
     private final long chunkNum;
-    private int lastId = 0;             // Local chunk blob ID
+    private int lastBlobId = 0;             // Local chunk blob ID
 
     // Every local (chunk) blob id can be allocated to multiple global network id's
     private final Map<BlobId, Set<NetworkId>> networkMappings = new HashMap<>();
@@ -115,8 +115,8 @@ public class ChunkBlob {
 
         if (ids.isEmpty()) {
             // New id
-            lastId++;
-            BlobId blobId = new BlobId(lastId);
+            lastBlobId++;
+            BlobId blobId = new BlobId(lastBlobId);
             blobAllocations.put(posId, blobId);
             blobColors.put(blobId, color);
             if (posId.isBorder()) {
@@ -202,8 +202,8 @@ public class ChunkBlob {
                     BlobId oldId = blobAllocations.get(ip);
                     if (oldId != null && blobColors.get(oldId).equals(oldColor)) {
                         networkMappings.remove(oldId);
-                        lastId++;
-                        changed = propagateId(ip, oldColor, oldId, new BlobId(lastId), changed);
+                        lastBlobId++;
+                        changed = propagateId(ip, oldColor, oldId, new BlobId(lastBlobId), changed);
                     }
                 }
             }
@@ -264,7 +264,7 @@ public class ChunkBlob {
         blobColors.clear();
         borderPositions.clear();
 
-        lastId = compound.getInteger("lastId");
+        lastBlobId = compound.getInteger("lastId");
         Set<BlobId> foundBlobs = new HashSet<>();       // Keep track of blobs we found
         if (compound.hasKey("allocations")) {
             int[] allocations = compound.getIntArray("allocations");
@@ -326,7 +326,7 @@ public class ChunkBlob {
     }
 
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-        compound.setInteger("lastId", lastId);
+        compound.setInteger("lastId", lastBlobId);
 
         List<Integer> m = new ArrayList<>();
         for (Map.Entry<BlobId, Set<NetworkId>> entry : networkMappings.entrySet()) {

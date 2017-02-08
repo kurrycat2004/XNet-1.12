@@ -13,6 +13,7 @@ public class WorldBlob {
 
     private final int dimId;
     private final Map<Long, ChunkBlob> chunkBlobMap = new HashMap<>();
+    private int lastNetworkId = 0;             // Local network ID
 
     public WorldBlob(int dimId) {
         this.dimId = dimId;
@@ -27,6 +28,11 @@ public class WorldBlob {
         if (blob.createNetworkProvider(pos, color, network)) {
             recalculateNetwork(blob);
         }
+    }
+
+    public NetworkId newNetwork() {
+        lastNetworkId++;
+        return new NetworkId(lastNetworkId);
     }
 
     /**
@@ -130,6 +136,7 @@ public class WorldBlob {
 
     public void readFromNBT(NBTTagCompound compound) {
         chunkBlobMap.clear();
+        lastNetworkId = compound.getInteger("lastId");
         if (compound.hasKey("chunks")) {
             NBTTagList chunks = (NBTTagList) compound.getTag("chunks");
             for (int i = 0 ; i < chunks.tagCount() ; i++) {
@@ -144,6 +151,7 @@ public class WorldBlob {
     }
 
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+        compound.setInteger("lastId", lastNetworkId);
         NBTTagList list = new NBTTagList();
         for (Map.Entry<Long, ChunkBlob> entry : chunkBlobMap.entrySet()) {
             ChunkBlob blob = entry.getValue();

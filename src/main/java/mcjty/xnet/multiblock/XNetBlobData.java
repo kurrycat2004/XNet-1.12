@@ -27,7 +27,7 @@ public class XNetBlobData extends WorldSavedData {
 
     public static void clearInstance() {
         if (instance != null) {
-//            instance.networks.clear();
+            instance.worldBlobMap.clear();
             instance = null;
         }
     }
