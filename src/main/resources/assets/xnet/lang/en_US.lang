@@ -1,3 +1,4 @@
+tile.xnet.connector.name=Connector
 tile.xnet.netcable.name=Network Cable
 tile.xnet.controller.name=Controller
 itemGroup.XNet=XNet

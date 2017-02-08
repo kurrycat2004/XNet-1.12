@@ -1,8 +1,7 @@
 package mcjty.xnet.blocks.generic;
 
 import mcjty.xnet.XNet;
-import mcjty.xnet.blocks.cables.EnergyConnectorBlock;
-import mcjty.xnet.blocks.cables.ItemConnectorBlock;
+import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.blocks.cables.NetCableBlock;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
@@ -19,8 +18,7 @@ public class BakedModelLoader implements ICustomModelLoader {
         if (!modelLocation.getResourceDomain().equals(XNet.MODID)) {
             return false;
         }
-        return EnergyConnectorBlock.ENERGY_CONNECTOR.equals(modelLocation.getResourcePath()) ||
-                ItemConnectorBlock.ITEM_CONNECTOR.equals(modelLocation.getResourcePath()) ||
+        return ConnectorBlock.CONNECTOR.equals(modelLocation.getResourcePath()) ||
                 NetCableBlock.NETCABLE.equals(modelLocation.getResourcePath());
     }
 

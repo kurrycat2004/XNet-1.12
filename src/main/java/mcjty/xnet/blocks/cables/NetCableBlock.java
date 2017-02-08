@@ -36,7 +36,7 @@ public class NetCableBlock extends GenericCableBlock {
         StateMapperBase ignoreState = new StateMapperBase() {
             @Override
             protected ModelResourceLocation getModelResourceLocation(IBlockState iBlockState) {
-                return GenericCableISBM.modelEnergyConnector;
+                return GenericCableISBM.modelCable;
             }
         };
         ModelLoader.setCustomStateMapper(this, ignoreState);

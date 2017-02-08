@@ -3,8 +3,7 @@ package mcjty.xnet.blocks.generic;
 import com.google.common.base.Function;
 import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.cables.ConnectorType;
-import mcjty.xnet.blocks.cables.EnergyConnectorBlock;
-import mcjty.xnet.blocks.cables.ItemConnectorBlock;
+import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.blocks.cables.NetCableBlock;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -26,8 +25,7 @@ import static mcjty.xnet.blocks.generic.CablePatterns.SpriteIdx.*;
 
 public class GenericCableISBM implements IBakedModel {
 
-    public static final ModelResourceLocation modelEnergyConnector = new ModelResourceLocation(XNet.MODID + ":" + EnergyConnectorBlock.ENERGY_CONNECTOR);
-    public static final ModelResourceLocation modelItemConnector = new ModelResourceLocation(XNet.MODID + ":" + ItemConnectorBlock.ITEM_CONNECTOR);
+    public static final ModelResourceLocation modelConnector = new ModelResourceLocation(XNet.MODID + ":" + ConnectorBlock.CONNECTOR);
     public static final ModelResourceLocation modelCable = new ModelResourceLocation(XNet.MODID + ":" + NetCableBlock.NETCABLE);
 
     private TextureAtlasSprite spriteCable;

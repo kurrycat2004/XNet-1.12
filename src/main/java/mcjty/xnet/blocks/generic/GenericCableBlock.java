@@ -1,27 +1,41 @@
 package mcjty.xnet.blocks.generic;
 
+import mcjty.lib.compat.CompatBlock;
+import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
+import mcjty.lib.compat.waila.WailaInfoProvider;
+import mcjty.theoneprobe.api.IProbeHitData;
+import mcjty.theoneprobe.api.IProbeInfo;
+import mcjty.theoneprobe.api.ProbeMode;
+import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.cables.ConnectorType;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.List;
 
-public abstract class GenericCableBlock extends GenericXNetBlock {
+public abstract class GenericCableBlock extends CompatBlock implements WailaInfoProvider, TOPInfoProvider {
 
     // Properties that indicate if there is the same block in a certain direction.
     public static final UnlistedPropertyBlockType NORTH = new UnlistedPropertyBlockType("north");
@@ -33,14 +47,32 @@ public abstract class GenericCableBlock extends GenericXNetBlock {
 
 
     public GenericCableBlock(Material material, String name) {
-        super(material, name);
+        super(material);
+        setHardness(2.0f);
+        setSoundType(SoundType.METAL);
+        setHarvestLevel("pickaxe", 0);
+        setUnlocalizedName(XNet.MODID + "." + name);
+        setRegistryName(name);
+        GameRegistry.register(this);
+        GameRegistry.register(new ItemBlock(this), getRegistryName());
+        setCreativeTab(XNet.tabXNet);
     }
+
+    @SideOnly(Side.CLIENT)
+    public void initModel() {
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
+    }
+
 
     @Override
     @SideOnly(Side.CLIENT)
     public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
-        super.getWailaBody(itemStack, currenttip, accessor, config);
         return currenttip;
+    }
+
+    @Override
+    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data) {
+
     }
 
     public String getConnectorTexture() {
