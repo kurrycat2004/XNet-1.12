@@ -1,6 +1,7 @@
 package mcjty.xnet.blocks.cables;
 
 import mcjty.xnet.XNet;
+import mcjty.xnet.blocks.controller.TileEntityController;
 import mcjty.xnet.blocks.generic.GenericCableBlock;
 import mcjty.xnet.blocks.generic.GenericCableISBM;
 import net.minecraft.block.Block;
@@ -67,14 +68,14 @@ public class ConnectorBlock extends GenericCableBlock {
         Block block = world.getBlockState(pos).getBlock();
         if (block instanceof GenericCableBlock) {
             return ConnectorType.CABLE;
-        } else if (isContainer(world, pos)) {
+        } else if (isConnectable(world, pos)) {
             return ConnectorType.BLOCK;
         } else {
             return ConnectorType.NONE;
         }
     }
 
-    private static boolean isContainer(IBlockAccess world, BlockPos pos) {
+    private static boolean isConnectable(IBlockAccess world, BlockPos pos) {
         TileEntity te = world.getTileEntity(pos);
         if (te == null) {
             return false;
@@ -83,6 +84,9 @@ public class ConnectorBlock extends GenericCableBlock {
             return true;
         }
         if (te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
+            return true;
+        }
+        if (te instanceof TileEntityController) {
             return true;
         }
         return false;
