@@ -1,4 +1,4 @@
-package mcjty.xnet.blocks.test;
+package mcjty.xnet.blocks.cables;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;

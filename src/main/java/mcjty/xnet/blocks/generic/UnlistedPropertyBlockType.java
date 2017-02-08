@@ -1,6 +1,6 @@
 package mcjty.xnet.blocks.generic;
 
-import mcjty.xnet.blocks.test.ConnectorType;
+import mcjty.xnet.blocks.cables.ConnectorType;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
 public class UnlistedPropertyBlockType implements IUnlistedProperty<ConnectorType> {

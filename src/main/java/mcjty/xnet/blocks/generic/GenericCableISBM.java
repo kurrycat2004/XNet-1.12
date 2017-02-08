@@ -2,10 +2,10 @@ package mcjty.xnet.blocks.generic;
 
 import com.google.common.base.Function;
 import mcjty.xnet.XNet;
-import mcjty.xnet.blocks.test.ConnectorType;
-import mcjty.xnet.blocks.test.EnergyConnectorBlock;
-import mcjty.xnet.blocks.test.ItemConnectorBlock;
-import mcjty.xnet.blocks.test.NetCableBlock;
+import mcjty.xnet.blocks.cables.ConnectorType;
+import mcjty.xnet.blocks.cables.EnergyConnectorBlock;
+import mcjty.xnet.blocks.cables.ItemConnectorBlock;
+import mcjty.xnet.blocks.cables.NetCableBlock;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.*;

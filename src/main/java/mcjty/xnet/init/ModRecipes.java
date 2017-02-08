@@ -1,6 +1,6 @@
 package mcjty.xnet.init;
 
-import mcjty.xnet.blocks.test.NetCableSetup;
+import mcjty.xnet.blocks.cables.NetCableSetup;
 
 public class ModRecipes {
 

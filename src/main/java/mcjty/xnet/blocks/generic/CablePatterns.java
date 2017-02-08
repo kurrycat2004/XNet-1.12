@@ -1,11 +1,11 @@
 package mcjty.xnet.blocks.generic;
 
-import mcjty.xnet.blocks.test.ConnectorType;
+import mcjty.xnet.blocks.cables.ConnectorType;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static mcjty.xnet.blocks.test.ConnectorType.NONE;
+import static mcjty.xnet.blocks.cables.ConnectorType.NONE;
 
 public class CablePatterns {
 

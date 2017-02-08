@@ -1,4 +1,4 @@
-package mcjty.xnet.blocks.test;
+package mcjty.xnet.blocks.cables;
 
 import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.generic.GenericCableBlock;
@@ -10,7 +10,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -20,13 +22,14 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.items.CapabilityItemHandler;
 
-public class NetCableBlock extends GenericCableBlock {
+public class ItemConnectorBlock extends GenericCableBlock {
 
-    public static final String NETCABLE = "netcable";
+    public static final String ITEM_CONNECTOR = "item_connector";
 
-    public NetCableBlock() {
-        super(Material.CLOTH, NETCABLE);
+    public ItemConnectorBlock() {
+        super(Material.IRON, ITEM_CONNECTOR);
     }
 
     @Override
@@ -46,7 +49,7 @@ public class NetCableBlock extends GenericCableBlock {
     public void initItemModel() {
         // For our item model we want to use a normal json model. This has to be called in
         // ClientProxy.init (not preInit) so that's why it is a separate method.
-        Item itemBlock = ForgeRegistries.ITEMS.getValue(new ResourceLocation(XNet.MODID, NETCABLE));
+        Item itemBlock = ForgeRegistries.ITEMS.getValue(new ResourceLocation(XNet.MODID, ITEM_CONNECTOR));
         ModelResourceLocation itemModelResourceLocation = new ModelResourceLocation(getRegistryName(), "inventory");
         final int DEFAULT_ITEM_SUBTYPE = 0;
         Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(itemBlock, DEFAULT_ITEM_SUBTYPE, itemModelResourceLocation);
@@ -64,9 +67,29 @@ public class NetCableBlock extends GenericCableBlock {
         Block block = world.getBlockState(pos).getBlock();
         if (block instanceof GenericCableBlock) {
             return ConnectorType.CABLE;
+        } else if (isContainer(world, pos)) {
+            return ConnectorType.BLOCK;
         } else {
             return ConnectorType.NONE;
         }
     }
 
+    private static boolean isContainer(IBlockAccess world, BlockPos pos) {
+        TileEntity te = world.getTileEntity(pos);
+        if (te == null) {
+            return false;
+        }
+        if (te instanceof IInventory) {
+            return true;
+        }
+        if (te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public String getConnectorTexture() {
+        return XNet.MODID + ":blocks/item_connector";
+    }
 }

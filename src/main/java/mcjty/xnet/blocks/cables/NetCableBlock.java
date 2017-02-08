@@ -1,7 +1,5 @@
-package mcjty.xnet.blocks.test;
+package mcjty.xnet.blocks.cables;
 
-import mcjty.lib.container.EmptyContainer;
-import mcjty.lib.varia.EnergyTools;
 import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.generic.GenericCableBlock;
 import mcjty.xnet.blocks.generic.GenericCableISBM;
@@ -13,7 +11,7 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -23,12 +21,12 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class EnergyConnectorBlock extends GenericCableBlock {
+public class NetCableBlock extends GenericCableBlock {
 
-    public static final String ENERGY_CONNECTOR = "energy_connector";
+    public static final String NETCABLE = "netcable";
 
-    public EnergyConnectorBlock() {
-        super(Material.IRON, ENERGY_CONNECTOR);
+    public NetCableBlock() {
+        super(Material.CLOTH, NETCABLE);
     }
 
     @Override
@@ -48,16 +46,17 @@ public class EnergyConnectorBlock extends GenericCableBlock {
     public void initItemModel() {
         // For our item model we want to use a normal json model. This has to be called in
         // ClientProxy.init (not preInit) so that's why it is a separate method.
-        Item itemBlock = ForgeRegistries.ITEMS.getValue(new ResourceLocation(XNet.MODID, ENERGY_CONNECTOR));
+        Item itemBlock = ForgeRegistries.ITEMS.getValue(new ResourceLocation(XNet.MODID, NETCABLE));
         ModelResourceLocation itemModelResourceLocation = new ModelResourceLocation(getRegistryName(), "inventory");
         final int DEFAULT_ITEM_SUBTYPE = 0;
         Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(itemBlock, DEFAULT_ITEM_SUBTYPE, itemModelResourceLocation);
     }
 
     @Override
-    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+    protected IBlockState clGetStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
         // When our block is placed down we force a re-render of adjacent blocks to make sure their ISBM model is updated
         world.markBlockRangeForRenderUpdate(pos.add(-1, -1, -1), pos.add(1, 1, 1));
+        return super.clGetStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, placer);
     }
 
     @Override
@@ -65,15 +64,9 @@ public class EnergyConnectorBlock extends GenericCableBlock {
         Block block = world.getBlockState(pos).getBlock();
         if (block instanceof GenericCableBlock) {
             return ConnectorType.CABLE;
-        } else if (EnergyTools.isEnergyTE(world.getTileEntity(pos))) {
-            return ConnectorType.BLOCK;
         } else {
             return ConnectorType.NONE;
         }
     }
 
-    @Override
-    public String getConnectorTexture() {
-        return XNet.MODID + ":blocks/energy_connector";
-    }
 }

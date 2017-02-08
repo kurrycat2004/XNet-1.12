@@ -1,6 +1,6 @@
 package mcjty.xnet.init;
 
-import mcjty.xnet.blocks.test.NetCableSetup;
+import mcjty.xnet.blocks.cables.NetCableSetup;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 

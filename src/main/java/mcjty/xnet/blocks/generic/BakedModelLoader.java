@@ -1,9 +1,9 @@
 package mcjty.xnet.blocks.generic;
 
 import mcjty.xnet.XNet;
-import mcjty.xnet.blocks.test.EnergyConnectorBlock;
-import mcjty.xnet.blocks.test.ItemConnectorBlock;
-import mcjty.xnet.blocks.test.NetCableBlock;
+import mcjty.xnet.blocks.cables.EnergyConnectorBlock;
+import mcjty.xnet.blocks.cables.ItemConnectorBlock;
+import mcjty.xnet.blocks.cables.NetCableBlock;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ICustomModelLoader;

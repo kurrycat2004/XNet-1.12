@@ -1,6 +1,6 @@
 package mcjty.xnet.blocks.generic;
 
-import mcjty.xnet.blocks.test.ConnectorType;
+import mcjty.xnet.blocks.cables.ConnectorType;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import net.minecraft.block.material.Material;
