@@ -1,5 +1,5 @@
 {
-  "parent": "xnet:block/item_connector",
+  "parent": "xnet:block/connector",
   "display": {
     "thirdperson": {
       "rotation": [ 10, -45, 170 ],

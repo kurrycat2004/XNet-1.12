@@ -90,6 +90,6 @@ public class ConnectorBlock extends GenericCableBlock {
 
     @Override
     public String getConnectorTexture() {
-        return XNet.MODID + ":blocks/item_connector";
+        return XNet.MODID + ":blocks/connector";
     }
 }

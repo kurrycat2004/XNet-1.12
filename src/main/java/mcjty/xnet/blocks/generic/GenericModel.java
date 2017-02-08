@@ -35,8 +35,7 @@ public class GenericModel implements IModel {
                 new ResourceLocation(XNet.MODID, "blocks/normal_none_netcable"),
                 new ResourceLocation(XNet.MODID, "blocks/normal_three_netcable"),
                 new ResourceLocation(XNet.MODID, "blocks/connector_side"),
-                new ResourceLocation(XNet.MODID, "blocks/energy_connector"),
-                new ResourceLocation(XNet.MODID, "blocks/item_connector")
+                new ResourceLocation(XNet.MODID, "blocks/connector")
                 );
     }
 
