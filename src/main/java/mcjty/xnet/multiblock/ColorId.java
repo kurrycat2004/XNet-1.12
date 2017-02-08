@@ -1,14 +1,14 @@
 package mcjty.xnet.multiblock;
 
 /**
- * Every connected set of cables (so cables with the same color) will form a blob
- * in a chunk and has a local blob ID for that chunk.
+ * Every cable has a 'color' associated with it. Cables with different color will
+ * never mix with cables of another color
  */
-public class BlobId {
+public class ColorId {
 
     private final int id;
 
-    public BlobId(int id) {
+    public ColorId(int id) {
         this.id = id;
     }
 
@@ -21,7 +21,7 @@ public class BlobId {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        BlobId blobId = (BlobId) o;
+        ColorId blobId = (ColorId) o;
 
         if (id != blobId.id) return false;
 

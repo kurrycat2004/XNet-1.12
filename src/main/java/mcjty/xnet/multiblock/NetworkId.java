@@ -1,5 +1,9 @@
 package mcjty.xnet.multiblock;
 
+/**
+ * This is a global ID representing a network. It is given by network providers.
+ * In a chunk network ID's are coupled with blob ID's.
+ */
 public class NetworkId {
 
     private final int id;

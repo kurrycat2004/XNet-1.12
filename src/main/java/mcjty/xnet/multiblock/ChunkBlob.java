@@ -4,22 +4,33 @@ import mcjty.lib.varia.BlockPosTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagIntArray;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 
 import java.util.*;
 
+/**
+ * All blobs in a single chunk are represented here as wel
+ * as how blob id's are mapped to global network id's.
+ */
 public class ChunkBlob {
 
     private final long chunkPos;
     private int lastId = 0;             // Local chunk blob ID
 
     // Every local (chunk) blob id can be allocated to multiple global network id's
-    private final Map<BlobId, Set<NetworkId>> idMappings = new HashMap<>();
+    private final Map<BlobId, Set<NetworkId>> networkMappings = new HashMap<>();
 
     // Every position in a chunk can be allocated to one local chunk blob id
     private final Map<IntPos, BlobId> blobAllocations = new HashMap<>();
 
     // These positions represent network ID providers
     private final Map<IntPos, NetworkId> networkProviders = new HashMap<>();
+
+    // Blob id are mapped to colors
+    private final Map<BlobId, ColorId> blobColors = new HashMap<>();
+
+    // Transient datastructure that caches are positions at the border
+    private final Set<IntPos> borderPositions = new HashSet<>();
 
     public ChunkBlob(long chunkPos) {
         this.chunkPos = chunkPos;
@@ -29,32 +40,51 @@ public class ChunkBlob {
         return chunkPos;
     }
 
-    private Set<NetworkId> getMappings(BlobId blobId) {
-        if (!idMappings.containsKey(blobId)) {
-            idMappings.put(blobId, new HashSet<>());
-        }
-        return idMappings.get(blobId);
+    public BlockPos getPosition(IntPos pos) {
+        ChunkPos chunkPos = IntPos.chunkPosFromLong(this.chunkPos);
+        return pos.toBlockPos(chunkPos);
     }
 
-    public void clearNetworkAllocations() {
-        idMappings.clear();
+    public Set<NetworkId> getNetworksForPosition(IntPos pos) {
+        return networkMappings.get(blobAllocations.get(pos));
+    }
+
+    public Set<IntPos> getBorderPositions() {
+        return borderPositions;
+    }
+
+    private Set<NetworkId> getMappings(BlobId blobId) {
+        if (!networkMappings.containsKey(blobId)) {
+            networkMappings.put(blobId, new HashSet<>());
+        }
+        return networkMappings.get(blobId);
+    }
+
+    // Go over all network providers in this chunk and distribute their id's
+    // to the local blob id's
+    public void fixNetworkAllocations() {
+        networkMappings.clear();
+        for (Map.Entry<IntPos, NetworkId> entry : networkProviders.entrySet()) {
+            BlobId blobId = blobAllocations.get(entry.getKey());
+            getMappings(blobId).add(entry.getValue());
+        }
     }
 
     public Map<IntPos, NetworkId> getNetworkProviders() {
         return networkProviders;
     }
 
-    public List<IntPos> createNetworkProvider(BlockPos pos, NetworkId networkId) {
+    public List<IntPos> createNetworkProvider(BlockPos pos, ColorId color, NetworkId networkId) {
         IntPos posId = new IntPos(pos);
         networkProviders.put(posId, networkId);
-        List<IntPos> changed = createCableSegment(pos);
+        List<IntPos> changed = createCableSegment(pos, color);
         getMappings(blobAllocations.get(posId)).add(networkId);
         return changed;
     }
 
     // Create a cable segment and return all positions on the border of this
     // chunk where something changed. Network ids are merged
-    public List<IntPos> createCableSegment(BlockPos pos) {
+    public List<IntPos> createCableSegment(BlockPos pos, ColorId color) {
         IntPos posId = new IntPos(pos);
         if (blobAllocations.containsKey(posId)) {
             throw new IllegalArgumentException("There is already a cablesegment at " + BlockPosTools.toString(pos) + "!");
@@ -64,8 +94,11 @@ public class ChunkBlob {
         for (int p : posId.getSidePositions()) {
             if (p != -1) {
                 IntPos ip = new IntPos(p);
-                if (blobAllocations.containsKey(ip)) {
-                    ids.add(blobAllocations.get(ip));
+                BlobId blobId = blobAllocations.get(ip);
+                if (blobId != null) {
+                    if (blobColors.get(blobId).equals(color)) {
+                        ids.add(blobId);
+                    }
                 }
             }
         }
@@ -73,8 +106,11 @@ public class ChunkBlob {
         if (ids.isEmpty()) {
             // New id
             lastId++;
-            blobAllocations.put(posId, new BlobId(lastId));
+            BlobId blobId = new BlobId(lastId);
+            blobAllocations.put(posId, blobId);
+            blobColors.put(blobId, color);
             if (posId.isBorder()) {
+                borderPositions.add(posId);
                 return Collections.singletonList(posId);
             } else {
                 return Collections.emptyList();
@@ -84,6 +120,7 @@ public class ChunkBlob {
             BlobId id = ids.iterator().next();
             blobAllocations.put(posId, id);
             if (posId.isBorder()) {
+                borderPositions.add(posId);
                 return Collections.singletonList(posId);
             } else {
                 return Collections.emptyList();
@@ -94,6 +131,7 @@ public class ChunkBlob {
             BlobId id = ids.iterator().next();
             blobAllocations.put(posId, id);
             if (posId.isBorder()) {
+                borderPositions.add(posId);
                 changed.add(posId);
             }
             for (Map.Entry<IntPos, BlobId> entry : blobAllocations.entrySet()) {
@@ -106,12 +144,12 @@ public class ChunkBlob {
                 }
             }
             Set<NetworkId> networkIds = new HashSet<>();
-            for (Map.Entry<BlobId, Set<NetworkId>> entry : idMappings.entrySet()) {
+            for (Map.Entry<BlobId, Set<NetworkId>> entry : networkMappings.entrySet()) {
                 if (ids.contains(entry.getKey())) {
                     networkIds.addAll(entry.getValue());
                 }
             }
-            idMappings.put(id, networkIds);
+            networkMappings.put(id, networkIds);
             return changed;
         }
     }
@@ -126,11 +164,14 @@ public class ChunkBlob {
             throw new IllegalArgumentException("There is no cablesegment at " + BlockPosTools.toString(pos) + "!");
         }
         networkProviders.remove(posId);
+        ColorId oldColor = blobColors.get(blobAllocations.get(posId));
+        // @todo: old blob ids are never cleaned up with regards to color allocation
 
         int cnt = 0;
         for (int p : posId.getSidePositions()) {
             if (p != -1) {
-                if (blobAllocations.containsKey(new IntPos(p))) {
+                BlobId blobId = blobAllocations.get(new IntPos(p));
+                if (blobId != null && blobColors.get(blobId).equals(oldColor)) {
                     cnt++;
                 }
             }
@@ -139,6 +180,7 @@ public class ChunkBlob {
         List<IntPos> changed = new ArrayList<>();
         blobAllocations.remove(posId);
         if (posId.isBorder()) {
+            borderPositions.remove(posId);
             changed.add(posId);
         }
         if (cnt > 1) {
@@ -147,11 +189,11 @@ public class ChunkBlob {
             for (int p : posId.getSidePositions()) {
                 if (p != -1) {
                     IntPos ip = new IntPos(p);
-                    if (blobAllocations.containsKey(ip)) {
-                        BlobId oldId = blobAllocations.get(ip);
-                        idMappings.remove(oldId);
+                    BlobId oldId = blobAllocations.get(ip);
+                    if (oldId != null && blobColors.get(oldId).equals(oldColor)) {
+                        networkMappings.remove(oldId);
                         lastId++;
-                        propagateId(ip, oldId, new BlobId(lastId), changed);
+                        propagateId(ip, oldColor, oldId, new BlobId(lastId), changed);
                     }
                 }
             }
@@ -159,7 +201,7 @@ public class ChunkBlob {
         return changed;
     }
 
-    private void propagateId(IntPos pos, BlobId oldId, BlobId newId, List<IntPos> changed) {
+    private void propagateId(IntPos pos, ColorId color, BlobId oldId, BlobId newId, List<IntPos> changed) {
         blobAllocations.put(pos, newId);
         if (pos.isBorder()) {
             changed.add(pos);
@@ -167,17 +209,20 @@ public class ChunkBlob {
         for (int p : pos.getSidePositions()) {
             if (p != -1) {
                 IntPos ip = new IntPos(p);
-                if (blobAllocations.get(ip).equals(oldId)) {
-                    propagateId(ip, oldId, newId, changed);
+                BlobId blobId = blobAllocations.get(ip);
+                if (blobId.equals(oldId) && blobColors.get(blobId).equals(color)) {
+                    propagateId(ip, color, oldId, newId, changed);
                 }
             }
         }
     }
 
     public void readFromNBT(NBTTagCompound compound) {
-        idMappings.clear();
+        networkMappings.clear();
         blobAllocations.clear();
         networkProviders.clear();
+        blobColors.clear();
+        borderPositions.clear();
 
         lastId = compound.getInteger("lastId");
         if (compound.hasKey("mappings")) {
@@ -187,7 +232,7 @@ public class ChunkBlob {
                 int key = mappings[idx];
                 BlobId id = new BlobId(key);
                 Set<NetworkId> ids = new HashSet<>();
-                idMappings.put(id, ids);
+                networkMappings.put(id, ids);
                 idx++;
                 while (idx < mappings.length && mappings[idx] != -1) {
                     ids.add(new NetworkId(mappings[idx]));
@@ -201,7 +246,11 @@ public class ChunkBlob {
             int[] allocations = compound.getIntArray("allocations");
             int idx = 0;
             while (idx < allocations.length-1) {
-                blobAllocations.put(new IntPos(allocations[idx]), new BlobId(allocations[idx+1]));
+                IntPos pos = new IntPos(allocations[idx]);
+                blobAllocations.put(pos, new BlobId(allocations[idx+1]));
+                if (pos.isBorder()) {
+                    borderPositions.add(pos);
+                }
                 idx += 2;
             }
         }
@@ -214,13 +263,22 @@ public class ChunkBlob {
                 idx += 2;
             }
         }
+
+        if (compound.hasKey("colors")) {
+            int[] colors = compound.getIntArray("colors");
+            int idx = 0;
+            while (idx < colors.length-1) {
+                blobColors.put(new BlobId(colors[idx]), new ColorId(colors[idx+1]));
+                idx += 2;
+            }
+        }
     }
 
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         compound.setInteger("lastId", lastId);
 
         List<Integer> m = new ArrayList<>();
-        for (Map.Entry<BlobId, Set<NetworkId>> entry : idMappings.entrySet()) {
+        for (Map.Entry<BlobId, Set<NetworkId>> entry : networkMappings.entrySet()) {
             m.add(entry.getKey().getId());
             for (NetworkId v : entry.getValue()) {
                 m.add(v.getId());
@@ -245,6 +303,14 @@ public class ChunkBlob {
         }
         NBTTagIntArray providers = new NBTTagIntArray(m.stream().mapToInt(i -> i).toArray());
         compound.setTag("providers", providers);
+
+        m.clear();
+        for (Map.Entry<BlobId, ColorId> entry : blobColors.entrySet()) {
+            m.add(entry.getKey().getId());
+            m.add(entry.getValue().getId());
+        }
+        NBTTagIntArray colors = new NBTTagIntArray(m.stream().mapToInt(i -> i).toArray());
+        compound.setTag("colors", colors);
 
         return compound;
     }

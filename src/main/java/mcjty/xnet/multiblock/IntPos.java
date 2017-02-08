@@ -1,8 +1,13 @@
 package mcjty.xnet.multiblock;
 
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 
+/**
+ * A local position in a chunk can be represented with a single int like done
+ * in this class.
+ */
 public class IntPos {
 
     private final int pos;
@@ -12,7 +17,7 @@ public class IntPos {
     }
 
     public IntPos(BlockPos pos) {
-        this.pos = posToInt(pos);
+        this.pos = toInt(pos);
     }
 
     public int getPos() {
@@ -20,11 +25,99 @@ public class IntPos {
     }
 
     public int[] getSidePositions() {
-        return getSidePositions(pos);
+        return new int[] { posDown(), posUp(), posEast(), posWest(), posSouth(), posNorth() };
     }
 
     public boolean isBorder() {
-        return isBorder(pos);
+        return getX() == 0 || getX() == 15 || getZ() == 0 || getZ() == 15;
+    }
+
+    public boolean isBorder(EnumFacing facing) {
+        switch (facing) {
+            case DOWN:
+            case UP:
+                return false;
+            case NORTH:
+                return getZ() == 0;
+            case SOUTH:
+                return getZ() == 15;
+            case WEST:
+                return getX() == 0;
+            case EAST:
+                return getX() == 15;
+        }
+        return false;
+    }
+
+    public IntPos otherSide(EnumFacing facing) {
+        switch (facing) {
+            case DOWN:
+            case UP:
+                return this;
+            case NORTH:
+                return new IntPos(pos + (15 << 12));
+            case SOUTH:
+                return new IntPos(pos - (15 << 12));
+            case WEST:
+                return new IntPos(pos + 15);
+            case EAST:
+                return new IntPos(pos - 15);
+        }
+        return this;
+    }
+
+    public int getX() {
+        return pos & 0xf;
+    }
+
+    public int getY() {
+        return (pos >> 4) & 0xff;
+    }
+
+    public int getZ() {
+        return (pos >> 12) & 0xf;
+    }
+
+    public int posSouth() {
+        if (getZ() >= 15) {
+            return -1;
+        }
+        return pos + (1<<12);
+    }
+
+    public int posNorth() {
+        if (getZ() <= 1) {
+            return -1;
+        }
+        return pos - (1<<12);
+    }
+
+    public int posEast() {
+        if (getX() >= 15) {
+            return -1;
+        }
+        return pos+1;
+    }
+
+    public int posWest() {
+        if (getX() <= 1) {
+            return -1;
+        }
+        return pos-1;
+    }
+
+    public int posUp() {
+        if (getY() >= 255) {
+            return -1;
+        }
+        return pos + (1<<4);
+    }
+
+    public int posDown() {
+        if (getY() <= 1) {
+            return -1;
+        }
+        return pos - (1<<4);
     }
 
     @Override
@@ -44,79 +137,23 @@ public class IntPos {
         return pos;
     }
 
-    public static int getX(int pos) {
-        return pos & 0xf;
-    }
-
-    public static int getY(int pos) {
-        return (pos >> 4) & 0xff;
-    }
-
-    public static int getZ(int pos) {
-        return (pos >> 12) & 0xf;
-    }
-
-    public static boolean isBorder(int pos) {
-        return getX(pos) == 0 || getX(pos) == 15 || getZ(pos) == 0 || getZ(pos) == 15;
-    }
-
-    public static int posSouth(int pos) {
-        if (getZ(pos) >= 15) {
-            return -1;
-        }
-        return pos + (1<<12);
-    }
-
-    public static int posNorth(int pos) {
-        if (getZ(pos) <= 1) {
-            return -1;
-        }
-        return pos - (1<<12);
-    }
-
-    public static int posEast(int pos) {
-        if (getX(pos) >= 15) {
-            return -1;
-        }
-        return pos+1;
-    }
-
-    public static int posWest(int pos) {
-        if (getX(pos) <= 1) {
-            return -1;
-        }
-        return pos-1;
-    }
-
-    public static int posUp(int pos) {
-        if (getY(pos) >= 255) {
-            return -1;
-        }
-        return pos + (1<<4);
-    }
-
-    public static int posDown(int pos) {
-        if (getY(pos) <= 1) {
-            return -1;
-        }
-        return pos - (1<<4);
-    }
-
-    public static int[] getSidePositions(int pos) {
-        return new int[] { posDown(pos), posUp(pos), posEast(pos), posWest(pos), posSouth(pos), posNorth(pos) };
-    }
-
-    public static int posToInt(BlockPos pos) {
+    private static int toInt(BlockPos pos) {
         int dx = pos.getX() & 0xf;
         int dy = pos.getY();
         int dz = pos.getZ() & 0xf;
         return dx << 12 | dy << 4 | dz;
     }
 
-    public static BlockPos intToPos(ChunkPos cpos, int i) {
-        int dx = getX(i);
-        int dy = getY(i);
-        int dz = getZ(i);
-        return new BlockPos(cpos.chunkXPos | dx, dy, cpos.chunkZPos | dz);
+    public static ChunkPos chunkPosFromLong(long l) {
+        int x = (int) (l & 4294967295L);
+        int z = (int) ((l >> 32) & 4294967295L);
+        return new ChunkPos(x, z);
+    }
+
+    public BlockPos toBlockPos(ChunkPos cpos) {
+        int dx = getX();
+        int dy = getY();
+        int dz = getZ();
+        return cpos.getBlock(dx, dy, dz);
     }
 }
