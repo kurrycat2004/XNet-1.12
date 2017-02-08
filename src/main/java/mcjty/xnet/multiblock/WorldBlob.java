@@ -58,6 +58,8 @@ public class WorldBlob {
         ChunkBlob blob = getOrCreateBlob(pos);
         if (blob.removeCableSegment(pos)) {
             recalculateNetwork();
+        } else {
+            blob.fixNetworkAllocations();
         }
     }
 

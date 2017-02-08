@@ -8,6 +8,9 @@ import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.ProbeMode;
 import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.cables.ConnectorType;
+import mcjty.xnet.multiblock.ColorId;
+import mcjty.xnet.multiblock.WorldBlob;
+import mcjty.xnet.multiblock.XNetBlobData;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import net.minecraft.block.SoundType;
@@ -45,6 +48,7 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
     public static final UnlistedPropertyBlockType UP = new UnlistedPropertyBlockType("up");
     public static final UnlistedPropertyBlockType DOWN = new UnlistedPropertyBlockType("down");
 
+    public static final ColorId STANDARD_COLOR = new ColorId(1);
 
     public GenericCableBlock(Material material, String name) {
         super(material);
@@ -80,77 +84,23 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
     }
 
     @Override
-    protected IBlockState clGetStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+    public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
+        super.onBlockAdded(world, pos, state);
         if (!world.isRemote) {
-//            CableNetwork cableNetwork = CableNetwork.getChannels(world);
-//            GenericCableTileEntity genericCableTileEntity = (GenericCableTileEntity) world.getTileEntity(pos);
-//            int id;
-//
-//            Set<Integer> networks = findAdjacentNetworks(world, pos);
-//            if (networks.isEmpty()) {
-//                // Make a new network.
-//                id = cableNetwork.newChannel();
-//                genericCableTileEntity.setId(id);
-//            } else if (networks.size() == 1) {
-//                // Just connect to the existing network.
-//                id = networks.iterator().next();
-//                genericCableTileEntity.setId(id);
-//            } else {
-//                // Here we must merge the networks.
-//                Iterator<Integer> iterator = networks.iterator();
-//                int id1 = iterator.next();
-//                int id2 = iterator.next();
-//                cableNetwork.moveNetwork(world, id2, id1);
-//                genericCableTileEntity.setId(id1);
-//                id = id1;
-//            }
-//
-//            CableNetwork.Network network = cableNetwork.getOrCreateNetwork(id);
-//            network.add(pos);
-//            cableNetwork.save(world);
+            XNetBlobData blobData = XNetBlobData.getBlobData(world);
+            WorldBlob worldBlob = blobData.getWorldBlob(world);
+            worldBlob.createCableSegment(pos, STANDARD_COLOR);
+            blobData.save(world);
         }
-        return super.clGetStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, placer);
     }
 
     @Override
     public void breakBlock(World world, BlockPos pos, IBlockState state) {
         if (!world.isRemote) {
-//            CableNetwork cableNetwork = CableNetwork.getChannels(world);
-//            GenericCableTileEntity genericCableTileEntity = (GenericCableTileEntity) world.getTileEntity(pos);
-//            int id = genericCableTileEntity.getId();
-//            CableNetwork.Network network = cableNetwork.getOrCreateNetwork(id);
-//
-//            Set<Integer> networks = findAdjacentNetworks(world, pos);
-//            if (networks.isEmpty()) {
-//                // There are no adjacent networks so we can just get rid of this one.
-//                network.remove(pos);
-//            } else {
-//                // There are adjacent blocks. We possible have to split them.
-//                // Set all blocks to -1 first.
-//                for (BlockPos coordinate : network.getBlocks()) {
-//                    TileEntity te = world.getTileEntity(coordinate);
-//                    if (te instanceof GenericCableTileEntity) {
-//                        GenericCableTileEntity gte = (GenericCableTileEntity) te;
-//                        gte.setId(-1);
-//                    }
-//                }
-//                // Now in every direction that there is a network we try to fully fill it.
-//                for (EnumFacing facing : VALUES) {
-//                    BlockPos p = pos.offset(facing);
-//                    TileEntity te = world.getTileEntity(p);
-//                    if (te instanceof GenericCableTileEntity) {
-//                        GenericCableTileEntity gte = (GenericCableTileEntity) te;
-//                        if (gte.getId() == -1) {
-//                            Set<BlockPos> done = new HashSet<>();
-//                            done.add(pos);
-//                            connectNetwork(world, done, id, p);
-//                            id = cableNetwork.newChannel();
-//                        }
-//                    }
-//                }
-//            }
-//
-//            cableNetwork.save(world);
+            XNetBlobData blobData = XNetBlobData.getBlobData(world);
+            WorldBlob worldBlob = blobData.getWorldBlob(world);
+            worldBlob.removeCableSegment(pos);
+            blobData.save(world);
         }
 
         super.breakBlock(world, pos, state);

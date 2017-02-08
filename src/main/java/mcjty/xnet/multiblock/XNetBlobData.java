@@ -46,6 +46,13 @@ public class XNetBlobData extends WorldSavedData {
         return instance;
     }
 
+    public WorldBlob getWorldBlob(World world) {
+        int dimId = world.provider.getDimension();
+        if (!worldBlobMap.containsKey(dimId)) {
+            worldBlobMap.put(dimId, new WorldBlob(dimId));
+        }
+        return worldBlobMap.get(dimId);
+    }
 
 
     @Override
