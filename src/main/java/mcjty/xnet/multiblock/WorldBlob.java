@@ -32,9 +32,18 @@ public class WorldBlob {
             chunkBlobMap.put(chunkId, new ChunkBlob(chunkId));
         }
         ChunkBlob blob = chunkBlobMap.get(chunkId);
-        List<Integer> changed = blob.createCableSegment(pos);
+        List<IntPos> changed = blob.createCableSegment(pos);
 
     }
+
+    public void recalculateNetwork() {
+        for (ChunkBlob blob : chunkBlobMap.values()) {
+            blob.clearNetworkAllocations();
+        }
+
+
+    }
+
 
     public void readFromNBT(NBTTagCompound compound) {
         chunkBlobMap.clear();

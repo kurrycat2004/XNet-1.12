@@ -3,7 +3,46 @@ package mcjty.xnet.multiblock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 
-public class IntPosTools {
+public class IntPos {
+
+    private final int pos;
+
+    public IntPos(int pos) {
+        this.pos = pos;
+    }
+
+    public IntPos(BlockPos pos) {
+        this.pos = posToInt(pos);
+    }
+
+    public int getPos() {
+        return pos;
+    }
+
+    public int[] getSidePositions() {
+        return getSidePositions(pos);
+    }
+
+    public boolean isBorder() {
+        return isBorder(pos);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        IntPos intPos = (IntPos) o;
+
+        if (pos != intPos.pos) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return pos;
+    }
 
     public static int getX(int pos) {
         return pos & 0xf;

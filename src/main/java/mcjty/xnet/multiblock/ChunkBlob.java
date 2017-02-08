@@ -1,7 +1,5 @@
 package mcjty.xnet.multiblock;
 
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
 import mcjty.lib.varia.BlockPosTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagIntArray;
@@ -15,16 +13,13 @@ public class ChunkBlob {
     private int lastId = 0;             // Local chunk blob ID
 
     // Every local (chunk) blob id can be allocated to multiple global network id's
-    private final Map<Integer, Set<Integer>> idMappings = new HashMap<>();
+    private final Map<BlobId, Set<NetworkId>> idMappings = new HashMap<>();
 
     // Every position in a chunk can be allocated to one local chunk blob id
-    // First Integer is a local chunk blockpos coordinate converted to int
-    // Second is bloc ID
-    private final Map<Integer, Integer> blobAllocations = new HashMap<>();
+    private final Map<IntPos, BlobId> blobAllocations = new HashMap<>();
 
     // These positions represent network ID providers
-    // First is location, second is network Id
-    private final Map<Integer, Integer> networkIdProviders = new HashMap<>();
+    private final Map<IntPos, NetworkId> networkProviders = new HashMap<>();
 
     public ChunkBlob(long chunkPos) {
         this.chunkPos = chunkPos;
@@ -34,73 +29,84 @@ public class ChunkBlob {
         return chunkPos;
     }
 
-    private Set<Integer> getMappings(int blobId) {
+    private Set<NetworkId> getMappings(BlobId blobId) {
         if (!idMappings.containsKey(blobId)) {
             idMappings.put(blobId, new HashSet<>());
         }
         return idMappings.get(blobId);
     }
 
-    public List<Integer> createNetworkProvider(BlockPos pos, int networkId) {
-        int posId = IntPosTools.posToInt(pos);
-        networkIdProviders.put(posId, networkId);
-        List<Integer> changed = createCableSegment(pos);
+    public void clearNetworkAllocations() {
+        idMappings.clear();
+    }
+
+    public Map<IntPos, NetworkId> getNetworkProviders() {
+        return networkProviders;
+    }
+
+    public List<IntPos> createNetworkProvider(BlockPos pos, NetworkId networkId) {
+        IntPos posId = new IntPos(pos);
+        networkProviders.put(posId, networkId);
+        List<IntPos> changed = createCableSegment(pos);
         getMappings(blobAllocations.get(posId)).add(networkId);
         return changed;
     }
 
     // Create a cable segment and return all positions on the border of this
     // chunk where something changed. Network ids are merged
-    public List<Integer> createCableSegment(BlockPos pos) {
-        int posId = IntPosTools.posToInt(pos);
+    public List<IntPos> createCableSegment(BlockPos pos) {
+        IntPos posId = new IntPos(pos);
         if (blobAllocations.containsKey(posId)) {
             throw new IllegalArgumentException("There is already a cablesegment at " + BlockPosTools.toString(pos) + "!");
         }
 
-        TIntSet ids = new TIntHashSet();
-        for (int p : IntPosTools.getSidePositions(posId)) {
-            if (blobAllocations.containsKey(p)) {
-                ids.add(blobAllocations.get(p));
+        Set<BlobId> ids = new HashSet<>();
+        for (int p : posId.getSidePositions()) {
+            if (p != -1) {
+                IntPos ip = new IntPos(p);
+                if (blobAllocations.containsKey(ip)) {
+                    ids.add(blobAllocations.get(ip));
+                }
             }
         }
 
         if (ids.isEmpty()) {
             // New id
             lastId++;
-            blobAllocations.put(posId, lastId);
-            if (IntPosTools.isBorder(posId)) {
+            blobAllocations.put(posId, new BlobId(lastId));
+            if (posId.isBorder()) {
                 return Collections.singletonList(posId);
             } else {
                 return Collections.emptyList();
             }
         } else if (ids.size() == 1) {
             // Merge with existing
-            int id = ids.iterator().next();
+            BlobId id = ids.iterator().next();
             blobAllocations.put(posId, id);
-            if (IntPosTools.isBorder(posId)) {
+            if (posId.isBorder()) {
                 return Collections.singletonList(posId);
             } else {
                 return Collections.emptyList();
             }
         } else {
             // Merge several blobs
-            List<Integer> changed = new ArrayList<>();
-            int id = ids.iterator().next();
+            List<IntPos> changed = new ArrayList<>();
+            BlobId id = ids.iterator().next();
             blobAllocations.put(posId, id);
-            if (IntPosTools.isBorder(posId)) {
+            if (posId.isBorder()) {
                 changed.add(posId);
             }
-            for (Map.Entry<Integer, Integer> entry : blobAllocations.entrySet()) {
+            for (Map.Entry<IntPos, BlobId> entry : blobAllocations.entrySet()) {
                 if (ids.contains(entry.getValue())) {
-                    Integer p = entry.getKey();
+                    IntPos p = entry.getKey();
                     blobAllocations.put(p, id);
-                    if (IntPosTools.isBorder(p)) {
+                    if (p.isBorder()) {
                         changed.add(p);
                     }
                 }
             }
-            Set<Integer> networkIds = new HashSet<>();
-            for (Map.Entry<Integer, Set<Integer>> entry : idMappings.entrySet()) {
+            Set<NetworkId> networkIds = new HashSet<>();
+            for (Map.Entry<BlobId, Set<NetworkId>> entry : idMappings.entrySet()) {
                 if (ids.contains(entry.getKey())) {
                     networkIds.addAll(entry.getValue());
                 }
@@ -114,48 +120,56 @@ public class ChunkBlob {
     // chunk where something changed. Note that this function will unlink all
     // affected network Ids (except from providers) so you have to make sure
     // to traverse the network providers again
-    public List<Integer> removeCableSegment(BlockPos pos) {
-        int posId = IntPosTools.posToInt(pos);
+    public List<IntPos> removeCableSegment(BlockPos pos) {
+        IntPos posId = new IntPos(pos);
         if (!blobAllocations.containsKey(posId)) {
             throw new IllegalArgumentException("There is no cablesegment at " + BlockPosTools.toString(pos) + "!");
         }
-        networkIdProviders.remove(posId);
+        networkProviders.remove(posId);
 
         int cnt = 0;
-        for (int p : IntPosTools.getSidePositions(posId)) {
-            if (blobAllocations.containsKey(p)) {
-                cnt++;
+        for (int p : posId.getSidePositions()) {
+            if (p != -1) {
+                if (blobAllocations.containsKey(new IntPos(p))) {
+                    cnt++;
+                }
             }
         }
 
-        List<Integer> changed = new ArrayList<>();
+        List<IntPos> changed = new ArrayList<>();
         blobAllocations.remove(posId);
-        if (IntPosTools.isBorder(posId)) {
+        if (posId.isBorder()) {
             changed.add(posId);
         }
         if (cnt > 1) {
             // Multiple adjacent blocks. We might need to split in multiple blobs. For
             // every adjacent block we allocate a new id:
-            for (int p : IntPosTools.getSidePositions(posId)) {
-                if (blobAllocations.containsKey(p)) {
-                    int oldId = blobAllocations.get(p);
-                    idMappings.remove(oldId);
-                    lastId++;
-                    propagateId(p, oldId, lastId, changed);
+            for (int p : posId.getSidePositions()) {
+                if (p != -1) {
+                    IntPos ip = new IntPos(p);
+                    if (blobAllocations.containsKey(ip)) {
+                        BlobId oldId = blobAllocations.get(ip);
+                        idMappings.remove(oldId);
+                        lastId++;
+                        propagateId(ip, oldId, new BlobId(lastId), changed);
+                    }
                 }
             }
         }
         return changed;
     }
 
-    private void propagateId(int pos, int oldId, int newId, List<Integer> changed) {
+    private void propagateId(IntPos pos, BlobId oldId, BlobId newId, List<IntPos> changed) {
         blobAllocations.put(pos, newId);
-        if (IntPosTools.isBorder(pos)) {
+        if (pos.isBorder()) {
             changed.add(pos);
         }
-        for (int p : IntPosTools.getSidePositions(pos)) {
-            if (blobAllocations.get(p) == oldId) {
-                propagateId(p, oldId, newId, changed);
+        for (int p : pos.getSidePositions()) {
+            if (p != -1) {
+                IntPos ip = new IntPos(p);
+                if (blobAllocations.get(ip).equals(oldId)) {
+                    propagateId(ip, oldId, newId, changed);
+                }
             }
         }
     }
@@ -163,18 +177,20 @@ public class ChunkBlob {
     public void readFromNBT(NBTTagCompound compound) {
         idMappings.clear();
         blobAllocations.clear();
+        networkProviders.clear();
 
         lastId = compound.getInteger("lastId");
         if (compound.hasKey("mappings")) {
             int[] mappings = compound.getIntArray("mappings");
             int idx = 0;
             while (idx < mappings.length-1) {
-                Integer key = mappings[idx];
-                Set<Integer> ids = new HashSet<>();
-                idMappings.put(key, ids);
+                int key = mappings[idx];
+                BlobId id = new BlobId(key);
+                Set<NetworkId> ids = new HashSet<>();
+                idMappings.put(id, ids);
                 idx++;
                 while (idx < mappings.length && mappings[idx] != -1) {
-                    ids.add(mappings[idx]);
+                    ids.add(new NetworkId(mappings[idx]));
                     idx++;
                 }
                 idx++;
@@ -185,7 +201,16 @@ public class ChunkBlob {
             int[] allocations = compound.getIntArray("allocations");
             int idx = 0;
             while (idx < allocations.length-1) {
-                blobAllocations.put(allocations[idx], allocations[idx]+1);
+                blobAllocations.put(new IntPos(allocations[idx]), new BlobId(allocations[idx+1]));
+                idx += 2;
+            }
+        }
+
+        if (compound.hasKey("providers")) {
+            int[] providers = compound.getIntArray("providers");
+            int idx = 0;
+            while (idx < providers.length-1) {
+                networkProviders.put(new IntPos(providers[idx]), new NetworkId(providers[idx+1]));
                 idx += 2;
             }
         }
@@ -195,10 +220,10 @@ public class ChunkBlob {
         compound.setInteger("lastId", lastId);
 
         List<Integer> m = new ArrayList<>();
-        for (Map.Entry<Integer, Set<Integer>> entry : idMappings.entrySet()) {
-            m.add(entry.getKey());
-            for (Integer v : entry.getValue()) {
-                m.add(v);
+        for (Map.Entry<BlobId, Set<NetworkId>> entry : idMappings.entrySet()) {
+            m.add(entry.getKey().getId());
+            for (NetworkId v : entry.getValue()) {
+                m.add(v.getId());
             }
             m.add(-1);
         }
@@ -206,12 +231,20 @@ public class ChunkBlob {
         compound.setTag("mappings", mappings);
 
         m.clear();
-        for (Map.Entry<Integer, Integer> entry : blobAllocations.entrySet()) {
-            m.add(entry.getKey());
-            m.add(entry.getValue());
+        for (Map.Entry<IntPos, BlobId> entry : blobAllocations.entrySet()) {
+            m.add(entry.getKey().getPos());
+            m.add(entry.getValue().getId());
         }
         NBTTagIntArray allocations = new NBTTagIntArray(m.stream().mapToInt(i -> i).toArray());
         compound.setTag("allocations", allocations);
+
+        m.clear();
+        for (Map.Entry<IntPos, NetworkId> entry : networkProviders.entrySet()) {
+            m.add(entry.getKey().getPos());
+            m.add(entry.getValue().getId());
+        }
+        NBTTagIntArray providers = new NBTTagIntArray(m.stream().mapToInt(i -> i).toArray());
+        compound.setTag("providers", providers);
 
         return compound;
     }
