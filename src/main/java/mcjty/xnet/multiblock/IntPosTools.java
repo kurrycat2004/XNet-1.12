@@ -17,6 +17,10 @@ public class IntPosTools {
         return (pos >> 12) & 0xf;
     }
 
+    public static boolean isBorder(int pos) {
+        return getX(pos) == 0 || getX(pos) == 15 || getZ(pos) == 0 || getZ(pos) == 15;
+    }
+
     public static int posSouth(int pos) {
         if (getZ(pos) >= 15) {
             return -1;

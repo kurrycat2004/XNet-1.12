@@ -6,6 +6,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class WorldBlob {
@@ -22,16 +23,17 @@ public class WorldBlob {
     }
 
     /**
-     * Create a cable segment at a position and return a chunk local blob id.
+     * Create a cable segment at a position
      */
-    public int createCableSegment(BlockPos pos) {
+    public void createCableSegment(BlockPos pos) {
         ChunkPos cpos = new ChunkPos(pos);
         long chunkId = ChunkPos.asLong(cpos.chunkXPos, cpos.chunkZPos);
         if (!chunkBlobMap.containsKey(chunkId)) {
             chunkBlobMap.put(chunkId, new ChunkBlob(chunkId));
         }
         ChunkBlob blob = chunkBlobMap.get(chunkId);
-        return blob.createCableSegment(pos);
+        List<Integer> changed = blob.createCableSegment(pos);
+
     }
 
     public void readFromNBT(NBTTagCompound compound) {
