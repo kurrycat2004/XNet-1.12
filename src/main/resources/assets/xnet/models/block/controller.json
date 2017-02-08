@@ -1,6 +1,6 @@
 {
   "parent": "xnet:block/xnetblock",
   "textures": {
-    "front": "xnet:blocks/machineController"
+    "front": "xnet:blocks/machine_controller"
   }
 }
