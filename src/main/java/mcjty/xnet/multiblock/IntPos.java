@@ -86,7 +86,7 @@ public class IntPos {
     }
 
     public int posNorth() {
-        if (getZ() <= 1) {
+        if (getZ() < 1) {
             return -1;
         }
         return pos - (1<<12);
@@ -100,7 +100,7 @@ public class IntPos {
     }
 
     public int posWest() {
-        if (getX() <= 1) {
+        if (getX() < 1) {
             return -1;
         }
         return pos-1;
@@ -114,7 +114,7 @@ public class IntPos {
     }
 
     public int posDown() {
-        if (getY() <= 1) {
+        if (getY() < 1) {
             return -1;
         }
         return pos - (1<<4);
@@ -141,13 +141,7 @@ public class IntPos {
         int dx = pos.getX() & 0xf;
         int dy = pos.getY();
         int dz = pos.getZ() & 0xf;
-        return dx << 12 | dy << 4 | dz;
-    }
-
-    public static ChunkPos chunkPosFromLong(long l) {
-        int x = (int) (l & 4294967295L);
-        int z = (int) ((l >> 32) & 4294967295L);
-        return new ChunkPos(x, z);
+        return dz << 12 | dy << 4 | dx;
     }
 
     public BlockPos toBlockPos(ChunkPos cpos) {

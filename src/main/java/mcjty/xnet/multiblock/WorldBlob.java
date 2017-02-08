@@ -22,38 +22,79 @@ public class WorldBlob {
         return dimId;
     }
 
+    public void createNetworkProvider(BlockPos pos, ColorId color, NetworkId network) {
+        ChunkBlob blob = getOrCreateBlob(pos);
+        if (blob.createNetworkProvider(pos, color, network)) {
+            recalculateNetwork(blob);
+        }
+    }
+
     /**
      * Create a cable segment at a position
      */
     public void createCableSegment(BlockPos pos, ColorId color) {
+        ChunkBlob blob = getOrCreateBlob(pos);
+        if (blob.createCableSegment(pos, color)) {
+            recalculateNetwork(blob);
+        }
+    }
+
+    private ChunkBlob getOrCreateBlob(BlockPos pos) {
         ChunkPos cpos = new ChunkPos(pos);
         long chunkId = ChunkPos.asLong(cpos.chunkXPos, cpos.chunkZPos);
         if (!chunkBlobMap.containsKey(chunkId)) {
-            chunkBlobMap.put(chunkId, new ChunkBlob(chunkId));
+            chunkBlobMap.put(chunkId, new ChunkBlob(cpos));
         }
-        ChunkBlob blob = chunkBlobMap.get(chunkId);
-        List<IntPos> changed = blob.createCableSegment(pos, color);
-        //@todo
+        return chunkBlobMap.get(chunkId);
     }
 
-    public void recalculateNetwork() {
+    public void removeCableSegment(BlockPos pos) {
+        ChunkBlob blob = getOrCreateBlob(pos);
+        if (blob.removeCableSegment(pos)) {
+            recalculateNetwork();
+        }
+    }
+
+    private void fixNetworkAllocations() {
         // First make sure that every chunk has its network mappings correct (mapping
         // from blob id to network id)
         for (ChunkBlob blob : chunkBlobMap.values()) {
             blob.fixNetworkAllocations();
         }
+    }
+
+    /**
+     * Recalculate the network starting from the given block
+     */
+    public void recalculateNetwork(ChunkBlob blob) {
+        fixNetworkAllocations();
+
+        Set<ChunkBlob> todo = new HashSet<>();
+        todo.add(blob);
+        recalculateNetwork(todo);
+    }
+
+    /**
+     * Recalculate the entire network
+     */
+    public void recalculateNetwork() {
+        fixNetworkAllocations();
 
         // For every chunk we check all border positions and see where they connect with
         // adjacent chunks
         Set<ChunkBlob> todo = new HashSet<>(chunkBlobMap.values());
+        recalculateNetwork(todo);
+    }
+
+    private void recalculateNetwork(Set<ChunkBlob> todo) {
         while (!todo.isEmpty()) {
             ChunkBlob blob = todo.iterator().next();
             todo.remove(blob);
 
             Set<IntPos> borderPositions = blob.getBorderPositions();
-            ChunkPos chunkPos = IntPos.chunkPosFromLong(blob.getChunkPos());
+            ChunkPos chunkPos = blob.getChunkPos();
             for (IntPos pos : borderPositions) {
-                Set<NetworkId> networks = blob.getNetworksForPosition(pos);
+                Set<NetworkId> networks = blob.getOrCreateNetworksForPosition(pos);
                 for (EnumFacing facing : EnumFacing.HORIZONTALS) {
                     if (pos.isBorder(facing)) {
                         Vec3i vec = facing.getDirectionVec();
@@ -63,7 +104,7 @@ public class WorldBlob {
                             IntPos connectedPos = pos.otherSide(facing);
                             if (adjacent.getBorderPositions().contains(connectedPos)) {
                                 // We have a connection!
-                                Set<NetworkId> adjacentNetworks = adjacent.getNetworksForPosition(connectedPos);
+                                Set<NetworkId> adjacentNetworks = adjacent.getOrCreateNetworksForPosition(connectedPos);
                                 if (networks.addAll(adjacentNetworks)) {
                                     todo.add(blob);     // We changed this blob so need to push back on todo
                                 }
@@ -77,9 +118,13 @@ public class WorldBlob {
             }
 
         }
+    }
 
 
-        // @todo
+    public void dump() {
+        for (ChunkBlob blob : chunkBlobMap.values()) {
+            blob.dump();
+        }
     }
 
 
@@ -89,10 +134,11 @@ public class WorldBlob {
             NBTTagList chunks = (NBTTagList) compound.getTag("chunks");
             for (int i = 0 ; i < chunks.tagCount() ; i++) {
                 NBTTagCompound tc = (NBTTagCompound) chunks.get(i);
-                long chunk = tc.getLong("chunk");
-                ChunkBlob blob = new ChunkBlob(chunk);
+                int chunkX = tc.getInteger("chunkX");
+                int chunkZ = tc.getInteger("chunkZ");
+                ChunkBlob blob = new ChunkBlob(new ChunkPos(chunkX, chunkZ));
                 blob.readFromNBT(tc);
-                chunkBlobMap.put(chunk, blob);
+                chunkBlobMap.put(blob.getChunkNum(), blob);
             }
         }
     }
@@ -102,7 +148,8 @@ public class WorldBlob {
         for (Map.Entry<Long, ChunkBlob> entry : chunkBlobMap.entrySet()) {
             ChunkBlob blob = entry.getValue();
             NBTTagCompound tc = new NBTTagCompound();
-            tc.setLong("chunk", blob.getChunkPos());
+            tc.setInteger("chunkX", blob.getChunkPos().chunkXPos);
+            tc.setInteger("chunkZ", blob.getChunkPos().chunkZPos);
             blob.writeToNBT(tc);
             list.appendTag(tc);
         }
