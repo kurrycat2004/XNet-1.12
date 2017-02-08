@@ -1,5 +1,6 @@
 package mcjty.xnet.multiblock;
 
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
@@ -41,6 +42,17 @@ public class WorldBlobTest {
         System.out.println("------------------------------------------------------------");
 
         world.removeCableSegment(new BlockPos(30, 61, 10));
+
+        System.out.println("------------------------------------------------------------");
+        System.out.println("------------------------------------------------------------");
+        System.out.println("------------------------------------------------------------");
+        world.dump();
+
+        NBTTagCompound compound = new NBTTagCompound();
+        world.writeToNBT(compound);
+
+        world = new WorldBlob(0);
+        world.readFromNBT(compound);
 
         System.out.println("------------------------------------------------------------");
         System.out.println("------------------------------------------------------------");

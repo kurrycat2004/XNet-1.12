@@ -176,7 +176,6 @@ public class ChunkBlob {
         }
         networkProviders.remove(posId);
         ColorId oldColor = blobColors.get(blobAllocations.get(posId));
-        // @todo: old blob ids are never cleaned up with regards to color allocation
 
         int cnt = 0;
         for (int p : posId.getSidePositions()) {
@@ -266,33 +265,39 @@ public class ChunkBlob {
         borderPositions.clear();
 
         lastId = compound.getInteger("lastId");
-        if (compound.hasKey("mappings")) {
-            int[] mappings = compound.getIntArray("mappings");
-            int idx = 0;
-            while (idx < mappings.length-1) {
-                int key = mappings[idx];
-                BlobId id = new BlobId(key);
-                Set<NetworkId> ids = new HashSet<>();
-                networkMappings.put(id, ids);
-                idx++;
-                while (idx < mappings.length && mappings[idx] != -1) {
-                    ids.add(new NetworkId(mappings[idx]));
-                    idx++;
-                }
-                idx++;
-            }
-        }
-
+        Set<BlobId> foundBlobs = new HashSet<>();       // Keep track of blobs we found
         if (compound.hasKey("allocations")) {
             int[] allocations = compound.getIntArray("allocations");
             int idx = 0;
             while (idx < allocations.length-1) {
                 IntPos pos = new IntPos(allocations[idx]);
-                blobAllocations.put(pos, new BlobId(allocations[idx+1]));
+                BlobId blob = new BlobId(allocations[idx + 1]);
+                blobAllocations.put(pos, blob);
+                foundBlobs.add(blob);
                 if (pos.isBorder()) {
                     borderPositions.add(pos);
                 }
                 idx += 2;
+            }
+        }
+
+        if (compound.hasKey("mappings")) {
+            int[] mappings = compound.getIntArray("mappings");
+            int idx = 0;
+            while (idx < mappings.length-1) {
+                int key = mappings[idx];
+                BlobId blob = new BlobId(key);
+                Set<NetworkId> ids = new HashSet<>();
+                idx++;
+                while (idx < mappings.length && mappings[idx] != -1) {
+                    ids.add(new NetworkId(mappings[idx]));
+                    idx++;
+                }
+                if (foundBlobs.contains(blob)) {
+                    // Only add mappings if we still have allocations for the blob
+                    networkMappings.put(blob, ids);
+                }
+                idx++;
             }
         }
 
@@ -309,7 +314,12 @@ public class ChunkBlob {
             int[] colors = compound.getIntArray("colors");
             int idx = 0;
             while (idx < colors.length-1) {
-                blobColors.put(new BlobId(colors[idx]), new ColorId(colors[idx+1]));
+                BlobId blob = new BlobId(colors[idx]);
+                ColorId color = new ColorId(colors[idx + 1]);
+                if (foundBlobs.contains(blob)) {
+                    // Only add colors if we still have allocations for the blob
+                    blobColors.put(blob, color);
+                }
                 idx += 2;
             }
         }
