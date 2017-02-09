@@ -83,7 +83,7 @@ public class ConnectorBlock extends GenericCableBlock {
         }
     }
 
-    private static boolean isConnectable(IBlockAccess world, BlockPos pos) {
+    public static boolean isConnectable(IBlockAccess world, BlockPos pos) {
         TileEntity te = world.getTileEntity(pos);
         if (te == null) {
             return false;

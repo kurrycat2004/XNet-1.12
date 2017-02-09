@@ -3,10 +3,12 @@ package mcjty.xnet.blocks.controller;
 import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.network.Argument;
 import mcjty.typed.Type;
+import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.multiblock.NetworkId;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nonnull;
@@ -58,9 +60,18 @@ public final class TileEntityController extends GenericTileEntity {
     }
 
     @Nonnull
-    private Set<BlockPos> findConsumers() {
+    private List<BlockPos> findConsumers() {
+        List<BlockPos> consumers = new ArrayList<>();
         WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
-        return worldBlob.getConsumers(networkId);
+        for (BlockPos connectorPos : worldBlob.getConsumers(networkId)) {
+            for (EnumFacing facing : EnumFacing.values()) {
+                BlockPos p = connectorPos.offset(facing);
+                if (ConnectorBlock.isConnectable(getWorld(), p)) {
+                    consumers.add(p);
+                }
+            }
+        }
+        return consumers;
     }
 
     @Nonnull
@@ -71,7 +82,7 @@ public final class TileEntityController extends GenericTileEntity {
             return rc;
         }
         if (CMD_GETCONSUMERS.equals(command)) {
-            return type.convert(new ArrayList<BlockPos>(findConsumers()));
+            return type.convert(findConsumers());
         }
         return Collections.emptyList();
     }
