@@ -6,6 +6,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSavedData;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,9 +33,10 @@ public class XNetBlobData extends WorldSavedData {
         }
     }
 
+    @Nonnull
     public static XNetBlobData getBlobData(World world) {
         if (world.isRemote) {
-            return null;
+            throw new RuntimeException("Don't access this client-side!");
         }
         if (instance != null) {
             return instance;

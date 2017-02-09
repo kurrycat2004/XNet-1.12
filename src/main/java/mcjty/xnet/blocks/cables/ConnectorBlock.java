@@ -1,9 +1,13 @@
 package mcjty.xnet.blocks.cables;
 
+import mcjty.lib.tools.ItemStackTools;
 import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.controller.TileEntityController;
 import mcjty.xnet.blocks.generic.GenericCableBlock;
 import mcjty.xnet.blocks.generic.GenericCableISBM;
+import mcjty.xnet.multiblock.ConsumerId;
+import mcjty.xnet.multiblock.WorldBlob;
+import mcjty.xnet.multiblock.XNetBlobData;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -13,6 +17,8 @@ import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -24,6 +30,8 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
+
+import java.util.List;
 
 public class ConnectorBlock extends GenericCableBlock {
 
@@ -90,6 +98,40 @@ public class ConnectorBlock extends GenericCableBlock {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public List<ItemStack> getDrops(IBlockAccess blockAccess, BlockPos pos, IBlockState state, int fortune) {
+        List<ItemStack> drops = super.getDrops(blockAccess, pos, state, fortune);
+        if (blockAccess instanceof World) {
+            World world = (World) blockAccess;
+            for (ItemStack drop : drops) {
+                if (!drop.hasTagCompound()) {
+                    drop.setTagCompound(new NBTTagCompound());
+                }
+                WorldBlob worldBlob = XNetBlobData.getBlobData(world).getWorldBlob(world);
+                ConsumerId consumer = worldBlob.getConsumerAt(pos);
+                if (consumer != null) {
+                    drop.getTagCompound().setInteger("consumerId", consumer.getId());
+                }
+            }
+        }
+
+        return drops;
+    }
+
+    @Override
+    protected void createCableSegment(World world, BlockPos pos, ItemStack stack) {
+        XNetBlobData blobData = XNetBlobData.getBlobData(world);
+        WorldBlob worldBlob = blobData.getWorldBlob(world);
+        ConsumerId consumer;
+        if (ItemStackTools.isValid(stack) && stack.hasTagCompound() && stack.getTagCompound().hasKey("consumerId")) {
+            consumer = new ConsumerId(stack.getTagCompound().getInteger("consumerId"));
+        } else {
+            consumer = worldBlob.newConsumer();
+        }
+        worldBlob.createNetworkConsumer(pos, STANDARD_COLOR, consumer);
+        blobData.save(world);
     }
 
     @Override

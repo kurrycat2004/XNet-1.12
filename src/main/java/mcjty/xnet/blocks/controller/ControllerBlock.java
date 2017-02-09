@@ -52,6 +52,8 @@ public class ControllerBlock extends GenericXNetBlock<TileEntityController, Empt
             blobData.save(world);
 
             TileEntity te = world.getTileEntity(pos);
+            System.out.println("te = " + te);
+            System.out.println("networkId = " + networkId);
             if (te instanceof TileEntityController) {
                 ((TileEntityController) te).setNetworkId(networkId);
             }

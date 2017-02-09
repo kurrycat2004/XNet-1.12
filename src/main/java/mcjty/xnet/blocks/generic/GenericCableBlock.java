@@ -58,8 +58,12 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
         setUnlocalizedName(XNet.MODID + "." + name);
         setRegistryName(name);
         GameRegistry.register(this);
-        GameRegistry.register(new ItemBlock(this), getRegistryName());
+        GameRegistry.register(createItemBlock(), getRegistryName());
         setCreativeTab(XNet.tabXNet);
+    }
+
+    protected ItemBlock createItemBlock() {
+        return new ItemBlock(this);
     }
 
     @SideOnly(Side.CLIENT)
@@ -84,14 +88,18 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
     }
 
     @Override
-    public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
-        super.onBlockAdded(world, pos, state);
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+        super.onBlockPlacedBy(world, pos, state, placer, stack);
         if (!world.isRemote) {
-            XNetBlobData blobData = XNetBlobData.getBlobData(world);
-            WorldBlob worldBlob = blobData.getWorldBlob(world);
-            worldBlob.createCableSegment(pos, STANDARD_COLOR);
-            blobData.save(world);
+            createCableSegment(world, pos, stack);
         }
+    }
+
+    protected void createCableSegment(World world, BlockPos pos, ItemStack stack) {
+        XNetBlobData blobData = XNetBlobData.getBlobData(world);
+        WorldBlob worldBlob = blobData.getWorldBlob(world);
+        worldBlob.createCableSegment(pos, STANDARD_COLOR);
+        blobData.save(world);
     }
 
     @Override
