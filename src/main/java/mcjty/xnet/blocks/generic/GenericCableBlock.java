@@ -122,6 +122,10 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
         return false;
     }
 
+    @Override
+    public boolean isFullCube(IBlockState state) {
+        return false;
+    }
 
     @Override
     protected BlockStateContainer createBlockState() {
