@@ -71,6 +71,12 @@ public class WorldBlob {
         return consumersOnNetwork.get(network);
     }
 
+    private void removeCachedNetworksForBlob(ChunkBlob blob) {
+        for (NetworkId id : blob.getNetworks()) {
+            consumersOnNetwork.remove(id);
+        }
+    }
+
     /**
      * Create a cable segment that is also a network provider at this section
      */
@@ -78,6 +84,8 @@ public class WorldBlob {
         ChunkBlob blob = getOrCreateBlob(pos);
         if (blob.createNetworkProvider(pos, color, network)) {
             recalculateNetwork(blob);
+        } else {
+            removeCachedNetworksForBlob(blob);
         }
     }
 
@@ -88,6 +96,8 @@ public class WorldBlob {
         ChunkBlob blob = getOrCreateBlob(pos);
         if (blob.createNetworkConsumer(pos, color, consumer)) {
             recalculateNetwork(blob);
+        } else {
+            removeCachedNetworksForBlob(blob);
         }
     }
 
@@ -98,6 +108,8 @@ public class WorldBlob {
         ChunkBlob blob = getOrCreateBlob(pos);
         if (blob.createCableSegment(pos, color)) {
             recalculateNetwork(blob);
+        } else {
+            removeCachedNetworksForBlob(blob);
         }
     }
 
@@ -162,6 +174,7 @@ public class WorldBlob {
         while (!todo.isEmpty()) {
             ChunkBlob blob = todo.iterator().next();
             todo.remove(blob);
+            removeCachedNetworksForBlob(blob);
 
             Set<IntPos> borderPositions = blob.getBorderPositions();
             ChunkPos chunkPos = blob.getChunkPos();

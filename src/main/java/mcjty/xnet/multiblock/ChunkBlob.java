@@ -7,6 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
 
 /**
@@ -40,6 +41,9 @@ public class ChunkBlob {
     // Transient datastructure that caches which consumer positions are coupled to a network
     private Map<NetworkId, Set<IntPos>> cachedConsumers = null;
 
+    // Transient datastructure that contains all networks actually used in this chunk
+    private Set<NetworkId> cachedNetworks = null;
+
     public ChunkBlob(ChunkPos chunkPos) {
         this.chunkPos = chunkPos;
         this.chunkNum = ChunkPos.asLong(chunkPos.chunkXPos, chunkPos.chunkZPos);
@@ -57,16 +61,30 @@ public class ChunkBlob {
         return pos.toBlockPos(chunkPos);
     }
 
+    @Nullable
     public Set<NetworkId> getNetworksForPosition(IntPos pos) {
         return networkMappings.get(blobAllocations.get(pos));
     }
 
+    @Nonnull
     public Set<NetworkId> getOrCreateNetworksForPosition(IntPos pos) {
         return getMappings(blobAllocations.get(pos));
     }
 
+    @Nonnull
     public Set<IntPos> getBorderPositions() {
         return cachedBorderPositions;
+    }
+
+    @Nonnull
+    public Set<NetworkId> getNetworks() {
+        if (cachedNetworks == null) {
+            cachedNetworks = new HashSet<>();
+            for (Set<NetworkId> networkIds : networkMappings.values()) {
+                cachedNetworks.addAll(networkIds);
+            }
+        }
+        return cachedNetworks;
     }
 
     @Nonnull
@@ -103,6 +121,7 @@ public class ChunkBlob {
     // to the local blob id's
     public void fixNetworkAllocations() {
         cachedConsumers = null;
+        cachedNetworks = null;
         networkMappings.clear();
         for (Map.Entry<IntPos, NetworkId> entry : networkProviders.entrySet()) {
             BlobId blobId = blobAllocations.get(entry.getKey());
@@ -204,6 +223,7 @@ public class ChunkBlob {
             }
             networkMappings.put(id, networkIds);
             cachedConsumers = null;
+            cachedNetworks = null;
             return changed;
         }
     }
@@ -246,6 +266,7 @@ public class ChunkBlob {
                     BlobId oldId = blobAllocations.get(ip);
                     if (oldId != null && blobColors.get(oldId).equals(oldColor)) {
                         networkMappings.remove(oldId);
+                        cachedNetworks = null;
                         cachedConsumers = null;
                         lastBlobId++;
                         BlobId newId = new BlobId(lastBlobId);
@@ -314,6 +335,7 @@ public class ChunkBlob {
         networkProviders.clear();
         blobColors.clear();
         cachedBorderPositions.clear();
+        cachedNetworks = null;
         cachedConsumers = null;
 
         lastBlobId = compound.getInteger("lastBlob");
