@@ -14,6 +14,7 @@ import mcjty.lib.tools.MinecraftTools;
 import mcjty.lib.varia.BlockPosTools;
 import mcjty.xnet.XNet;
 import mcjty.xnet.gui.GuiProxy;
+import mcjty.xnet.network.PacketGetConsumers;
 import mcjty.xnet.network.XNetMessages;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -25,17 +26,13 @@ import java.util.List;
 
 public class GuiController extends GenericGuiContainer<TileEntityController> {
     private WidgetList list;
-    private ChoiceLabel alarmModeChoiceLabel;
-    private ScrollableLabel alarmLabel;
     private int listDirty;
 
-    public static final int TEXT_COLOR_SELECTED = 0xFFFFFF;
-
-    // A copy of the adjacent blocks we're currently showing
-    private List<BlockPos> adjacentBlocks = null;
+    // A copy of the consumers we're currently showing
+    private List<BlockPos> consumers = null;
 
     // From server.
-    public static List<BlockPos> fromServer_clientAdjacentBlocks = null;
+    public static List<BlockPos> fromServer_consumers = null;
 
 
     public GuiController(TileEntityController controller, EmptyContainer container) {
@@ -55,7 +52,6 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
 //                setSelectedBlock(index);
             }
         });
-        listDirty = 0;
         Slider listSlider = new Slider(mc, this).setDesiredWidth(10).setVertical().setScrollable(list);
         Panel listPanel = new Panel(mc, this).setLayout(new HorizontalLayout().setHorizontalMargin(3).setSpacing(1)).addChild(list).addChild(listSlider);
 
@@ -63,28 +59,40 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         toplevel.setBounds(new Rectangle(guiLeft, guiTop, xSize, ySize));
         window = new Window(this, toplevel);
 
-        fromServer_clientAdjacentBlocks = new ArrayList<>();
-//        RFToolsMessages.INSTANCE.sendToServer(new PacketGetAdjacentBlocks(tileEntity.getPos()));
+        fromServer_consumers = null;
+        listDirty = 0;
+        XNetMessages.INSTANCE.sendToServer(new PacketGetConsumers(tileEntity.getPos()));
+    }
+
+
+    private void requestListsIfNeeded() {
+        if (fromServer_consumers != null) {
+            return;
+        }
+        listDirty--;
+        if (listDirty <= 0) {
+            XNetMessages.INSTANCE.sendToServer(new PacketGetConsumers(tileEntity.getPos()));
+            listDirty = 10;
+        }
     }
 
 
     private void populateList() {
-        List<BlockPos> newAdjacentBlocks = fromServer_clientAdjacentBlocks;
-        if (newAdjacentBlocks == null) {
+        List<BlockPos> newConsumers = fromServer_consumers;
+        if (newConsumers == null) {
             return;
         }
-        if (newAdjacentBlocks.equals(adjacentBlocks)) {
-//            refreshList();
+        if (newConsumers.equals(consumers)) {
             return;
         }
 
 
-        adjacentBlocks = new ArrayList<>(newAdjacentBlocks);
+        consumers = new ArrayList<>(newConsumers);
         list.removeChildren();
 
         int index = 0;
         int sel = -1;
-        for (BlockPos coordinate : adjacentBlocks) {
+        for (BlockPos coordinate : consumers) {
             IBlockState state = MinecraftTools.getWorld(mc).getBlockState(coordinate);
             Block block = state.getBlock();
 
@@ -111,12 +119,8 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float v, int i, int i2) {
-        listDirty--;
-        if (listDirty <= 0) {
-            populateList();
-            listDirty = 5;
-        }
-
+        requestListsIfNeeded();
+        populateList();
         drawWindow();
     }
 }

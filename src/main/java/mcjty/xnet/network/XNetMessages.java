@@ -1,6 +1,8 @@
 package mcjty.xnet.network;
 
+import mcjty.lib.network.PacketHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.relauncher.Side;
 
 public class XNetMessages {
     public static SimpleNetworkWrapper INSTANCE;
@@ -9,11 +11,9 @@ public class XNetMessages {
         INSTANCE = net;
 
         // Server side
-//        net.registerMessage(PacketCrafter.Handler.class, PacketCrafter.class, PacketHandler.nextID(), Side.SERVER);
+        net.registerMessage(PacketGetConsumers.Handler.class, PacketGetConsumers.class, PacketHandler.nextID(), Side.SERVER);
 
         // Client side
-//        net.registerMessage(PacketPlayersReady.Handler.class, PacketPlayersReady.class, PacketHandler.nextID(), Side.CLIENT);
-
-//        PacketHandler.register(PacketHandler.nextPacketID(), StorageInfoPacketServer.class, StorageInfoPacketClient.class);
+        net.registerMessage(PacketConsumersReady.Handler.class, PacketConsumersReady.class, PacketHandler.nextID(), Side.CLIENT);
     }
 }
