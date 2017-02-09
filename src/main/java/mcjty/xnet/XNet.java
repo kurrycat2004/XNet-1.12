@@ -3,6 +3,7 @@ package mcjty.xnet;
 
 import mcjty.lib.base.ModBase;
 import mcjty.lib.compat.CompatCreativeTabs;
+import mcjty.xnet.commands.CommandDump;
 import mcjty.xnet.multiblock.XNetBlobData;
 import mcjty.xnet.proxy.CommonProxy;
 import net.minecraft.creativetab.CreativeTabs;
@@ -11,10 +12,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
+import net.minecraftforge.fml.common.event.*;
 import org.apache.logging.log4j.Logger;
 
 @Mod(modid = XNet.MODID, name = XNet.MODNAME,
@@ -71,6 +69,10 @@ public class XNet implements ModBase {
         XNetBlobData.clearInstance();
     }
 
+    @Mod.EventHandler
+    public void serverLoad(FMLServerStartingEvent event) {
+        event.registerServerCommand(new CommandDump());
+    }
 
     public String getModId() {
         return MODID;

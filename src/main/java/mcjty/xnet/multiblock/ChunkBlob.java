@@ -203,7 +203,9 @@ public class ChunkBlob {
                     if (oldId != null && blobColors.get(oldId).equals(oldColor)) {
                         networkMappings.remove(oldId);
                         lastBlobId++;
-                        changed = propagateId(ip, oldColor, oldId, new BlobId(lastBlobId), changed);
+                        BlobId newId = new BlobId(lastBlobId);
+                        blobColors.put(newId, oldColor);
+                        changed = propagateId(ip, oldColor, oldId, newId, changed);
                     }
                 }
             }
