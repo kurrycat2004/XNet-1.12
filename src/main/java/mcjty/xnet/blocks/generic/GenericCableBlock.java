@@ -122,6 +122,7 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
         return false;
     }
 
+
     @Override
     protected BlockStateContainer createBlockState() {
         IProperty[] listedProperties = new IProperty[0]; // no listed properties

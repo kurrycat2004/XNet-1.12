@@ -10,6 +10,7 @@ import mcjty.xnet.gui.GuiProxy;
 import mcjty.xnet.init.ModBlocks;
 import mcjty.xnet.init.ModItems;
 import mcjty.xnet.init.ModRecipes;
+import mcjty.xnet.network.XNetMessages;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
@@ -40,7 +41,7 @@ public abstract class CommonProxy {
         readMainConfig();
 
         SimpleNetworkWrapper network = PacketHandler.registerMessages(XNet.MODID, "xnet");
-//        RFToolsMessages.registerNetworkMessages(network);
+        XNetMessages.registerNetworkMessages(network);
 
         ModItems.init();
         ModBlocks.init();

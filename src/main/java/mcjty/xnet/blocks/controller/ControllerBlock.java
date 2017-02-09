@@ -1,11 +1,13 @@
 package mcjty.xnet.blocks.controller;
 
 import mcjty.lib.container.EmptyContainer;
+import mcjty.lib.container.GenericGuiContainer;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.ProbeMode;
 import mcjty.theoneprobe.api.TextStyleClass;
 import mcjty.xnet.blocks.generic.GenericXNetBlock;
+import mcjty.xnet.gui.GuiProxy;
 import mcjty.xnet.multiblock.NetworkId;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
@@ -16,8 +18,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static mcjty.xnet.blocks.generic.GenericCableBlock.STANDARD_COLOR;
 
@@ -29,12 +32,13 @@ public class ControllerBlock extends GenericXNetBlock<TileEntityController, Empt
 
     @Override
     public int getGuiID() {
-        return -1;
+        return GuiProxy.GUI_CONTROLLER;
     }
 
+    @SideOnly(Side.CLIENT)
     @Override
-    protected boolean openGui(World world, int x, int y, int z, EntityPlayer player) {
-        return false; //We don't have a GUI, and this prevents a possible NPE
+    public Class<? extends GenericGuiContainer> getGuiClass() {
+        return GuiController.class;
     }
 
     @Override
