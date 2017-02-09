@@ -144,6 +144,7 @@ public class WorldBlob {
         // from blob id to network id)
         for (ChunkBlob blob : chunkBlobMap.values()) {
             blob.fixNetworkAllocations();
+            removeCachedNetworksForBlob(blob);
         }
     }
 

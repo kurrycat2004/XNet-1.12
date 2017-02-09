@@ -102,11 +102,14 @@ public class ChunkBlob {
             for (Map.Entry<IntPos, ConsumerId> entry : networkConsumers.entrySet()) {
                 IntPos pos = entry.getKey();
                 BlobId blobId = blobAllocations.get(pos);
-                for (NetworkId net : networkMappings.get(blobId)) {
-                    if (!cachedConsumers.containsKey(net)) {
-                        cachedConsumers.put(net, new HashSet<>());
+                Set<NetworkId> networkIds = networkMappings.get(blobId);
+                if (networkIds != null) {
+                    for (NetworkId net : networkIds) {
+                        if (!cachedConsumers.containsKey(net)) {
+                            cachedConsumers.put(net, new HashSet<>());
+                        }
+                        cachedConsumers.get(net).add(pos);
                     }
-                    cachedConsumers.get(net).add(pos);
                 }
             }
         }
