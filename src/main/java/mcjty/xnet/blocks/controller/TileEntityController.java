@@ -1,5 +1,7 @@
 package mcjty.xnet.blocks.controller;
 
+import mcjty.lib.container.DefaultSidedInventory;
+import mcjty.lib.container.InventoryHelper;
 import mcjty.lib.entity.GenericEnergyReceiverTileEntity;
 import mcjty.lib.network.Argument;
 import mcjty.typed.Type;
@@ -8,6 +10,7 @@ import mcjty.xnet.multiblock.NetworkId;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
 import mcjty.xnet.network.PacketGetConsumers;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -18,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public final class TileEntityController extends GenericEnergyReceiverTileEntity {
+public final class TileEntityController extends GenericEnergyReceiverTileEntity implements DefaultSidedInventory {
 
     public static final String CMD_GETCONSUMERS = "getConsumers";
     public static final String CLIENTCMD_CONSUMERSREADY = "consumersReady";
@@ -27,6 +30,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         super(100000, 1000); // @todo configurable
     }
 
+    private InventoryHelper inventoryHelper = new InventoryHelper(this, ControllerContainer.factory, ControllerContainer.COUNT_FILTER_SLOTS);
     private NetworkId networkId;
 
     public NetworkId getNetworkId() {
@@ -51,6 +55,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     @Override
     public void writeRestorableToNBT(NBTTagCompound tagCompound) {
         super.writeRestorableToNBT(tagCompound);
+        writeBufferToNBT(tagCompound, inventoryHelper);
         if (networkId != null) {
             tagCompound.setInteger("networkId", networkId.getId());
         }
@@ -59,6 +64,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     @Override
     public void readRestorableFromNBT(NBTTagCompound tagCompound) {
         super.readRestorableFromNBT(tagCompound);
+        readBufferFromNBT(tagCompound, inventoryHelper);
         if (tagCompound.hasKey("networkId")) {
             networkId = new NetworkId(tagCompound.getInteger("networkId"));
         } else {
@@ -80,6 +86,17 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         }
         return consumers;
     }
+
+    @Override
+    public InventoryHelper getInventoryHelper() {
+        return inventoryHelper;
+    }
+
+    @Override
+    public boolean isUsable(EntityPlayer player) {
+        return canPlayerAccess(player);
+    }
+
 
     @Nonnull
     @Override

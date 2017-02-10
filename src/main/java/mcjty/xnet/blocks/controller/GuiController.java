@@ -1,7 +1,6 @@
 package mcjty.xnet.blocks.controller;
 
 import mcjty.lib.base.StyleConfig;
-import mcjty.lib.container.EmptyContainer;
 import mcjty.lib.container.GenericGuiContainer;
 import mcjty.lib.entity.GenericEnergyStorageTileEntity;
 import mcjty.lib.gui.RenderHelper;
@@ -60,7 +59,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     public static List<PacketGetConsumers.SidedPos> fromServer_consumers = null;
 
 
-    public GuiController(TileEntityController controller, EmptyContainer container) {
+    public GuiController(TileEntityController controller, ControllerContainer container) {
         super(XNet.instance, XNetMessages.INSTANCE, controller, container, GuiProxy.GUI_MANUAL_MAIN, "controller");
 
         xSize = WIDTH;
@@ -102,7 +101,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                 addChoice(RedstoneMode.REDSTONE_IGNORED.getDescription(), "Redstone mode:\nIgnored", iconGuiElements, 0, 0).
                 addChoice(RedstoneMode.REDSTONE_OFFREQUIRED.getDescription(), "Redstone mode:\nOff to activate", iconGuiElements, 16, 0).
                 addChoice(RedstoneMode.REDSTONE_ONREQUIRED.getDescription(), "Redstone mode:\nOn to activate", iconGuiElements, 32, 0);
-        redstoneMode.setLayoutHint(new PositionalLayout.PositionalHint(66, 3, 16, 16));
+        redstoneMode.setLayoutHint(new PositionalLayout.PositionalHint(66, 2, 16, 16));
     }
 
     private void initEnergyBar() {
@@ -110,7 +109,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         energyBar = new EnergyBar(mc, this)
                 .setHorizontal()
                 .setMaxValue(maxEnergyStored)
-                .setLayoutHint(new PositionalLayout.PositionalHint(3, 7, 37, 12))
+                .setLayoutHint(new PositionalLayout.PositionalHint(5, 7, 35, 11))
                 .setShowText(false);
         energyBar.setValue(GenericEnergyStorageTileEntity.getCurrentRF());
     }

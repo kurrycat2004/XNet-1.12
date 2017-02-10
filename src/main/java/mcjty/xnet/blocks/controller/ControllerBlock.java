@@ -1,6 +1,5 @@
 package mcjty.xnet.blocks.controller;
 
-import mcjty.lib.container.EmptyContainer;
 import mcjty.lib.container.GenericGuiContainer;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
@@ -24,10 +23,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static mcjty.xnet.blocks.generic.GenericCableBlock.STANDARD_COLOR;
 
-public class ControllerBlock extends GenericXNetBlock<TileEntityController, EmptyContainer> {
+public class ControllerBlock extends GenericXNetBlock<TileEntityController, ControllerContainer> {
 
     public ControllerBlock() {
-        super(Material.IRON, TileEntityController.class, EmptyContainer.class, "controller", false);
+        super(Material.IRON, TileEntityController.class, ControllerContainer.class, "controller", false);
     }
 
     @Override
