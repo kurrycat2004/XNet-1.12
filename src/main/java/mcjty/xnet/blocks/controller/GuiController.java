@@ -192,6 +192,10 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         }
         consumerEditPanel.removeChildren();
         if (but.isPressed()) {
+            if (editingChannel != getSelectedChannel()) {
+                selectChannelEditor(editingChannel);
+            }
+
             ChoiceLabel type = new ChoiceLabel(mc, this).addChoices("Insert", "Extract")
                     .setLayoutHint(new PositionalLayout.PositionalHint(4, 3, 60, 14));
 
