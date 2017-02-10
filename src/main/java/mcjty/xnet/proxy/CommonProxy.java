@@ -6,6 +6,7 @@ import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.network.PacketHandler;
 import mcjty.lib.varia.WrenchChecker;
 import mcjty.xnet.XNet;
+import mcjty.xnet.apiimpl.ItemChannelType;
 import mcjty.xnet.gui.GuiProxy;
 import mcjty.xnet.init.ModBlocks;
 import mcjty.xnet.init.ModItems;
@@ -45,6 +46,8 @@ public abstract class CommonProxy {
 
         ModItems.init();
         ModBlocks.init();
+
+        XNet.xNetApi.registerChannelType(new ItemChannelType());
     }
 
     private void readMainConfig() {

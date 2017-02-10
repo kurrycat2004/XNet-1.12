@@ -1,8 +1,12 @@
 package mcjty.xnet;
 
 
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.compat.CompatCreativeTabs;
+import mcjty.xnet.api.IXNet;
+import mcjty.xnet.apiimpl.XNetApi;
 import mcjty.xnet.commands.CommandDump;
 import mcjty.xnet.multiblock.XNetBlobData;
 import mcjty.xnet.proxy.CommonProxy;
@@ -40,6 +44,8 @@ public class XNet implements ModBase {
     @Mod.Instance(MODID)
     public static XNet instance;
     public static Logger logger;
+
+    public static XNetApi xNetApi = new XNetApi();
 
     public static CreativeTabs tabXNet = new CompatCreativeTabs("XNet") {
         @Override
@@ -81,6 +87,20 @@ public class XNet implements ModBase {
     @Override
     public void openManual(EntityPlayer entityPlayer, int i, String s) {
         // @todo
+    }
+
+    @Mod.EventHandler
+    public void imcCallback(FMLInterModComms.IMCEvent event) {
+        for (FMLInterModComms.IMCMessage message : event.getMessages()) {
+            if (message.key.equalsIgnoreCase("getXNet")) {
+                Optional<Function<IXNet, Void>> value = message.getFunctionValue(IXNet.class, Void.class);
+                if (value.isPresent()) {
+                    value.get().apply(xNetApi);
+                } else {
+                    logger.warn("Some mod didn't return a valid result with getXNet!");
+                }
+            }
+        }
     }
 
 }
