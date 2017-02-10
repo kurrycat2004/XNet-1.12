@@ -8,6 +8,7 @@ import mcjty.lib.varia.Logging;
 import mcjty.typed.Type;
 import mcjty.xnet.XNet;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -15,23 +16,26 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import java.util.List;
 
-public class PacketConsumersReady extends PacketListFromServer<PacketConsumersReady,BlockPos> {
+public class PacketConsumersReady extends PacketListFromServer<PacketConsumersReady,PacketGetConsumers.SidedPos> {
 
     public PacketConsumersReady() {
     }
 
-    public PacketConsumersReady(BlockPos pos, String command, List<BlockPos> list) {
+    public PacketConsumersReady(BlockPos pos, String command, List<PacketGetConsumers.SidedPos> list) {
         super(pos, command, list);
     }
 
     @Override
-    protected BlockPos createItem(ByteBuf buf) {
-        return NetworkTools.readPos(buf);
+    protected PacketGetConsumers.SidedPos createItem(ByteBuf buf) {
+        BlockPos pos = NetworkTools.readPos(buf);
+        EnumFacing side = EnumFacing.values()[buf.readByte()];
+        return new PacketGetConsumers.SidedPos(pos, side);
     }
 
     @Override
-    protected void writeItemToBuf(ByteBuf buf, BlockPos item) {
-        NetworkTools.writePos(buf, item);
+    protected void writeItemToBuf(ByteBuf buf, PacketGetConsumers.SidedPos item) {
+        NetworkTools.writePos(buf, item.getPos());
+        buf.writeByte(item.getSide().ordinal());
     }
 
     public static class Handler implements IMessageHandler<PacketConsumersReady, IMessage> {
@@ -48,7 +52,7 @@ public class PacketConsumersReady extends PacketListFromServer<PacketConsumersRe
                 return;
             }
             ClientCommandHandler clientCommandHandler = (ClientCommandHandler) te;
-            if (!clientCommandHandler.execute(message.command, message.list, Type.create(BlockPos.class))) {
+            if (!clientCommandHandler.execute(message.command, message.list, Type.create(PacketGetConsumers.SidedPos.class))) {
                 Logging.log("Command " + message.command + " was not handled!");
             }
         }

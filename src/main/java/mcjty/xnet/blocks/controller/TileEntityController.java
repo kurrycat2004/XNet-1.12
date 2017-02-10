@@ -1,24 +1,31 @@
 package mcjty.xnet.blocks.controller;
 
-import mcjty.lib.entity.GenericTileEntity;
+import mcjty.lib.entity.GenericEnergyReceiverTileEntity;
 import mcjty.lib.network.Argument;
 import mcjty.typed.Type;
 import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.multiblock.NetworkId;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
+import mcjty.xnet.network.PacketGetConsumers;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
-public final class TileEntityController extends GenericTileEntity {
+public final class TileEntityController extends GenericEnergyReceiverTileEntity {
 
     public static final String CMD_GETCONSUMERS = "getConsumers";
     public static final String CLIENTCMD_CONSUMERSREADY = "consumersReady";
 
+    public TileEntityController() {
+        super(100000, 1000); // @todo configurable
+    }
 
     private NetworkId networkId;
 
@@ -60,14 +67,14 @@ public final class TileEntityController extends GenericTileEntity {
     }
 
     @Nonnull
-    private List<BlockPos> findConsumers() {
-        List<BlockPos> consumers = new ArrayList<>();
+    private List<PacketGetConsumers.SidedPos> findConsumers() {
+        List<PacketGetConsumers.SidedPos> consumers = new ArrayList<>();
         WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
         for (BlockPos connectorPos : worldBlob.getConsumers(networkId)) {
             for (EnumFacing facing : EnumFacing.values()) {
                 BlockPos p = connectorPos.offset(facing);
                 if (ConnectorBlock.isConnectable(getWorld(), p)) {
-                    consumers.add(p);
+                    consumers.add(new PacketGetConsumers.SidedPos(p, facing.getOpposite()));
                 }
             }
         }
@@ -94,7 +101,7 @@ public final class TileEntityController extends GenericTileEntity {
             return true;
         }
         if (CLIENTCMD_CONSUMERSREADY.equals(command)) {
-            GuiController.fromServer_consumers = new ArrayList<>(Type.create(BlockPos.class).convert(list));
+            GuiController.fromServer_consumers = new ArrayList<>(Type.create(PacketGetConsumers.SidedPos.class).convert(list));
             return true;
         }
         return false;
