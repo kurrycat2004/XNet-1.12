@@ -6,8 +6,10 @@ import mcjty.lib.container.GenericGuiContainer;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.DefaultSelectionEvent;
 import mcjty.lib.gui.layout.HorizontalLayout;
+import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.gui.layout.VerticalLayout;
 import mcjty.lib.gui.widgets.*;
+import mcjty.lib.gui.widgets.Button;
 import mcjty.lib.gui.widgets.Label;
 import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.tools.MinecraftTools;
@@ -18,6 +20,7 @@ import mcjty.xnet.network.PacketGetConsumers;
 import mcjty.xnet.network.XNetMessages;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
 import java.awt.*;
@@ -25,8 +28,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GuiController extends GenericGuiContainer<TileEntityController> {
+
+    public static final int SIDEWIDTH = 80;
+    public static final int WIDTH = 256;
+    public static final int HEIGHT = 236;
+
     private WidgetList list;
     private int listDirty;
+
+    private static final ResourceLocation mainBackground = new ResourceLocation(XNet.MODID, "textures/gui/controller.png");
+    private static final ResourceLocation sideBackground = new ResourceLocation(XNet.MODID, "textures/gui/sidegui.png");
 
     // A copy of the consumers we're currently showing
     private List<BlockPos> consumers = null;
@@ -38,14 +49,44 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     public GuiController(TileEntityController controller, EmptyContainer container) {
         super(XNet.instance, XNetMessages.INSTANCE, controller, container, GuiProxy.GUI_MANUAL_MAIN, "controller");
 
-        xSize = 256;
-        ySize = 180;
+        xSize = WIDTH;
+        ySize = HEIGHT;
     }
 
     @Override
     public void initGui() {
         super.initGui();
 
+        Panel toplevel = new Panel(mc, this).setLayout(new PositionalLayout())
+                .setBackgrounds(sideBackground, mainBackground)
+                .setBackgroundLayout(true, SIDEWIDTH);
+        toplevel.setBounds(new Rectangle(guiLeft-SIDEWIDTH, guiTop, xSize+SIDEWIDTH, ySize));
+
+        Panel listPanel = initConsumerListPanel();
+        Panel channelSelectionPanel = initChannelSelectionPanel();
+
+        Panel channelEditPanel = new Panel(mc, this).setLayout(new PositionalLayout())
+                .setFilledRectThickness(-1)
+                .setFilledBackground(StyleConfig.colorListBackground)
+                .setLayoutHint(new PositionalLayout.PositionalHint(171, 5, 161, 52));
+        Panel consumerEditPanel = new Panel(mc, this).setLayout(new PositionalLayout())
+                .setFilledRectThickness(-1)
+                .setFilledBackground(StyleConfig.colorListBackground)
+                .setLayoutHint(new PositionalLayout.PositionalHint(171, 60, 161, 52));
+
+        toplevel.addChild(channelSelectionPanel);
+        toplevel.addChild(listPanel);
+        toplevel.addChild(channelEditPanel);
+        toplevel.addChild(consumerEditPanel);
+
+        window = new Window(this, toplevel);
+
+        fromServer_consumers = null;
+        listDirty = 0;
+        XNetMessages.INSTANCE.sendToServer(new PacketGetConsumers(tileEntity.getPos()));
+    }
+
+    private Panel initConsumerListPanel() {
         list = new WidgetList(mc, this).addSelectionEvent(new DefaultSelectionEvent() {
             @Override
             public void select(Widget parent, int index) {
@@ -53,15 +94,25 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
             }
         });
         Slider listSlider = new Slider(mc, this).setDesiredWidth(10).setVertical().setScrollable(list);
-        Panel listPanel = new Panel(mc, this).setLayout(new HorizontalLayout().setHorizontalMargin(3).setSpacing(1)).addChild(list).addChild(listSlider);
+        return new Panel(mc, this)
+                .setLayout(new HorizontalLayout().setHorizontalMargin(3).setSpacing(1))
+                .addChild(list)
+                .addChild(listSlider)
+                .setLayoutHint(new PositionalLayout.PositionalHint(2, 20, 169, 214));
+    }
 
-        Widget toplevel = new Panel(mc, this).setFilledRectThickness(2).setLayout(new VerticalLayout()).addChild(listPanel);
-        toplevel.setBounds(new Rectangle(guiLeft, guiTop, xSize, ySize));
-        window = new Window(this, toplevel);
-
-        fromServer_consumers = null;
-        listDirty = 0;
-        XNetMessages.INSTANCE.sendToServer(new PacketGetConsumers(tileEntity.getPos()));
+    private Panel initChannelSelectionPanel() {
+        Panel channelSelectionPanel = new Panel(mc, this)
+                .setLayout(new HorizontalLayout().setHorizontalMargin(0).setSpacing(0))
+                .setLayoutHint(new PositionalLayout.PositionalHint(41, 1, 124, 24));
+        for (int i = 0 ; i < 8 ; i++) {
+            String channel = String.valueOf(i + 1);
+            ToggleButton but = new ToggleButton(mc, this).setDesiredWidth(14)
+                    .setText(channel)
+                    .setTooltips("Edit channel " + channel);
+            channelSelectionPanel.addChild(but);
+        }
+        return channelSelectionPanel;
     }
 
 
@@ -105,10 +156,14 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
 //                color = TEXT_COLOR_SELECTED;
 //            }
 
-            Panel panel = new Panel(mc, this).setLayout(new HorizontalLayout());
+            Panel panel = new Panel(mc, this).setLayout(new HorizontalLayout().setHorizontalMargin(0).setSpacing(0));
             panel.addChild(new BlockRender(mc, this).setRenderItem(block));
 //            panel.addChild(new Label(mc, this).setText(displayName).setColor(color).setHorizontalAlignment(HorizontalAlignment.ALIGH_LEFT).setDesiredWidth(90));
-            panel.addChild(new Label(mc, this).setDynamic(true).setText(BlockPosTools.toString(coordinate)).setColor(color));
+            panel.addChild(new Label(mc, this).setText("E").setColor(color).setDesiredWidth(18));
+            for (int i = 0 ; i < 8 ; i++) {
+                Button but = new Button(mc, this).setDesiredWidth(14);
+                panel.addChild(but);
+            }
             list.addChild(panel);
 
             index++;
