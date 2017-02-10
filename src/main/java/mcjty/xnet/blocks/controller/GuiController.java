@@ -29,6 +29,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static mcjty.xnet.logic.ChannelInfo.MAX_CHANNELS;
+
 public class GuiController extends GenericGuiContainer<TileEntityController> {
 
     public static final int SIDEWIDTH = 80;
@@ -41,7 +43,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     private Panel channelEditPanel;
     private Panel consumerEditPanel;
 
-    private ToggleButton channelButtons[] = new ToggleButton[8];
+    private ToggleButton channelButtons[] = new ToggleButton[MAX_CHANNELS];
 
     private PacketGetConsumers.SidedPos editing = null;
     private int editingChannel = -1;
@@ -145,7 +147,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         Panel channelSelectionPanel = new Panel(mc, this)
                 .setLayout(new HorizontalLayout().setHorizontalMargin(0).setSpacing(0))
                 .setLayoutHint(new PositionalLayout.PositionalHint(41, 1, 124, 24));
-        for (int i = 0 ; i < 8 ; i++) {
+        for (int i = 0 ; i < MAX_CHANNELS ; i++) {
             String channel = String.valueOf(i + 1);
             channelButtons[i] = new ToggleButton(mc, this).setDesiredWidth(14)
                     .setText(channel)
@@ -160,7 +162,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     }
 
     private void selectChannelEditor(int finalI) {
-        for (int j = 0 ; j < 8 ; j++) {
+        for (int j = 0 ; j < MAX_CHANNELS ; j++) {
             if (j != finalI) {
                 channelButtons[j].setPressed(false);
             }
@@ -230,7 +232,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     }
 
     private int getSelectedChannel() {
-        for (int i = 0 ; i < 8 ; i++) {
+        for (int i = 0 ; i < MAX_CHANNELS ; i++) {
             if (channelButtons[i].isPressed()) {
                 return i;
             }
@@ -277,7 +279,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
             }
 //            panel.addChild(new Label(mc, this).setText(displayName).setColor(color).setHorizontalAlignment(HorizontalAlignment.ALIGH_LEFT).setDesiredWidth(90));
             panel.addChild(new Label(mc, this).setText(sidedPos.getSide().getName().substring(0, 1).toUpperCase()).setColor(color).setDesiredWidth(18));
-            for (int i = 0 ; i < 8 ; i++) {
+            for (int i = 0 ; i < MAX_CHANNELS ; i++) {
                 ToggleButton but = new ToggleButton(mc, this).setDesiredWidth(14);
                 if (i == 3) {
                     if (index == 3) {

@@ -5,7 +5,10 @@ import mcjty.lib.container.InventoryHelper;
 import mcjty.lib.entity.GenericEnergyReceiverTileEntity;
 import mcjty.lib.network.Argument;
 import mcjty.typed.Type;
+import mcjty.xnet.XNet;
+import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.blocks.cables.ConnectorBlock;
+import mcjty.xnet.logic.ChannelInfo;
 import mcjty.xnet.multiblock.NetworkId;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
@@ -21,17 +24,24 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static mcjty.xnet.logic.ChannelInfo.MAX_CHANNELS;
+
 public final class TileEntityController extends GenericEnergyReceiverTileEntity implements DefaultSidedInventory {
 
     public static final String CMD_GETCONSUMERS = "getConsumers";
     public static final String CLIENTCMD_CONSUMERSREADY = "consumersReady";
 
-    public TileEntityController() {
-        super(100000, 1000); // @todo configurable
-    }
-
     private InventoryHelper inventoryHelper = new InventoryHelper(this, ControllerContainer.factory, ControllerContainer.COUNT_FILTER_SLOTS);
     private NetworkId networkId;
+
+    private ChannelInfo[] channels = new ChannelInfo[MAX_CHANNELS];
+
+    public TileEntityController() {
+        super(100000, 1000); // @todo configurable
+        for (int i = 0 ; i < MAX_CHANNELS ; i++) {
+            channels[i] = null;
+        }
+    }
 
     public NetworkId getNetworkId() {
         return networkId;
@@ -59,6 +69,14 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         if (networkId != null) {
             tagCompound.setInteger("networkId", networkId.getId());
         }
+        for (int i = 0 ; i < MAX_CHANNELS ; i++) {
+            if (channels[i] != null) {
+                NBTTagCompound tc = new NBTTagCompound();
+                tc.setString("type", channels[i].getType().getID());
+                channels[i].writeToNBT(tc);
+                tagCompound.setTag("channel"+i, tc);
+            }
+        }
     }
 
     @Override
@@ -69,6 +87,21 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             networkId = new NetworkId(tagCompound.getInteger("networkId"));
         } else {
             networkId = null;
+        }
+        for (int i = 0 ; i < MAX_CHANNELS ; i++) {
+            if (tagCompound.hasKey("channel" + i)) {
+                NBTTagCompound tc = (NBTTagCompound) tagCompound.getTag("channel" + i);
+                String id = tc.getString("type");
+                IChannelType type = XNet.xNetApi.findType(id);
+                if (type == null) {
+                    XNet.logger.warn("Unsupported type " + id + "!");
+                    continue;
+                }
+                channels[i] = new ChannelInfo(type);
+                channels[i].readFromNBT(tc);
+            } else {
+                channels[i] = null;
+            }
         }
     }
 
