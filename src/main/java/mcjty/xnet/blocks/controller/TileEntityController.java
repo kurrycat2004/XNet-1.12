@@ -9,10 +9,10 @@ import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.logic.ChannelInfo;
+import mcjty.xnet.logic.SidedPos;
 import mcjty.xnet.multiblock.NetworkId;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
-import mcjty.xnet.network.PacketGetConsumers;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -34,7 +34,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     private InventoryHelper inventoryHelper = new InventoryHelper(this, ControllerContainer.factory, ControllerContainer.COUNT_FILTER_SLOTS);
     private NetworkId networkId;
 
-    private ChannelInfo[] channels = new ChannelInfo[MAX_CHANNELS];
+    private final ChannelInfo[] channels = new ChannelInfo[MAX_CHANNELS];
 
     public TileEntityController() {
         super(100000, 1000); // @todo configurable
@@ -69,6 +69,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         if (networkId != null) {
             tagCompound.setInteger("networkId", networkId.getId());
         }
+
         for (int i = 0 ; i < MAX_CHANNELS ; i++) {
             if (channels[i] != null) {
                 NBTTagCompound tc = new NBTTagCompound();
@@ -106,14 +107,14 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     }
 
     @Nonnull
-    private List<PacketGetConsumers.SidedPos> findConsumers() {
-        List<PacketGetConsumers.SidedPos> consumers = new ArrayList<>();
+    private List<SidedPos> findConsumers() {
+        List<SidedPos> consumers = new ArrayList<>();
         WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
         for (BlockPos connectorPos : worldBlob.getConsumers(networkId)) {
             for (EnumFacing facing : EnumFacing.values()) {
                 BlockPos p = connectorPos.offset(facing);
                 if (ConnectorBlock.isConnectable(getWorld(), p)) {
-                    consumers.add(new PacketGetConsumers.SidedPos(p, facing.getOpposite()));
+                    consumers.add(new SidedPos(p, facing.getOpposite()));
                 }
             }
         }
@@ -151,7 +152,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             return true;
         }
         if (CLIENTCMD_CONSUMERSREADY.equals(command)) {
-            GuiController.fromServer_consumers = new ArrayList<>(Type.create(PacketGetConsumers.SidedPos.class).convert(list));
+            GuiController.fromServer_consumers = new ArrayList<>(Type.create(SidedPos.class).convert(list));
             return true;
         }
         return false;

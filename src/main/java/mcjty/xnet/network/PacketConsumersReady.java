@@ -7,6 +7,7 @@ import mcjty.lib.network.PacketListFromServer;
 import mcjty.lib.varia.Logging;
 import mcjty.typed.Type;
 import mcjty.xnet.XNet;
+import mcjty.xnet.logic.SidedPos;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -16,24 +17,24 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import java.util.List;
 
-public class PacketConsumersReady extends PacketListFromServer<PacketConsumersReady,PacketGetConsumers.SidedPos> {
+public class PacketConsumersReady extends PacketListFromServer<PacketConsumersReady,SidedPos> {
 
     public PacketConsumersReady() {
     }
 
-    public PacketConsumersReady(BlockPos pos, String command, List<PacketGetConsumers.SidedPos> list) {
+    public PacketConsumersReady(BlockPos pos, String command, List<SidedPos> list) {
         super(pos, command, list);
     }
 
     @Override
-    protected PacketGetConsumers.SidedPos createItem(ByteBuf buf) {
+    protected SidedPos createItem(ByteBuf buf) {
         BlockPos pos = NetworkTools.readPos(buf);
         EnumFacing side = EnumFacing.values()[buf.readByte()];
-        return new PacketGetConsumers.SidedPos(pos, side);
+        return new SidedPos(pos, side);
     }
 
     @Override
-    protected void writeItemToBuf(ByteBuf buf, PacketGetConsumers.SidedPos item) {
+    protected void writeItemToBuf(ByteBuf buf, SidedPos item) {
         NetworkTools.writePos(buf, item.getPos());
         buf.writeByte(item.getSide().ordinal());
     }
@@ -52,7 +53,7 @@ public class PacketConsumersReady extends PacketListFromServer<PacketConsumersRe
                 return;
             }
             ClientCommandHandler clientCommandHandler = (ClientCommandHandler) te;
-            if (!clientCommandHandler.execute(message.command, message.list, Type.create(PacketGetConsumers.SidedPos.class))) {
+            if (!clientCommandHandler.execute(message.command, message.list, Type.create(SidedPos.class))) {
                 Logging.log("Command " + message.command + " was not handled!");
             }
         }

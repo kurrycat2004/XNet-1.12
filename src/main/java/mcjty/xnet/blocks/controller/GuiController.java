@@ -17,6 +17,7 @@ import mcjty.lib.varia.RedstoneMode;
 import mcjty.xnet.XNet;
 import mcjty.xnet.gui.GuiProxy;
 import mcjty.xnet.network.PacketGetConsumers;
+import mcjty.xnet.logic.SidedPos;
 import mcjty.xnet.network.XNetMessages;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -45,7 +46,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
 
     private ToggleButton channelButtons[] = new ToggleButton[MAX_CHANNELS];
 
-    private PacketGetConsumers.SidedPos editing = null;
+    private SidedPos editing = null;
     private int editingChannel = -1;
     private EnergyBar energyBar;
     private ImageChoiceLabel redstoneMode;
@@ -55,10 +56,10 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     private static final ResourceLocation sideBackground = new ResourceLocation(XNet.MODID, "textures/gui/sidegui.png");
 
     // A copy of the consumers we're currently showing
-    private List<PacketGetConsumers.SidedPos> consumers = null;
+    private List<SidedPos> consumers = null;
 
     // From server.
-    public static List<PacketGetConsumers.SidedPos> fromServer_consumers = null;
+    public static List<SidedPos> fromServer_consumers = null;
 
 
     public GuiController(TileEntityController controller, ControllerContainer container) {
@@ -183,7 +184,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         }
     }
 
-    private void selectConsumerEditor(PacketGetConsumers.SidedPos sidedPos, ToggleButton but, int finalI) {
+    private void selectConsumerEditor(SidedPos sidedPos, ToggleButton but, int finalI) {
         consumers = null;
         if (but.isPressed()) {
             editing = sidedPos;
@@ -241,7 +242,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     }
 
     private void populateList() {
-        List<PacketGetConsumers.SidedPos> newConsumers = fromServer_consumers;
+        List<SidedPos> newConsumers = fromServer_consumers;
         if (newConsumers == null) {
             return;
         }
@@ -256,7 +257,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         int index = 0;
         int sel = -1;
         BlockPos prevPos = null;
-        for (PacketGetConsumers.SidedPos sidedPos : consumers) {
+        for (SidedPos sidedPos : consumers) {
             BlockPos coordinate = sidedPos.getPos();
             IBlockState state = MinecraftTools.getWorld(mc).getBlockState(coordinate);
             Block block = state.getBlock();
