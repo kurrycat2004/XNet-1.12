@@ -6,7 +6,7 @@ import mcjty.lib.varia.Logging;
 import mcjty.typed.Type;
 import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.controller.TileEntityController;
-import mcjty.xnet.logic.SidedPos;
+import mcjty.xnet.logic.SidedConsumer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -16,28 +16,28 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import java.util.List;
 
-public class PacketGetConsumers extends PacketRequestListFromServer<SidedPos, PacketGetConsumers, PacketConsumersReady> {
+public class PacketGetConnectors extends PacketRequestListFromServer<SidedConsumer, PacketGetConnectors, PacketConnectorsReady> {
 
-    public PacketGetConsumers() {
+    public PacketGetConnectors() {
 
     }
 
-    public PacketGetConsumers(BlockPos pos) {
-        super(XNet.MODID, pos, TileEntityController.CMD_GETCONSUMERS);
+    public PacketGetConnectors(BlockPos pos) {
+        super(XNet.MODID, pos, TileEntityController.CMD_GETCONNECTORINFO);
     }
 
-    public static class Handler implements IMessageHandler<PacketGetConsumers, IMessage> {
+    public static class Handler implements IMessageHandler<PacketGetConnectors, IMessage> {
         @Override
-        public IMessage onMessage(PacketGetConsumers message, MessageContext ctx) {
+        public IMessage onMessage(PacketGetConnectors message, MessageContext ctx) {
             FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
             return null;
         }
 
-        private void handle(PacketGetConsumers message, MessageContext ctx) {
+        private void handle(PacketGetConnectors message, MessageContext ctx) {
             TileEntity te = ctx.getServerHandler().player.getEntityWorld().getTileEntity(message.pos);
             CommandHandler commandHandler = (CommandHandler) te;
-            List<SidedPos> list = commandHandler.executeWithResultList(message.command, message.args, Type.create(SidedPos.class));
-            XNetMessages.INSTANCE.sendTo(new PacketConsumersReady(message.pos, TileEntityController.CLIENTCMD_CONSUMERSREADY, list), ctx.getServerHandler().player);
+            List<SidedConsumer> list = commandHandler.executeWithResultList(message.command, message.args, Type.create(SidedConsumer.class));
+            XNetMessages.INSTANCE.sendTo(new PacketConnectorsReady(message.pos, TileEntityController.CLIENTCMD_CONNECTORSREADY, list), ctx.getServerHandler().player);
         }
     }
 

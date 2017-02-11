@@ -12,8 +12,10 @@ public class XNetMessages {
 
         // Server side
         net.registerMessage(PacketGetConsumers.Handler.class, PacketGetConsumers.class, PacketHandler.nextID(), Side.SERVER);
+        net.registerMessage(PacketGetConnectors.Handler.class, PacketGetConnectors.class, PacketHandler.nextID(), Side.SERVER);
 
         // Client side
         net.registerMessage(PacketConsumersReady.Handler.class, PacketConsumersReady.class, PacketHandler.nextID(), Side.CLIENT);
+        net.registerMessage(PacketConnectorsReady.Handler.class, PacketConnectorsReady.class, PacketHandler.nextID(), Side.CLIENT);
     }
 }

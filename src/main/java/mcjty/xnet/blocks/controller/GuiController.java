@@ -16,6 +16,8 @@ import mcjty.lib.tools.MinecraftTools;
 import mcjty.lib.varia.RedstoneMode;
 import mcjty.xnet.XNet;
 import mcjty.xnet.gui.GuiProxy;
+import mcjty.xnet.logic.ConnectorInfo;
+import mcjty.xnet.network.PacketGetConnectors;
 import mcjty.xnet.network.PacketGetConsumers;
 import mcjty.xnet.logic.SidedPos;
 import mcjty.xnet.network.XNetMessages;
@@ -60,6 +62,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
 
     // From server.
     public static List<SidedPos> fromServer_consumers = null;
+    public static List<ConnectorInfo> fromServer_connectors = null;
 
 
     public GuiController(TileEntityController controller, ControllerContainer container) {
@@ -93,8 +96,10 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         editingChannel = -1;
 
         fromServer_consumers = null;
+        fromServer_connectors = null;
         listDirty = 0;
         XNetMessages.INSTANCE.sendToServer(new PacketGetConsumers(tileEntity.getPos()));
+        XNetMessages.INSTANCE.sendToServer(new PacketGetConnectors(tileEntity.getPos()));
     }
 
     private void initRedstoneMode() {
@@ -222,12 +227,13 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
 
 
     private void requestListsIfNeeded() {
-        if (fromServer_consumers != null) {
+        if (fromServer_consumers != null && fromServer_connectors != null) {
             return;
         }
         listDirty--;
         if (listDirty <= 0) {
             XNetMessages.INSTANCE.sendToServer(new PacketGetConsumers(tileEntity.getPos()));
+            XNetMessages.INSTANCE.sendToServer(new PacketGetConnectors(tileEntity.getPos()));
             listDirty = 10;
         }
     }
@@ -242,10 +248,10 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     }
 
     private void populateList() {
-        List<SidedPos> newConsumers = fromServer_consumers;
-        if (newConsumers == null) {
+        if (fromServer_consumers == null || fromServer_connectors == null) {
             return;
         }
+        List<SidedPos> newConsumers = fromServer_consumers;
         if (newConsumers.equals(consumers)) {
             return;
         }

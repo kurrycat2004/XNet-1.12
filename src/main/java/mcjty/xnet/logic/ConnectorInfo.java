@@ -7,11 +7,12 @@ import net.minecraft.nbt.NBTTagCompound;
 public class ConnectorInfo {
 
     private final IChannelType type;
+    private final SidedConsumer id;
+    private final IConnectorSettings connectorSettings;
 
-    private IConnectorSettings connectorSettings;
-
-    public ConnectorInfo(IChannelType type) {
+    public ConnectorInfo(IChannelType type, SidedConsumer id) {
         this.type = type;
+        this.id = id;
         connectorSettings = type.createConnector();
     }
 
@@ -23,10 +24,9 @@ public class ConnectorInfo {
         return connectorSettings;
     }
 
-    public void setConnectorSettings(IConnectorSettings connectorSettings) {
-        this.connectorSettings = connectorSettings;
+    public SidedConsumer getId() {
+        return id;
     }
-
 
     public void writeToNBT(NBTTagCompound tag) {
         connectorSettings.writeToNBT(tag);

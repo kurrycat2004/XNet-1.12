@@ -3,6 +3,7 @@ package mcjty.xnet.logic;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelSettings;
 import mcjty.xnet.api.channels.IChannelType;
+import mcjty.xnet.multiblock.ConsumerId;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
@@ -17,9 +18,9 @@ public class ChannelInfo {
     public static final int MAX_CHANNELS = 8;
 
     private final IChannelType type;
-    private IChannelSettings channelSettings;
+    private final IChannelSettings channelSettings;
 
-    private final Map<SidedPos, ConnectorInfo> connectors = new HashMap<>();
+    private final Map<SidedConsumer, ConnectorInfo> connectors = new HashMap<>();
 
     public ChannelInfo(IChannelType type) {
         this.type = type;
@@ -34,21 +35,18 @@ public class ChannelInfo {
         return channelSettings;
     }
 
-    public void setChannelSettings(IChannelSettings channelSettings) {
-        this.channelSettings = channelSettings;
+    public Map<SidedConsumer, ConnectorInfo> getConnectors() {
+        return connectors;
     }
 
     public void writeToNBT(NBTTagCompound tag) {
         channelSettings.writeToNBT(tag);
         NBTTagList conlist = new NBTTagList();
-        for (Map.Entry<SidedPos, ConnectorInfo> entry : connectors.entrySet()) {
+        for (Map.Entry<SidedConsumer, ConnectorInfo> entry : connectors.entrySet()) {
             NBTTagCompound tc = new NBTTagCompound();
             ConnectorInfo connectorInfo = entry.getValue();
             connectorInfo.writeToNBT(tc);
-            BlockPos pos = entry.getKey().getPos();
-            tc.setInteger("px", pos.getX());
-            tc.setInteger("py", pos.getY());
-            tc.setInteger("pz", pos.getZ());
+            tc.setInteger("consumerId", entry.getKey().getConsumerId().getId());
             tc.setInteger("side", entry.getKey().getSide().ordinal());
             tc.setString("type", connectorInfo.getType().getID());
             conlist.appendTag(tc);
@@ -71,12 +69,12 @@ public class ChannelInfo {
                 XNet.logger.warn("Trying to load a connector with non-matching type " + type + "!");
                 continue;
             }
-            ConnectorInfo connectorInfo = new ConnectorInfo(type);
-            connectorInfo.readFromNBT(tc);
-            BlockPos pos = new BlockPos(tc.getInteger("px"), tc.getInteger("py"), tc.getInteger("pz"));
+            ConsumerId consumerId = new ConsumerId(tc.getInteger("consumerId"));
             EnumFacing side = EnumFacing.values()[tc.getInteger("side")];
-
-            connectors.put(new SidedPos(pos, side), connectorInfo);
+            SidedConsumer key = new SidedConsumer(consumerId, side);
+            ConnectorInfo connectorInfo = new ConnectorInfo(type, key);
+            connectorInfo.readFromNBT(tc);
+            connectors.put(key, connectorInfo);
         }
     }
 }

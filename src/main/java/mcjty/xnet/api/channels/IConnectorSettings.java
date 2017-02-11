@@ -3,7 +3,7 @@ package mcjty.xnet.api.channels;
 import net.minecraft.nbt.NBTTagCompound;
 
 /**
- * Channel type specific connector settings. This is a server-side object only
+ * Channel type specific connector settings
  */
 public interface IConnectorSettings {
 

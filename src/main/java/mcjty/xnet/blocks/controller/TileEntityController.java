@@ -9,6 +9,7 @@ import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.logic.ChannelInfo;
+import mcjty.xnet.logic.ConnectorInfo;
 import mcjty.xnet.logic.SidedPos;
 import mcjty.xnet.multiblock.NetworkId;
 import mcjty.xnet.multiblock.WorldBlob;
@@ -30,6 +31,9 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
     public static final String CMD_GETCONSUMERS = "getConsumers";
     public static final String CLIENTCMD_CONSUMERSREADY = "consumersReady";
+
+    public static final String CMD_GETCONNECTORINFO = "getConnectorInfo";
+    public static final String CLIENTCMD_CONNECTORSREADY = "connectorsReady";
 
     private InventoryHelper inventoryHelper = new InventoryHelper(this, ControllerContainer.factory, ControllerContainer.COUNT_FILTER_SLOTS);
     private NetworkId networkId;
@@ -121,6 +125,17 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         return consumers;
     }
 
+    @Nonnull
+    private List<ConnectorInfo> findChannelInfo() {
+        List<ConnectorInfo> infos = new ArrayList<>();
+        for (ChannelInfo channel : channels) {
+            for (ConnectorInfo connector : channel.getConnectors().values()) {
+                infos.add(connector);
+            }
+        }
+        return infos;
+    }
+
     @Override
     public InventoryHelper getInventoryHelper() {
         return inventoryHelper;
@@ -141,6 +156,8 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         }
         if (CMD_GETCONSUMERS.equals(command)) {
             return type.convert(findConsumers());
+        } else if (CMD_GETCONNECTORINFO.equals(command)) {
+            return type.convert(findChannelInfo());
         }
         return Collections.emptyList();
     }
@@ -154,6 +171,8 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         if (CLIENTCMD_CONSUMERSREADY.equals(command)) {
             GuiController.fromServer_consumers = new ArrayList<>(Type.create(SidedPos.class).convert(list));
             return true;
+        } else if (CLIENTCMD_CONNECTORSREADY.equals(command)) {
+            GuiController.fromServer_connectors = new ArrayList<>(Type.create(ConnectorInfo.class).convert(list));
         }
         return false;
     }
