@@ -9,12 +9,14 @@ import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.logic.ChannelInfo;
-import mcjty.xnet.logic.ConnectorInfo;
+import mcjty.xnet.logic.ConnectorClientInfo;
 import mcjty.xnet.logic.SidedPos;
+import mcjty.xnet.multiblock.ConsumerId;
 import mcjty.xnet.multiblock.NetworkId;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -32,8 +34,10 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     public static final String CMD_GETCONSUMERS = "getConsumers";
     public static final String CLIENTCMD_CONSUMERSREADY = "consumersReady";
 
-    public static final String CMD_GETCONNECTORINFO = "getConnectorInfo";
-    public static final String CLIENTCMD_CONNECTORSREADY = "connectorsReady";
+    public static final String CMD_GETCHANNELS = "getChannelInfo";
+    public static final String CLIENTCMD_CHANNELSREADY = "channelsReady";
+
+    public static final String CMD_CREATECHANNEL = "createChannel";
 
     private InventoryHelper inventoryHelper = new InventoryHelper(this, ControllerContainer.factory, ControllerContainer.COUNT_FILTER_SLOTS);
     private NetworkId networkId;
@@ -111,14 +115,17 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     }
 
     @Nonnull
-    private List<SidedPos> findConsumers() {
-        List<SidedPos> consumers = new ArrayList<>();
+    private List<ConnectorClientInfo> findConsumers() {
+        List<ConnectorClientInfo> consumers = new ArrayList<>();
         WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
         for (BlockPos connectorPos : worldBlob.getConsumers(networkId)) {
+            ConsumerId consumerId = worldBlob.getConsumerAt(connectorPos);
             for (EnumFacing facing : EnumFacing.values()) {
                 BlockPos p = connectorPos.offset(facing);
                 if (ConnectorBlock.isConnectable(getWorld(), p)) {
-                    consumers.add(new SidedPos(p, facing.getOpposite()));
+                    if (consumerId != null) {
+                        consumers.add(new ConnectorClientInfo(new SidedPos(p, facing.getOpposite()), consumerId));
+                    }
                 }
             }
         }
@@ -126,14 +133,16 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     }
 
     @Nonnull
-    private List<ConnectorInfo> findChannelInfo() {
-        List<ConnectorInfo> infos = new ArrayList<>();
-        for (ChannelInfo channel : channels) {
-            for (ConnectorInfo connector : channel.getConnectors().values()) {
-                infos.add(connector);
-            }
-        }
-        return infos;
+    private List<ChannelInfo> findChannelInfo() {
+        List<ChannelInfo> chanList = new ArrayList<>();
+        Collections.addAll(chanList, channels);
+        return chanList;
+    }
+
+    private void createChannel(int index, String typeId) {
+        IChannelType type = XNet.xNetApi.findType(typeId);
+        channels[index] = new ChannelInfo(type);
+        markDirty();
     }
 
     @Override
@@ -146,6 +155,20 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         return canPlayerAccess(player);
     }
 
+    @Override
+    public boolean execute(EntityPlayerMP playerMP, String command, Map<String, Argument> args) {
+        boolean rc = super.execute(playerMP, command, args);
+        if (rc) {
+            return true;
+        }
+        if (CMD_CREATECHANNEL.equals(command)) {
+            int index = args.get("index").getInteger();
+            String typeId = args.get("type").getString();
+            createChannel(index, typeId);
+            return true;
+        }
+        return false;
+    }
 
     @Nonnull
     @Override
@@ -156,7 +179,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         }
         if (CMD_GETCONSUMERS.equals(command)) {
             return type.convert(findConsumers());
-        } else if (CMD_GETCONNECTORINFO.equals(command)) {
+        } else if (CMD_GETCHANNELS.equals(command)) {
             return type.convert(findChannelInfo());
         }
         return Collections.emptyList();
@@ -169,10 +192,10 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             return true;
         }
         if (CLIENTCMD_CONSUMERSREADY.equals(command)) {
-            GuiController.fromServer_consumers = new ArrayList<>(Type.create(SidedPos.class).convert(list));
+            GuiController.fromServer_consumers = new ArrayList<>(Type.create(ConnectorClientInfo.class).convert(list));
             return true;
-        } else if (CLIENTCMD_CONNECTORSREADY.equals(command)) {
-            GuiController.fromServer_connectors = new ArrayList<>(Type.create(ConnectorInfo.class).convert(list));
+        } else if (CLIENTCMD_CHANNELSREADY.equals(command)) {
+            GuiController.fromServer_channels = new ArrayList<>(Type.create(ChannelInfo.class).convert(list));
         }
         return false;
     }

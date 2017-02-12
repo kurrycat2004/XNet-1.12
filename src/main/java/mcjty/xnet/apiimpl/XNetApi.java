@@ -21,4 +21,8 @@ public class XNetApi implements IXNet {
     public IChannelType findType(@Nonnull String id) {
         return channels.get(id);
     }
+
+    public Map<String, IChannelType> getChannels() {
+        return channels;
+    }
 }

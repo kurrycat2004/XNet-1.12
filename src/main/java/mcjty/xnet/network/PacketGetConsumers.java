@@ -6,6 +6,7 @@ import mcjty.lib.varia.Logging;
 import mcjty.typed.Type;
 import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.controller.TileEntityController;
+import mcjty.xnet.logic.ConnectorClientInfo;
 import mcjty.xnet.logic.SidedPos;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -16,7 +17,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import java.util.List;
 
-public class PacketGetConsumers extends PacketRequestListFromServer<SidedPos, PacketGetConsumers, PacketConsumersReady> {
+public class PacketGetConsumers extends PacketRequestListFromServer<ConnectorClientInfo, PacketGetConsumers, PacketConsumersReady> {
 
     public PacketGetConsumers() {
 
@@ -36,7 +37,7 @@ public class PacketGetConsumers extends PacketRequestListFromServer<SidedPos, Pa
         private void handle(PacketGetConsumers message, MessageContext ctx) {
             TileEntity te = ctx.getServerHandler().player.getEntityWorld().getTileEntity(message.pos);
             CommandHandler commandHandler = (CommandHandler) te;
-            List<SidedPos> list = commandHandler.executeWithResultList(message.command, message.args, Type.create(SidedPos.class));
+            List<ConnectorClientInfo> list = commandHandler.executeWithResultList(message.command, message.args, Type.create(ConnectorClientInfo.class));
             XNetMessages.INSTANCE.sendTo(new PacketConsumersReady(message.pos, TileEntityController.CLIENTCMD_CONSUMERSREADY, list), ctx.getServerHandler().player);
         }
     }

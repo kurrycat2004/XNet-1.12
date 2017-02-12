@@ -7,7 +7,9 @@ import mcjty.lib.network.PacketListFromServer;
 import mcjty.lib.varia.Logging;
 import mcjty.typed.Type;
 import mcjty.xnet.XNet;
+import mcjty.xnet.logic.ConnectorClientInfo;
 import mcjty.xnet.logic.SidedPos;
+import mcjty.xnet.multiblock.ConsumerId;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -17,26 +19,28 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import java.util.List;
 
-public class PacketConsumersReady extends PacketListFromServer<PacketConsumersReady,SidedPos> {
+public class PacketConsumersReady extends PacketListFromServer<PacketConsumersReady,ConnectorClientInfo> {
 
     public PacketConsumersReady() {
     }
 
-    public PacketConsumersReady(BlockPos pos, String command, List<SidedPos> list) {
+    public PacketConsumersReady(BlockPos pos, String command, List<ConnectorClientInfo> list) {
         super(pos, command, list);
     }
 
     @Override
-    protected SidedPos createItem(ByteBuf buf) {
+    protected ConnectorClientInfo createItem(ByteBuf buf) {
         BlockPos pos = NetworkTools.readPos(buf);
         EnumFacing side = EnumFacing.values()[buf.readByte()];
-        return new SidedPos(pos, side);
+        ConsumerId consumerId = new ConsumerId(buf.readInt());
+        return new ConnectorClientInfo(new SidedPos(pos, side), consumerId);
     }
 
     @Override
-    protected void writeItemToBuf(ByteBuf buf, SidedPos item) {
-        NetworkTools.writePos(buf, item.getPos());
-        buf.writeByte(item.getSide().ordinal());
+    protected void writeItemToBuf(ByteBuf buf, ConnectorClientInfo item) {
+        NetworkTools.writePos(buf, item.getPos().getPos());
+        buf.writeByte(item.getPos().getSide().ordinal());
+        buf.writeInt(item.getConsumerId().getId());
     }
 
     public static class Handler implements IMessageHandler<PacketConsumersReady, IMessage> {
@@ -49,7 +53,7 @@ public class PacketConsumersReady extends PacketListFromServer<PacketConsumersRe
         private void handle(PacketConsumersReady message, MessageContext ctx) {
             TileEntity te = XNet.proxy.getClientWorld().getTileEntity(message.pos);
             ClientCommandHandler clientCommandHandler = (ClientCommandHandler) te;
-            if (!clientCommandHandler.execute(message.command, message.list, Type.create(SidedPos.class))) {
+            if (!clientCommandHandler.execute(message.command, message.list, Type.create(ConnectorClientInfo.class))) {
                 Logging.log("Command " + message.command + " was not handled!");
             }
         }

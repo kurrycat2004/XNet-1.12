@@ -10,14 +10,18 @@ import mcjty.lib.gui.layout.HorizontalAlignment;
 import mcjty.lib.gui.layout.HorizontalLayout;
 import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.gui.widgets.*;
+import mcjty.lib.gui.widgets.Button;
 import mcjty.lib.gui.widgets.Label;
 import mcjty.lib.gui.widgets.Panel;
+import mcjty.lib.network.Argument;
 import mcjty.lib.tools.MinecraftTools;
 import mcjty.lib.varia.RedstoneMode;
 import mcjty.xnet.XNet;
+import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.gui.GuiProxy;
-import mcjty.xnet.logic.ConnectorInfo;
-import mcjty.xnet.network.PacketGetConnectors;
+import mcjty.xnet.logic.ChannelInfo;
+import mcjty.xnet.logic.ConnectorClientInfo;
+import mcjty.xnet.network.PacketGetChannels;
 import mcjty.xnet.network.PacketGetConsumers;
 import mcjty.xnet.logic.SidedPos;
 import mcjty.xnet.network.XNetMessages;
@@ -58,11 +62,11 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     private static final ResourceLocation sideBackground = new ResourceLocation(XNet.MODID, "textures/gui/sidegui.png");
 
     // A copy of the consumers we're currently showing
-    private List<SidedPos> consumers = null;
+    private List<ConnectorClientInfo> consumers = null;
 
     // From server.
-    public static List<SidedPos> fromServer_consumers = null;
-    public static List<ConnectorInfo> fromServer_connectors = null;
+    public static List<ConnectorClientInfo> fromServer_consumers = null;
+    public static List<ChannelInfo> fromServer_channels = null;
 
 
     public GuiController(TileEntityController controller, ControllerContainer container) {
@@ -96,10 +100,10 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         editingChannel = -1;
 
         fromServer_consumers = null;
-        fromServer_connectors = null;
+        fromServer_channels = null;
         listDirty = 0;
         XNetMessages.INSTANCE.sendToServer(new PacketGetConsumers(tileEntity.getPos()));
-        XNetMessages.INSTANCE.sendToServer(new PacketGetConnectors(tileEntity.getPos()));
+        XNetMessages.INSTANCE.sendToServer(new PacketGetChannels(tileEntity.getPos()));
     }
 
     private void initRedstoneMode() {
@@ -176,17 +180,38 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
 
         channelEditPanel.removeChildren();
         if (channelButtons[finalI].isPressed()) {
-            Widget label = new Label(mc, this).setText("Channel " + (finalI+1))
-                    .setLayoutHint(new PositionalLayout.PositionalHint(4, 3, 60, 14));
-            ChoiceLabel type = new ChoiceLabel(mc, this).addChoices("Item", "Energy", "Fluid")
-                    .setLayoutHint(new PositionalLayout.PositionalHint(66, 3, 60, 14));
-            ToggleButton enabled = new ToggleButton(mc, this).setCheckMarker(true).setPressed(true)
-                    .setLayoutHint(new PositionalLayout.PositionalHint(130, 3, 13, 14));
-            ChoiceLabel mode = new ChoiceLabel(mc, this).addChoices("Round Robin", "Random", "First")
-                    .setLayoutHint(new PositionalLayout.PositionalHint(4, 20, 100, 14));
-
-            channelEditPanel.addChild(label).addChild(enabled).addChild(type).addChild(mode);
+            ChannelInfo info = fromServer_channels.get(finalI);
+            if (info != null) {
+                Widget label = new Label(mc, this).setText("Channel " + (finalI + 1))
+                        .setLayoutHint(new PositionalLayout.PositionalHint(4, 3, 60, 14));
+                ChoiceLabel type = new ChoiceLabel(mc, this).addChoices("Item", "Energy", "Fluid")
+                        .setLayoutHint(new PositionalLayout.PositionalHint(66, 3, 60, 14))
+                        .setChoice(info.getType().getName());
+                ToggleButton enabled = new ToggleButton(mc, this).setCheckMarker(true).setPressed(true)
+                        .setLayoutHint(new PositionalLayout.PositionalHint(130, 3, 13, 14));
+                ChoiceLabel mode = new ChoiceLabel(mc, this).addChoices("Round Robin", "Random", "First")
+                        .setLayoutHint(new PositionalLayout.PositionalHint(4, 20, 100, 14));
+                channelEditPanel.addChild(label).addChild(enabled).addChild(type).addChild(mode);
+            } else {
+                ChoiceLabel type = new ChoiceLabel(mc, this)
+                        .setLayoutHint(new PositionalLayout.PositionalHint(20, 20, 60, 14));
+                for (IChannelType channelType : XNet.xNetApi.getChannels().values()) {
+                    type.addChoices(channelType.getID());       // Show names?
+                }
+                Button create = new Button(mc, this)
+                        .setText("Create")
+                        .setLayoutHint(new PositionalLayout.PositionalHint(85, 20, 60, 14))
+                        .addButtonEvent(parent -> createChannel(type.getCurrentChoice()));
+                channelEditPanel.addChild(type).addChild(create);
+            }
         }
+    }
+
+    private void createChannel(String typeId) {
+        sendServerCommand(XNetMessages.INSTANCE, TileEntityController.CMD_CREATECHANNEL,
+                new Argument("index", getSelectedChannel()),
+                new Argument("type", typeId));
+        fromServer_channels = null;     // @todo good way?
     }
 
     private void selectConsumerEditor(SidedPos sidedPos, ToggleButton but, int finalI) {
@@ -201,39 +226,51 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         consumerEditPanel.removeChildren();
         if (but.isPressed()) {
             if (editingChannel != getSelectedChannel()) {
+                channelButtons[editingChannel].setPressed(true);
                 selectChannelEditor(editingChannel);
             }
 
-            ChoiceLabel type = new ChoiceLabel(mc, this).addChoices("Insert", "Extract")
-                    .setLayoutHint(new PositionalLayout.PositionalHint(4, 3, 60, 14));
+            ChannelInfo info = fromServer_channels.get(finalI);
+            if (info != null) {
+                ConnectorClientInfo clientInfo = consumers.get(finalI);
+                if (clientInfo != null) {
+                    ChoiceLabel type = new ChoiceLabel(mc, this).addChoices("Insert", "Extract")
+                            .setLayoutHint(new PositionalLayout.PositionalHint(4, 3, 60, 14));
 
-            Widget label1 = new Label(mc, this).setText("Filter:").setHorizontalAlignment(HorizontalAlignment.ALIGH_LEFT)
-                    .setLayoutHint(new PositionalLayout.PositionalHint(4, 35, 40, 14));
-            ToggleButton oreDict = new ToggleButton(mc, this).setText("Ore").setCheckMarker(true)
-                    .setLayoutHint(new PositionalLayout.PositionalHint(46, 35, 40, 14));
-            ToggleButton meta = new ToggleButton(mc, this).setText("Meta").setCheckMarker(true)
-                    .setLayoutHint(new PositionalLayout.PositionalHint(88, 35, 40, 14));
+                    Widget label1 = new Label(mc, this).setText("Filter:").setHorizontalAlignment(HorizontalAlignment.ALIGH_LEFT)
+                            .setLayoutHint(new PositionalLayout.PositionalHint(4, 35, 40, 14));
+                    ToggleButton oreDict = new ToggleButton(mc, this).setText("Ore").setCheckMarker(true)
+                            .setLayoutHint(new PositionalLayout.PositionalHint(46, 35, 40, 14));
+                    ToggleButton meta = new ToggleButton(mc, this).setText("Meta").setCheckMarker(true)
+                            .setLayoutHint(new PositionalLayout.PositionalHint(88, 35, 40, 14));
 
-            Widget label2 = new Label(mc, this).setText("Speed:").setHorizontalAlignment(HorizontalAlignment.ALIGH_LEFT)
-                    .setLayoutHint(new PositionalLayout.PositionalHint(4, 20, 40, 14));
-            ChoiceLabel speed = new ChoiceLabel(mc, this).addChoices("1 item", "stack")
-                    .setLayoutHint(new PositionalLayout.PositionalHint(46, 20, 50, 14));
+                    Widget label2 = new Label(mc, this).setText("Speed:").setHorizontalAlignment(HorizontalAlignment.ALIGH_LEFT)
+                            .setLayoutHint(new PositionalLayout.PositionalHint(4, 20, 40, 14));
+                    ChoiceLabel speed = new ChoiceLabel(mc, this).addChoices("1 item", "stack")
+                            .setLayoutHint(new PositionalLayout.PositionalHint(46, 20, 50, 14));
 
-            consumerEditPanel.addChild(type).addChild(redstoneMode).addChild(label1).addChild(oreDict).addChild(meta)
-                .addChild(label2).addChild(speed);
+                    consumerEditPanel.addChild(type).addChild(redstoneMode).addChild(label1).addChild(oreDict).addChild(meta)
+                            .addChild(label2).addChild(speed);
+                } else {
+                    Button create = new Button(mc, this)
+                            .setText("Create")
+                            .setLayoutHint(new PositionalLayout.PositionalHint(150, 12, 60, 14));
+                    channelEditPanel.addChild(create);
+                }
+            }
         }
 
     }
 
 
     private void requestListsIfNeeded() {
-        if (fromServer_consumers != null && fromServer_connectors != null) {
+        if (fromServer_consumers != null && fromServer_channels != null) {
             return;
         }
         listDirty--;
         if (listDirty <= 0) {
             XNetMessages.INSTANCE.sendToServer(new PacketGetConsumers(tileEntity.getPos()));
-            XNetMessages.INSTANCE.sendToServer(new PacketGetConnectors(tileEntity.getPos()));
+            XNetMessages.INSTANCE.sendToServer(new PacketGetChannels(tileEntity.getPos()));
             listDirty = 10;
         }
     }
@@ -248,10 +285,10 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     }
 
     private void populateList() {
-        if (fromServer_consumers == null || fromServer_connectors == null) {
+        if (fromServer_consumers == null || fromServer_channels == null) {
             return;
         }
-        List<SidedPos> newConsumers = fromServer_consumers;
+        List<ConnectorClientInfo> newConsumers = fromServer_consumers;
         if (newConsumers.equals(consumers)) {
             return;
         }
@@ -263,7 +300,8 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         int index = 0;
         int sel = -1;
         BlockPos prevPos = null;
-        for (SidedPos sidedPos : consumers) {
+        for (ConnectorClientInfo clientInfo : consumers) {
+            SidedPos sidedPos = clientInfo.getPos();
             BlockPos coordinate = sidedPos.getPos();
             IBlockState state = MinecraftTools.getWorld(mc).getBlockState(coordinate);
             Block block = state.getBlock();
@@ -288,15 +326,6 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
             panel.addChild(new Label(mc, this).setText(sidedPos.getSide().getName().substring(0, 1).toUpperCase()).setColor(color).setDesiredWidth(18));
             for (int i = 0 ; i < MAX_CHANNELS ; i++) {
                 ToggleButton but = new ToggleButton(mc, this).setDesiredWidth(14);
-                if (i == 3) {
-                    if (index == 3) {
-                        but.setText("I");
-                    } else if (index == 4) {
-                        but.setText("E");
-                    } else if (index == 0) {
-                        but.setText("E");
-                    }
-                }
                 but.setPressed(editingChannel == i && sidedPos.equals(editing));
                 int finalI = i;
                 but.addButtonEvent(parent -> {
