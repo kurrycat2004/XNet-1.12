@@ -7,9 +7,11 @@ import mcjty.lib.network.Argument;
 import mcjty.typed.Type;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelType;
+import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.logic.ChannelInfo;
 import mcjty.xnet.logic.ConnectorClientInfo;
+import mcjty.xnet.logic.SidedConsumer;
 import mcjty.xnet.logic.SidedPos;
 import mcjty.xnet.multiblock.ConsumerId;
 import mcjty.xnet.multiblock.NetworkId;
@@ -38,6 +40,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     public static final String CLIENTCMD_CHANNELSREADY = "channelsReady";
 
     public static final String CMD_CREATECHANNEL = "createChannel";
+    public static final String CMD_CREATECONNECTOR = "createConnector";
 
     private InventoryHelper inventoryHelper = new InventoryHelper(this, ControllerContainer.factory, ControllerContainer.COUNT_FILTER_SLOTS);
     private NetworkId networkId;
@@ -145,6 +148,11 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         markDirty();
     }
 
+    private void createConnector(int index, SidedConsumer id) {
+        channels[index].createConnector(id);
+        markDirty();
+    }
+
     @Override
     public InventoryHelper getInventoryHelper() {
         return inventoryHelper;
@@ -165,6 +173,11 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             int index = args.get("index").getInteger();
             String typeId = args.get("type").getString();
             createChannel(index, typeId);
+            return true;
+        } else if (CMD_CREATECONNECTOR.equals(command)) {
+            int index = args.get("index").getInteger();
+            SidedConsumer sidedConsumer = new SidedConsumer(new ConsumerId(args.get("consumer").getInteger()), EnumFacing.values()[args.get("side").getInteger()]);
+            createConnector(index, sidedConsumer);
             return true;
         }
         return false;
@@ -192,10 +205,11 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             return true;
         }
         if (CLIENTCMD_CONSUMERSREADY.equals(command)) {
-            GuiController.fromServer_consumers = new ArrayList<>(Type.create(ConnectorClientInfo.class).convert(list));
+            GuiController.fromServer_connectors = new ArrayList<>(Type.create(ConnectorClientInfo.class).convert(list));
             return true;
         } else if (CLIENTCMD_CHANNELSREADY.equals(command)) {
             GuiController.fromServer_channels = new ArrayList<>(Type.create(ChannelInfo.class).convert(list));
+            return true;
         }
         return false;
     }

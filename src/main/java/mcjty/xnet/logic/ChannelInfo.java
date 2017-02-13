@@ -39,6 +39,12 @@ public class ChannelInfo {
         return connectors;
     }
 
+    public ConnectorInfo createConnector(SidedConsumer id) {
+        ConnectorInfo info = new ConnectorInfo(type, id);
+        connectors.put(id, info);
+        return info;
+    }
+
     public void writeToNBT(NBTTagCompound tag) {
         channelSettings.writeToNBT(tag);
         NBTTagList conlist = new NBTTagList();
