@@ -173,11 +173,25 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         }
     }
 
+    private void removeConnector(SidedPos sidedPos) {
+        sendServerCommand(XNetMessages.INSTANCE, TileEntityController.CMD_REMOVECONNECTOR,
+                new Argument("channel", getSelectedChannel()),
+                new Argument("pos", sidedPos.getPos()),
+                new Argument("side", sidedPos.getSide().ordinal()));
+        refresh();
+    }
+
     private void createConnector(SidedPos sidedPos) {
         sendServerCommand(XNetMessages.INSTANCE, TileEntityController.CMD_CREATECONNECTOR,
                 new Argument("channel", getSelectedChannel()),
                 new Argument("pos", sidedPos.getPos()),
                 new Argument("side", sidedPos.getSide().ordinal()));
+        refresh();
+    }
+
+    private void removeChannel() {
+        sendServerCommand(XNetMessages.INSTANCE, TileEntityController.CMD_REMOVECHANNEL,
+                new Argument("index", getSelectedChannel()));
         refresh();
     }
 
@@ -237,7 +251,11 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                             .setLayoutHint(new PositionalLayout.PositionalHint(130, 3, 13, 14));
                     ChoiceLabel mode = new ChoiceLabel(mc, this).addChoices("Round Robin", "Random", "First")
                             .setLayoutHint(new PositionalLayout.PositionalHint(4, 20, 100, 14));
-                    channelEditPanel.addChild(label).addChild(enabled).addChild(type).addChild(mode);
+                    Button remove = new Button(mc, this).setText("x")
+                            .setTooltips("Remove this channel")
+                            .setLayoutHint(new PositionalLayout.PositionalHint(151, 2, 9, 9))
+                            .addButtonEvent(parent -> removeChannel());
+                    channelEditPanel.addChild(label).addChild(enabled).addChild(type).addChild(mode).addChild(remove);
                 } else {
                     ChoiceLabel type = new ChoiceLabel(mc, this)
                             .setLayoutHint(new PositionalLayout.PositionalHint(20, 20, 60, 14));
@@ -302,8 +320,13 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                     ChoiceLabel speed = new ChoiceLabel(mc, this).addChoices("1 item", "stack")
                             .setLayoutHint(new PositionalLayout.PositionalHint(46, 20, 50, 14));
 
+                    Button remove = new Button(mc, this).setText("x")
+                            .setTooltips("Remove this connector")
+                            .setLayoutHint(new PositionalLayout.PositionalHint(151, 2, 9, 9))
+                            .addButtonEvent(parent -> removeConnector(editingConnector));
+
                     connectorEditPanel.addChild(type).addChild(redstoneMode).addChild(label1).addChild(oreDict).addChild(meta)
-                            .addChild(label2).addChild(speed);
+                            .addChild(label2).addChild(speed).addChild(remove);
                 } else {
                     Button create = new Button(mc, this)
                             .setText("Create")

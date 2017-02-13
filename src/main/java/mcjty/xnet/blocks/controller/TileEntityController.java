@@ -35,6 +35,8 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
     public static final String CMD_CREATECHANNEL = "createChannel";
     public static final String CMD_CREATECONNECTOR = "createConnector";
+    public static final String CMD_REMOVECHANNEL = "removeChannel";
+    public static final String CMD_REMOVECONNECTOR = "removeConnector";
 
     private InventoryHelper inventoryHelper = new InventoryHelper(this, ControllerContainer.factory, ControllerContainer.COUNT_FILTER_SLOTS);
     private NetworkId networkId;
@@ -183,10 +185,32 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         return chanList;
     }
 
+    private void removeChannel(int index) {
+        channels[index] = null;
+        markDirty();
+    }
+
     private void createChannel(int index, String typeId) {
         IChannelType type = XNet.xNetApi.findType(typeId);
         channels[index] = new ChannelInfo(type);
         markDirty();
+    }
+
+    private void removeConnector(int channel, SidedPos pos) {
+        WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
+        ConsumerId consumerId = worldBlob.getConsumerAt(pos.getPos().offset(pos.getSide()));
+        SidedConsumer toremove = null;
+        for (Map.Entry<SidedConsumer, ConnectorInfo> entry : channels[channel].getConnectors().entrySet()) {
+            SidedConsumer key = entry.getKey();
+            if (key.getConsumerId().equals(consumerId)) {
+                toremove = key;
+                break;
+            }
+        }
+        if (toremove != null) {
+            channels[channel].getConnectors().remove(toremove);
+            markDirty();
+        }
     }
 
     private void createConnector(int channel, SidedPos pos) {
@@ -225,6 +249,15 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             int channel = args.get("channel").getInteger();
             SidedPos pos = new SidedPos(args.get("pos").getCoordinate(), EnumFacing.values()[args.get("side").getInteger()]);
             createConnector(channel, pos);
+            return true;
+        } else if (CMD_REMOVECHANNEL.equals(command)) {
+            int index = args.get("index").getInteger();
+            removeChannel(index);
+            return true;
+        } else if (CMD_REMOVECONNECTOR.equals(command)) {
+            SidedPos pos = new SidedPos(args.get("pos").getCoordinate(), EnumFacing.values()[args.get("side").getInteger()]);
+            int channel = args.get("channel").getInteger();
+            removeConnector(channel, pos);
             return true;
         }
         return false;
