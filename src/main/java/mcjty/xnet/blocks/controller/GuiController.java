@@ -304,6 +304,10 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                     EnumFacing side = clientInfo.getPos().getSide();
                     SidedConsumer sidedConsumer = new SidedConsumer(clientInfo.getConsumerId(), side.getOpposite());
                     ConnectorClientInfo connectorInfo = info.getConnectors().get(sidedConsumer);
+                    Button remove = new Button(mc, this).setText("x")
+                            .setTooltips("Remove this connector")
+                            .setLayoutHint(new PositionalLayout.PositionalHint(151, 2, 9, 9))
+                            .addButtonEvent(parent -> removeConnector(editingConnector));
 
                     ChoiceLabel type = new ChoiceLabel(mc, this).addChoices("Insert", "Extract")
                             .setLayoutHint(new PositionalLayout.PositionalHint(4, 3, 60, 14));
@@ -319,11 +323,6 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                             .setLayoutHint(new PositionalLayout.PositionalHint(4, 20, 40, 14));
                     ChoiceLabel speed = new ChoiceLabel(mc, this).addChoices("1 item", "stack")
                             .setLayoutHint(new PositionalLayout.PositionalHint(46, 20, 50, 14));
-
-                    Button remove = new Button(mc, this).setText("x")
-                            .setTooltips("Remove this connector")
-                            .setLayoutHint(new PositionalLayout.PositionalHint(151, 2, 9, 9))
-                            .addButtonEvent(parent -> removeConnector(editingConnector));
 
                     connectorEditPanel.addChild(type).addChild(redstoneMode).addChild(label1).addChild(oreDict).addChild(meta)
                             .addChild(label2).addChild(speed).addChild(remove);

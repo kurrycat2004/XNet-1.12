@@ -1,6 +1,7 @@
 package mcjty.xnet.apiimpl;
 
 import mcjty.xnet.api.channels.IConnectorSettings;
+import mcjty.xnet.api.channels.IEditorGui;
 import net.minecraft.nbt.NBTTagCompound;
 
 public class ItemConnectorSettings implements IConnectorSettings {
@@ -51,6 +52,14 @@ public class ItemConnectorSettings implements IConnectorSettings {
     @Override
     public boolean supportsGhostSlots() {
         return true;
+    }
+
+    @Override
+    public void createGui(IEditorGui gui) {
+        gui
+                .choices(itemMode, ItemMode.values()).redstoneMode(null).nl()
+                .label("OD").choices(oredictMode, OredictMode.values())
+                .label("Meta").choices(metaMode, MetaMode.values());
     }
 
     @Override

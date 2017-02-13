@@ -15,4 +15,10 @@ public interface IConnectorSettings {
     void readFromNBT(NBTTagCompound tag);
 
     void writeToNBT(NBTTagCompound tag);
+
+    /**
+     * Create the gui for this connector and fill with the current values or
+     * defaults if it is not set yet
+     */
+    void createGui(IEditorGui gui);
 }
