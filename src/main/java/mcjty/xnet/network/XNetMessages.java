@@ -11,11 +11,11 @@ public class XNetMessages {
         INSTANCE = net;
 
         // Server side
-        net.registerMessage(PacketGetConsumers.Handler.class, PacketGetConsumers.class, PacketHandler.nextID(), Side.SERVER);
         net.registerMessage(PacketGetChannels.Handler.class, PacketGetChannels.class, PacketHandler.nextID(), Side.SERVER);
+        net.registerMessage(PacketGetConnectedBlocks.Handler.class, PacketGetConnectedBlocks.class, PacketHandler.nextID(), Side.SERVER);
 
         // Client side
-        net.registerMessage(PacketConsumersReady.Handler.class, PacketConsumersReady.class, PacketHandler.nextID(), Side.CLIENT);
         net.registerMessage(PacketChannelsReady.Handler.class, PacketChannelsReady.class, PacketHandler.nextID(), Side.CLIENT);
+        net.registerMessage(PacketConnectedBlocksReady.Handler.class, PacketConnectedBlocksReady.class, PacketHandler.nextID(), Side.CLIENT);
     }
 }

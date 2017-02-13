@@ -5,6 +5,7 @@ import mcjty.lib.network.PacketRequestListFromServer;
 import mcjty.typed.Type;
 import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.controller.TileEntityController;
+import mcjty.xnet.logic.ChannelClientInfo;
 import mcjty.xnet.logic.ChannelInfo;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -15,7 +16,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import java.util.List;
 
-public class PacketGetChannels extends PacketRequestListFromServer<ChannelInfo, PacketGetChannels, PacketChannelsReady> {
+public class PacketGetChannels extends PacketRequestListFromServer<ChannelClientInfo, PacketGetChannels, PacketChannelsReady> {
 
     public PacketGetChannels() {
 
@@ -35,7 +36,7 @@ public class PacketGetChannels extends PacketRequestListFromServer<ChannelInfo, 
         private void handle(PacketGetChannels message, MessageContext ctx) {
             TileEntity te = ctx.getServerHandler().player.getEntityWorld().getTileEntity(message.pos);
             CommandHandler commandHandler = (CommandHandler) te;
-            List<ChannelInfo> list = commandHandler.executeWithResultList(message.command, message.args, Type.create(ChannelInfo.class));
+            List<ChannelClientInfo> list = commandHandler.executeWithResultList(message.command, message.args, Type.create(ChannelClientInfo.class));
             XNetMessages.INSTANCE.sendTo(new PacketChannelsReady(message.pos, TileEntityController.CLIENTCMD_CHANNELSREADY, list), ctx.getServerHandler().player);
         }
     }

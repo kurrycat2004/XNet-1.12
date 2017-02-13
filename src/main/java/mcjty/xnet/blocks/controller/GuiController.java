@@ -14,25 +14,20 @@ import mcjty.lib.gui.widgets.Button;
 import mcjty.lib.gui.widgets.Label;
 import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.network.Argument;
-import mcjty.lib.tools.MinecraftTools;
 import mcjty.lib.varia.RedstoneMode;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.gui.GuiProxy;
 import mcjty.xnet.logic.*;
 import mcjty.xnet.network.PacketGetChannels;
-import mcjty.xnet.network.PacketGetConsumers;
+import mcjty.xnet.network.PacketGetConnectedBlocks;
 import mcjty.xnet.network.XNetMessages;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static mcjty.xnet.logic.ChannelInfo.MAX_CHANNELS;
 
@@ -64,13 +59,10 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     private static final ResourceLocation mainBackground = new ResourceLocation(XNet.MODID, "textures/gui/controller.png");
     private static final ResourceLocation sideBackground = new ResourceLocation(XNet.MODID, "textures/gui/sidegui.png");
 
-    // A copy of the connectors we're currently showing
-    private List<ConnectorClientInfo> connectors = null;
-
     // From server.
-    public static List<ConnectorClientInfo> fromServer_connectors = null;
-    public static List<ChannelInfo> fromServer_channels = null;
-
+    public static List<ChannelClientInfo> fromServer_channels = null;
+    public static List<ConnectedBlockClientInfo> fromServer_connectedBlocks = null;
+    private boolean needsRefresh = true;
 
     public GuiController(TileEntityController controller, ControllerContainer container) {
         super(XNet.instance, XNetMessages.INSTANCE, controller, container, GuiProxy.GUI_MANUAL_MAIN, "controller");
@@ -181,11 +173,11 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         }
     }
 
-    private void createConnector(SidedConsumer sidedConsumer) {
+    private void createConnector(SidedPos sidedPos) {
         sendServerCommand(XNetMessages.INSTANCE, TileEntityController.CMD_CREATECONNECTOR,
-                new Argument("index", getSelectedChannel()),
-                new Argument("consumer", sidedConsumer.getConsumerId().getId()),
-                new Argument("side", sidedConsumer.getSide().ordinal()));
+                new Argument("channel", getSelectedChannel()),
+                new Argument("pos", sidedPos.getPos()),
+                new Argument("side", sidedPos.getSide().ordinal()));
         refresh();
     }
 
@@ -198,9 +190,10 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
 
     private void refresh() {
         fromServer_channels = null;
-        fromServer_connectors = null;
+        fromServer_connectedBlocks = null;
         showingChannel = -1;
         showingConnector = null;
+        needsRefresh = true;
         listDirty = 3;
         requestListsIfNeeded();
     }
@@ -208,7 +201,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     private void selectConnectorEditor(SidedPos sidedPos, ToggleButton but, int finalI) {
         if (but.isPressed()) {
             editingConnector = sidedPos;
-            editingChannel = finalI;
+            selectChannelEditor(finalI);
         } else {
             editingConnector = null;
         }
@@ -233,7 +226,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
 
             channelEditPanel.removeChildren();
             if (channelButtons[editingChannel].isPressed()) {
-                ChannelInfo info = fromServer_channels.get(editingChannel);
+                ChannelClientInfo info = fromServer_channels.get(editingChannel);
                 if (info != null) {
                     Widget label = new Label(mc, this).setText("Channel " + (editingChannel + 1))
                             .setLayoutHint(new PositionalLayout.PositionalHint(4, 3, 60, 14));
@@ -264,8 +257,8 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         }
     }
 
-    private ConnectorClientInfo findClientInfo(SidedPos p) {
-        for (ConnectorClientInfo connector : connectors) {
+    private ConnectorClientInfo findClientInfo(ChannelClientInfo info, SidedPos p) {
+        for (ConnectorClientInfo connector : info.getConnectors().values()) {
             if (connector.getPos().equals(p)) {
                 return connector;
             }
@@ -286,13 +279,14 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         if (editingConnector != null && !editingConnector.equals(showingConnector)) {
             showingConnector = editingConnector;
             connectorEditPanel.removeChildren();
-            ChannelInfo info = fromServer_channels.get(editingChannel);
+            ChannelClientInfo info = fromServer_channels.get(editingChannel);
             if (info != null) {
-                ConnectorClientInfo clientInfo = findClientInfo(editingConnector);
-                EnumFacing side = clientInfo.getPos().getSide();
-                SidedConsumer sidedConsumer = new SidedConsumer(clientInfo.getConsumerId(), side.getOpposite());
-                ConnectorInfo connectorInfo = info.getConnectors().get(sidedConsumer);
-                if (connectorInfo != null) {
+                ConnectorClientInfo clientInfo = findClientInfo(info, editingConnector);
+                if (clientInfo != null) {
+                    EnumFacing side = clientInfo.getPos().getSide();
+                    SidedConsumer sidedConsumer = new SidedConsumer(clientInfo.getConsumerId(), side.getOpposite());
+                    ConnectorClientInfo connectorInfo = info.getConnectors().get(sidedConsumer);
+
                     ChoiceLabel type = new ChoiceLabel(mc, this).addChoices("Insert", "Extract")
                             .setLayoutHint(new PositionalLayout.PositionalHint(4, 3, 60, 14));
 
@@ -313,9 +307,9 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                 } else {
                     Button create = new Button(mc, this)
                             .setText("Create")
-                            .setLayoutHint(new PositionalLayout.PositionalHint(150, 12, 60, 14))
-                            .addButtonEvent(parent -> createConnector(sidedConsumer));
-                    channelEditPanel.addChild(create);
+                            .setLayoutHint(new PositionalLayout.PositionalHint(85, 20, 60, 14))
+                            .addButtonEvent(parent -> createConnector(editingConnector));
+                    connectorEditPanel.addChild(create);
                 }
             }
         } else if (showingConnector != null && editingConnector == null) {
@@ -327,13 +321,13 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
 
 
     private void requestListsIfNeeded() {
-        if (fromServer_connectors != null && fromServer_channels != null) {
+        if (fromServer_channels != null && fromServer_connectedBlocks != null) {
             return;
         }
         listDirty--;
         if (listDirty <= 0) {
-            XNetMessages.INSTANCE.sendToServer(new PacketGetConsumers(tileEntity.getPos()));
             XNetMessages.INSTANCE.sendToServer(new PacketGetChannels(tileEntity.getPos()));
+            XNetMessages.INSTANCE.sendToServer(new PacketGetConnectedBlocks(tileEntity.getPos()));
             listDirty = 10;
             showingChannel = -1;
             showingConnector = null;
@@ -353,44 +347,41 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         if (!listsReady()) {
             return;
         }
-        List<ConnectorClientInfo> newConnectors = fromServer_connectors;
-        if (newConnectors.equals(connectors)) {
+        if (!needsRefresh) {
             return;
         }
+        needsRefresh = false;
 
-
-        connectors = new ArrayList<>(newConnectors);
         list.removeChildren();
 
         int index = 0;
         int sel = -1;
         BlockPos prevPos = null;
-        for (ConnectorClientInfo clientInfo : connectors) {
-            SidedPos sidedPos = clientInfo.getPos();
+
+        for (ConnectedBlockClientInfo connectedBlock : fromServer_connectedBlocks) {
+            SidedPos sidedPos = connectedBlock.getPos();
             BlockPos coordinate = sidedPos.getPos();
-            IBlockState state = MinecraftTools.getWorld(mc).getBlockState(coordinate);
-            Block block = state.getBlock();
 
             int color = StyleConfig.colorTextInListNormal;
-
-//            String displayName = BlockInfo.getReadableName(state);
-//
-//            if (coordinate.equals(tileEntity.getMonitor())) {
-//                sel = index;
-//                color = TEXT_COLOR_SELECTED;
-//            }
 
             Panel panel = new Panel(mc, this).setLayout(new HorizontalLayout().setHorizontalMargin(0).setSpacing(0));
             if (coordinate.equals(prevPos)) {
                 panel.addChild(new BlockRender(mc, this));
             } else {
-                panel.addChild(new BlockRender(mc, this).setRenderItem(block));
+                panel.addChild(new BlockRender(mc, this).setRenderItem(connectedBlock.getConnectedBlock()));
                 prevPos = coordinate;
             }
 //            panel.addChild(new Label(mc, this).setText(displayName).setColor(color).setHorizontalAlignment(HorizontalAlignment.ALIGH_LEFT).setDesiredWidth(90));
             panel.addChild(new Label(mc, this).setText(sidedPos.getSide().getName().substring(0, 1).toUpperCase()).setColor(color).setDesiredWidth(18));
             for (int i = 0 ; i < MAX_CHANNELS ; i++) {
                 ToggleButton but = new ToggleButton(mc, this).setDesiredWidth(14);
+                ChannelClientInfo info = fromServer_channels.get(i);
+                if (info != null) {
+                    ConnectorClientInfo clientInfo = findClientInfo(info, sidedPos);
+                    if (clientInfo != null) {
+                        but.setText("I");
+                    }
+                }
                 but.setPressed(editingChannel == i && sidedPos.equals(editingConnector));
                 int finalI = i;
                 but.addButtonEvent(parent -> {
@@ -407,15 +398,26 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     }
 
     private boolean listsReady() {
-        return fromServer_connectors != null && fromServer_channels != null;
+        return fromServer_channels != null && fromServer_connectedBlocks != null;
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(float v, int i, int i2) {
+    protected void drawGuiContainerBackgroundLayer(float v, int x1, int x2) {
         requestListsIfNeeded();
         populateList();
         refreshChannelEditor();
         refreshConnectorEditor();
+        if (fromServer_channels != null) {
+            for (int i = 0; i < MAX_CHANNELS; i++) {
+                String channel = String.valueOf(i + 1);
+                ChannelClientInfo info = fromServer_channels.get(i);
+                if (info != null) {
+                    channelButtons[i].setText(info.getType().getName().substring(0, 1).toUpperCase() + channel);
+                } else {
+                    channelButtons[i].setText(channel);
+                }
+            }
+        }
         drawWindow();
         int channel = getSelectedChannel();
         if (channel != -1) {

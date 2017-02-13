@@ -2,14 +2,11 @@ package mcjty.xnet.network;
 
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.network.ClientCommandHandler;
-import mcjty.lib.network.NetworkTools;
 import mcjty.lib.network.PacketListFromServer;
 import mcjty.lib.varia.Logging;
 import mcjty.typed.Type;
 import mcjty.xnet.XNet;
-import mcjty.xnet.api.channels.IChannelType;
-import mcjty.xnet.logic.ChannelInfo;
-import net.minecraft.nbt.NBTTagCompound;
+import mcjty.xnet.logic.ChannelClientInfo;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -18,39 +15,31 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import java.util.List;
 
-public class PacketChannelsReady extends PacketListFromServer<PacketChannelsReady, ChannelInfo> {
+public class PacketChannelsReady extends PacketListFromServer<PacketChannelsReady, ChannelClientInfo> {
 
     public PacketChannelsReady() {
     }
 
-    public PacketChannelsReady(BlockPos pos, String command, List<ChannelInfo> list) {
+    public PacketChannelsReady(BlockPos pos, String command, List<ChannelClientInfo> list) {
         super(pos, command, list);
     }
 
     @Override
-    protected ChannelInfo createItem(ByteBuf buf) {
+    protected ChannelClientInfo createItem(ByteBuf buf) {
         if (buf.readBoolean()) {
-            NBTTagCompound tag = NetworkTools.readTag(buf);
-            String typeId = tag.getString("type");
-            IChannelType type = XNet.xNetApi.findType(typeId);
-            ChannelInfo info = new ChannelInfo(type);
-            info.readFromNBT(tag);
-            return info;
+            return new ChannelClientInfo(buf);
         } else {
             return null;
         }
     }
 
     @Override
-    protected void writeItemToBuf(ByteBuf buf, ChannelInfo item) {
+    protected void writeItemToBuf(ByteBuf buf, ChannelClientInfo item) {
         if (item == null) {
             buf.writeBoolean(false);
         } else {
             buf.writeBoolean(true);
-            NBTTagCompound tag = new NBTTagCompound();
-            tag.setString("type", item.getType().getID());
-            item.writeToNBT(tag);
-            NetworkTools.writeTag(buf, tag);
+            item.writeToNBT(buf);
         }
     }
 
@@ -64,7 +53,7 @@ public class PacketChannelsReady extends PacketListFromServer<PacketChannelsRead
         private void handle(PacketChannelsReady message, MessageContext ctx) {
             TileEntity te = XNet.proxy.getClientWorld().getTileEntity(message.pos);
             ClientCommandHandler clientCommandHandler = (ClientCommandHandler) te;
-            if (!clientCommandHandler.execute(message.command, message.list, Type.create(ChannelInfo.class))) {
+            if (!clientCommandHandler.execute(message.command, message.list, Type.create(ChannelClientInfo.class))) {
                 Logging.log("Command " + message.command + " was not handled!");
             }
         }
