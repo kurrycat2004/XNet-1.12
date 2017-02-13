@@ -2,6 +2,10 @@ package mcjty.xnet.api.channels;
 
 public interface IEditorGui {
 
+    IEditorGui move(int x, int y);
+
+    IEditorGui shift(int x);
+
     IEditorGui label(String txt);
 
     IEditorGui text(String value);
@@ -10,7 +14,7 @@ public interface IEditorGui {
 
     IEditorGui choices(String current, String... values);
 
-    <T extends Enum<T>> IEditorGui choices(Enum<T> current, T... values);
+    <T extends Enum<T>> IEditorGui choices(T current, T... values);
 
     IEditorGui redstoneMode(Object current);    // @todo type
 

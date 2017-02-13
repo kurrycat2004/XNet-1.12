@@ -55,7 +55,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     private EnergyBar energyBar;
     private ImageChoiceLabel redstoneMode;
 
-    private static final ResourceLocation iconGuiElements = new ResourceLocation(XNet.MODID, "textures/gui/guielements.png");
+    static final ResourceLocation iconGuiElements = new ResourceLocation(XNet.MODID, "textures/gui/guielements.png");
     private static final ResourceLocation mainBackground = new ResourceLocation(XNet.MODID, "textures/gui/controller.png");
     private static final ResourceLocation sideBackground = new ResourceLocation(XNet.MODID, "textures/gui/sidegui.png");
 
@@ -165,6 +165,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
 
     private void selectChannelEditor(int finalI) {
         editingChannel = -1;
+        showingConnector = null;
         for (int j = 0 ; j < MAX_CHANNELS ; j++) {
             if (j != finalI) {
                 channelButtons[j].setPressed(false);
@@ -212,22 +213,9 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         requestListsIfNeeded();
     }
 
-    private void selectConnectorEditor(SidedPos sidedPos, ToggleButton but, int finalI) {
-        if (but.isPressed()) {
-            editingConnector = sidedPos;
-            selectChannelEditor(finalI);
-        } else {
-            editingConnector = null;
-        }
-        for (int i = 0 ; i < list.getChildCount() ; i++) {
-            Panel p = (Panel) list.getChild(i);
-            for (int j = 0 ; j < p.getChildCount() ; j++) {
-                Widget w = p.getChild(j);
-                if (w instanceof ToggleButton && w != but) {
-                    but.setPressed(false);
-                }
-            }
-        }
+    private void selectConnectorEditor(SidedPos sidedPos, int finalI) {
+        editingConnector = sidedPos;
+        selectChannelEditor(finalI);
     }
 
     private void refreshChannelEditor() {
@@ -253,7 +241,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                             .setLayoutHint(new PositionalLayout.PositionalHint(4, 20, 100, 14));
                     Button remove = new Button(mc, this).setText("x")
                             .setTooltips("Remove this channel")
-                            .setLayoutHint(new PositionalLayout.PositionalHint(151, 2, 9, 9))
+                            .setLayoutHint(new PositionalLayout.PositionalHint(151, 1, 9, 10))
                             .addButtonEvent(parent -> removeChannel());
                     channelEditPanel.addChild(label).addChild(enabled).addChild(type).addChild(mode).addChild(remove);
                 } else {
@@ -284,12 +272,6 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         return null;
     }
 
-    private ConnectorInfo findConnectorInfo(ChannelInfo info, ConnectorClientInfo clientInfo) {
-        EnumFacing side = clientInfo.getPos().getSide();
-        SidedConsumer sidedConsumer = new SidedConsumer(clientInfo.getConsumerId(), side.getOpposite());
-        return info.getConnectors().get(sidedConsumer);
-    }
-
     private void refreshConnectorEditor() {
         if (!listsReady()) {
             return;
@@ -304,28 +286,32 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                     EnumFacing side = clientInfo.getPos().getSide();
                     SidedConsumer sidedConsumer = new SidedConsumer(clientInfo.getConsumerId(), side.getOpposite());
                     ConnectorClientInfo connectorInfo = info.getConnectors().get(sidedConsumer);
+
                     Button remove = new Button(mc, this).setText("x")
                             .setTooltips("Remove this connector")
-                            .setLayoutHint(new PositionalLayout.PositionalHint(151, 2, 9, 9))
+                            .setLayoutHint(new PositionalLayout.PositionalHint(151, 1, 9, 10))
                             .addButtonEvent(parent -> removeConnector(editingConnector));
 
-                    ChoiceLabel type = new ChoiceLabel(mc, this).addChoices("Insert", "Extract")
-                            .setLayoutHint(new PositionalLayout.PositionalHint(4, 3, 60, 14));
+                    connectorInfo.getConnectorSettings().createGui(new EditorPanel(connectorEditPanel, mc, this));
 
-                    Widget label1 = new Label(mc, this).setText("Filter:").setHorizontalAlignment(HorizontalAlignment.ALIGH_LEFT)
-                            .setLayoutHint(new PositionalLayout.PositionalHint(4, 35, 40, 14));
-                    ToggleButton oreDict = new ToggleButton(mc, this).setText("Ore").setCheckMarker(true)
-                            .setLayoutHint(new PositionalLayout.PositionalHint(46, 35, 40, 14));
-                    ToggleButton meta = new ToggleButton(mc, this).setText("Meta").setCheckMarker(true)
-                            .setLayoutHint(new PositionalLayout.PositionalHint(88, 35, 40, 14));
+//                    ChoiceLabel type = new ChoiceLabel(mc, this).addChoices("Insert", "Extract")
+//                            .setLayoutHint(new PositionalLayout.PositionalHint(4, 3, 60, 14));
+//
+//                    Widget label1 = new Label(mc, this).setText("Filter:").setHorizontalAlignment(HorizontalAlignment.ALIGH_LEFT)
+//                            .setLayoutHint(new PositionalLayout.PositionalHint(4, 35, 40, 14));
+//                    ToggleButton oreDict = new ToggleButton(mc, this).setText("Ore").setCheckMarker(true)
+//                            .setLayoutHint(new PositionalLayout.PositionalHint(46, 35, 40, 14));
+//                    ToggleButton meta = new ToggleButton(mc, this).setText("Meta").setCheckMarker(true)
+//                            .setLayoutHint(new PositionalLayout.PositionalHint(88, 35, 40, 14));
+//
+//                    Widget label2 = new Label(mc, this).setText("Speed:").setHorizontalAlignment(HorizontalAlignment.ALIGH_LEFT)
+//                            .setLayoutHint(new PositionalLayout.PositionalHint(4, 20, 40, 14));
+//                    ChoiceLabel speed = new ChoiceLabel(mc, this).addChoices("1 item", "stack")
+//                            .setLayoutHint(new PositionalLayout.PositionalHint(46, 20, 50, 14));
 
-                    Widget label2 = new Label(mc, this).setText("Speed:").setHorizontalAlignment(HorizontalAlignment.ALIGH_LEFT)
-                            .setLayoutHint(new PositionalLayout.PositionalHint(4, 20, 40, 14));
-                    ChoiceLabel speed = new ChoiceLabel(mc, this).addChoices("1 item", "stack")
-                            .setLayoutHint(new PositionalLayout.PositionalHint(46, 20, 50, 14));
-
-                    connectorEditPanel.addChild(type).addChild(redstoneMode).addChild(label1).addChild(oreDict).addChild(meta)
-                            .addChild(label2).addChild(speed).addChild(remove);
+//                    connectorEditPanel.addChild(type).addChild(redstoneMode).addChild(label1).addChild(oreDict).addChild(meta)
+//                            .addChild(label2).addChild(speed).addChild(remove);
+                    connectorEditPanel.addChild(remove);
                 } else {
                     Button create = new Button(mc, this)
                             .setText("Create")
@@ -396,7 +382,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
 //            panel.addChild(new Label(mc, this).setText(displayName).setColor(color).setHorizontalAlignment(HorizontalAlignment.ALIGH_LEFT).setDesiredWidth(90));
             panel.addChild(new Label(mc, this).setText(sidedPos.getSide().getName().substring(0, 1).toUpperCase()).setColor(color).setDesiredWidth(18));
             for (int i = 0 ; i < MAX_CHANNELS ; i++) {
-                ToggleButton but = new ToggleButton(mc, this).setDesiredWidth(14);
+                Button but = new Button(mc, this).setDesiredWidth(14);
                 ChannelClientInfo info = fromServer_channels.get(i);
                 if (info != null) {
                     ConnectorClientInfo clientInfo = findClientInfo(info, sidedPos);
@@ -404,10 +390,10 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                         but.setText("I");
                     }
                 }
-                but.setPressed(editingChannel == i && sidedPos.equals(editingConnector));
+//                but.setPressed(editingChannel == i && sidedPos.equals(editingConnector));
                 int finalI = i;
                 but.addButtonEvent(parent -> {
-                    selectConnectorEditor(sidedPos, but, finalI);
+                    selectConnectorEditor(sidedPos, finalI);
                 });
                 panel.addChild(but);
             }

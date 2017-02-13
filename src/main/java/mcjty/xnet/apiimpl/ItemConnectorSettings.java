@@ -58,7 +58,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
     public void createGui(IEditorGui gui) {
         gui
                 .choices(itemMode, ItemMode.values()).redstoneMode(null).nl()
-                .label("OD").choices(oredictMode, OredictMode.values())
+                .label("OD").choices(oredictMode, OredictMode.values()).shift(10)
                 .label("Meta").choices(metaMode, MetaMode.values());
     }
 

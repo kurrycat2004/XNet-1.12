@@ -32,4 +32,23 @@ public class SidedConsumer {
     public EnumFacing getSide() {
         return side;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SidedConsumer that = (SidedConsumer) o;
+
+        if (consumerId != null ? !consumerId.equals(that.consumerId) : that.consumerId != null) return false;
+        return side == that.side;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = consumerId != null ? consumerId.hashCode() : 0;
+        result = 31 * result + (side != null ? side.hashCode() : 0);
+        return result;
+    }
 }
