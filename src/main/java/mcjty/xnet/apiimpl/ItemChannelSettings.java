@@ -37,8 +37,13 @@ public class ItemChannelSettings implements IChannelSettings {
     }
 
     @Override
+    public boolean isEnabled(String tag) {
+        return true;
+    }
+
+    @Override
     public void createGui(IEditorGui gui) {
-        gui.choices(TAG_MODE, channelMode, ChannelMode.values());
+        gui.nl().choices(TAG_MODE, channelMode, ChannelMode.values());
     }
 
     @Override

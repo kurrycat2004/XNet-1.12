@@ -20,6 +20,7 @@ public abstract class AbstractEditorPanel implements IEditorGui {
     private final Minecraft mc;
     private final GuiController gui;
     protected final Map<String, Object> data;
+    protected final Map<String, Widget> components = new HashMap<>();
 
     private int x;
     private int y;
@@ -74,7 +75,7 @@ public abstract class AbstractEditorPanel implements IEditorGui {
 
     @Override
     public IEditorGui label(String txt) {
-        int w = mc.fontRenderer.getStringWidth(txt);
+        int w = mc.fontRenderer.getStringWidth(txt)+5;
         fitWidth(w);
         Label label = new Label(mc, gui).setText(txt);
         label.setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
@@ -85,26 +86,28 @@ public abstract class AbstractEditorPanel implements IEditorGui {
 
     @Override
     public IEditorGui text(String tag, String value) {
-        int w = 60;
+        int w = 45;
         fitWidth(w);
         TextField text = new TextField(mc, gui).setText(value)
                 .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
         data.put(tag, value);
         text.addTextEnterEvent((parent, newText) -> update(tag, newText));
         panel.addChild(text);
+        components.put(tag, text);
         x += w;
         return this;
     }
 
     @Override
     public IEditorGui toggle(String tag, boolean value) {
-        int w = 20;
-        fitWidth(20);
+        int w = 12;
+        fitWidth(w);
         ToggleButton toggle = new ToggleButton(mc, gui).setCheckMarker(true).setPressed(value)
                 .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
         data.put(tag, value);
         toggle.addButtonEvent(parent -> update(tag, toggle.isPressed()));
         panel.addChild(toggle);
+        components.put(tag, toggle);
         x += w;
         return this;
     }
@@ -113,7 +116,7 @@ public abstract class AbstractEditorPanel implements IEditorGui {
     public IEditorGui choices(String tag, String current, String... values) {
         int w = 10;
         for (String s : values) {
-            w = Math.max(w, mc.fontRenderer.getStringWidth(s) + 10);
+            w = Math.max(w, mc.fontRenderer.getStringWidth(s) + 15);
         }
         fitWidth(w);
         ChoiceLabel choice = new ChoiceLabel(mc, gui).addChoices(values).setChoice(current)
@@ -121,6 +124,7 @@ public abstract class AbstractEditorPanel implements IEditorGui {
         data.put(tag, current);
         choice.addChoiceEvent((parent, newChoice) -> update(tag, newChoice));
         panel.addChild(choice);
+        components.put(tag, choice);
         x += w;
         return this;
     }
@@ -158,6 +162,7 @@ public abstract class AbstractEditorPanel implements IEditorGui {
         data.put(tag, current.name());
         redstoneMode.addChoiceEvent((parent, newChoice) -> update(tag, newChoice));
         panel.addChild(redstoneMode);
+        components.put(tag, redstoneMode);
         x += w;
         return this;
     }

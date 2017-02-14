@@ -1,11 +1,15 @@
 package mcjty.xnet.apiimpl;
 
+import com.google.common.collect.ImmutableSet;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.channels.IEditorGui;
 import mcjty.xnet.api.channels.RSMode;
 import net.minecraft.nbt.NBTTagCompound;
 
 import java.util.Map;
+import java.util.Set;
+
+import static mcjty.xnet.blocks.controller.GuiController.TAG_FACING;
 
 public class ItemConnectorSettings implements IConnectorSettings {
 
@@ -13,6 +17,8 @@ public class ItemConnectorSettings implements IConnectorSettings {
     public static final String TAG_OREDICT = "od";
     public static final String TAG_RS = "rs";
     public static final String TAG_META = "meta";
+    public static final String TAG_PRIORITY = "priority";
+    public static final String TAG_MAX = "max";
 
     enum ItemMode {
         INSERT,
@@ -71,9 +77,25 @@ public class ItemConnectorSettings implements IConnectorSettings {
     @Override
     public void createGui(IEditorGui gui) {
         gui
-                .choices(TAG_ITEM, itemMode, ItemMode.values()).redstoneMode(TAG_RS, rsMode).nl()
+                .shift(10)
+                .choices(TAG_ITEM, itemMode, ItemMode.values())
+                .shift(10)
+                .redstoneMode(TAG_RS, rsMode).nl()
                 .label("OD").choices(TAG_OREDICT, oredictMode, OredictMode.values()).shift(10)
-                .label("Meta").choices(TAG_META, metaMode, MetaMode.values());
+                .label("Meta").choices(TAG_META, metaMode, MetaMode.values()).nl()
+                .label("Pri").text(TAG_PRIORITY, "1").shift(10).label("Max").text(TAG_MAX, "");
+    }
+
+    private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_FACING, TAG_ITEM, TAG_RS, TAG_MAX, TAG_PRIORITY);
+    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_FACING, TAG_ITEM, TAG_RS, TAG_OREDICT, TAG_META, TAG_MAX);
+
+    @Override
+    public boolean isEnabled(String tag) {
+        if (itemMode == ItemMode.INSERT) {
+            return INSERT_TAGS.contains(tag);
+        } else {
+            return EXTRACT_TAGS.contains(tag);
+        }
     }
 
     @Override

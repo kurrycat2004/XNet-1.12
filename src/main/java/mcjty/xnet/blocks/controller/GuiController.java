@@ -36,6 +36,9 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     public static final int WIDTH = 256;
     public static final int HEIGHT = 236;
 
+    public static final String TAG_FACING = "facing";
+    public static final String TAG_ENABLED = "enabled";
+
     private WidgetList list;
     private int listDirty;
 
@@ -229,24 +232,18 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
             if (channelButtons[editingChannel].isPressed()) {
                 ChannelClientInfo info = fromServer_channels.get(editingChannel);
                 if (info != null) {
-                    Widget label = new Label(mc, this).setText("Channel " + (editingChannel + 1))
-                            .setLayoutHint(new PositionalLayout.PositionalHint(4, 3, 60, 14));
+                    ChannelEditorPanel editor = new ChannelEditorPanel(channelEditPanel, mc, this, editingChannel);
+                    editor.label("Channel " + (editingChannel + 1))
+                            .shift(10)
+                            .toggle(TAG_ENABLED, true);
+                    info.getChannelSettings().createGui(editor);
 
-                    info.getChannelSettings().createGui(new ChannelEditorPanel(channelEditPanel, mc, this, editingChannel));
-
-//                    ChoiceLabel type = new ChoiceLabel(mc, this).addChoices("Item", "Energy", "Fluid")
-//                            .setLayoutHint(new PositionalLayout.PositionalHint(66, 3, 60, 14))
-//                            .setChoice(info.getType().getName());
-//                    ToggleButton enabled = new ToggleButton(mc, this).setCheckMarker(true).setPressed(true)
-//                            .setLayoutHint(new PositionalLayout.PositionalHint(130, 3, 13, 14));
-//                    ChoiceLabel mode = new ChoiceLabel(mc, this).addChoices("Round Robin", "Random", "First")
-//                            .setLayoutHint(new PositionalLayout.PositionalHint(4, 20, 100, 14));
                     Button remove = new Button(mc, this).setText("x")
                             .setTooltips("Remove this channel")
                             .setLayoutHint(new PositionalLayout.PositionalHint(151, 1, 9, 10))
                             .addButtonEvent(parent -> removeChannel());
-//                    channelEditPanel.addChild(label).addChild(enabled).addChild(type).addChild(mode).addChild(remove);
-                    channelEditPanel.addChild(label).addChild(remove);
+                    channelEditPanel.addChild(remove);
+                    editor.setState(info.getChannelSettings());
                 } else {
                     ChoiceLabel type = new ChoiceLabel(mc, this)
                             .setLayoutHint(new PositionalLayout.PositionalHint(20, 20, 60, 14));
@@ -295,26 +292,12 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                             .setLayoutHint(new PositionalLayout.PositionalHint(151, 1, 9, 10))
                             .addButtonEvent(parent -> removeConnector(editingConnector));
 
-                    connectorInfo.getConnectorSettings().createGui(new ControllerEditorPanel(connectorEditPanel, mc, this, editingChannel, editingConnector));
+                    ControllerEditorPanel editor = new ControllerEditorPanel(connectorEditPanel, mc, this, editingChannel, editingConnector);
+                    editor.choices(TAG_FACING, side, EnumFacing.values());
 
-//                    ChoiceLabel type = new ChoiceLabel(mc, this).addChoices("Insert", "Extract")
-//                            .setLayoutHint(new PositionalLayout.PositionalHint(4, 3, 60, 14));
-//
-//                    Widget label1 = new Label(mc, this).setText("Filter:").setHorizontalAlignment(HorizontalAlignment.ALIGH_LEFT)
-//                            .setLayoutHint(new PositionalLayout.PositionalHint(4, 35, 40, 14));
-//                    ToggleButton oreDict = new ToggleButton(mc, this).setText("Ore").setCheckMarker(true)
-//                            .setLayoutHint(new PositionalLayout.PositionalHint(46, 35, 40, 14));
-//                    ToggleButton meta = new ToggleButton(mc, this).setText("Meta").setCheckMarker(true)
-//                            .setLayoutHint(new PositionalLayout.PositionalHint(88, 35, 40, 14));
-//
-//                    Widget label2 = new Label(mc, this).setText("Speed:").setHorizontalAlignment(HorizontalAlignment.ALIGH_LEFT)
-//                            .setLayoutHint(new PositionalLayout.PositionalHint(4, 20, 40, 14));
-//                    ChoiceLabel speed = new ChoiceLabel(mc, this).addChoices("1 item", "stack")
-//                            .setLayoutHint(new PositionalLayout.PositionalHint(46, 20, 50, 14));
-
-//                    connectorEditPanel.addChild(type).addChild(redstoneMode).addChild(label1).addChild(oreDict).addChild(meta)
-//                            .addChild(label2).addChild(speed).addChild(remove);
+                    connectorInfo.getConnectorSettings().createGui(editor);
                     connectorEditPanel.addChild(remove);
+                    editor.setState(connectorInfo.getConnectorSettings());
                 } else {
                     Button create = new Button(mc, this)
                             .setText("Create")

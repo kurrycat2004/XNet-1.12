@@ -24,6 +24,11 @@ public interface IConnectorSettings {
     String getIndicator();
 
     /**
+     * Return true if a tag is enabled given the current settings
+     */
+    boolean isEnabled(String tag);
+
+    /**
      * Create the gui for this connector and fill with the current values or
      * defaults if it is not set yet. This is called client-side.
      */

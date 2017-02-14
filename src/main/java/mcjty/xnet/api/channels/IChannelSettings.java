@@ -14,6 +14,11 @@ public interface IChannelSettings {
     void writeToNBT(NBTTagCompound tag);
 
     /**
+     * Return true if a tag is enabled given the current settings
+     */
+    boolean isEnabled(String tag);
+
+    /**
      * Create the gui for this channel and fill with the current values or
      * defaults if it is not set yet. This is called client-side.
      */

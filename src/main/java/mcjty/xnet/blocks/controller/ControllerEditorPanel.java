@@ -1,9 +1,13 @@
 package mcjty.xnet.blocks.controller;
 
 import mcjty.lib.gui.widgets.Panel;
+import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.network.Argument;
+import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.logic.SidedPos;
 import net.minecraft.client.Minecraft;
+
+import java.util.Map;
 
 public class ControllerEditorPanel extends AbstractEditorPanel {
 
@@ -25,5 +29,11 @@ public class ControllerEditorPanel extends AbstractEditorPanel {
         super(panel, mc, gui);
         this.channel = channel;
         this.sidedPos = sidedPos;
+    }
+
+    public void setState(IConnectorSettings settings) {
+        for (Map.Entry<String, Widget> entry : components.entrySet()) {
+            entry.getValue().setEnabled(settings.isEnabled(entry.getKey()));
+        }
     }
 }
