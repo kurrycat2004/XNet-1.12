@@ -5,7 +5,7 @@ import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.controller.TileEntityController;
 import mcjty.xnet.blocks.generic.GenericCableBlock;
 import mcjty.xnet.blocks.generic.GenericCableISBM;
-import mcjty.xnet.multiblock.ConsumerId;
+import mcjty.xnet.api.keys.ConsumerId;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
 import net.minecraft.block.Block;

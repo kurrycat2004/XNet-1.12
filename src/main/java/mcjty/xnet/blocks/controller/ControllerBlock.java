@@ -7,7 +7,7 @@ import mcjty.theoneprobe.api.ProbeMode;
 import mcjty.theoneprobe.api.TextStyleClass;
 import mcjty.xnet.blocks.generic.GenericXNetBlock;
 import mcjty.xnet.gui.GuiProxy;
-import mcjty.xnet.multiblock.NetworkId;
+import mcjty.xnet.api.keys.NetworkId;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
 import net.minecraft.block.material.Material;

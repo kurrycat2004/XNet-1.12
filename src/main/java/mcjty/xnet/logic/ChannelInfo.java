@@ -3,11 +3,11 @@ package mcjty.xnet.logic;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelSettings;
 import mcjty.xnet.api.channels.IChannelType;
-import mcjty.xnet.multiblock.ConsumerId;
+import mcjty.xnet.api.keys.SidedConsumer;
+import mcjty.xnet.api.keys.ConsumerId;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.HashMap;

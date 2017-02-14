@@ -1,6 +1,8 @@
 package mcjty.xnet.multiblock;
 
 import mcjty.lib.varia.BlockPosTools;
+import mcjty.xnet.api.keys.ConsumerId;
+import mcjty.xnet.api.keys.NetworkId;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagIntArray;
 import net.minecraft.util.math.BlockPos;

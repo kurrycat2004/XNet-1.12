@@ -4,7 +4,7 @@ import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.network.Argument;
 import mcjty.xnet.api.channels.IConnectorSettings;
-import mcjty.xnet.logic.SidedPos;
+import mcjty.xnet.api.keys.SidedPos;
 import net.minecraft.client.Minecraft;
 
 import java.util.Map;

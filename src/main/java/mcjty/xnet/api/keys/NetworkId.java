@@ -1,13 +1,14 @@
-package mcjty.xnet.multiblock;
+package mcjty.xnet.api.keys;
 
 /**
- * This is a global ID representing a consumer.
+ * This is a global ID representing a network. It is given by network providers.
+ * In a chunk network ID's are coupled with blob ID's.
  */
-public class ConsumerId {
+public class NetworkId {
 
     private final int id;
 
-    public ConsumerId(int id) {
+    public NetworkId(int id) {
         this.id = id;
     }
 
@@ -20,7 +21,7 @@ public class ConsumerId {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ConsumerId blobId = (ConsumerId) o;
+        NetworkId blobId = (NetworkId) o;
 
         if (id != blobId.id) return false;
 

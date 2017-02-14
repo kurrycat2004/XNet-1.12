@@ -1,6 +1,5 @@
-package mcjty.xnet.logic;
+package mcjty.xnet.api.keys;
 
-import mcjty.xnet.multiblock.ConsumerId;
 import net.minecraft.util.EnumFacing;
 
 import javax.annotation.Nonnull;

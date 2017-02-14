@@ -1,4 +1,4 @@
-package mcjty.xnet.logic;
+package mcjty.xnet.api.keys;
 
 import mcjty.lib.varia.BlockPosTools;
 import net.minecraft.util.EnumFacing;

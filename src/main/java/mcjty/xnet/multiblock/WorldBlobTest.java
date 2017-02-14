@@ -1,5 +1,6 @@
 package mcjty.xnet.multiblock;
 
+import mcjty.xnet.api.keys.NetworkId;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;

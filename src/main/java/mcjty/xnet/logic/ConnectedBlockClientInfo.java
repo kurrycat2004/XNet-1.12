@@ -2,6 +2,7 @@ package mcjty.xnet.logic;
 
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.network.NetworkTools;
+import mcjty.xnet.api.keys.SidedPos;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 

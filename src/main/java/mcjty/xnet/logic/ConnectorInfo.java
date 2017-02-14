@@ -2,6 +2,7 @@ package mcjty.xnet.logic;
 
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.api.channels.IConnectorSettings;
+import mcjty.xnet.api.keys.SidedConsumer;
 import net.minecraft.nbt.NBTTagCompound;
 
 public class ConnectorInfo {
