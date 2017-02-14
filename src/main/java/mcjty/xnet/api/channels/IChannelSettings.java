@@ -2,6 +2,7 @@ package mcjty.xnet.api.channels;
 
 import net.minecraft.nbt.NBTTagCompound;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
 /**
@@ -12,6 +13,19 @@ public interface IChannelSettings {
     void readFromNBT(NBTTagCompound tag);
 
     void writeToNBT(NBTTagCompound tag);
+
+    /**
+     * Return an optional indicator icon
+     */
+    @Nullable
+    IndicatorIcon getIndicatorIcon();
+
+    /**
+     * Return a one-char indicator of the current status. If this is
+     * present it is drawn on top of the existing icon.
+     */
+    @Nullable
+    String getIndicator();
 
     /**
      * Return true if a tag is enabled given the current settings

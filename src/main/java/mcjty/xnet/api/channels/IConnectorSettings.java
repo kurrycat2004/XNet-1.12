@@ -2,6 +2,7 @@ package mcjty.xnet.api.channels;
 
 import net.minecraft.nbt.NBTTagCompound;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
 /**
@@ -19,8 +20,16 @@ public interface IConnectorSettings {
     void writeToNBT(NBTTagCompound tag);
 
     /**
-     * Return a one-char indicator of the current status
+     * Return an optional indicator icon
      */
+    @Nullable
+    IndicatorIcon getIndicatorIcon();
+
+    /**
+     * Return a one-char indicator of the current status. If this is
+     * present it is drawn on top of the existing icon.
+     */
+    @Nullable
     String getIndicator();
 
     /**

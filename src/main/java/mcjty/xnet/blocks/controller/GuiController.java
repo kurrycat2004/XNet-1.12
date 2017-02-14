@@ -16,6 +16,7 @@ import mcjty.lib.network.Argument;
 import mcjty.lib.varia.RedstoneMode;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelType;
+import mcjty.xnet.api.channels.IndicatorIcon;
 import mcjty.xnet.gui.GuiProxy;
 import mcjty.xnet.logic.*;
 import mcjty.xnet.network.PacketGetChannels;
@@ -57,7 +58,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     private EnergyBar energyBar;
     private ImageChoiceLabel redstoneMode;
 
-    static final ResourceLocation iconGuiElements = new ResourceLocation(XNet.MODID, "textures/gui/guielements.png");
+    public static final ResourceLocation iconGuiElements = new ResourceLocation(XNet.MODID, "textures/gui/guielements.png");
     private static final ResourceLocation mainBackground = new ResourceLocation(XNet.MODID, "textures/gui/controller.png");
     private static final ResourceLocation sideBackground = new ResourceLocation(XNet.MODID, "textures/gui/sidegui.png");
 
@@ -364,7 +365,6 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                 panel.addChild(new BlockRender(mc, this).setRenderItem(connectedBlock.getConnectedBlock()));
                 prevPos = coordinate;
             }
-//            panel.addChild(new Label(mc, this).setText(displayName).setColor(color).setHorizontalAlignment(HorizontalAlignment.ALIGH_LEFT).setDesiredWidth(90));
             panel.addChild(new Label(mc, this).setText(sidedPos.getSide().getName().substring(0, 1).toUpperCase()).setColor(color).setDesiredWidth(18));
             for (int i = 0 ; i < MAX_CHANNELS ; i++) {
                 Button but = new Button(mc, this).setDesiredWidth(14);
@@ -372,10 +372,14 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                 if (info != null) {
                     ConnectorClientInfo clientInfo = findClientInfo(info, sidedPos);
                     if (clientInfo != null) {
-                        but.setText(clientInfo.getConnectorSettings().getIndicator());
+                        IndicatorIcon icon = clientInfo.getConnectorSettings().getIndicatorIcon();
+                        if (icon != null) {
+                            but.setImage(icon.getImage(), icon.getU(), icon.getV(), icon.getIw(), icon.getIh());
+                        }
+                        String indicator = clientInfo.getConnectorSettings().getIndicator();
+                        but.setText(indicator != null ? indicator : "");
                     }
                 }
-//                but.setPressed(editingChannel == i && sidedPos.equals(editingConnector));
                 int finalI = i;
                 but.addButtonEvent(parent -> {
                     selectConnectorEditor(sidedPos, finalI);
@@ -403,7 +407,16 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                 String channel = String.valueOf(i + 1);
                 ChannelClientInfo info = fromServer_channels.get(i);
                 if (info != null) {
-                    channelButtons[i].setText(info.getType().getName().substring(0, 1).toUpperCase() + channel);
+                    IndicatorIcon icon = info.getChannelSettings().getIndicatorIcon();
+                    if (icon != null) {
+                        channelButtons[i].setImage(icon.getImage(), icon.getU(), icon.getV(), icon.getIw(), icon.getIh());
+                    }
+                    String indicator = info.getChannelSettings().getIndicator();
+                    if (indicator != null) {
+                        channelButtons[i].setText(indicator + channel);
+                    } else {
+                        channelButtons[i].setText(channel);
+                    }
                 } else {
                     channelButtons[i].setText(channel);
                 }

@@ -2,8 +2,12 @@ package mcjty.xnet.apiimpl;
 
 import mcjty.xnet.api.channels.IChannelSettings;
 import mcjty.xnet.api.channels.IEditorGui;
+import mcjty.xnet.api.channels.IndicatorIcon;
+import mcjty.xnet.blocks.controller.GuiController;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
 public class ItemChannelSettings implements IChannelSettings {
@@ -39,6 +43,18 @@ public class ItemChannelSettings implements IChannelSettings {
     @Override
     public boolean isEnabled(String tag) {
         return true;
+    }
+
+    @Nullable
+    @Override
+    public IndicatorIcon getIndicatorIcon() {
+        return new IndicatorIcon(GuiController.iconGuiElements, 0, 80, 10, 10);
+    }
+
+    @Nullable
+    @Override
+    public String getIndicator() {
+        return null;
     }
 
     @Override

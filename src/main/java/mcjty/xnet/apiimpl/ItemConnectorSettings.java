@@ -3,7 +3,9 @@ package mcjty.xnet.apiimpl;
 import com.google.common.collect.ImmutableSet;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.channels.IEditorGui;
+import mcjty.xnet.api.channels.IndicatorIcon;
 import mcjty.xnet.api.channels.RSMode;
+import mcjty.xnet.blocks.controller.GuiController;
 import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nullable;
@@ -86,9 +88,22 @@ public class ItemConnectorSettings implements IConnectorSettings {
         return true;
     }
 
+    @Nullable
     @Override
+    public IndicatorIcon getIndicatorIcon() {
+        switch (itemMode) {
+            case INSERT:
+                return new IndicatorIcon(GuiController.iconGuiElements, 0, 70, 10, 10);
+            case EXTRACT:
+                return new IndicatorIcon(GuiController.iconGuiElements, 10, 70, 10, 10);
+        }
+        return null;
+    }
+
+    @Override
+    @Nullable
     public String getIndicator() {
-        return itemMode.name().substring(0, 1);
+        return null;
     }
 
     @Override
