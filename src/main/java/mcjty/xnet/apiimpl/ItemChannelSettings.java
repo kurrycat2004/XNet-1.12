@@ -43,7 +43,7 @@ public class ItemChannelSettings implements IChannelSettings {
 
     @Override
     public void createGui(IEditorGui gui) {
-        gui.nl().choices(TAG_MODE, channelMode, ChannelMode.values());
+        gui.nl().choices(TAG_MODE, "Item distribution mode", channelMode, ChannelMode.values());
     }
 
     @Override

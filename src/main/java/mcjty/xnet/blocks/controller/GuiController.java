@@ -235,7 +235,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                     ChannelEditorPanel editor = new ChannelEditorPanel(channelEditPanel, mc, this, editingChannel);
                     editor.label("Channel " + (editingChannel + 1))
                             .shift(10)
-                            .toggle(TAG_ENABLED, true);
+                            .toggle(TAG_ENABLED, "Enable processing on this channel", true);
                     info.getChannelSettings().createGui(editor);
 
                     Button remove = new Button(mc, this).setText("x")
@@ -293,7 +293,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                             .addButtonEvent(parent -> removeConnector(editingConnector));
 
                     ControllerEditorPanel editor = new ControllerEditorPanel(connectorEditPanel, mc, this, editingChannel, editingConnector);
-                    editor.choices(TAG_FACING, side, EnumFacing.values());
+                    editor.choices(TAG_FACING, "Side from which to operate", side, EnumFacing.values());
 
                     connectorInfo.getConnectorSettings().createGui(editor);
                     connectorEditPanel.addChild(remove);

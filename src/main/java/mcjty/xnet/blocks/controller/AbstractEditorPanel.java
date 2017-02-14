@@ -87,10 +87,11 @@ public abstract class AbstractEditorPanel implements IEditorGui {
     }
 
     @Override
-    public IEditorGui text(String tag, String value) {
+    public IEditorGui text(String tag, String tooltip, String value) {
         int w = 45;
         fitWidth(w);
         TextField text = new TextField(mc, gui).setText(value)
+                .setTooltips(tooltip)
                 .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
         data.put(tag, value);
         text.addTextEnterEvent((parent, newText) -> update(tag, newText));
@@ -112,10 +113,11 @@ public abstract class AbstractEditorPanel implements IEditorGui {
     }
 
     @Override
-    public IEditorGui integer(String tag, Integer value) {
+    public IEditorGui integer(String tag, String tooltip, Integer value) {
         int w = 45;
         fitWidth(w);
         TextField text = new TextField(mc, gui).setText(value == null ? "" : value.toString())
+                .setTooltips(tag)
                 .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
         data.put(tag, value);
         text.addTextEnterEvent((parent, newText) -> update(tag, parseInt(newText)));
@@ -137,10 +139,11 @@ public abstract class AbstractEditorPanel implements IEditorGui {
     }
 
     @Override
-    public IEditorGui real(String tag, Double value) {
+    public IEditorGui real(String tag, String tooltip, Double value) {
         int w = 45;
         fitWidth(w);
         TextField text = new TextField(mc, gui).setText(value == null ? "" : value.toString())
+                .setTooltips(tooltip)
                 .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
         data.put(tag, value);
         text.addTextEnterEvent((parent, newText) -> update(tag, parseDouble(newText)));
@@ -151,10 +154,11 @@ public abstract class AbstractEditorPanel implements IEditorGui {
     }
 
     @Override
-    public IEditorGui toggle(String tag, boolean value) {
+    public IEditorGui toggle(String tag, String tooltip, boolean value) {
         int w = 12;
         fitWidth(w);
         ToggleButton toggle = new ToggleButton(mc, gui).setCheckMarker(true).setPressed(value)
+                .setTooltips(tooltip)
                 .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
         data.put(tag, value);
         toggle.addButtonEvent(parent -> update(tag, toggle.isPressed()));
@@ -165,13 +169,14 @@ public abstract class AbstractEditorPanel implements IEditorGui {
     }
 
     @Override
-    public IEditorGui choices(String tag, String current, String... values) {
+    public IEditorGui choices(String tag, String tooltip, String current, String... values) {
         int w = 10;
         for (String s : values) {
             w = Math.max(w, mc.fontRenderer.getStringWidth(s) + 15);
         }
         fitWidth(w);
         ChoiceLabel choice = new ChoiceLabel(mc, gui).addChoices(values).setChoice(current)
+                .setTooltips(tooltip)
                 .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
         data.put(tag, current);
         choice.addChoiceEvent((parent, newChoice) -> update(tag, newChoice));
@@ -182,13 +187,13 @@ public abstract class AbstractEditorPanel implements IEditorGui {
     }
 
     @Override
-    public <T extends Enum<T>> IEditorGui choices(String tag, T current, T... values) {
+    public <T extends Enum<T>> IEditorGui choices(String tag, String tooltip, T current, T... values) {
         String[] strings = new String[values.length];
         int i = 0;
         for (T s : values) {
             strings[i++] = StringUtils.capitalize(s.name().toLowerCase());
         }
-        return choices(tag, StringUtils.capitalize(current.name().toLowerCase()), strings);
+        return choices(tag, tooltip, StringUtils.capitalize(current.name().toLowerCase()), strings);
     }
 
     @Override

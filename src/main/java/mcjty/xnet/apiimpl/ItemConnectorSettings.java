@@ -10,8 +10,6 @@ import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
 
-import static mcjty.xnet.blocks.controller.GuiController.TAG_FACING;
-
 public class ItemConnectorSettings implements IConnectorSettings {
 
     public static final String TAG_ITEM = "item";
@@ -97,16 +95,17 @@ public class ItemConnectorSettings implements IConnectorSettings {
     public void createGui(IEditorGui gui) {
         gui
                 .shift(10)
-                .choices(TAG_ITEM, itemMode, ItemMode.values())
+                .choices(TAG_ITEM, "Insert or extract mode", itemMode, ItemMode.values())
                 .shift(10)
                 .redstoneMode(TAG_RS, rsMode).nl()
-                .label("OD").choices(TAG_OREDICT, oredictMode, OredictMode.values()).shift(10)
-                .label("Meta").choices(TAG_META, metaMode, MetaMode.values()).nl()
-                .label("Pri").integer(TAG_PRIORITY, priority).shift(10).label("Max").integer(TAG_MAX, maxAmount);
+                .label("Ore").choices(TAG_OREDICT, "If enabled the ore dictionary is used", oredictMode, OredictMode.values()).shift(10)
+                .label("Meta").choices(TAG_META, "If enabled then metadata must match", metaMode, MetaMode.values()).nl()
+                .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority).shift(10)
+                .label("Max").integer(TAG_MAX, "Maximum number to insert/keep", maxAmount);
     }
 
-    private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_FACING, TAG_ITEM, TAG_RS, TAG_MAX, TAG_PRIORITY);
-    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_FACING, TAG_ITEM, TAG_RS, TAG_OREDICT, TAG_META, TAG_MAX);
+    private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_ITEM, TAG_RS, TAG_MAX, TAG_PRIORITY);
+    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_ITEM, TAG_RS, TAG_OREDICT, TAG_META, TAG_MAX);
 
     @Override
     public boolean isEnabled(String tag) {
