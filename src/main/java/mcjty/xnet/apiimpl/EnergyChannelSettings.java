@@ -21,8 +21,7 @@ public class EnergyChannelSettings implements IChannelSettings {
     }
 
     @Override
-    public void tick(IControllerContext context) {
-
+    public void tick(int channel, IControllerContext context) {
     }
 
     @Override

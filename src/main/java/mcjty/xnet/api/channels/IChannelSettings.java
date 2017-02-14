@@ -19,7 +19,7 @@ public interface IChannelSettings {
     /**
      * Do a tick on this channel. This is called server-side
      */
-    void tick(IControllerContext context);
+    void tick(int channel, IControllerContext context);
 
     /**
      * Return an optional indicator icon

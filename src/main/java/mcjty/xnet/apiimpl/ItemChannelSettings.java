@@ -1,9 +1,11 @@
 package mcjty.xnet.apiimpl;
 
 import mcjty.xnet.api.channels.IChannelSettings;
+import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.channels.IControllerContext;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
+import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.blocks.controller.GuiController;
 import net.minecraft.nbt.NBTTagCompound;
 
@@ -41,8 +43,8 @@ public class ItemChannelSettings implements IChannelSettings {
     }
 
     @Override
-    public void tick(IControllerContext context) {
-
+    public void tick(int channel, IControllerContext context) {
+        Map<SidedConsumer, IConnectorSettings> connectors = context.getConnectors(channel);
     }
 
     @Override
