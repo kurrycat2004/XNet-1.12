@@ -14,7 +14,7 @@ import java.util.Set;
 
 public class ItemConnectorSettings implements IConnectorSettings {
 
-    public static final String TAG_ITEM = "item";
+    public static final String TAG_MODE = "mode";
     public static final String TAG_OREDICT = "od";
     public static final String TAG_RS = "rs";
     public static final String TAG_META = "meta";
@@ -110,7 +110,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
     public void createGui(IEditorGui gui) {
         gui
                 .shift(10)
-                .choices(TAG_ITEM, "Insert or extract mode", itemMode, ItemMode.values())
+                .choices(TAG_MODE, "Insert or extract mode", itemMode, ItemMode.values())
                 .shift(10)
                 .redstoneMode(TAG_RS, rsMode).nl()
                 .label("Ore").choices(TAG_OREDICT, "If enabled the ore dictionary is used", oredictMode, OredictMode.values()).shift(10)
@@ -119,8 +119,8 @@ public class ItemConnectorSettings implements IConnectorSettings {
                 .label("Max").integer(TAG_MAX, "Maximum number to insert/keep", maxAmount);
     }
 
-    private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_ITEM, TAG_RS, TAG_MAX, TAG_PRIORITY);
-    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_ITEM, TAG_RS, TAG_OREDICT, TAG_META, TAG_MAX);
+    private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_MAX, TAG_PRIORITY);
+    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_OREDICT, TAG_META, TAG_MAX);
 
     @Override
     public boolean isEnabled(String tag) {
@@ -133,7 +133,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
 
     @Override
     public void update(Map<String, Object> data) {
-        itemMode = ItemMode.valueOf(((String)data.get(TAG_ITEM)).toUpperCase());
+        itemMode = ItemMode.valueOf(((String)data.get(TAG_MODE)).toUpperCase());
         oredictMode = OredictMode.valueOf(((String)data.get(TAG_OREDICT)).toUpperCase());
         metaMode = MetaMode.valueOf(((String)data.get(TAG_META)).toUpperCase());
         rsMode = RSMode.valueOf(((String)data.get(TAG_RS)).toUpperCase());

@@ -240,6 +240,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                     info.getChannelSettings().createGui(editor);
 
                     Button remove = new Button(mc, this).setText("x")
+                            .setTextOffset(0, -1)
                             .setTooltips("Remove this channel")
                             .setLayoutHint(new PositionalLayout.PositionalHint(151, 1, 9, 10))
                             .addButtonEvent(parent -> removeChannel());
@@ -289,6 +290,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                     ConnectorClientInfo connectorInfo = info.getConnectors().get(sidedConsumer);
 
                     Button remove = new Button(mc, this).setText("x")
+                            .setTextOffset(0, -1)
                             .setTooltips("Remove this connector")
                             .setLayoutHint(new PositionalLayout.PositionalHint(151, 1, 9, 10))
                             .addButtonEvent(parent -> removeConnector(editingConnector));
@@ -418,6 +420,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                         channelButtons[i].setText(channel);
                     }
                 } else {
+                    channelButtons[i].setImage(null, 0, 0, 0, 0);
                     channelButtons[i].setText(channel);
                 }
             }
