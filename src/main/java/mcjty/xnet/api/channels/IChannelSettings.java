@@ -1,5 +1,7 @@
 package mcjty.xnet.api.channels;
 
+import mcjty.xnet.api.gui.IEditorGui;
+import mcjty.xnet.api.gui.IndicatorIcon;
 import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nullable;
@@ -13,6 +15,11 @@ public interface IChannelSettings {
     void readFromNBT(NBTTagCompound tag);
 
     void writeToNBT(NBTTagCompound tag);
+
+    /**
+     * Do a tick on this channel. This is called server-side
+     */
+    void tick(IControllerContext context);
 
     /**
      * Return an optional indicator icon

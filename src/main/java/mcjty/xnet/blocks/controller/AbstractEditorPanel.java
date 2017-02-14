@@ -5,7 +5,7 @@ import mcjty.lib.gui.widgets.*;
 import mcjty.lib.network.Argument;
 import mcjty.lib.network.ArgumentType;
 import mcjty.lib.varia.RedstoneMode;
-import mcjty.xnet.api.channels.IEditorGui;
+import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.channels.RSMode;
 import mcjty.xnet.network.XNetMessages;
 import net.minecraft.client.Minecraft;

@@ -7,6 +7,7 @@ import mcjty.lib.network.Argument;
 import mcjty.typed.Type;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelType;
+import mcjty.xnet.api.channels.IControllerContext;
 import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.logic.*;
 import mcjty.xnet.multiblock.ConsumerId;
@@ -19,6 +20,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nonnull;
@@ -26,7 +28,7 @@ import java.util.*;
 
 import static mcjty.xnet.logic.ChannelInfo.MAX_CHANNELS;
 
-public final class TileEntityController extends GenericEnergyReceiverTileEntity implements DefaultSidedInventory {
+public final class TileEntityController extends GenericEnergyReceiverTileEntity implements DefaultSidedInventory, ITickable, IControllerContext {
 
     public static final String CMD_GETCHANNELS = "getChannelInfo";
     public static final String CLIENTCMD_CHANNELSREADY = "channelsReady";
@@ -60,6 +62,17 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     public void setNetworkId(NetworkId networkId) {
         this.networkId = networkId;
         markDirty();
+    }
+
+    @Override
+    public void update() {
+        if (!getWorld().isRemote) {
+            for (int i = 0 ; i < MAX_CHANNELS ; i++) {
+                if (channels[i] != null) {
+                    channels[i].getChannelSettings().tick(this);
+                }
+            }
+        }
     }
 
     @Override

@@ -1,11 +1,11 @@
 package mcjty.xnet.apiimpl;
 
 import mcjty.xnet.api.channels.IChannelSettings;
-import mcjty.xnet.api.channels.IEditorGui;
-import mcjty.xnet.api.channels.IndicatorIcon;
+import mcjty.xnet.api.channels.IControllerContext;
+import mcjty.xnet.api.gui.IEditorGui;
+import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.blocks.controller.GuiController;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -38,6 +38,11 @@ public class ItemChannelSettings implements IChannelSettings {
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         tag.setByte("mode", (byte) channelMode.ordinal());
+    }
+
+    @Override
+    public void tick(IControllerContext context) {
+
     }
 
     @Override

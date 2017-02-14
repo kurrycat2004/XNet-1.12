@@ -2,8 +2,8 @@ package mcjty.xnet.apiimpl;
 
 import com.google.common.collect.ImmutableSet;
 import mcjty.xnet.api.channels.IConnectorSettings;
-import mcjty.xnet.api.channels.IEditorGui;
-import mcjty.xnet.api.channels.IndicatorIcon;
+import mcjty.xnet.api.gui.IEditorGui;
+import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.channels.RSMode;
 import mcjty.xnet.blocks.controller.GuiController;
 import net.minecraft.nbt.NBTTagCompound;

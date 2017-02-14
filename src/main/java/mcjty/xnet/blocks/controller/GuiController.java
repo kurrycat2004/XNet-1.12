@@ -16,7 +16,7 @@ import mcjty.lib.network.Argument;
 import mcjty.lib.varia.RedstoneMode;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelType;
-import mcjty.xnet.api.channels.IndicatorIcon;
+import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.gui.GuiProxy;
 import mcjty.xnet.logic.*;
 import mcjty.xnet.network.PacketGetChannels;

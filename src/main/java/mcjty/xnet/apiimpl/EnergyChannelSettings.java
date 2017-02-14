@@ -1,8 +1,9 @@
 package mcjty.xnet.apiimpl;
 
 import mcjty.xnet.api.channels.IChannelSettings;
-import mcjty.xnet.api.channels.IEditorGui;
-import mcjty.xnet.api.channels.IndicatorIcon;
+import mcjty.xnet.api.channels.IControllerContext;
+import mcjty.xnet.api.gui.IEditorGui;
+import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.blocks.controller.GuiController;
 import net.minecraft.nbt.NBTTagCompound;
 
@@ -17,6 +18,11 @@ public class EnergyChannelSettings implements IChannelSettings {
 
     @Override
     public void writeToNBT(NBTTagCompound tag) {
+    }
+
+    @Override
+    public void tick(IControllerContext context) {
+
     }
 
     @Override

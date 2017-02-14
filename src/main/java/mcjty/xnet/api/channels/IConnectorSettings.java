@@ -1,5 +1,7 @@
 package mcjty.xnet.api.channels;
 
+import mcjty.xnet.api.gui.IEditorGui;
+import mcjty.xnet.api.gui.IndicatorIcon;
 import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nullable;

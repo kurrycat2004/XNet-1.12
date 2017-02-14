@@ -1,4 +1,6 @@
-package mcjty.xnet.api.channels;
+package mcjty.xnet.api.gui;
+
+import mcjty.xnet.api.channels.RSMode;
 
 public interface IEditorGui {
 

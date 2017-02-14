@@ -1,4 +1,4 @@
-package mcjty.xnet.api.channels;
+package mcjty.xnet.api.gui;
 
 import net.minecraft.util.ResourceLocation;
 
