@@ -10,6 +10,10 @@ public interface IEditorGui {
 
     IEditorGui text(String tag, String value);
 
+    IEditorGui integer(String tag, Integer value);
+
+    IEditorGui real(String tag, Double value);
+
     IEditorGui toggle(String tag, boolean value);
 
     IEditorGui choices(String tag, String current, String... values);

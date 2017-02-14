@@ -6,6 +6,7 @@ import mcjty.xnet.api.channels.IEditorGui;
 import mcjty.xnet.api.channels.RSMode;
 import net.minecraft.nbt.NBTTagCompound;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,6 +40,8 @@ public class ItemConnectorSettings implements IConnectorSettings {
     private OredictMode oredictMode = OredictMode.OFF;
     private MetaMode metaMode = MetaMode.OFF;
     private RSMode rsMode = RSMode.IGNORED;
+    @Nullable private Integer priority = 0;
+    @Nullable private Integer maxAmount = null;
 
     public ItemMode getItemMode() {
         return itemMode;
@@ -64,6 +67,22 @@ public class ItemConnectorSettings implements IConnectorSettings {
         this.metaMode = metaMode;
     }
 
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
+        this.priority = priority;
+    }
+
+    public Integer getMaxAmount() {
+        return maxAmount;
+    }
+
+    public void setMaxAmount(Integer maxAmount) {
+        this.maxAmount = maxAmount;
+    }
+
     @Override
     public boolean supportsGhostSlots() {
         return true;
@@ -83,7 +102,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
                 .redstoneMode(TAG_RS, rsMode).nl()
                 .label("OD").choices(TAG_OREDICT, oredictMode, OredictMode.values()).shift(10)
                 .label("Meta").choices(TAG_META, metaMode, MetaMode.values()).nl()
-                .label("Pri").text(TAG_PRIORITY, "1").shift(10).label("Max").text(TAG_MAX, "");
+                .label("Pri").integer(TAG_PRIORITY, priority).shift(10).label("Max").integer(TAG_MAX, maxAmount);
     }
 
     private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_FACING, TAG_ITEM, TAG_RS, TAG_MAX, TAG_PRIORITY);
@@ -104,6 +123,8 @@ public class ItemConnectorSettings implements IConnectorSettings {
         oredictMode = OredictMode.valueOf(((String)data.get(TAG_OREDICT)).toUpperCase());
         metaMode = MetaMode.valueOf(((String)data.get(TAG_META)).toUpperCase());
         rsMode = RSMode.valueOf(((String)data.get(TAG_RS)).toUpperCase());
+        priority = (Integer) data.get(TAG_PRIORITY);
+        maxAmount = (Integer) data.get(TAG_MAX);
     }
 
     @Override
@@ -112,6 +133,16 @@ public class ItemConnectorSettings implements IConnectorSettings {
         oredictMode = OredictMode.values()[tag.getByte("oredictMode")];
         metaMode = MetaMode.values()[tag.getByte("metaMode")];
         rsMode = RSMode.values()[tag.getByte("rsMode")];
+        if (tag.hasKey("priority")) {
+            priority = tag.getInteger("priority");
+        } else {
+            priority = null;
+        }
+        if (tag.hasKey("max")) {
+            maxAmount = tag.getInteger("max");
+        } else {
+            maxAmount = null;
+        }
     }
 
     @Override
@@ -120,5 +151,11 @@ public class ItemConnectorSettings implements IConnectorSettings {
         tag.setByte("oredictMode", (byte) oredictMode.ordinal());
         tag.setByte("metaMode", (byte) metaMode.ordinal());
         tag.setByte("rsMode", (byte) rsMode.ordinal());
+        if (priority != null) {
+            tag.setInteger("priority", priority);
+        }
+        if (maxAmount != null) {
+            tag.setInteger("max", maxAmount);
+        }
     }
 }

@@ -51,4 +51,9 @@ public class SidedConsumer {
         result = 31 * result + (side != null ? side.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "SidedConsumer{id=" + consumerId + "/" + side + '}';
+    }
 }

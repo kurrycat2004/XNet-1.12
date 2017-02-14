@@ -38,6 +38,8 @@ public abstract class AbstractEditorPanel implements IEditorGui {
                 args[i++] = new Argument(entry.getKey(), ArgumentType.TYPE_BOOLEAN, o);
             } else if (o instanceof Double) {
                 args[i++] = new Argument(entry.getKey(), ArgumentType.TYPE_DOUBLE, o);
+            } else {
+                args[i++] = new Argument(entry.getKey(), ArgumentType.TYPE_STRING, o);
             }
         }
 
@@ -92,6 +94,56 @@ public abstract class AbstractEditorPanel implements IEditorGui {
                 .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
         data.put(tag, value);
         text.addTextEnterEvent((parent, newText) -> update(tag, newText));
+        panel.addChild(text);
+        components.put(tag, text);
+        x += w;
+        return this;
+    }
+
+    private Integer parseInt(String i) {
+        if (i == null || i.isEmpty()) {
+            return null;
+        }
+        try {
+            return Integer.parseInt(i);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public IEditorGui integer(String tag, Integer value) {
+        int w = 45;
+        fitWidth(w);
+        TextField text = new TextField(mc, gui).setText(value == null ? "" : value.toString())
+                .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
+        data.put(tag, value);
+        text.addTextEnterEvent((parent, newText) -> update(tag, parseInt(newText)));
+        panel.addChild(text);
+        components.put(tag, text);
+        x += w;
+        return this;
+    }
+
+    private Double parseDouble(String i) {
+        if (i == null || i.isEmpty()) {
+            return null;
+        }
+        try {
+            return Double.parseDouble(i);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public IEditorGui real(String tag, Double value) {
+        int w = 45;
+        fitWidth(w);
+        TextField text = new TextField(mc, gui).setText(value == null ? "" : value.toString())
+                .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
+        data.put(tag, value);
+        text.addTextEnterEvent((parent, newText) -> update(tag, parseDouble(newText)));
         panel.addChild(text);
         components.put(tag, text);
         x += w;

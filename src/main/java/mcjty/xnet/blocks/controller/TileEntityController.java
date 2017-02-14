@@ -142,7 +142,6 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                     IBlockState state = getWorld().getBlockState(pos);
                     ItemStack item = state.getBlock().getItem(getWorld(), pos, state);
                     ConnectedBlockClientInfo info = new ConnectedBlockClientInfo(sidedPos, item);
-                    System.out.println("findConnectedBlocks: sidedPos = " + sidedPos);
                     set.add(info);
                 }
             }
@@ -176,7 +175,6 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                         SidedPos pos = new SidedPos(consumerPos.offset(sidedConsumer.getSide()), sidedConsumer.getSide().getOpposite());
                         ConnectorClientInfo ci = new ConnectorClientInfo(pos, sidedConsumer.getConsumerId(), channel.getType(), info.getConnectorSettings());
                         clientInfo.getConnectors().put(sidedConsumer, ci);
-                        System.out.println("findChannelInfo: sidedPos = " + pos);
                     }
                 }
 
@@ -213,7 +211,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         ConsumerId consumerId = worldBlob.getConsumerAt(pos.getPos().offset(pos.getSide()));
         for (Map.Entry<SidedConsumer, ConnectorInfo> entry : channels[channel].getConnectors().entrySet()) {
             SidedConsumer key = entry.getKey();
-            if (key.getConsumerId().equals(consumerId)) {
+            if (key.getConsumerId().equals(consumerId) && key.getSide().getOpposite().equals(pos.getSide())) {
                 Map<String, Object> data = new HashMap<>();
                 for (Map.Entry<String, Argument> e : args.entrySet()) {
                     data.put(e.getKey(), e.getValue().getValue());
