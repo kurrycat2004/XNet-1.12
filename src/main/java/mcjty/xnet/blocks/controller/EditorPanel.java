@@ -1,28 +1,68 @@
 package mcjty.xnet.blocks.controller;
 
+import mcjty.lib.container.GenericGuiContainer;
 import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.gui.widgets.*;
+import mcjty.lib.network.Argument;
+import mcjty.lib.network.ArgumentType;
 import mcjty.lib.varia.RedstoneMode;
 import mcjty.xnet.api.channels.IEditorGui;
+import mcjty.xnet.api.channels.RSMode;
+import mcjty.xnet.logic.SidedPos;
+import mcjty.xnet.network.XNetMessages;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class EditorPanel implements IEditorGui {
 
     private final Panel panel;
     private final Minecraft mc;
-    private final Gui gui;
+    private final GuiController gui;
+    private final Map<String, Object> data;
+
+    private final int channel;
+    private final SidedPos sidedPos;
 
     private int x;
     private int y;
 
-    public EditorPanel(Panel panel, Minecraft mc, Gui gui) {
+    private void update(String tag, Object value) {
+        data.put(tag, value);
+        Argument[] args = new Argument[data.size() + 3];
+        int i = 0;
+        args[i++] = new Argument("pos", sidedPos.getPos());
+        args[i++] = new Argument("side", sidedPos.getSide().ordinal());
+        args[i++] = new Argument("channel", channel);
+
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+            Object o = entry.getValue();
+            if (o instanceof String) {
+                args[i++] = new Argument(entry.getKey(), ArgumentType.TYPE_STRING, o);
+            } else if (o instanceof Integer) {
+                args[i++] = new Argument(entry.getKey(), ArgumentType.TYPE_INTEGER, o);
+            } else if (o instanceof Boolean) {
+                args[i++] = new Argument(entry.getKey(), ArgumentType.TYPE_BOOLEAN, o);
+            } else if (o instanceof Double) {
+                args[i++] = new Argument(entry.getKey(), ArgumentType.TYPE_DOUBLE, o);
+            }
+        }
+
+        gui.sendServerCommand(XNetMessages.INSTANCE, TileEntityController.CMD_UPDATECONNECTOR, args);
+        gui.refresh();
+    }
+
+    public EditorPanel(Panel panel, Minecraft mc, GuiController gui, int channel, SidedPos sidedPos) {
         this.panel = panel;
         this.mc = mc;
         this.gui = gui;
+        this.channel = channel;
+        this.sidedPos = sidedPos;
         x = 4;
         y = 3;
+        data = new HashMap<>();
     }
 
     @Override
@@ -56,29 +96,33 @@ public class EditorPanel implements IEditorGui {
     }
 
     @Override
-    public IEditorGui text(String value) {
+    public IEditorGui text(String tag, String value) {
         int w = 60;
         fitWidth(w);
         TextField text = new TextField(mc, gui).setText(value)
                 .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
+        data.put(tag, value);
+        text.addTextEnterEvent((parent, newText) -> update(tag, newText));
         panel.addChild(text);
         x += w;
         return this;
     }
 
     @Override
-    public IEditorGui toggle(boolean value) {
+    public IEditorGui toggle(String tag, boolean value) {
         int w = 20;
         fitWidth(20);
         ToggleButton toggle = new ToggleButton(mc, gui).setCheckMarker(true).setPressed(value)
                 .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
+        data.put(tag, value);
+        toggle.addButtonEvent(parent -> update(tag, toggle.isPressed()));
         panel.addChild(toggle);
         x += w;
         return this;
     }
 
     @Override
-    public IEditorGui choices(String current, String... values) {
+    public IEditorGui choices(String tag, String current, String... values) {
         int w = 10;
         for (String s : values) {
             w = Math.max(w, mc.fontRenderer.getStringWidth(s) + 10);
@@ -86,30 +130,45 @@ public class EditorPanel implements IEditorGui {
         fitWidth(w);
         ChoiceLabel choice = new ChoiceLabel(mc, gui).addChoices(values).setChoice(current)
                 .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
+        data.put(tag, current);
+        choice.addChoiceEvent((parent, newChoice) -> update(tag, newChoice));
         panel.addChild(choice);
         x += w;
         return this;
     }
 
     @Override
-    public <T extends Enum<T>> IEditorGui choices(T current, T... values) {
+    public <T extends Enum<T>> IEditorGui choices(String tag, T current, T... values) {
         String[] strings = new String[values.length];
         int i = 0;
         for (T s : values) {
             strings[i++] = StringUtils.capitalize(s.name().toLowerCase());
         }
-        return choices(StringUtils.capitalize(current.name().toLowerCase()), strings);
+        return choices(tag, StringUtils.capitalize(current.name().toLowerCase()), strings);
     }
 
     @Override
-    public IEditorGui redstoneMode(Object current) {
+    public IEditorGui redstoneMode(String tag, RSMode current) {
         int w = 16;
         fitWidth(w);
         ImageChoiceLabel redstoneMode = new ImageChoiceLabel(mc, gui)
                 .addChoice(RedstoneMode.REDSTONE_IGNORED.getDescription(), "Redstone mode:\nIgnored", GuiController.iconGuiElements, 0, 0)
                 .addChoice(RedstoneMode.REDSTONE_OFFREQUIRED.getDescription(), "Redstone mode:\nOff to activate", GuiController.iconGuiElements, 16, 0)
                 .addChoice(RedstoneMode.REDSTONE_ONREQUIRED.getDescription(), "Redstone mode:\nOn to activate", GuiController.iconGuiElements, 32, 0);
+        switch (current) {
+            case IGNORED:
+                redstoneMode.setCurrentChoice(RedstoneMode.REDSTONE_IGNORED.getDescription());
+                break;
+            case OFF:
+                redstoneMode.setCurrentChoice(RedstoneMode.REDSTONE_OFFREQUIRED.getDescription());
+                break;
+            case ON:
+                redstoneMode.setCurrentChoice(RedstoneMode.REDSTONE_ONREQUIRED.getDescription());
+                break;
+        }
         redstoneMode.setLayoutHint(new PositionalLayout.PositionalHint(x, y-1, w, 16));
+        data.put(tag, current.name());
+        redstoneMode.addChoiceEvent((parent, newChoice) -> update(tag, newChoice));
         panel.addChild(redstoneMode);
         x += w;
         return this;

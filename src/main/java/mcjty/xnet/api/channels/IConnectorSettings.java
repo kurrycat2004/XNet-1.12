@@ -2,6 +2,8 @@ package mcjty.xnet.api.channels;
 
 import net.minecraft.nbt.NBTTagCompound;
 
+import java.util.Map;
+
 /**
  * Channel type specific connector settings
  */
@@ -18,7 +20,18 @@ public interface IConnectorSettings {
 
     /**
      * Create the gui for this connector and fill with the current values or
-     * defaults if it is not set yet
+     * defaults if it is not set yet. This is called client-side.
      */
     void createGui(IEditorGui gui);
+
+    /**
+     * Return a one-char indicator of the current status
+     */
+    String getIndicator();
+
+    /**
+     * If something changes on the gui then this will be called server
+     * side with a map for all gui components
+     */
+    void update(Map<String, Object> data);
 }

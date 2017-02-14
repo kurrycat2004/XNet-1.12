@@ -8,15 +8,15 @@ public interface IEditorGui {
 
     IEditorGui label(String txt);
 
-    IEditorGui text(String value);
+    IEditorGui text(String tag, String value);
 
-    IEditorGui toggle(boolean value);
+    IEditorGui toggle(String tag, boolean value);
 
-    IEditorGui choices(String current, String... values);
+    IEditorGui choices(String tag, String current, String... values);
 
-    <T extends Enum<T>> IEditorGui choices(T current, T... values);
+    <T extends Enum<T>> IEditorGui choices(String tag, T current, T... values);
 
-    IEditorGui redstoneMode(Object current);    // @todo type
+    IEditorGui redstoneMode(String tag, RSMode current);
 
     IEditorGui nl();
 }

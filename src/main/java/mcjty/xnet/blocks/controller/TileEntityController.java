@@ -33,10 +33,12 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     public static final String CMD_GETCONNECTEDBLOCKS = "getConnectedBlocks";
     public static final String CLIENTCMD_CONNECTEDBLOCKSREADY = "connectedBlocksReady";
 
-    public static final String CMD_CREATECHANNEL = "createChannel";
     public static final String CMD_CREATECONNECTOR = "createConnector";
-    public static final String CMD_REMOVECHANNEL = "removeChannel";
     public static final String CMD_REMOVECONNECTOR = "removeConnector";
+    public static final String CMD_UPDATECONNECTOR = "updateConnector";
+
+    public static final String CMD_CREATECHANNEL = "createChannel";
+    public static final String CMD_REMOVECHANNEL = "removeChannel";
 
     private InventoryHelper inventoryHelper = new InventoryHelper(this, ControllerContainer.factory, ControllerContainer.COUNT_FILTER_SLOTS);
     private NetworkId networkId;
@@ -196,6 +198,23 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         markDirty();
     }
 
+    private void updateConnector(int channel, SidedPos pos, Map<String, Argument> args) {
+        WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
+        ConsumerId consumerId = worldBlob.getConsumerAt(pos.getPos().offset(pos.getSide()));
+        for (Map.Entry<SidedConsumer, ConnectorInfo> entry : channels[channel].getConnectors().entrySet()) {
+            SidedConsumer key = entry.getKey();
+            if (key.getConsumerId().equals(consumerId)) {
+                Map<String, Object> data = new HashMap<>();
+                for (Map.Entry<String, Argument> e : args.entrySet()) {
+                    data.put(e.getKey(), e.getValue().getValue());
+                }
+                channels[channel].getConnectors().get(key).getConnectorSettings().update(data);
+                markDirty();
+                return;
+            }
+        }
+    }
+
     private void removeConnector(int channel, SidedPos pos) {
         WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
         ConsumerId consumerId = worldBlob.getConsumerAt(pos.getPos().offset(pos.getSide()));
@@ -258,6 +277,11 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             SidedPos pos = new SidedPos(args.get("pos").getCoordinate(), EnumFacing.values()[args.get("side").getInteger()]);
             int channel = args.get("channel").getInteger();
             removeConnector(channel, pos);
+            return true;
+        } else if (CMD_UPDATECONNECTOR.equals(command)) {
+            SidedPos pos = new SidedPos(args.get("pos").getCoordinate(), EnumFacing.values()[args.get("side").getInteger()]);
+            int channel = args.get("channel").getInteger();
+            updateConnector(channel, pos, args);
             return true;
         }
         return false;

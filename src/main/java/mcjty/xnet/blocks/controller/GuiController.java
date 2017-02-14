@@ -203,7 +203,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         refresh();
     }
 
-    private void refresh() {
+    public void refresh() {
         fromServer_channels = null;
         fromServer_connectedBlocks = null;
         showingChannel = -1;
@@ -292,7 +292,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                             .setLayoutHint(new PositionalLayout.PositionalHint(151, 1, 9, 10))
                             .addButtonEvent(parent -> removeConnector(editingConnector));
 
-                    connectorInfo.getConnectorSettings().createGui(new EditorPanel(connectorEditPanel, mc, this));
+                    connectorInfo.getConnectorSettings().createGui(new EditorPanel(connectorEditPanel, mc, this, editingChannel, editingConnector));
 
 //                    ChoiceLabel type = new ChoiceLabel(mc, this).addChoices("Insert", "Extract")
 //                            .setLayoutHint(new PositionalLayout.PositionalHint(4, 3, 60, 14));
@@ -362,8 +362,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
 
         list.removeChildren();
 
-        int index = 0;
-        int sel = -1;
+        int sel = list.getSelected();
         BlockPos prevPos = null;
 
         for (ConnectedBlockClientInfo connectedBlock : fromServer_connectedBlocks) {
@@ -387,7 +386,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                 if (info != null) {
                     ConnectorClientInfo clientInfo = findClientInfo(info, sidedPos);
                     if (clientInfo != null) {
-                        but.setText("I");
+                        but.setText(clientInfo.getConnectorSettings().getIndicator());
                     }
                 }
 //                but.setPressed(editingChannel == i && sidedPos.equals(editingConnector));
@@ -398,8 +397,6 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                 panel.addChild(but);
             }
             list.addChild(panel);
-
-            index++;
         }
 
         list.setSelected(sel);
