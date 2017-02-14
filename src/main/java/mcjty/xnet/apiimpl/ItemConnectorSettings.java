@@ -78,7 +78,6 @@ public class ItemConnectorSettings implements IConnectorSettings {
 
     @Override
     public void update(Map<String, Object> data) {
-        System.out.println("ItemConnectorSettings.update");
         itemMode = ItemMode.valueOf(((String)data.get(TAG_ITEM)).toUpperCase());
         oredictMode = OredictMode.valueOf(((String)data.get(TAG_OREDICT)).toUpperCase());
         metaMode = MetaMode.valueOf(((String)data.get(TAG_META)).toUpperCase());

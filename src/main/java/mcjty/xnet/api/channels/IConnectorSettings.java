@@ -19,15 +19,15 @@ public interface IConnectorSettings {
     void writeToNBT(NBTTagCompound tag);
 
     /**
+     * Return a one-char indicator of the current status
+     */
+    String getIndicator();
+
+    /**
      * Create the gui for this connector and fill with the current values or
      * defaults if it is not set yet. This is called client-side.
      */
     void createGui(IEditorGui gui);
-
-    /**
-     * Return a one-char indicator of the current status
-     */
-    String getIndicator();
 
     /**
      * If something changes on the gui then this will be called server

@@ -6,7 +6,6 @@ import mcjty.lib.entity.GenericEnergyStorageTileEntity;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.DefaultSelectionEvent;
-import mcjty.lib.gui.layout.HorizontalAlignment;
 import mcjty.lib.gui.layout.HorizontalLayout;
 import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.gui.widgets.*;
@@ -232,18 +231,22 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                 if (info != null) {
                     Widget label = new Label(mc, this).setText("Channel " + (editingChannel + 1))
                             .setLayoutHint(new PositionalLayout.PositionalHint(4, 3, 60, 14));
-                    ChoiceLabel type = new ChoiceLabel(mc, this).addChoices("Item", "Energy", "Fluid")
-                            .setLayoutHint(new PositionalLayout.PositionalHint(66, 3, 60, 14))
-                            .setChoice(info.getType().getName());
-                    ToggleButton enabled = new ToggleButton(mc, this).setCheckMarker(true).setPressed(true)
-                            .setLayoutHint(new PositionalLayout.PositionalHint(130, 3, 13, 14));
-                    ChoiceLabel mode = new ChoiceLabel(mc, this).addChoices("Round Robin", "Random", "First")
-                            .setLayoutHint(new PositionalLayout.PositionalHint(4, 20, 100, 14));
+
+                    info.getChannelSettings().createGui(new ChannelEditorPanel(channelEditPanel, mc, this, editingChannel));
+
+//                    ChoiceLabel type = new ChoiceLabel(mc, this).addChoices("Item", "Energy", "Fluid")
+//                            .setLayoutHint(new PositionalLayout.PositionalHint(66, 3, 60, 14))
+//                            .setChoice(info.getType().getName());
+//                    ToggleButton enabled = new ToggleButton(mc, this).setCheckMarker(true).setPressed(true)
+//                            .setLayoutHint(new PositionalLayout.PositionalHint(130, 3, 13, 14));
+//                    ChoiceLabel mode = new ChoiceLabel(mc, this).addChoices("Round Robin", "Random", "First")
+//                            .setLayoutHint(new PositionalLayout.PositionalHint(4, 20, 100, 14));
                     Button remove = new Button(mc, this).setText("x")
                             .setTooltips("Remove this channel")
                             .setLayoutHint(new PositionalLayout.PositionalHint(151, 1, 9, 10))
                             .addButtonEvent(parent -> removeChannel());
-                    channelEditPanel.addChild(label).addChild(enabled).addChild(type).addChild(mode).addChild(remove);
+//                    channelEditPanel.addChild(label).addChild(enabled).addChild(type).addChild(mode).addChild(remove);
+                    channelEditPanel.addChild(label).addChild(remove);
                 } else {
                     ChoiceLabel type = new ChoiceLabel(mc, this)
                             .setLayoutHint(new PositionalLayout.PositionalHint(20, 20, 60, 14));
@@ -292,7 +295,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                             .setLayoutHint(new PositionalLayout.PositionalHint(151, 1, 9, 10))
                             .addButtonEvent(parent -> removeConnector(editingConnector));
 
-                    connectorInfo.getConnectorSettings().createGui(new EditorPanel(connectorEditPanel, mc, this, editingChannel, editingConnector));
+                    connectorInfo.getConnectorSettings().createGui(new ControllerEditorPanel(connectorEditPanel, mc, this, editingChannel, editingConnector));
 
 //                    ChoiceLabel type = new ChoiceLabel(mc, this).addChoices("Insert", "Extract")
 //                            .setLayoutHint(new PositionalLayout.PositionalHint(4, 3, 60, 14));

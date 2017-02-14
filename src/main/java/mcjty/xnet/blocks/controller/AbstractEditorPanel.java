@@ -1,6 +1,5 @@
 package mcjty.xnet.blocks.controller;
 
-import mcjty.lib.container.GenericGuiContainer;
 import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.gui.widgets.*;
 import mcjty.lib.network.Argument;
@@ -8,7 +7,6 @@ import mcjty.lib.network.ArgumentType;
 import mcjty.lib.varia.RedstoneMode;
 import mcjty.xnet.api.channels.IEditorGui;
 import mcjty.xnet.api.channels.RSMode;
-import mcjty.xnet.logic.SidedPos;
 import mcjty.xnet.network.XNetMessages;
 import net.minecraft.client.Minecraft;
 import org.apache.commons.lang3.StringUtils;
@@ -16,27 +14,19 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EditorPanel implements IEditorGui {
+public abstract class AbstractEditorPanel implements IEditorGui {
 
     private final Panel panel;
     private final Minecraft mc;
     private final GuiController gui;
-    private final Map<String, Object> data;
-
-    private final int channel;
-    private final SidedPos sidedPos;
+    protected final Map<String, Object> data;
 
     private int x;
     private int y;
 
-    private void update(String tag, Object value) {
-        data.put(tag, value);
-        Argument[] args = new Argument[data.size() + 3];
-        int i = 0;
-        args[i++] = new Argument("pos", sidedPos.getPos());
-        args[i++] = new Argument("side", sidedPos.getSide().ordinal());
-        args[i++] = new Argument("channel", channel);
+    protected abstract void update(String tag, Object value);
 
+    protected void performUpdate(Argument[] args, int i, String cmd) {
         for (Map.Entry<String, Object> entry : data.entrySet()) {
             Object o = entry.getValue();
             if (o instanceof String) {
@@ -50,16 +40,14 @@ public class EditorPanel implements IEditorGui {
             }
         }
 
-        gui.sendServerCommand(XNetMessages.INSTANCE, TileEntityController.CMD_UPDATECONNECTOR, args);
+        gui.sendServerCommand(XNetMessages.INSTANCE, cmd, args);
         gui.refresh();
     }
 
-    public EditorPanel(Panel panel, Minecraft mc, GuiController gui, int channel, SidedPos sidedPos) {
+    public AbstractEditorPanel(Panel panel, Minecraft mc, GuiController gui) {
         this.panel = panel;
         this.mc = mc;
         this.gui = gui;
-        this.channel = channel;
-        this.sidedPos = sidedPos;
         x = 4;
         y = 3;
         data = new HashMap<>();

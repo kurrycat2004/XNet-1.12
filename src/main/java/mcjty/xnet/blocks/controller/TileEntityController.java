@@ -39,6 +39,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
     public static final String CMD_CREATECHANNEL = "createChannel";
     public static final String CMD_REMOVECHANNEL = "removeChannel";
+    public static final String CMD_UPDATECHANNEL = "updateChannel";
 
     private InventoryHelper inventoryHelper = new InventoryHelper(this, ControllerContainer.factory, ControllerContainer.COUNT_FILTER_SLOTS);
     private NetworkId networkId;
@@ -187,6 +188,15 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         return chanList;
     }
 
+    private void updateChannel(int channel, Map<String, Argument> args) {
+        Map<String, Object> data = new HashMap<>();
+        for (Map.Entry<String, Argument> e : args.entrySet()) {
+            data.put(e.getKey(), e.getValue().getValue());
+        }
+        channels[channel].getChannelSettings().update(data);
+        markDirty();
+    }
+
     private void removeChannel(int index) {
         channels[index] = null;
         markDirty();
@@ -282,6 +292,10 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             SidedPos pos = new SidedPos(args.get("pos").getCoordinate(), EnumFacing.values()[args.get("side").getInteger()]);
             int channel = args.get("channel").getInteger();
             updateConnector(channel, pos, args);
+            return true;
+        } else if (CMD_UPDATECHANNEL.equals(command)) {
+            int channel = args.get("channel").getInteger();
+            updateChannel(channel, args);
             return true;
         }
         return false;
