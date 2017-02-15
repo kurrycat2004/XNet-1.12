@@ -19,6 +19,7 @@ import java.util.function.Predicate;
 public class ItemConnectorSettings implements IConnectorSettings {
 
     public static final String TAG_MODE = "mode";
+    public static final String TAG_SPEED = "speed";
     public static final String TAG_OREDICT = "od";
     public static final String TAG_NBT = "nbt";
     public static final String TAG_RS = "rs";
@@ -32,11 +33,17 @@ public class ItemConnectorSettings implements IConnectorSettings {
     public static final int FILTER_SIZE = 18;
 
     enum ItemMode {
-        INSERT,
-        EXTRACT
+        INS,
+        EXT
     }
 
-    private ItemMode itemMode = ItemMode.INSERT;
+    enum SpeedMode {
+        SINGLE,
+        STACK
+    }
+
+    private ItemMode itemMode = ItemMode.INS;
+    private SpeedMode speedMode = SpeedMode.SINGLE;
     private boolean oredictMode = false;
     private boolean metaMode = false;
     private boolean nbtMode = false;
@@ -63,9 +70,9 @@ public class ItemConnectorSettings implements IConnectorSettings {
     @Override
     public IndicatorIcon getIndicatorIcon() {
         switch (itemMode) {
-            case INSERT:
+            case INS:
                 return new IndicatorIcon(GuiController.iconGuiElements, 0, 70, 13, 10);
-            case EXTRACT:
+            case EXT:
                 return new IndicatorIcon(GuiController.iconGuiElements, 13, 70, 13, 10);
         }
         return null;
@@ -80,17 +87,17 @@ public class ItemConnectorSettings implements IConnectorSettings {
     @Override
     public void createGui(IEditorGui gui) {
         gui
-                .shift(10)
                 .choices(TAG_MODE, "Insert or extract mode", itemMode, ItemMode.values())
-                .shift(10)
+                .choices(TAG_SPEED, "Extraction speed", speedMode, SpeedMode.values())
+                .shift(5)
                 .redstoneMode(TAG_RS, rsMode).nl()
                 .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority).shift(10)
                 .label("Keep")
                 .integer(TAG_MIN, "Minimum number to insert/keep", minAmount)
                 .integer(TAG_MAX, "Maximum number to insert/keep", maxAmount).nl()
-                .toggleText(TAG_BLACKLIST, "Enable blacklist mode", "BL", blacklist).shift(5)
-                .toggleText(TAG_OREDICT, "Ore dictionary matching", "Ore", oredictMode).shift(5)
-                .toggleText(TAG_META, "Metadata matching", "Meta", metaMode).shift(5)
+                .toggleText(TAG_BLACKLIST, "Enable blacklist mode", "BL", blacklist).shift(2)
+                .toggleText(TAG_OREDICT, "Ore dictionary matching", "Ore", oredictMode).shift(2)
+                .toggleText(TAG_META, "Metadata matching", "Meta", metaMode).shift(2)
                 .toggleText(TAG_NBT, "NBT matching", "NBT", nbtMode).nl();
         for (int i = 0 ; i < FILTER_SIZE ; i++) {
             gui.ghostSlot(TAG_FILTER + i, filters.get(i));
@@ -98,7 +105,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
     }
 
     private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_MIN, TAG_MAX, TAG_PRIORITY, TAG_OREDICT, TAG_META, TAG_NBT, TAG_BLACKLIST);
-    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_MIN, TAG_MAX, TAG_OREDICT, TAG_META, TAG_NBT, TAG_BLACKLIST);
+    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_MIN, TAG_MAX, TAG_OREDICT, TAG_META, TAG_NBT, TAG_BLACKLIST, TAG_SPEED);
 
     public Predicate<ItemStack> getMatcher() {
         if (matcher == null) {
@@ -123,7 +130,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
         if (tag.startsWith(TAG_FILTER)) {
             return true;
         }
-        if (itemMode == ItemMode.INSERT) {
+        if (itemMode == ItemMode.INS) {
             return INSERT_TAGS.contains(tag);
         } else {
             return EXTRACT_TAGS.contains(tag);
@@ -133,6 +140,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
     @Override
     public void update(Map<String, Object> data) {
         itemMode = ItemMode.valueOf(((String)data.get(TAG_MODE)).toUpperCase());
+        speedMode = SpeedMode.valueOf(((String)data.get(TAG_SPEED)).toUpperCase());
         oredictMode = Boolean.TRUE.equals(data.get(TAG_OREDICT));
         metaMode = Boolean.TRUE.equals(data.get(TAG_META));
         nbtMode = Boolean.TRUE.equals(data.get(TAG_NBT));
@@ -150,6 +158,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         itemMode = ItemMode.values()[tag.getByte("itemMode")];
+        speedMode = SpeedMode.values()[tag.getByte("speedMode")];
         oredictMode = tag.getBoolean("oredictMode");
         metaMode = tag.getBoolean("metaMode");
         nbtMode = tag.getBoolean("nbtMode");
@@ -184,6 +193,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         tag.setByte("itemMode", (byte) itemMode.ordinal());
+        tag.setByte("speedMode", (byte) speedMode.ordinal());
         tag.setBoolean("oredictMode", oredictMode);
         tag.setBoolean("metaMode", metaMode);
         tag.setBoolean("nbtMode", nbtMode);

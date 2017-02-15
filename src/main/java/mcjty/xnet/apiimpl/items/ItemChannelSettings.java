@@ -127,7 +127,7 @@ public class ItemChannelSettings implements IChannelSettings {
             Map<SidedConsumer, IConnectorSettings> connectors = context.getConnectors(channel);
             for (Map.Entry<SidedConsumer, IConnectorSettings> entry : connectors.entrySet()) {
                 ItemConnectorSettings con = (ItemConnectorSettings) entry.getValue();
-                if (con.getItemMode() == ItemConnectorSettings.ItemMode.EXTRACT) {
+                if (con.getItemMode() == ItemConnectorSettings.ItemMode.EXT) {
                     itemExtractors.put(entry.getKey(), con);
                 } else {
                     itemConsumers.put(entry.getKey(), con);
