@@ -40,7 +40,15 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
     public static final String CONNECTOR = "connector";
 
     public ConnectorBlock() {
-        super(Material.IRON, CONNECTOR);
+        this(CONNECTOR);
+    }
+
+    public ConnectorBlock(String name) {
+        super(Material.IRON, name);
+        initTileEntity();
+    }
+
+    protected void initTileEntity() {
         GameRegistry.registerTileEntity(ConnectorTileEntity.class, XNet.MODID + "_connector");
     }
 
