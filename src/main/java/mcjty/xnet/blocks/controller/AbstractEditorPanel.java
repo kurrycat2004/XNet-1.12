@@ -280,7 +280,7 @@ public abstract class AbstractEditorPanel implements IEditorGui {
 
             }
         });
-        blockRender.setLayoutHint(new PositionalLayout.PositionalHint(x, y-1, w, 18));
+        blockRender.setLayoutHint(new PositionalLayout.PositionalHint(x, y-1, 17, 17));
         data.put(tag, stack);
         panel.addChild(blockRender);
         components.put(tag, blockRender);

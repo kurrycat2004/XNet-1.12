@@ -119,7 +119,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
                 matcher = itemStack -> true;
             } else {
                 ItemFilterCache filterCache = new ItemFilterCache(metaMode, oredictMode, blacklist, nbtMode, filterList);
-                matcher = itemStack -> filterCache.match(itemStack);
+                matcher = filterCache::match;
             }
         }
         return matcher;
