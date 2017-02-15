@@ -2,6 +2,7 @@ package mcjty.xnet.multiblock;
 
 import mcjty.xnet.api.keys.ConsumerId;
 import mcjty.xnet.api.keys.NetworkId;
+import mcjty.xnet.logic.VersionNumber;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
@@ -23,6 +24,11 @@ public class WorldBlob {
     // All consumers (as position) for a given network. If an entry in this map does not
     // exist for a certain network that means the information has to be calculated
     private final Map<NetworkId, Set<BlockPos>> consumersOnNetwork = new HashMap<>();
+
+    // For every network we maintain a version number. If something on a network changes
+    // this increases and so things that depend on network topology can detect this change
+    // and do the needed updates
+    private final Map<NetworkId, VersionNumber> networkVersions = new HashMap<>();
 
 
     public WorldBlob(int dimId) {
@@ -76,7 +82,15 @@ public class WorldBlob {
     private void removeCachedNetworksForBlob(ChunkBlob blob) {
         for (NetworkId id : blob.getNetworks()) {
             consumersOnNetwork.remove(id);
+            incNetworkVersion(id);
         }
+    }
+
+    private void incNetworkVersion(NetworkId id) {
+        if (!networkVersions.containsKey(id)) {
+            networkVersions.put(id, new VersionNumber(0));
+        }
+        networkVersions.get(id).inc();
     }
 
     /**
