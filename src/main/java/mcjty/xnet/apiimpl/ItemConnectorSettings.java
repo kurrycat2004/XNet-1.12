@@ -1,11 +1,14 @@
 package mcjty.xnet.apiimpl;
 
 import com.google.common.collect.ImmutableSet;
+import mcjty.lib.tools.ItemStackList;
+import mcjty.lib.tools.ItemStackTools;
 import mcjty.xnet.api.channels.IConnectorSettings;
+import mcjty.xnet.api.channels.RSMode;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
-import mcjty.xnet.api.channels.RSMode;
 import mcjty.xnet.blocks.controller.GuiController;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nullable;
@@ -20,6 +23,9 @@ public class ItemConnectorSettings implements IConnectorSettings {
     public static final String TAG_META = "meta";
     public static final String TAG_PRIORITY = "priority";
     public static final String TAG_MAX = "max";
+    public static final String TAG_FILTER = "f";
+
+    public static final int FILTER_SIZE = 9;
 
     enum ItemMode {
         INSERT,
@@ -42,6 +48,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
     private RSMode rsMode = RSMode.IGNORED;
     @Nullable private Integer priority = 0;
     @Nullable private Integer maxAmount = null;
+    private ItemStackList filters = ItemStackList.create(FILTER_SIZE);
 
     public ItemMode getItemMode() {
         return itemMode;
@@ -117,13 +124,19 @@ public class ItemConnectorSettings implements IConnectorSettings {
                 .label("Meta").choices(TAG_META, "If enabled then metadata must match", metaMode, MetaMode.values()).nl()
                 .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority).shift(10)
                 .label("Max").integer(TAG_MAX, "Maximum number to insert/keep", maxAmount);
+        for (int i = 0 ; i < FILTER_SIZE ; i++) {
+            gui.ghostSlot(TAG_FILTER + i, filters.get(i));
+        }
     }
 
-    private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_MAX, TAG_PRIORITY);
+    private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_MAX, TAG_PRIORITY, TAG_OREDICT, TAG_META);
     private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_OREDICT, TAG_META, TAG_MAX);
 
     @Override
     public boolean isEnabled(String tag) {
+        if (tag.startsWith(TAG_FILTER)) {
+            return true;
+        }
         if (itemMode == ItemMode.INSERT) {
             return INSERT_TAGS.contains(tag);
         } else {
@@ -139,6 +152,9 @@ public class ItemConnectorSettings implements IConnectorSettings {
         rsMode = RSMode.valueOf(((String)data.get(TAG_RS)).toUpperCase());
         priority = (Integer) data.get(TAG_PRIORITY);
         maxAmount = (Integer) data.get(TAG_MAX);
+        for (int i = 0 ; i < FILTER_SIZE ; i++) {
+            filters.set(i, (ItemStack) data.get(TAG_FILTER+i));
+        }
     }
 
     @Override
@@ -157,6 +173,14 @@ public class ItemConnectorSettings implements IConnectorSettings {
         } else {
             maxAmount = null;
         }
+        for (int i = 0 ; i < FILTER_SIZE ; i++) {
+            if (tag.hasKey("filter" + i)) {
+                NBTTagCompound itemTag = tag.getCompoundTag("filter" + i);
+                filters.set(i, ItemStackTools.loadFromNBT(itemTag));
+            } else {
+                filters.set(i, ItemStackTools.getEmptyStack());
+            }
+        }
     }
 
     @Override
@@ -170,6 +194,13 @@ public class ItemConnectorSettings implements IConnectorSettings {
         }
         if (maxAmount != null) {
             tag.setInteger("max", maxAmount);
+        }
+        for (int i = 0 ; i < FILTER_SIZE ; i++) {
+            if (ItemStackTools.isValid(filters.get(i))) {
+                NBTTagCompound itemTag = new NBTTagCompound();
+                filters.get(i).writeToNBT(itemTag);
+                tag.setTag("filter" + i, itemTag);
+            }
         }
     }
 }

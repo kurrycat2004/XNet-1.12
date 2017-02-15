@@ -1,14 +1,18 @@
 package mcjty.xnet.blocks.controller;
 
+import mcjty.lib.gui.events.BlockRenderEvent;
 import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.gui.widgets.*;
 import mcjty.lib.network.Argument;
 import mcjty.lib.network.ArgumentType;
+import mcjty.lib.tools.ItemStackTools;
+import mcjty.lib.tools.MinecraftTools;
 import mcjty.lib.varia.RedstoneMode;
-import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.channels.RSMode;
+import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.network.XNetMessages;
 import net.minecraft.client.Minecraft;
+import net.minecraft.item.ItemStack;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
@@ -38,6 +42,8 @@ public abstract class AbstractEditorPanel implements IEditorGui {
                 args[i++] = new Argument(entry.getKey(), ArgumentType.TYPE_BOOLEAN, o);
             } else if (o instanceof Double) {
                 args[i++] = new Argument(entry.getKey(), ArgumentType.TYPE_DOUBLE, o);
+            } else if (o instanceof ItemStack) {
+                args[i++] = new Argument(entry.getKey(), ArgumentType.TYPE_STACK, o);
             } else {
                 args[i++] = new Argument(entry.getKey(), ArgumentType.TYPE_STRING, o);
             }
@@ -220,6 +226,42 @@ public abstract class AbstractEditorPanel implements IEditorGui {
         redstoneMode.addChoiceEvent((parent, newChoice) -> update(tag, newChoice));
         panel.addChild(redstoneMode);
         components.put(tag, redstoneMode);
+        x += w;
+        return this;
+    }
+
+    @Override
+    public IEditorGui ghostSlot(String tag, ItemStack stack) {
+        int w = 16;
+        fitWidth(w);
+        BlockRender blockRender = new BlockRender(mc, gui)
+                .setRenderItem(stack)
+                .setDesiredWidth(18).setDesiredHeight(18)
+                .setFilledRectThickness(1).setFilledBackground(0xff555555);
+        blockRender.addSelectionEvent(new BlockRenderEvent() {
+            @Override
+            public void select(Widget widget) {
+                ItemStack holding = MinecraftTools.getPlayer(Minecraft.getMinecraft()).inventory.getItemStack();
+                if (ItemStackTools.isEmpty(holding)) {
+                    update(tag, holding);
+                    blockRender.setRenderItem(null);
+                } else {
+                    ItemStack copy = holding.copy();
+                    ItemStackTools.setStackSize(copy, 1);
+                    blockRender.setRenderItem(copy);
+                    update(tag, copy);
+                }
+            }
+
+            @Override
+            public void doubleClick(Widget widget) {
+
+            }
+        });
+        blockRender.setLayoutHint(new PositionalLayout.PositionalHint(x, y-1, w, 18));
+        data.put(tag, stack);
+        panel.addChild(blockRender);
+        components.put(tag, blockRender);
         x += w;
         return this;
     }

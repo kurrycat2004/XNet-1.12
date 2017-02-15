@@ -131,7 +131,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         connectorEditPanel = new Panel(mc, this).setLayout(new PositionalLayout())
                 .setFilledRectThickness(-1)
                 .setFilledBackground(StyleConfig.colorListBackground)
-                .setLayoutHint(new PositionalLayout.PositionalHint(171, 60, 161, 52));
+                .setLayoutHint(new PositionalLayout.PositionalHint(171, 60, 161, 93));
     }
 
     private Panel initConnectorListPanel() {

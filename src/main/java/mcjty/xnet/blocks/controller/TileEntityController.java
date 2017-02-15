@@ -1,7 +1,5 @@
 package mcjty.xnet.blocks.controller;
 
-import mcjty.lib.container.DefaultSidedInventory;
-import mcjty.lib.container.InventoryHelper;
 import mcjty.lib.entity.GenericEnergyReceiverTileEntity;
 import mcjty.lib.network.Argument;
 import mcjty.typed.Type;
@@ -9,16 +7,15 @@ import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.channels.IControllerContext;
+import mcjty.xnet.api.keys.ConsumerId;
+import mcjty.xnet.api.keys.NetworkId;
 import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.api.keys.SidedPos;
 import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.logic.*;
-import mcjty.xnet.api.keys.ConsumerId;
-import mcjty.xnet.api.keys.NetworkId;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -26,7 +23,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -34,7 +30,7 @@ import java.util.*;
 
 import static mcjty.xnet.logic.ChannelInfo.MAX_CHANNELS;
 
-public final class TileEntityController extends GenericEnergyReceiverTileEntity implements DefaultSidedInventory, ITickable, IControllerContext {
+public final class TileEntityController extends GenericEnergyReceiverTileEntity implements ITickable, IControllerContext {
 
     public static final String CMD_GETCHANNELS = "getChannelInfo";
     public static final String CLIENTCMD_CHANNELSREADY = "channelsReady";
@@ -49,7 +45,6 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     public static final String CMD_REMOVECHANNEL = "removeChannel";
     public static final String CMD_UPDATECHANNEL = "updateChannel";
 
-    private InventoryHelper inventoryHelper = new InventoryHelper(this, ControllerContainer.factory, ControllerContainer.COUNT_FILTER_SLOTS);
     private NetworkId networkId;
 
     private final ChannelInfo[] channels = new ChannelInfo[MAX_CHANNELS];
@@ -120,7 +115,6 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     @Override
     public void writeRestorableToNBT(NBTTagCompound tagCompound) {
         super.writeRestorableToNBT(tagCompound);
-        writeBufferToNBT(tagCompound, inventoryHelper);
         if (networkId != null) {
             tagCompound.setInteger("networkId", networkId.getId());
         }
@@ -138,7 +132,6 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     @Override
     public void readRestorableFromNBT(NBTTagCompound tagCompound) {
         super.readRestorableFromNBT(tagCompound);
-        readBufferFromNBT(tagCompound, inventoryHelper);
         if (tagCompound.hasKey("networkId")) {
             networkId = new NetworkId(tagCompound.getInteger("networkId"));
         } else {
@@ -316,16 +309,6 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         channels[channel].createConnector(id);
         cleanCache(channel);
         markDirty();
-    }
-
-    @Override
-    public InventoryHelper getInventoryHelper() {
-        return inventoryHelper;
-    }
-
-    @Override
-    public boolean isUsable(EntityPlayer player) {
-        return canPlayerAccess(player);
     }
 
     @Override

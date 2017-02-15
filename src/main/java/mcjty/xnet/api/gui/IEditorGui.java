@@ -1,6 +1,7 @@
 package mcjty.xnet.api.gui;
 
 import mcjty.xnet.api.channels.RSMode;
+import net.minecraft.item.ItemStack;
 
 public interface IEditorGui {
 
@@ -23,6 +24,8 @@ public interface IEditorGui {
     <T extends Enum<T>> IEditorGui choices(String tag, String tooltip, T current, T... values);
 
     IEditorGui redstoneMode(String tag, RSMode current);
+
+    IEditorGui ghostSlot(String tag, ItemStack slot);
 
     IEditorGui nl();
 }
