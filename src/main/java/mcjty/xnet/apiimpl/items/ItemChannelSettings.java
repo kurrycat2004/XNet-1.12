@@ -25,6 +25,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public class ItemChannelSettings implements IChannelSettings {
 
@@ -74,10 +75,11 @@ public class ItemChannelSettings implements IChannelSettings {
                 IItemHandler handler = getItemHandlerAt(te, side.getOpposite());
                 // @todo report error somewhere?
                 if (handler != null) {
-                    ItemStack stack = fetchOneItem(handler, true);
+                    Predicate<ItemStack> extractMatcher = entry.getValue().getMatcher();
+                    ItemStack stack = fetchOneItem(handler, true, extractMatcher);
                     if (ItemStackTools.isValid(stack)) {
                         if (insertStack(context, stack, true)) {
-                            insertStack(context, fetchOneItem(handler, false), false);
+                            insertStack(context, fetchOneItem(handler, false, extractMatcher), false);
                         }
                     }
                 }
@@ -87,16 +89,19 @@ public class ItemChannelSettings implements IChannelSettings {
 
     private boolean insertStack(@Nonnull IControllerContext context, @Nonnull ItemStack stack, boolean simulate) {
         for (Map.Entry<SidedConsumer, ItemConnectorSettings> entry : itemConsumers.entrySet()) {
-            BlockPos consumerPosition = context.findConsumerPosition(entry.getKey().getConsumerId());
-            if (consumerPosition != null) {
-                EnumFacing side = entry.getKey().getSide();
-                BlockPos pos = consumerPosition.offset(side);
-                TileEntity te = context.getControllerWorld().getTileEntity(pos);
-                IItemHandler handler = getItemHandlerAt(te, side.getOpposite());
-                // @todo report error somewhere?
-                if (handler != null) {
-                    if (ItemStackTools.isEmpty(ItemHandlerHelper.insertItem(handler, stack, simulate))) {
-                        return true;
+            ItemConnectorSettings settings = entry.getValue();
+            if (settings.getMatcher().test(stack)) {
+                BlockPos consumerPosition = context.findConsumerPosition(entry.getKey().getConsumerId());
+                if (consumerPosition != null) {
+                    EnumFacing side = entry.getKey().getSide();
+                    BlockPos pos = consumerPosition.offset(side);
+                    TileEntity te = context.getControllerWorld().getTileEntity(pos);
+                    IItemHandler handler = getItemHandlerAt(te, side.getOpposite());
+                    // @todo report error somewhere?
+                    if (handler != null) {
+                        if (ItemStackTools.isEmpty(ItemHandlerHelper.insertItem(handler, stack, simulate))) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -104,10 +109,10 @@ public class ItemChannelSettings implements IChannelSettings {
         return false;
     }
 
-    private ItemStack fetchOneItem(IItemHandler handler, boolean simulate) {
+    private ItemStack fetchOneItem(IItemHandler handler, boolean simulate, Predicate<ItemStack> matcher) {
         for (int i = 0 ; i < handler.getSlots() ; i++) {
             ItemStack stack = handler.extractItem(i, 1, simulate);
-            if (ItemStackTools.isValid(stack)) {
+            if (ItemStackTools.isValid(stack) && matcher.test(stack)) {
                 return stack;
             }
         }

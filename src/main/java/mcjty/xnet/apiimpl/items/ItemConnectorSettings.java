@@ -14,6 +14,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 public class ItemConnectorSettings implements IConnectorSettings {
 
@@ -46,61 +47,11 @@ public class ItemConnectorSettings implements IConnectorSettings {
     @Nullable private Integer maxAmount = null;
     private ItemStackList filters = ItemStackList.create(FILTER_SIZE);
 
+    // Cached matcher for items
+    private Predicate<ItemStack> matcher = null;
+
     public ItemMode getItemMode() {
         return itemMode;
-    }
-
-    public void setItemMode(ItemMode itemMode) {
-        this.itemMode = itemMode;
-    }
-
-    public boolean isOredictMode() {
-        return oredictMode;
-    }
-
-    public void setOredictMode(boolean oredictMode) {
-        this.oredictMode = oredictMode;
-    }
-
-    public boolean isMetaMode() {
-        return metaMode;
-    }
-
-    public void setMetaMode(boolean metaMode) {
-        this.metaMode = metaMode;
-    }
-
-    public boolean isNbtMode() {
-        return nbtMode;
-    }
-
-    public void setNbtMode(boolean nbtMode) {
-        this.nbtMode = nbtMode;
-    }
-
-    public Integer getPriority() {
-        return priority;
-    }
-
-    public void setPriority(Integer priority) {
-        this.priority = priority;
-    }
-
-    @Nullable
-    public Integer getMinAmount() {
-        return minAmount;
-    }
-
-    public void setMinAmount(@Nullable Integer minAmount) {
-        this.minAmount = minAmount;
-    }
-
-    public Integer getMaxAmount() {
-        return maxAmount;
-    }
-
-    public void setMaxAmount(Integer maxAmount) {
-        this.maxAmount = maxAmount;
     }
 
     @Override
@@ -149,6 +100,24 @@ public class ItemConnectorSettings implements IConnectorSettings {
     private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_MIN, TAG_MAX, TAG_PRIORITY, TAG_OREDICT, TAG_META, TAG_NBT, TAG_BLACKLIST);
     private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_MIN, TAG_MAX, TAG_OREDICT, TAG_META, TAG_NBT, TAG_BLACKLIST);
 
+    public Predicate<ItemStack> getMatcher() {
+        if (matcher == null) {
+            ItemStackList filterList = ItemStackList.create();
+            for (ItemStack stack : filters) {
+                if (ItemStackTools.isValid(stack)) {
+                    filterList.add(stack);
+                }
+            }
+            if (filterList.isEmpty()) {
+                matcher = itemStack -> true;
+            } else {
+                ItemFilterCache filterCache = new ItemFilterCache(metaMode, oredictMode, blacklist, nbtMode, filterList);
+                matcher = itemStack -> filterCache.match(itemStack);
+            }
+        }
+        return matcher;
+    }
+
     @Override
     public boolean isEnabled(String tag) {
         if (tag.startsWith(TAG_FILTER)) {
@@ -175,6 +144,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
         for (int i = 0 ; i < FILTER_SIZE ; i++) {
             filters.set(i, (ItemStack) data.get(TAG_FILTER+i));
         }
+        matcher = null;
     }
 
     @Override
@@ -208,6 +178,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
                 filters.set(i, ItemStackTools.getEmptyStack());
             }
         }
+        matcher = null;
     }
 
     @Override
