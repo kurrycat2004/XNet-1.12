@@ -25,6 +25,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
@@ -64,6 +65,11 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     }
 
     @Override
+    public World getControllerWorld() {
+        return getWorld();
+    }
+
+    @Override
     public NetworkId getNetworkId() {
         return networkId;
     }
@@ -77,11 +83,16 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     public void update() {
         if (!getWorld().isRemote) {
             for (int i = 0 ; i < MAX_CHANNELS ; i++) {
-                if (channels[i] != null) {
+                if (channels[i] != null && channels[i].isEnabled()) {
                     channels[i].getChannelSettings().tick(i, this);
                 }
             }
         }
+    }
+
+    private void cleanCache(int channel) {
+        cachedConnectors[channel] = null;
+        channels[channel].getChannelSettings().cleanCache();
     }
 
     @Override
@@ -238,7 +249,11 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             data.put(e.getKey(), e.getValue().getValue());
         }
         channels[channel].getChannelSettings().update(data);
-        cachedConnectors[channel] = null;
+
+        Boolean enabled = (Boolean) data.get(GuiController.TAG_ENABLED);
+        channels[channel].setEnabled(Boolean.TRUE.equals(enabled));
+
+        cleanCache(channel);
         markDirty();
     }
 
@@ -251,7 +266,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     private void createChannel(int channel, String typeId) {
         IChannelType type = XNet.xNetApi.findType(typeId);
         channels[channel] = new ChannelInfo(type);
-        cachedConnectors[channel] = null;
+        cleanCache(channel);
         markDirty();
     }
 
@@ -266,7 +281,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                     data.put(e.getKey(), e.getValue().getValue());
                 }
                 channels[channel].getConnectors().get(key).getConnectorSettings().update(data);
-                cachedConnectors[channel] = null;
+                cleanCache(channel);
                 markDirty();
                 return;
             }
@@ -286,7 +301,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         }
         if (toremove != null) {
             channels[channel].getConnectors().remove(toremove);
-            cachedConnectors[channel] = null;
+            cleanCache(channel);
             markDirty();
         }
     }
@@ -299,7 +314,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         }
         SidedConsumer id = new SidedConsumer(consumerId, pos.getSide().getOpposite());
         channels[channel].createConnector(id);
-        cachedConnectors[channel] = null;
+        cleanCache(channel);
         markDirty();
     }
 

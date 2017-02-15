@@ -25,6 +25,11 @@ public class EnergyChannelSettings implements IChannelSettings {
     }
 
     @Override
+    public void cleanCache() {
+
+    }
+
+    @Override
     public boolean isEnabled(String tag) {
         return true;
     }

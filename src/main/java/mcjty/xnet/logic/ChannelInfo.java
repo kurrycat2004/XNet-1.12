@@ -19,12 +19,21 @@ public class ChannelInfo {
 
     private final IChannelType type;
     private final IChannelSettings channelSettings;
+    private boolean enabled = true;
 
     private final Map<SidedConsumer, ConnectorInfo> connectors = new HashMap<>();
 
     public ChannelInfo(IChannelType type) {
         this.type = type;
         channelSettings = type.createChannel();
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public IChannelType getType() {
@@ -47,6 +56,7 @@ public class ChannelInfo {
 
     public void writeToNBT(NBTTagCompound tag) {
         channelSettings.writeToNBT(tag);
+        tag.setBoolean("enabled", enabled);
         NBTTagList conlist = new NBTTagList();
         for (Map.Entry<SidedConsumer, ConnectorInfo> entry : connectors.entrySet()) {
             NBTTagCompound tc = new NBTTagCompound();
@@ -62,6 +72,7 @@ public class ChannelInfo {
 
     public void readFromNBT(NBTTagCompound tag) {
         channelSettings.readFromNBT(tag);
+        enabled = tag.getBoolean("enabled");
         NBTTagList conlist = tag.getTagList("connectors", Constants.NBT.TAG_COMPOUND);
         for (int i = 0 ; i < conlist.tagCount() ; i++) {
             NBTTagCompound tc = conlist.getCompoundTagAt(i);

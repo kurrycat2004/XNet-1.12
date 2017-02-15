@@ -22,6 +22,13 @@ public interface IChannelSettings {
     void tick(int channel, IControllerContext context);
 
     /**
+     * Clean cache. This is called when the controller knows too much
+     * has changed and you should not rely on cached data from consumers
+     * and such.
+     */
+    void cleanCache();
+
+    /**
      * Return an optional indicator icon
      */
     @Nullable
