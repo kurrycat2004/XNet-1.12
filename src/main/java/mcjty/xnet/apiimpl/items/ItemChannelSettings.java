@@ -1,4 +1,4 @@
-package mcjty.xnet.apiimpl;
+package mcjty.xnet.apiimpl.items;
 
 import mcjty.lib.tools.ItemStackTools;
 import mcjty.xnet.api.channels.IChannelSettings;

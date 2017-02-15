@@ -1,4 +1,4 @@
-package mcjty.xnet.apiimpl;
+package mcjty.xnet.apiimpl.energy;
 
 import mcjty.xnet.api.channels.IChannelSettings;
 import mcjty.xnet.api.channels.IControllerContext;

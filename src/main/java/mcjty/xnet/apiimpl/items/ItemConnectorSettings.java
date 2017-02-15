@@ -1,4 +1,4 @@
-package mcjty.xnet.apiimpl;
+package mcjty.xnet.apiimpl.items;
 
 import com.google.common.collect.ImmutableSet;
 import mcjty.lib.tools.ItemStackList;
@@ -19,6 +19,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
 
     public static final String TAG_MODE = "mode";
     public static final String TAG_OREDICT = "od";
+    public static final String TAG_NBT = "nbt";
     public static final String TAG_RS = "rs";
     public static final String TAG_META = "meta";
     public static final String TAG_PRIORITY = "priority";
@@ -37,6 +38,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
     private ItemMode itemMode = ItemMode.INSERT;
     private boolean oredictMode = false;
     private boolean metaMode = false;
+    private boolean nbtMode = false;
     private RSMode rsMode = RSMode.IGNORED;
     private boolean blacklist = false;
     @Nullable private Integer priority = 0;
@@ -66,6 +68,14 @@ public class ItemConnectorSettings implements IConnectorSettings {
 
     public void setMetaMode(boolean metaMode) {
         this.metaMode = metaMode;
+    }
+
+    public boolean isNbtMode() {
+        return nbtMode;
+    }
+
+    public void setNbtMode(boolean nbtMode) {
+        this.nbtMode = nbtMode;
     }
 
     public Integer getPriority() {
@@ -129,14 +139,15 @@ public class ItemConnectorSettings implements IConnectorSettings {
                 .integer(TAG_MAX, "Maximum number to insert/keep", maxAmount).nl()
                 .toggleText(TAG_BLACKLIST, "Enable blacklist mode", "BL", blacklist).shift(5)
                 .toggleText(TAG_OREDICT, "Ore dictionary matching", "Ore", oredictMode).shift(5)
-                .toggleText(TAG_META, "Metadata matching", "Meta", metaMode).nl();
+                .toggleText(TAG_META, "Metadata matching", "Meta", metaMode).shift(5)
+                .toggleText(TAG_NBT, "NBT matching", "NBT", nbtMode).nl();
         for (int i = 0 ; i < FILTER_SIZE ; i++) {
             gui.ghostSlot(TAG_FILTER + i, filters.get(i));
         }
     }
 
-    private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_MIN, TAG_MAX, TAG_PRIORITY, TAG_OREDICT, TAG_META, TAG_BLACKLIST);
-    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_MIN, TAG_MAX, TAG_OREDICT, TAG_META, TAG_BLACKLIST);
+    private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_MIN, TAG_MAX, TAG_PRIORITY, TAG_OREDICT, TAG_META, TAG_NBT, TAG_BLACKLIST);
+    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_MIN, TAG_MAX, TAG_OREDICT, TAG_META, TAG_NBT, TAG_BLACKLIST);
 
     @Override
     public boolean isEnabled(String tag) {
@@ -155,6 +166,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
         itemMode = ItemMode.valueOf(((String)data.get(TAG_MODE)).toUpperCase());
         oredictMode = Boolean.TRUE.equals(data.get(TAG_OREDICT));
         metaMode = Boolean.TRUE.equals(data.get(TAG_META));
+        nbtMode = Boolean.TRUE.equals(data.get(TAG_NBT));
         rsMode = RSMode.valueOf(((String)data.get(TAG_RS)).toUpperCase());
         blacklist = Boolean.TRUE.equals(data.get(TAG_BLACKLIST));
         priority = (Integer) data.get(TAG_PRIORITY);
@@ -170,6 +182,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
         itemMode = ItemMode.values()[tag.getByte("itemMode")];
         oredictMode = tag.getBoolean("oredictMode");
         metaMode = tag.getBoolean("metaMode");
+        nbtMode = tag.getBoolean("nbtMode");
         rsMode = RSMode.values()[tag.getByte("rsMode")];
         blacklist = tag.getBoolean("blacklist");
         if (tag.hasKey("priority")) {
@@ -202,6 +215,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
         tag.setByte("itemMode", (byte) itemMode.ordinal());
         tag.setBoolean("oredictMode", oredictMode);
         tag.setBoolean("metaMode", metaMode);
+        tag.setBoolean("nbtMode", nbtMode);
         tag.setByte("rsMode", (byte) rsMode.ordinal());
         tag.setBoolean("blacklist", blacklist);
         if (priority != null) {

@@ -1,28 +1,27 @@
-package mcjty.xnet.apiimpl;
+package mcjty.xnet.apiimpl.energy;
 
 import mcjty.xnet.api.channels.IChannelSettings;
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.api.channels.IConnectorSettings;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.energy.CapabilityEnergy;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class ItemChannelType implements IChannelType {
+public class EnergyChannelType implements IChannelType {
 
     @Override
     public String getID() {
-        return "xnet.item";
+        return "xnet.energy";
     }
 
     @Override
     public String getName() {
-        return "Item";
+        return "Energy";
     }
 
     @Override
@@ -31,24 +30,24 @@ public class ItemChannelType implements IChannelType {
         if (te == null) {
             return false;
         }
-        if (te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side)) {
+        if (te.hasCapability(CapabilityEnergy.ENERGY, side)) {
             return true;
         }
-        if (te instanceof IInventory) {
-            return true;
-        }
+//        if (te instanceof IInventory) {
+//            return true;
+//        }
         return false;
     }
 
     @Override
     @Nonnull
     public IConnectorSettings createConnector() {
-        return new ItemConnectorSettings();
+        return new EnergyConnectorSettings();
     }
 
     @Nonnull
     @Override
     public IChannelSettings createChannel() {
-        return new ItemChannelSettings();
+        return new EnergyChannelSettings();
     }
 }

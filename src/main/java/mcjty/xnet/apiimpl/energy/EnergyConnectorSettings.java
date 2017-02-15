@@ -1,4 +1,4 @@
-package mcjty.xnet.apiimpl;
+package mcjty.xnet.apiimpl.energy;
 
 import com.google.common.collect.ImmutableSet;
 import mcjty.xnet.api.channels.IConnectorSettings;
