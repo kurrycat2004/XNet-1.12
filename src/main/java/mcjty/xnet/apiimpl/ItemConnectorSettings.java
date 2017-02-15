@@ -22,31 +22,25 @@ public class ItemConnectorSettings implements IConnectorSettings {
     public static final String TAG_RS = "rs";
     public static final String TAG_META = "meta";
     public static final String TAG_PRIORITY = "priority";
+    public static final String TAG_MIN = "min";
     public static final String TAG_MAX = "max";
     public static final String TAG_FILTER = "f";
+    public static final String TAG_BLACKLIST = "blacklist";
 
-    public static final int FILTER_SIZE = 9;
+    public static final int FILTER_SIZE = 18;
 
     enum ItemMode {
         INSERT,
         EXTRACT
     }
 
-    enum OredictMode {
-        ON,
-        OFF
-    }
-
-    enum MetaMode {
-        ON,
-        OFF
-    }
-
     private ItemMode itemMode = ItemMode.INSERT;
-    private OredictMode oredictMode = OredictMode.OFF;
-    private MetaMode metaMode = MetaMode.OFF;
+    private boolean oredictMode = false;
+    private boolean metaMode = false;
     private RSMode rsMode = RSMode.IGNORED;
+    private boolean blacklist = false;
     @Nullable private Integer priority = 0;
+    @Nullable private Integer minAmount = null;
     @Nullable private Integer maxAmount = null;
     private ItemStackList filters = ItemStackList.create(FILTER_SIZE);
 
@@ -58,19 +52,19 @@ public class ItemConnectorSettings implements IConnectorSettings {
         this.itemMode = itemMode;
     }
 
-    public OredictMode getOredictMode() {
+    public boolean isOredictMode() {
         return oredictMode;
     }
 
-    public void setOredictMode(OredictMode oredictMode) {
+    public void setOredictMode(boolean oredictMode) {
         this.oredictMode = oredictMode;
     }
 
-    public MetaMode getMetaMode() {
+    public boolean isMetaMode() {
         return metaMode;
     }
 
-    public void setMetaMode(MetaMode metaMode) {
+    public void setMetaMode(boolean metaMode) {
         this.metaMode = metaMode;
     }
 
@@ -80,6 +74,15 @@ public class ItemConnectorSettings implements IConnectorSettings {
 
     public void setPriority(Integer priority) {
         this.priority = priority;
+    }
+
+    @Nullable
+    public Integer getMinAmount() {
+        return minAmount;
+    }
+
+    public void setMinAmount(@Nullable Integer minAmount) {
+        this.minAmount = minAmount;
     }
 
     public Integer getMaxAmount() {
@@ -120,17 +123,20 @@ public class ItemConnectorSettings implements IConnectorSettings {
                 .choices(TAG_MODE, "Insert or extract mode", itemMode, ItemMode.values())
                 .shift(10)
                 .redstoneMode(TAG_RS, rsMode).nl()
-                .label("Ore").choices(TAG_OREDICT, "If enabled the ore dictionary is used", oredictMode, OredictMode.values()).shift(10)
-                .label("Meta").choices(TAG_META, "If enabled then metadata must match", metaMode, MetaMode.values()).nl()
                 .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority).shift(10)
-                .label("Max").integer(TAG_MAX, "Maximum number to insert/keep", maxAmount);
+                .label("Keep")
+                .integer(TAG_MIN, "Minimum number to insert/keep", minAmount)
+                .integer(TAG_MAX, "Maximum number to insert/keep", maxAmount).nl()
+                .toggleText(TAG_BLACKLIST, "Enable blacklist mode", "BL", blacklist).shift(5)
+                .toggleText(TAG_OREDICT, "Ore dictionary matching", "Ore", oredictMode).shift(5)
+                .toggleText(TAG_META, "Metadata matching", "Meta", metaMode).nl();
         for (int i = 0 ; i < FILTER_SIZE ; i++) {
             gui.ghostSlot(TAG_FILTER + i, filters.get(i));
         }
     }
 
-    private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_MAX, TAG_PRIORITY, TAG_OREDICT, TAG_META);
-    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_OREDICT, TAG_META, TAG_MAX);
+    private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_MIN, TAG_MAX, TAG_PRIORITY, TAG_OREDICT, TAG_META, TAG_BLACKLIST);
+    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_MIN, TAG_MAX, TAG_OREDICT, TAG_META, TAG_BLACKLIST);
 
     @Override
     public boolean isEnabled(String tag) {
@@ -147,10 +153,12 @@ public class ItemConnectorSettings implements IConnectorSettings {
     @Override
     public void update(Map<String, Object> data) {
         itemMode = ItemMode.valueOf(((String)data.get(TAG_MODE)).toUpperCase());
-        oredictMode = OredictMode.valueOf(((String)data.get(TAG_OREDICT)).toUpperCase());
-        metaMode = MetaMode.valueOf(((String)data.get(TAG_META)).toUpperCase());
+        oredictMode = Boolean.TRUE.equals(data.get(TAG_OREDICT));
+        metaMode = Boolean.TRUE.equals(data.get(TAG_META));
         rsMode = RSMode.valueOf(((String)data.get(TAG_RS)).toUpperCase());
+        blacklist = Boolean.TRUE.equals(data.get(TAG_BLACKLIST));
         priority = (Integer) data.get(TAG_PRIORITY);
+        minAmount = (Integer) data.get(TAG_MIN);
         maxAmount = (Integer) data.get(TAG_MAX);
         for (int i = 0 ; i < FILTER_SIZE ; i++) {
             filters.set(i, (ItemStack) data.get(TAG_FILTER+i));
@@ -160,13 +168,19 @@ public class ItemConnectorSettings implements IConnectorSettings {
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         itemMode = ItemMode.values()[tag.getByte("itemMode")];
-        oredictMode = OredictMode.values()[tag.getByte("oredictMode")];
-        metaMode = MetaMode.values()[tag.getByte("metaMode")];
+        oredictMode = tag.getBoolean("oredictMode");
+        metaMode = tag.getBoolean("metaMode");
         rsMode = RSMode.values()[tag.getByte("rsMode")];
+        blacklist = tag.getBoolean("blacklist");
         if (tag.hasKey("priority")) {
             priority = tag.getInteger("priority");
         } else {
             priority = null;
+        }
+        if (tag.hasKey("min")) {
+            minAmount = tag.getInteger("min");
+        } else {
+            minAmount = null;
         }
         if (tag.hasKey("max")) {
             maxAmount = tag.getInteger("max");
@@ -186,11 +200,15 @@ public class ItemConnectorSettings implements IConnectorSettings {
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         tag.setByte("itemMode", (byte) itemMode.ordinal());
-        tag.setByte("oredictMode", (byte) oredictMode.ordinal());
-        tag.setByte("metaMode", (byte) metaMode.ordinal());
+        tag.setBoolean("oredictMode", oredictMode);
+        tag.setBoolean("metaMode", metaMode);
         tag.setByte("rsMode", (byte) rsMode.ordinal());
+        tag.setBoolean("blacklist", blacklist);
         if (priority != null) {
             tag.setInteger("priority", priority);
+        }
+        if (minAmount != null) {
+            tag.setInteger("min", minAmount);
         }
         if (maxAmount != null) {
             tag.setInteger("max", maxAmount);

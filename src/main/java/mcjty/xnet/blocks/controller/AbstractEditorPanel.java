@@ -70,6 +70,12 @@ public abstract class AbstractEditorPanel implements IEditorGui {
     }
 
     @Override
+    public IEditorGui move(int x) {
+        this.x = x;
+        return this;
+    }
+
+    @Override
     public IEditorGui shift(int x) {
         this.x += x;
         return this;
@@ -94,7 +100,7 @@ public abstract class AbstractEditorPanel implements IEditorGui {
 
     @Override
     public IEditorGui text(String tag, String tooltip, String value) {
-        int w = 45;
+        int w = 40;
         fitWidth(w);
         TextField text = new TextField(mc, gui).setText(value)
                 .setTooltips(tooltip)
@@ -120,10 +126,10 @@ public abstract class AbstractEditorPanel implements IEditorGui {
 
     @Override
     public IEditorGui integer(String tag, String tooltip, Integer value) {
-        int w = 45;
+        int w = 30;
         fitWidth(w);
         TextField text = new TextField(mc, gui).setText(value == null ? "" : value.toString())
-                .setTooltips(tag)
+                .setTooltips(tooltip)
                 .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
         data.put(tag, value);
         text.addTextEnterEvent((parent, newText) -> update(tag, parseInt(newText)));
@@ -146,7 +152,7 @@ public abstract class AbstractEditorPanel implements IEditorGui {
 
     @Override
     public IEditorGui real(String tag, String tooltip, Double value) {
-        int w = 45;
+        int w = 30;
         fitWidth(w);
         TextField text = new TextField(mc, gui).setText(value == null ? "" : value.toString())
                 .setTooltips(tooltip)
@@ -164,6 +170,22 @@ public abstract class AbstractEditorPanel implements IEditorGui {
         int w = 12;
         fitWidth(w);
         ToggleButton toggle = new ToggleButton(mc, gui).setCheckMarker(true).setPressed(value)
+                .setTooltips(tooltip)
+                .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
+        data.put(tag, value);
+        toggle.addButtonEvent(parent -> update(tag, toggle.isPressed()));
+        panel.addChild(toggle);
+        components.put(tag, toggle);
+        x += w;
+        return this;
+    }
+
+    @Override
+    public IEditorGui toggleText(String tag, String tooltip, String text, boolean value) {
+        int w = mc.fontRenderer.getStringWidth(text) + 10;
+        fitWidth(w);
+        ToggleButton toggle = new ToggleButton(mc, gui).setCheckMarker(false).setPressed(value)
+                .setText(text)
                 .setTooltips(tooltip)
                 .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
         data.put(tag, value);
@@ -237,7 +259,7 @@ public abstract class AbstractEditorPanel implements IEditorGui {
         BlockRender blockRender = new BlockRender(mc, gui)
                 .setRenderItem(stack)
                 .setDesiredWidth(18).setDesiredHeight(18)
-                .setFilledRectThickness(1).setFilledBackground(0xff555555);
+                .setFilledRectThickness(-1).setFilledBackground(0xff888888);
         blockRender.addSelectionEvent(new BlockRenderEvent() {
             @Override
             public void select(Widget widget) {

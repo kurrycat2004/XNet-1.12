@@ -7,6 +7,8 @@ public interface IEditorGui {
 
     IEditorGui move(int x, int y);
 
+    IEditorGui move(int x);
+
     IEditorGui shift(int x);
 
     IEditorGui label(String txt);
@@ -18,6 +20,8 @@ public interface IEditorGui {
     IEditorGui real(String tag, String tooltip, Double value);
 
     IEditorGui toggle(String tag, String tooltip, boolean value);
+
+    IEditorGui toggleText(String tag, String tooltip, String text, boolean value);
 
     IEditorGui choices(String tag, String tooltip, String current, String... values);
 
