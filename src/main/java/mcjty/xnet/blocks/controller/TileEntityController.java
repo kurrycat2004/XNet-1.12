@@ -217,7 +217,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         for (ChannelInfo channel : channels) {
             if (channel != null) {
                 ChannelClientInfo clientInfo = new ChannelClientInfo(channel.getType(),
-                        channel.getChannelSettings());
+                        channel.getChannelSettings(), channel.isEnabled());
 
                 for (Map.Entry<SidedConsumer, ConnectorInfo> entry : channel.getConnectors().entrySet()) {
                     SidedConsumer sidedConsumer = entry.getKey();

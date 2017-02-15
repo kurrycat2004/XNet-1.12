@@ -238,7 +238,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                     ChannelEditorPanel editor = new ChannelEditorPanel(channelEditPanel, mc, this, editingChannel);
                     editor.label("Channel " + (editingChannel + 1))
                             .shift(10)
-                            .toggle(TAG_ENABLED, "Enable processing on this channel", true);
+                            .toggle(TAG_ENABLED, "Enable processing on this channel", info.isEnabled());
                     info.getChannelSettings().createGui(editor);
 
                     Button remove = new Button(mc, this).setText("x")

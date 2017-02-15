@@ -21,15 +21,18 @@ public class ChannelClientInfo {
 
     @Nonnull private final IChannelType type;
     @Nonnull private final IChannelSettings channelSettings;
+    @Nonnull private final boolean enabled;
 
     private final Map<SidedConsumer, ConnectorClientInfo> connectors = new HashMap<>();
 
-    public ChannelClientInfo(@Nonnull IChannelType type, @Nonnull IChannelSettings channelSettings) {
+    public ChannelClientInfo(@Nonnull IChannelType type, @Nonnull IChannelSettings channelSettings, boolean enabled) {
         this.type = type;
         this.channelSettings = channelSettings;
+        this.enabled = enabled;
     }
 
     public ChannelClientInfo(@Nonnull ByteBuf buf) {
+        enabled = buf.readBoolean();
         String id = NetworkTools.readString(buf);
         IChannelType t = XNet.xNetApi.findType(id);
         if (t == null) {
@@ -49,6 +52,7 @@ public class ChannelClientInfo {
     }
 
     public void writeToNBT(@Nonnull ByteBuf buf) {
+        buf.writeBoolean(enabled);
         NetworkTools.writeString(buf, type.getID());
         NBTTagCompound tag = new NBTTagCompound();
         channelSettings.writeToNBT(tag);
@@ -63,6 +67,11 @@ public class ChannelClientInfo {
 
             info.writeToBuf(buf);
         }
+    }
+
+    @Nonnull
+    public boolean isEnabled() {
+        return enabled;
     }
 
     @Nonnull
