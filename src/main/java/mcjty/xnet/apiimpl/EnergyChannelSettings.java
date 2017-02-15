@@ -32,7 +32,7 @@ public class EnergyChannelSettings implements IChannelSettings {
     @Nullable
     @Override
     public IndicatorIcon getIndicatorIcon() {
-        return new IndicatorIcon(GuiController.iconGuiElements, 10, 80, 10, 10);
+        return new IndicatorIcon(GuiController.iconGuiElements, 11, 80, 11, 10);
     }
 
     @Nullable

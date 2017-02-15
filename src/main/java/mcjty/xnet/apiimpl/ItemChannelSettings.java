@@ -55,7 +55,7 @@ public class ItemChannelSettings implements IChannelSettings {
     @Nullable
     @Override
     public IndicatorIcon getIndicatorIcon() {
-        return new IndicatorIcon(GuiController.iconGuiElements, 0, 80, 10, 10);
+        return new IndicatorIcon(GuiController.iconGuiElements, 0, 80, 11, 10);
     }
 
     @Nullable

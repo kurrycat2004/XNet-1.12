@@ -6,13 +6,14 @@ import mcjty.xnet.api.keys.SidedConsumer;
 import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Map;
 
 public interface IControllerContext {
 
     NetworkId getNetworkId();
 
-    @Nonnull
+    @Nullable
     BlockPos findConsumerPosition(@Nonnull ConsumerId consumerId);
 
     @Nonnull

@@ -28,6 +28,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
 
 import static mcjty.xnet.logic.ChannelInfo.MAX_CHANNELS;
@@ -149,14 +150,14 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         }
     }
 
-    @Nonnull
+    @Nullable
     @Override
     public BlockPos findConsumerPosition(@Nonnull ConsumerId consumerId) {
         WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
         return findConsumerPosition(worldBlob, consumerId);
     }
 
-    @Nonnull
+    @Nullable
     private BlockPos findConsumerPosition(@Nonnull WorldBlob worldBlob, @Nonnull ConsumerId consumerId) {
         Set<BlockPos> consumers = worldBlob.getConsumers(networkId);
         for (BlockPos pos : consumers) {
@@ -165,7 +166,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                 return pos;
             }
         }
-        throw new RuntimeException("This really cannot happen!");
+        return null;
     }
 
     @Nonnull
@@ -212,9 +213,14 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                     ConnectorInfo info = entry.getValue();
                     if (info.getConnectorSettings() != null) {
                         BlockPos consumerPos = findConsumerPosition(worldBlob, sidedConsumer.getConsumerId());
-                        SidedPos pos = new SidedPos(consumerPos.offset(sidedConsumer.getSide()), sidedConsumer.getSide().getOpposite());
-                        ConnectorClientInfo ci = new ConnectorClientInfo(pos, sidedConsumer.getConsumerId(), channel.getType(), info.getConnectorSettings());
-                        clientInfo.getConnectors().put(sidedConsumer, ci);
+                        if (consumerPos != null) {
+                            SidedPos pos = new SidedPos(consumerPos.offset(sidedConsumer.getSide()), sidedConsumer.getSide().getOpposite());
+                            ConnectorClientInfo ci = new ConnectorClientInfo(pos, sidedConsumer.getConsumerId(), channel.getType(), info.getConnectorSettings());
+                            clientInfo.getConnectors().put(sidedConsumer, ci);
+                        } else {
+                            // Consumer was possibly removed. We might want to remove the entry from our list here?
+                            // @todo
+                        }
                     }
                 }
 

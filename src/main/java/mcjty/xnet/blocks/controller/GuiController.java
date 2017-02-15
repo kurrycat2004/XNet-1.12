@@ -250,13 +250,13 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                     editor.setState(info.getChannelSettings());
                 } else {
                     ChoiceLabel type = new ChoiceLabel(mc, this)
-                            .setLayoutHint(new PositionalLayout.PositionalHint(20, 20, 60, 14));
+                            .setLayoutHint(new PositionalLayout.PositionalHint(10, 20, 85, 14));
                     for (IChannelType channelType : XNet.xNetApi.getChannels().values()) {
                         type.addChoices(channelType.getID());       // Show names?
                     }
                     Button create = new Button(mc, this)
                             .setText("Create")
-                            .setLayoutHint(new PositionalLayout.PositionalHint(85, 20, 60, 14))
+                            .setLayoutHint(new PositionalLayout.PositionalHint(98, 20, 55, 14))
                             .addButtonEvent(parent -> createChannel(type.getCurrentChoice()));
                     channelEditPanel.addChild(type).addChild(create);
                 }

@@ -93,9 +93,9 @@ public class ItemConnectorSettings implements IConnectorSettings {
     public IndicatorIcon getIndicatorIcon() {
         switch (itemMode) {
             case INSERT:
-                return new IndicatorIcon(GuiController.iconGuiElements, 0, 70, 10, 10);
+                return new IndicatorIcon(GuiController.iconGuiElements, 0, 70, 13, 10);
             case EXTRACT:
-                return new IndicatorIcon(GuiController.iconGuiElements, 10, 70, 10, 10);
+                return new IndicatorIcon(GuiController.iconGuiElements, 13, 70, 13, 10);
         }
         return null;
     }
