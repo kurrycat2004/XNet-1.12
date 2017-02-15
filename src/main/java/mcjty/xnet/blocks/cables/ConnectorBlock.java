@@ -2,13 +2,14 @@ package mcjty.xnet.blocks.cables;
 
 import mcjty.lib.tools.ItemStackTools;
 import mcjty.xnet.XNet;
+import mcjty.xnet.api.keys.ConsumerId;
 import mcjty.xnet.blocks.controller.TileEntityController;
 import mcjty.xnet.blocks.generic.GenericCableBlock;
 import mcjty.xnet.blocks.generic.GenericCableISBM;
-import mcjty.xnet.api.keys.ConsumerId;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
 import net.minecraft.block.Block;
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -27,18 +28,30 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 
 import java.util.List;
 
-public class ConnectorBlock extends GenericCableBlock {
+public class ConnectorBlock extends GenericCableBlock implements ITileEntityProvider {
 
     public static final String CONNECTOR = "connector";
 
     public ConnectorBlock() {
         super(Material.IRON, CONNECTOR);
+        GameRegistry.registerTileEntity(ConnectorTileEntity.class, XNet.MODID + "_connector");
+    }
+
+    @Override
+    public TileEntity createNewTileEntity(World world, int i) {
+        return null;
+    }
+
+    @Override
+    public TileEntity createTileEntity(World world, IBlockState metadata) {
+        return new ConnectorTileEntity();
     }
 
     @Override
