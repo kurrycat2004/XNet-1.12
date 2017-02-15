@@ -43,6 +43,7 @@ public class ItemChannelSettings implements IChannelSettings {
     }
 
     private ChannelMode channelMode = ChannelMode.PRIORITY;
+    private int delay = 0;
 
     public ChannelMode getChannelMode() {
         return channelMode;
@@ -64,6 +65,12 @@ public class ItemChannelSettings implements IChannelSettings {
 
     @Override
     public void tick(int channel, IControllerContext context) {
+        delay--;
+        if (delay <= 0) {
+            delay = 10;
+        } else {
+            return;
+        }
         updateCache(channel, context);
         // @todo optimize
         for (Map.Entry<SidedConsumer, ItemConnectorSettings> entry : itemExtractors.entrySet()) {

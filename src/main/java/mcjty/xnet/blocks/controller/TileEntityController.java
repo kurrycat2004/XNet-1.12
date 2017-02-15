@@ -71,19 +71,27 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
     public void setNetworkId(NetworkId networkId) {
         this.networkId = networkId;
-        markDirty();
+        markDirtyQuick();
     }
 
     @Override
     public void update() {
         if (!getWorld().isRemote) {
-            for (int i = 0 ; i < MAX_CHANNELS ; i++) {
+            for (int i = 0; i < MAX_CHANNELS; i++) {
                 if (channels[i] != null && channels[i].isEnabled()) {
                     channels[i].getChannelSettings().tick(i, this);
+                    markDirtyQuick();
                 }
             }
         }
     }
+
+    public void markDirtyQuick() {
+        if (this.world != null) {
+            this.world.markChunkDirty(this.pos, this);
+        }
+    }
+
 
     private void cleanCache(int channel) {
         cachedConnectors[channel] = null;
@@ -247,20 +255,20 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         channels[channel].setEnabled(Boolean.TRUE.equals(enabled));
 
         cleanCache(channel);
-        markDirty();
+        markDirtyQuick();
     }
 
     private void removeChannel(int channel) {
         channels[channel] = null;
         cachedConnectors[channel] = null;
-        markDirty();
+        markDirtyQuick();
     }
 
     private void createChannel(int channel, String typeId) {
         IChannelType type = XNet.xNetApi.findType(typeId);
         channels[channel] = new ChannelInfo(type);
         cleanCache(channel);
-        markDirty();
+        markDirtyQuick();
     }
 
     private void updateConnector(int channel, SidedPos pos, Map<String, Argument> args) {
@@ -275,7 +283,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                 }
                 channels[channel].getConnectors().get(key).getConnectorSettings().update(data);
                 cleanCache(channel);
-                markDirty();
+                markDirtyQuick();
                 return;
             }
         }
@@ -295,7 +303,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         if (toremove != null) {
             channels[channel].getConnectors().remove(toremove);
             cleanCache(channel);
-            markDirty();
+            markDirtyQuick();
         }
     }
 
@@ -308,7 +316,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         SidedConsumer id = new SidedConsumer(consumerId, pos.getSide().getOpposite());
         channels[channel].createConnector(id);
         cleanCache(channel);
-        markDirty();
+        markDirtyQuick();
     }
 
     @Override
