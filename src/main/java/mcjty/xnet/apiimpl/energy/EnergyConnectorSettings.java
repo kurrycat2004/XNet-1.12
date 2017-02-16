@@ -67,12 +67,12 @@ public class EnergyConnectorSettings implements IConnectorSettings {
     @Override
     public void createGui(IEditorGui gui) {
         gui
-                .shift(10)
                 .choices(TAG_MODE, "Insert or extract mode", energyMode, EnergyMode.values())
                 .shift(10)
                 .redstoneMode(TAG_RS, rsMode).nl()
 
-                .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority).shift(10)
+                .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority).nl()
+
                 .label("Rate")
                 .integer(TAG_RATE, energyMode == EnergyMode.EXT ? "Max energy extraction rate" : "Max energy insertion rate", rate)
                 .shift(10)
