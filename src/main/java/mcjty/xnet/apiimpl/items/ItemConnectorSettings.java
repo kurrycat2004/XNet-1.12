@@ -166,6 +166,9 @@ public class ItemConnectorSettings implements IConnectorSettings {
         itemMode = ItemMode.valueOf(((String)data.get(TAG_MODE)).toUpperCase());
         stackMode = StackMode.valueOf(((String)data.get(TAG_STACK)).toUpperCase());
         speed = Integer.parseInt((String) data.get(TAG_SPEED)) / 10;
+        if (speed == 0) {
+            speed = 2;
+        }
         oredictMode = Boolean.TRUE.equals(data.get(TAG_OREDICT));
         metaMode = Boolean.TRUE.equals(data.get(TAG_META));
         nbtMode = Boolean.TRUE.equals(data.get(TAG_NBT));
@@ -184,6 +187,9 @@ public class ItemConnectorSettings implements IConnectorSettings {
         itemMode = ItemMode.values()[tag.getByte("itemMode")];
         stackMode = StackMode.values()[tag.getByte("stackMode")];
         speed = tag.getInteger("speed");
+        if (speed == 0) {
+            speed = 2;
+        }
         oredictMode = tag.getBoolean("oredictMode");
         metaMode = tag.getBoolean("metaMode");
         nbtMode = tag.getBoolean("nbtMode");

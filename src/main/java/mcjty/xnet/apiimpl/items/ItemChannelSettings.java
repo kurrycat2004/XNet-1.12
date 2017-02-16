@@ -70,10 +70,13 @@ public class ItemChannelSettings implements IChannelSettings {
     public void tick(int channel, IControllerContext context) {
         delay--;
         if (delay <= 0) {
-            delay = 10;
-        } else {
+            delay = 200*6;      // Multiply of the different speeds we have
+        }
+        if (delay % 10 != 0) {
             return;
         }
+        int d = delay/10;
+
         updateCache(channel, context);
         // @todo optimize
         for (Map.Entry<SidedConsumer, ItemConnectorSettings> entry : itemExtractors.entrySet()) {
@@ -86,8 +89,9 @@ public class ItemChannelSettings implements IChannelSettings {
                 // @todo report error somewhere?
                 if (handler != null) {
                     ItemConnectorSettings settings = entry.getValue();
-//                    if (settings.getSpeed()
-                    //@todo
+                    if (d % settings.getSpeed() != 0) {
+                        continue;
+                    }
 
                     Predicate<ItemStack> extractMatcher = settings.getMatcher();
 
