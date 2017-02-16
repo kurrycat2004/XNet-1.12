@@ -3,6 +3,8 @@ package mcjty.xnet.commands;
 import mcjty.lib.compat.CompatCommand;
 import mcjty.lib.compat.CompatCommandBase;
 import mcjty.lib.tools.ItemStackTools;
+import mcjty.rftools.blocks.teleporter.TeleportDestination;
+import mcjty.rftools.blocks.teleporter.TeleportationTools;
 import mcjty.xnet.blocks.cables.NetCableSetup;
 import mcjty.xnet.init.ModBlocks;
 import mcjty.xnet.multiblock.XNetBlobData;
@@ -52,13 +54,15 @@ public class CommandGen implements CompatCommand {
         System.out.println("facing = " + facing);
         System.out.println("pos = " + pos);
         World world = player.getEntityWorld();
-        for (int i = 0 ; i < 200 ; i++) {
+        for (int i = 0 ; i < 1000 ; i++) {
             System.out.println("i = " + i);
             world.setBlockState(pos, NetCableSetup.netCableBlock.getDefaultState());
             world.markBlockRangeForRenderUpdate(pos.add(-1, -1, -1), pos.add(1, 1, 1));
             NetCableSetup.netCableBlock.createCableSegment(world, pos, ItemStackTools.getEmptyStack());
             pos = pos.offset(facing);
         }
+
+        TeleportationTools.performTeleport(player, new TeleportDestination(pos, 0), 0, 0, true);
         System.out.println("done");
     }
 

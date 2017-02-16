@@ -243,6 +243,8 @@ public class ChunkBlob {
         if (!blobAllocations.containsKey(posId)) {
             throw new IllegalArgumentException("There is no cablesegment at " + BlockPosTools.toString(pos) + "!");
         }
+        networkConsumers.remove(posId);
+        cachedConsumers = null;
         networkProviders.remove(posId);
         ColorId oldColor = blobColors.get(blobAllocations.get(posId));
 
