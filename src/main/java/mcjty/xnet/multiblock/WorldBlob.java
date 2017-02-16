@@ -176,42 +176,48 @@ public class WorldBlob {
         }
     }
 
-    private void fixNetworkAllocations() {
-        // First make sure that every chunk has its network mappings correct (mapping
-        // from blob id to network id)
-        for (ChunkBlob blob : chunkBlobMap.values()) {
-            blob.fixNetworkAllocations();
-            removeCachedNetworksForBlob(blob);
-        }
-    }
-
     /**
      * Recalculate the network starting from the given block
      */
     public void recalculateNetwork(ChunkBlob blob) {
-        fixNetworkAllocations();
+        blob.fixNetworkAllocations();
+        removeCachedNetworksForBlob(blob);
 
         Set<ChunkBlob> todo = new HashSet<>();
+        Set<ChunkBlob> recalculated = new HashSet<>();  // Keep track of which chunks we already recalculated
+        recalculated.add(blob);
         todo.add(blob);
-        recalculateNetwork(todo);
+        recalculateNetwork(todo, recalculated);
     }
 
     /**
      * Recalculate the entire network
      */
     public void recalculateNetwork() {
-        fixNetworkAllocations();
+        // First make sure that every chunk has its network mappings correct (mapping
+        // from blob id to network id). Note that this will discard all networking
+        // information from neighbouring chunks. recalculateNetwork() should fix those.
+        for (ChunkBlob blob : chunkBlobMap.values()) {
+            blob.fixNetworkAllocations();
+            removeCachedNetworksForBlob(blob);
+        }
 
         // For every chunk we check all border positions and see where they connect with
         // adjacent chunks
         Set<ChunkBlob> todo = new HashSet<>(chunkBlobMap.values());
-        recalculateNetwork(todo);
+        recalculateNetwork(todo, null);
     }
 
-    private void recalculateNetwork(Set<ChunkBlob> todo) {
+    private void recalculateNetwork(@Nonnull Set<ChunkBlob> todo, @Nullable Set<ChunkBlob> recalculated) {
         while (!todo.isEmpty()) {
             ChunkBlob blob = todo.iterator().next();
             todo.remove(blob);
+            if (recalculated != null) {
+                if (!recalculated.contains(blob)) {
+                    blob.fixNetworkAllocations();
+                    recalculated.add(blob);
+                }
+            }
             removeCachedNetworksForBlob(blob);
 
             Set<IntPos> borderPositions = blob.getBorderPositions();

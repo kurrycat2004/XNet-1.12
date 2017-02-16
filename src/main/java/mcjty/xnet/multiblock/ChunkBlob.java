@@ -464,4 +464,19 @@ public class ChunkBlob {
         return compound;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ChunkBlob chunkBlob = (ChunkBlob) o;
+
+        return chunkNum == chunkBlob.chunkNum;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (chunkNum ^ (chunkNum >>> 32));
+    }
 }
