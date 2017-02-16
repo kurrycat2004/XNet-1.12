@@ -1,6 +1,5 @@
 package mcjty.xnet.apiimpl.energy;
 
-import cofh.api.energy.IEnergyReceiver;
 import mcjty.lib.varia.EnergyTools;
 import mcjty.xnet.api.channels.IChannelSettings;
 import mcjty.xnet.api.channels.IConnectorSettings;
@@ -14,26 +13,42 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.IEnergyStorage;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class EnergyChannelSettings implements IChannelSettings {
 
+    public static final String TAG_MODE = "mode";
+
+    enum ChannelMode {
+        PRIORITY,
+        DISTRIBUTE
+    }
+
+    private ChannelMode channelMode = ChannelMode.DISTRIBUTE;
+
     // Cache data
     private Map<SidedConsumer, EnergyConnectorSettings> energyExtractors = null;
-    private Map<SidedConsumer, EnergyConnectorSettings> energyConsumers = null;
+    private List<Pair<SidedConsumer, EnergyConnectorSettings>> energyConsumers = null;
+
+    public ChannelMode getChannelMode() {
+        return channelMode;
+    }
 
     @Override
     public void readFromNBT(NBTTagCompound tag) {
+        channelMode = ChannelMode.values()[tag.getByte("mode")];
     }
 
     @Override
     public void writeToNBT(NBTTagCompound tag) {
+        tag.setByte("mode", (byte) channelMode.ordinal());
     }
 
     @Override
@@ -48,9 +63,14 @@ public class EnergyChannelSettings implements IChannelSettings {
                 TileEntity te = context.getControllerWorld().getTileEntity(pos);
                 // @todo report error somewhere?
                 if (EnergyTools.isEnergyTE(te)) {
+                    EnergyConnectorSettings settings = entry.getValue();
                     ConnectorTileEntity connectorTE = (ConnectorTileEntity) context.getControllerWorld().getTileEntity(consumerPosition);
-                    connectorTE.setEnergyInputFrom(side, 1000);
-                    int tosend = Math.max(1000, connectorTE.getEnergy());
+                    Integer rate = settings.getRate();
+                    if (rate == null) {
+                        rate = 1000000000;
+                    }
+                    connectorTE.setEnergyInputFrom(side, rate);
+                    int tosend = Math.max(rate, connectorTE.getEnergy());
                     if (tosend > 0) {
                         int actuallysent = insertEnergy(context, tosend);
                         connectorTE.setEnergy(connectorTE.getEnergy() - actuallysent);
@@ -62,7 +82,7 @@ public class EnergyChannelSettings implements IChannelSettings {
 
     private int insertEnergy(@Nonnull IControllerContext context, int energy) {
         int total = energy;
-        for (Map.Entry<SidedConsumer, EnergyConnectorSettings> entry : energyConsumers.entrySet()) {
+        for (Pair<SidedConsumer, EnergyConnectorSettings> entry : energyConsumers) {
             EnergyConnectorSettings settings = entry.getValue();
             BlockPos consumerPosition = context.findConsumerPosition(entry.getKey().getConsumerId());
             if (consumerPosition != null) {
@@ -71,7 +91,12 @@ public class EnergyChannelSettings implements IChannelSettings {
                 TileEntity te = context.getControllerWorld().getTileEntity(pos);
                 // @todo report error somewhere?
                 if (EnergyTools.isEnergyTE(te)) {
-                    energy -= EnergyTools.receiveEnergy(te, side.getOpposite(), energy);
+                    Integer rate = settings.getRate();
+                    if (rate == null) {
+                        rate = 1000000000;
+                    }
+                    int totransfer = Math.max(rate, energy);
+                    energy -= EnergyTools.receiveEnergy(te, side.getOpposite(), totransfer);
                     if (energy <= 0) {
                         return total;
                     }
@@ -90,16 +115,17 @@ public class EnergyChannelSettings implements IChannelSettings {
     private void updateCache(int channel, IControllerContext context) {
         if (energyExtractors == null) {
             energyExtractors = new HashMap<>();
-            energyConsumers = new HashMap<>();
+            energyConsumers = new ArrayList<>();
             Map<SidedConsumer, IConnectorSettings> connectors = context.getConnectors(channel);
             for (Map.Entry<SidedConsumer, IConnectorSettings> entry : connectors.entrySet()) {
                 EnergyConnectorSettings con = (EnergyConnectorSettings) entry.getValue();
-                if (con.getEnergyMode() == EnergyConnectorSettings.EnergyMode.EXTRACT) {
+                if (con.getEnergyMode() == EnergyConnectorSettings.EnergyMode.EXT) {
                     energyExtractors.put(entry.getKey(), con);
                 } else {
-                    energyConsumers.put(entry.getKey(), con);
+                    energyConsumers.add(Pair.of(entry.getKey(), con));
                 }
             }
+            energyConsumers.sort((o1, o2) -> o2.getRight().getPriority().compareTo(o1.getRight().getPriority()));
         }
     }
 
@@ -122,9 +148,11 @@ public class EnergyChannelSettings implements IChannelSettings {
 
     @Override
     public void createGui(IEditorGui gui) {
+        gui.nl().choices(TAG_MODE, "Energy distribution mode", channelMode, ChannelMode.values());
     }
 
     @Override
     public void update(Map<String, Object> data) {
+        channelMode = ChannelMode.valueOf(((String)data.get(TAG_MODE)).toUpperCase());
     }
 }
