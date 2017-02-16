@@ -51,6 +51,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
     // Cached/transient data
     private Map<SidedConsumer, IConnectorSettings> cachedConnectors[] = new Map[MAX_CHANNELS];
+    private int networkVersion = -1;
 
     public TileEntityController() {
         super(100000, 1000); // @todo configurable
@@ -74,9 +75,24 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         markDirtyQuick();
     }
 
+    private void checkNetwork() {
+        WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
+        int netversion = worldBlob.getNetworkVersion(networkId);
+        if (netversion != this.networkVersion) {
+            networkVersion = netversion;
+            System.out.println("netversion = " + netversion);
+            for (int i = 0 ; i < MAX_CHANNELS ; i++) {
+                if (channels[i] != null) {
+                    cleanCache(i);
+                }
+            }
+        }
+    }
+
     @Override
     public void update() {
         if (!getWorld().isRemote) {
+            checkNetwork();
             boolean dirty = false;
             for (int i = 0; i < MAX_CHANNELS; i++) {
                 if (channels[i] != null && channels[i].isEnabled()) {

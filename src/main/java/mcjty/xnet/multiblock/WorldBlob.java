@@ -80,6 +80,7 @@ public class WorldBlob {
     }
 
     private void removeCachedNetworksForBlob(ChunkBlob blob) {
+        blob.fixNetworkAllocations();
         for (NetworkId id : blob.getNetworks()) {
             consumersOnNetwork.remove(id);
             incNetworkVersion(id);
@@ -88,9 +89,17 @@ public class WorldBlob {
 
     private void incNetworkVersion(NetworkId id) {
         if (!networkVersions.containsKey(id)) {
-            networkVersions.put(id, new VersionNumber(0));
+            networkVersions.put(id, new VersionNumber(1));
         }
         networkVersions.get(id).inc();
+    }
+
+    public int getNetworkVersion(NetworkId id) {
+        if (!networkVersions.containsKey(id)) {
+            return 0;
+        } else {
+            return networkVersions.get(id).getVersion();
+        }
     }
 
     /**
@@ -159,7 +168,6 @@ public class WorldBlob {
         // First make sure that every chunk has its network mappings correct (mapping
         // from blob id to network id)
         for (ChunkBlob blob : chunkBlobMap.values()) {
-            blob.fixNetworkAllocations();
             removeCachedNetworksForBlob(blob);
         }
     }
