@@ -86,23 +86,23 @@ public class ItemChannelSettings implements IChannelSettings {
                 // @todo report error somewhere?
                 if (handler != null) {
                     ItemConnectorSettings settings = entry.getValue();
+//                    if (settings.getSpeed()
+                    //@todo
+
                     Predicate<ItemStack> extractMatcher = settings.getMatcher();
 
-                    boolean ok;
                     Integer count = settings.getCount();
                     if (count != null) {
                         int amount = countItems(handler, extractMatcher);
-                        ok = amount >= count;
-                    } else {
-                        ok = true;
+                        if (amount < count) {
+                            continue;
+                        }
                     }
-                    if (ok) {
-                        ItemStack stack = fetchItem(handler, true, extractMatcher, settings.getSpeedMode());
-                        if (ItemStackTools.isValid(stack)) {
-                            Pair<SidedConsumer, ItemConnectorSettings> inserted = insertStackSimulate(context, stack);
-                            if (inserted != null) {
-                                insertStackReal(context, inserted, fetchItem(handler, false, extractMatcher, settings.getSpeedMode()));
-                            }
+                    ItemStack stack = fetchItem(handler, true, extractMatcher, settings.getStackMode());
+                    if (ItemStackTools.isValid(stack)) {
+                        Pair<SidedConsumer, ItemConnectorSettings> inserted = insertStackSimulate(context, stack);
+                        if (inserted != null) {
+                            insertStackReal(context, inserted, fetchItem(handler, false, extractMatcher, settings.getStackMode()));
                         }
                     }
                 }
@@ -167,11 +167,11 @@ public class ItemChannelSettings implements IChannelSettings {
         return cnt;
     }
 
-    private ItemStack fetchItem(IItemHandler handler, boolean simulate, Predicate<ItemStack> matcher, ItemConnectorSettings.SpeedMode speedMode) {
+    private ItemStack fetchItem(IItemHandler handler, boolean simulate, Predicate<ItemStack> matcher, ItemConnectorSettings.StackMode stackMode) {
         for (int i = 0 ; i < handler.getSlots() ; i++) {
             ItemStack stack = handler.getStackInSlot(i);
             if (ItemStackTools.isValid(stack)) {
-                stack = handler.extractItem(i, speedMode == ItemConnectorSettings.SpeedMode.SINGLE ? 1 : stack.getMaxStackSize(), simulate);
+                stack = handler.extractItem(i, stackMode == ItemConnectorSettings.StackMode.SINGLE ? 1 : stack.getMaxStackSize(), simulate);
                 if (ItemStackTools.isValid(stack) && matcher.test(stack)) {
                     return stack;
                 }

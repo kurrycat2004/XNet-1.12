@@ -20,6 +20,9 @@ import java.util.Map;
 
 public abstract class AbstractEditorPanel implements IEditorGui {
 
+    public static final int LEFTMARGIN = 3;
+    public static final int TOPMARGIN = 3;
+
     private final Panel panel;
     private final Minecraft mc;
     private final GuiController gui;
@@ -57,8 +60,8 @@ public abstract class AbstractEditorPanel implements IEditorGui {
         this.panel = panel;
         this.mc = mc;
         this.gui = gui;
-        x = 4;
-        y = 3;
+        x = LEFTMARGIN;
+        y = TOPMARGIN;
         data = new HashMap<>();
     }
 
@@ -200,7 +203,7 @@ public abstract class AbstractEditorPanel implements IEditorGui {
     public IEditorGui choices(String tag, String tooltip, String current, String... values) {
         int w = 10;
         for (String s : values) {
-            w = Math.max(w, mc.fontRenderer.getStringWidth(s) + 15);
+            w = Math.max(w, mc.fontRenderer.getStringWidth(s) + 14);
         }
         fitWidth(w);
         ChoiceLabel choice = new ChoiceLabel(mc, gui).addChoices(values).setChoice(current)
@@ -291,7 +294,7 @@ public abstract class AbstractEditorPanel implements IEditorGui {
     @Override
     public IEditorGui nl() {
         y += 16;
-        x = 4;
+        x = LEFTMARGIN;
         return this;
     }
 }
