@@ -195,9 +195,7 @@ public class ItemChannelSettings implements IChannelSettings {
                 }
             }
 
-            if (channelMode == ChannelMode.PRIORITY) {
-                itemConsumers.sort((o1, o2) -> o2.getRight().getPriority().compareTo(o1.getRight().getPriority()));
-            }
+            itemConsumers.sort((o1, o2) -> o2.getRight().getPriority().compareTo(o1.getRight().getPriority()));
         }
     }
 
