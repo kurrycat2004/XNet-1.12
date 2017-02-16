@@ -8,6 +8,7 @@ import mcjty.lib.compat.CompatCreativeTabs;
 import mcjty.xnet.api.IXNet;
 import mcjty.xnet.apiimpl.XNetApi;
 import mcjty.xnet.commands.CommandDump;
+import mcjty.xnet.commands.CommandGen;
 import mcjty.xnet.multiblock.XNetBlobData;
 import mcjty.xnet.proxy.CommonProxy;
 import net.minecraft.creativetab.CreativeTabs;
@@ -78,6 +79,7 @@ public class XNet implements ModBase {
     @Mod.EventHandler
     public void serverLoad(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandDump());
+        event.registerServerCommand(new CommandGen());
     }
 
     public String getModId() {

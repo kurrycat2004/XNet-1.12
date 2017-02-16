@@ -142,7 +142,7 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
     }
 
     @Override
-    protected void createCableSegment(World world, BlockPos pos, ItemStack stack) {
+    public void createCableSegment(World world, BlockPos pos, ItemStack stack) {
         XNetBlobData blobData = XNetBlobData.getBlobData(world);
         WorldBlob worldBlob = blobData.getWorldBlob(world);
         ConsumerId consumer;

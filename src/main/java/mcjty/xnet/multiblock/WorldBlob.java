@@ -52,7 +52,17 @@ public class WorldBlob {
     }
 
     @Nullable
-    public ConsumerId getConsumerAt(BlockPos pos) {
+    public Set<NetworkId> getNetworksAt(@Nonnull BlockPos pos) {
+        ChunkBlob blob = getBlob(pos);
+        if (blob == null) {
+            return null;
+        }
+        IntPos intPos = new IntPos(pos);
+        return blob.getNetworksForPosition(intPos);
+    }
+
+    @Nullable
+    public ConsumerId getConsumerAt(@Nonnull BlockPos pos) {
         ChunkBlob blob = getBlob(pos);
         if (blob == null) {
             return null;
@@ -80,7 +90,6 @@ public class WorldBlob {
     }
 
     private void removeCachedNetworksForBlob(ChunkBlob blob) {
-        blob.fixNetworkAllocations();
         for (NetworkId id : blob.getNetworks()) {
             consumersOnNetwork.remove(id);
             incNetworkVersion(id);
@@ -110,6 +119,7 @@ public class WorldBlob {
         if (blob.createNetworkProvider(pos, color, network)) {
             recalculateNetwork(blob);
         } else {
+            blob.fixNetworkAllocations();
             removeCachedNetworksForBlob(blob);
         }
     }
@@ -122,6 +132,7 @@ public class WorldBlob {
         if (blob.createNetworkConsumer(pos, color, consumer)) {
             recalculateNetwork(blob);
         } else {
+            blob.fixNetworkAllocations();
             removeCachedNetworksForBlob(blob);
         }
     }
@@ -134,6 +145,7 @@ public class WorldBlob {
         if (blob.createCableSegment(pos, color)) {
             recalculateNetwork(blob);
         } else {
+            blob.fixNetworkAllocations();
             removeCachedNetworksForBlob(blob);
         }
     }
@@ -168,6 +180,7 @@ public class WorldBlob {
         // First make sure that every chunk has its network mappings correct (mapping
         // from blob id to network id)
         for (ChunkBlob blob : chunkBlobMap.values()) {
+            blob.fixNetworkAllocations();
             removeCachedNetworksForBlob(blob);
         }
     }
@@ -228,6 +241,14 @@ public class WorldBlob {
             }
 
         }
+    }
+
+    private void dump(String prefix, Set<NetworkId> networks) {
+        String s = prefix + ": ";
+        for (NetworkId network : networks) {
+            s += network.getId() + " ";
+        }
+        System.out.println("s = " + s);
     }
 
 

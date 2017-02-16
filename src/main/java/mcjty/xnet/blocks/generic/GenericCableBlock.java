@@ -6,7 +6,10 @@ import mcjty.lib.compat.waila.WailaInfoProvider;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.ProbeMode;
+import mcjty.theoneprobe.api.TextStyleClass;
 import mcjty.xnet.XNet;
+import mcjty.xnet.api.keys.ConsumerId;
+import mcjty.xnet.api.keys.NetworkId;
 import mcjty.xnet.blocks.cables.ConnectorType;
 import mcjty.xnet.multiblock.ColorId;
 import mcjty.xnet.multiblock.WorldBlob;
@@ -37,6 +40,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.List;
+import java.util.Set;
 
 public abstract class GenericCableBlock extends CompatBlock implements WailaInfoProvider, TOPInfoProvider {
 
@@ -80,7 +84,19 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
 
     @Override
     public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data) {
+        WorldBlob worldBlob = XNetBlobData.getBlobData(world).getWorldBlob(world);
 
+        Set<NetworkId> networks = worldBlob.getNetworksAt(data.getPos());
+        if (networks != null && !networks.isEmpty()) {
+            for (NetworkId network : networks) {
+                probeInfo.text(TextStyleClass.LABEL + "Network: " + TextStyleClass.INFO + network.getId());
+            }
+        }
+
+        ConsumerId consumerId = worldBlob.getConsumerAt(data.getPos());
+        if (consumerId != null) {
+            probeInfo.text(TextStyleClass.LABEL + "Consumer: " + TextStyleClass.INFO + consumerId.getId());
+        }
     }
 
     public String getConnectorTexture() {
@@ -95,7 +111,7 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
         }
     }
 
-    protected void createCableSegment(World world, BlockPos pos, ItemStack stack) {
+    public void createCableSegment(World world, BlockPos pos, ItemStack stack) {
         XNetBlobData blobData = XNetBlobData.getBlobData(world);
         WorldBlob worldBlob = blobData.getWorldBlob(world);
         worldBlob.createCableSegment(pos, STANDARD_COLOR);
