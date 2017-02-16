@@ -11,6 +11,7 @@ import mcjty.xnet.blocks.controller.GuiController;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
@@ -25,9 +26,8 @@ public class ItemConnectorSettings implements IConnectorSettings {
     public static final String TAG_RS = "rs";
     public static final String TAG_META = "meta";
     public static final String TAG_PRIORITY = "priority";
-    public static final String TAG_MIN = "min";
-    public static final String TAG_MAX = "max";
-    public static final String TAG_FILTER = "f";
+    public static final String TAG_COUNT = "count";
+    public static final String TAG_FILTER = "flt";
     public static final String TAG_BLACKLIST = "blacklist";
 
     public static final int FILTER_SIZE = 18;
@@ -50,8 +50,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
     private RSMode rsMode = RSMode.IGNORED;
     private boolean blacklist = false;
     @Nullable private Integer priority = 0;
-    @Nullable private Integer minAmount = null;
-    @Nullable private Integer maxAmount = null;
+    @Nullable private Integer count = null;
     private ItemStackList filters = ItemStackList.create(FILTER_SIZE);
 
     // Cached matcher for items
@@ -92,9 +91,8 @@ public class ItemConnectorSettings implements IConnectorSettings {
                 .shift(5)
                 .redstoneMode(TAG_RS, rsMode).nl()
                 .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority).shift(10)
-                .label("Keep")
-                .integer(TAG_MIN, "Minimum number to insert/keep", minAmount)
-                .integer(TAG_MAX, "Maximum number to insert/keep", maxAmount).nl()
+                .label("Count")
+                .integer(TAG_COUNT, itemMode == ItemMode.EXT ? "Amount in destination inventory to keep" : "Max amount in destination inventory", count).nl()
                 .toggleText(TAG_BLACKLIST, "Enable blacklist mode", "BL", blacklist).shift(2)
                 .toggleText(TAG_OREDICT, "Ore dictionary matching", "Ore", oredictMode).shift(2)
                 .toggleText(TAG_META, "Metadata matching", "Meta", metaMode).shift(2)
@@ -103,9 +101,6 @@ public class ItemConnectorSettings implements IConnectorSettings {
             gui.ghostSlot(TAG_FILTER + i, filters.get(i));
         }
     }
-
-    private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_MIN, TAG_MAX, TAG_PRIORITY, TAG_OREDICT, TAG_META, TAG_NBT, TAG_BLACKLIST);
-    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_MIN, TAG_MAX, TAG_OREDICT, TAG_META, TAG_NBT, TAG_BLACKLIST, TAG_SPEED);
 
     public Predicate<ItemStack> getMatcher() {
         if (matcher == null) {
@@ -124,6 +119,23 @@ public class ItemConnectorSettings implements IConnectorSettings {
         }
         return matcher;
     }
+
+    public SpeedMode getSpeedMode() {
+        return speedMode;
+    }
+
+    @Nonnull
+    public Integer getPriority() {
+        return priority == null ? 0 : priority;
+    }
+
+    @Nullable
+    public Integer getCount() {
+        return count;
+    }
+
+    private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COUNT, TAG_PRIORITY, TAG_OREDICT, TAG_META, TAG_NBT, TAG_BLACKLIST);
+    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COUNT, TAG_OREDICT, TAG_META, TAG_NBT, TAG_BLACKLIST, TAG_SPEED);
 
     @Override
     public boolean isEnabled(String tag) {
@@ -147,8 +159,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
         rsMode = RSMode.valueOf(((String)data.get(TAG_RS)).toUpperCase());
         blacklist = Boolean.TRUE.equals(data.get(TAG_BLACKLIST));
         priority = (Integer) data.get(TAG_PRIORITY);
-        minAmount = (Integer) data.get(TAG_MIN);
-        maxAmount = (Integer) data.get(TAG_MAX);
+        count = (Integer) data.get(TAG_COUNT);
         for (int i = 0 ; i < FILTER_SIZE ; i++) {
             filters.set(i, (ItemStack) data.get(TAG_FILTER+i));
         }
@@ -169,15 +180,10 @@ public class ItemConnectorSettings implements IConnectorSettings {
         } else {
             priority = null;
         }
-        if (tag.hasKey("min")) {
-            minAmount = tag.getInteger("min");
+        if (tag.hasKey("count")) {
+            count = tag.getInteger("count");
         } else {
-            minAmount = null;
-        }
-        if (tag.hasKey("max")) {
-            maxAmount = tag.getInteger("max");
-        } else {
-            maxAmount = null;
+            count = null;
         }
         for (int i = 0 ; i < FILTER_SIZE ; i++) {
             if (tag.hasKey("filter" + i)) {
@@ -202,11 +208,8 @@ public class ItemConnectorSettings implements IConnectorSettings {
         if (priority != null) {
             tag.setInteger("priority", priority);
         }
-        if (minAmount != null) {
-            tag.setInteger("min", minAmount);
-        }
-        if (maxAmount != null) {
-            tag.setInteger("max", maxAmount);
+        if (count != null) {
+            tag.setInteger("count", count);
         }
         for (int i = 0 ; i < FILTER_SIZE ; i++) {
             if (ItemStackTools.isValid(filters.get(i))) {

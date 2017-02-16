@@ -226,12 +226,12 @@ public abstract class AbstractEditorPanel implements IEditorGui {
 
     @Override
     public IEditorGui redstoneMode(String tag, RSMode current) {
-        int w = 16;
+        int w = 14;
         fitWidth(w);
         ImageChoiceLabel redstoneMode = new ImageChoiceLabel(mc, gui)
-                .addChoice(RedstoneMode.REDSTONE_IGNORED.getDescription(), "Redstone mode:\nIgnored", GuiController.iconGuiElements, 0, 0)
-                .addChoice(RedstoneMode.REDSTONE_OFFREQUIRED.getDescription(), "Redstone mode:\nOff to activate", GuiController.iconGuiElements, 16, 0)
-                .addChoice(RedstoneMode.REDSTONE_ONREQUIRED.getDescription(), "Redstone mode:\nOn to activate", GuiController.iconGuiElements, 32, 0);
+                .addChoice(RedstoneMode.REDSTONE_IGNORED.getDescription(), "Redstone mode:\nIgnored", GuiController.iconGuiElements, 1, 1)
+                .addChoice(RedstoneMode.REDSTONE_OFFREQUIRED.getDescription(), "Redstone mode:\nOff to activate", GuiController.iconGuiElements, 17, 1)
+                .addChoice(RedstoneMode.REDSTONE_ONREQUIRED.getDescription(), "Redstone mode:\nOn to activate", GuiController.iconGuiElements, 33, 1);
         switch (current) {
             case IGNORED:
                 redstoneMode.setCurrentChoice(RedstoneMode.REDSTONE_IGNORED.getDescription());
@@ -243,7 +243,7 @@ public abstract class AbstractEditorPanel implements IEditorGui {
                 redstoneMode.setCurrentChoice(RedstoneMode.REDSTONE_ONREQUIRED.getDescription());
                 break;
         }
-        redstoneMode.setLayoutHint(new PositionalLayout.PositionalHint(x, y-1, w, 16));
+        redstoneMode.setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
         data.put(tag, current.name());
         redstoneMode.addChoiceEvent((parent, newChoice) -> update(tag, newChoice));
         panel.addChild(redstoneMode);

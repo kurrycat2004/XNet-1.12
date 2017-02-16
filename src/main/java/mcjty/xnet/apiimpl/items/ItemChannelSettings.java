@@ -20,10 +20,13 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -33,34 +36,34 @@ public class ItemChannelSettings implements IChannelSettings {
 
     // Cache data
     private Map<SidedConsumer, ItemConnectorSettings> itemExtractors = null;
-    private Map<SidedConsumer, ItemConnectorSettings> itemConsumers = null;
+    private List<Pair<SidedConsumer, ItemConnectorSettings>> itemConsumers = null;
 
 
     enum ChannelMode {
         PRIORITY,
-        ROUNDROBIN,
-        RANDOM
+        ROUNDROBIN
     }
 
     private ChannelMode channelMode = ChannelMode.PRIORITY;
     private int delay = 0;
+    private int roundRobinOffset = 0;
 
     public ChannelMode getChannelMode() {
         return channelMode;
     }
 
-    public void setChannelMode(ChannelMode channelMode) {
-        this.channelMode = channelMode;
-    }
-
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         channelMode = ChannelMode.values()[tag.getByte("mode")];
+        delay = tag.getInteger("delay");
+        roundRobinOffset = tag.getInteger("offset");
     }
 
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         tag.setByte("mode", (byte) channelMode.ordinal());
+        tag.setInteger("delay", delay);
+        tag.setInteger("offset", roundRobinOffset);
     }
 
     @Override
@@ -82,11 +85,24 @@ public class ItemChannelSettings implements IChannelSettings {
                 IItemHandler handler = getItemHandlerAt(te, side.getOpposite());
                 // @todo report error somewhere?
                 if (handler != null) {
-                    Predicate<ItemStack> extractMatcher = entry.getValue().getMatcher();
-                    ItemStack stack = fetchOneItem(handler, true, extractMatcher);
-                    if (ItemStackTools.isValid(stack)) {
-                        if (insertStack(context, stack, true)) {
-                            insertStack(context, fetchOneItem(handler, false, extractMatcher), false);
+                    ItemConnectorSettings settings = entry.getValue();
+                    Predicate<ItemStack> extractMatcher = settings.getMatcher();
+
+                    boolean ok;
+                    Integer count = settings.getCount();
+                    if (count != null) {
+                        int amount = countItems(handler, extractMatcher);
+                        ok = amount >= count;
+                    } else {
+                        ok = true;
+                    }
+                    if (ok) {
+                        ItemStack stack = fetchItem(handler, true, extractMatcher, settings.getSpeedMode());
+                        if (ItemStackTools.isValid(stack)) {
+                            Pair<SidedConsumer, ItemConnectorSettings> inserted = insertStackSimulate(context, stack);
+                            if (inserted != null) {
+                                insertStackReal(context, inserted, fetchItem(handler, false, extractMatcher, settings.getSpeedMode()));
+                            }
                         }
                     }
                 }
@@ -94,9 +110,12 @@ public class ItemChannelSettings implements IChannelSettings {
         }
     }
 
-    private boolean insertStack(@Nonnull IControllerContext context, @Nonnull ItemStack stack, boolean simulate) {
-        for (Map.Entry<SidedConsumer, ItemConnectorSettings> entry : itemConsumers.entrySet()) {
+    private Pair<SidedConsumer, ItemConnectorSettings> insertStackSimulate(@Nonnull IControllerContext context, @Nonnull ItemStack stack) {
+        for (int j = 0 ; j < itemConsumers.size() ; j++) {
+            int i = (j + roundRobinOffset)  % itemConsumers.size();
+            Pair<SidedConsumer, ItemConnectorSettings> entry = itemConsumers.get(i);
             ItemConnectorSettings settings = entry.getValue();
+
             if (settings.getMatcher().test(stack)) {
                 BlockPos consumerPosition = context.findConsumerPosition(entry.getKey().getConsumerId());
                 if (consumerPosition != null) {
@@ -106,21 +125,56 @@ public class ItemChannelSettings implements IChannelSettings {
                     IItemHandler handler = getItemHandlerAt(te, side.getOpposite());
                     // @todo report error somewhere?
                     if (handler != null) {
-                        if (ItemStackTools.isEmpty(ItemHandlerHelper.insertItem(handler, stack, simulate))) {
-                            return true;
+                        Integer count = settings.getCount();
+                        boolean ok;
+                        if (count != null) {
+                            int amount = countItems(handler, settings.getMatcher());
+                            ok = amount < count;
+                        } else {
+                            ok = true;
+                        }
+                        if (ok && ItemStackTools.isEmpty(ItemHandlerHelper.insertItem(handler, stack, true))) {
+                            return entry;
                         }
                     }
                 }
             }
         }
-        return false;
+        return null;
     }
 
-    private ItemStack fetchOneItem(IItemHandler handler, boolean simulate, Predicate<ItemStack> matcher) {
+    private void insertStackReal(@Nonnull IControllerContext context, @Nonnull Pair<SidedConsumer, ItemConnectorSettings> entry, @Nonnull ItemStack stack) {
+        BlockPos consumerPosition = context.findConsumerPosition(entry.getKey().getConsumerId());
+        EnumFacing side = entry.getKey().getSide();
+        BlockPos pos = consumerPosition.offset(side);
+        TileEntity te = context.getControllerWorld().getTileEntity(pos);
+        IItemHandler handler = getItemHandlerAt(te, side.getOpposite());
+        if (ItemStackTools.isEmpty(ItemHandlerHelper.insertItem(handler, stack, false))) {
+            roundRobinOffset = (roundRobinOffset+1) % itemConsumers.size();
+        }
+    }
+
+    private int countItems(IItemHandler handler, Predicate<ItemStack> matcher) {
+        int cnt = 0;
         for (int i = 0 ; i < handler.getSlots() ; i++) {
-            ItemStack stack = handler.extractItem(i, 1, simulate);
-            if (ItemStackTools.isValid(stack) && matcher.test(stack)) {
-                return stack;
+            ItemStack s = handler.getStackInSlot(i);
+            if (ItemStackTools.isValid(s)) {
+                if (matcher.test(s)) {
+                    cnt += ItemStackTools.getStackSize(s);
+                }
+            }
+        }
+        return cnt;
+    }
+
+    private ItemStack fetchItem(IItemHandler handler, boolean simulate, Predicate<ItemStack> matcher, ItemConnectorSettings.SpeedMode speedMode) {
+        for (int i = 0 ; i < handler.getSlots() ; i++) {
+            ItemStack stack = handler.getStackInSlot(i);
+            if (ItemStackTools.isValid(stack)) {
+                stack = handler.extractItem(i, speedMode == ItemConnectorSettings.SpeedMode.SINGLE ? 1 : stack.getMaxStackSize(), simulate);
+                if (ItemStackTools.isValid(stack) && matcher.test(stack)) {
+                    return stack;
+                }
             }
         }
         return ItemStackTools.getEmptyStack();
@@ -130,15 +184,19 @@ public class ItemChannelSettings implements IChannelSettings {
     private void updateCache(int channel, IControllerContext context) {
         if (itemExtractors == null) {
             itemExtractors = new HashMap<>();
-            itemConsumers = new HashMap<>();
+            itemConsumers = new ArrayList<>();
             Map<SidedConsumer, IConnectorSettings> connectors = context.getConnectors(channel);
             for (Map.Entry<SidedConsumer, IConnectorSettings> entry : connectors.entrySet()) {
                 ItemConnectorSettings con = (ItemConnectorSettings) entry.getValue();
                 if (con.getItemMode() == ItemConnectorSettings.ItemMode.EXT) {
                     itemExtractors.put(entry.getKey(), con);
                 } else {
-                    itemConsumers.put(entry.getKey(), con);
+                    itemConsumers.add(Pair.of(entry.getKey(), con));
                 }
+            }
+
+            if (channelMode == ChannelMode.PRIORITY) {
+                itemConsumers.sort((o1, o2) -> o2.getRight().getPriority().compareTo(o1.getRight().getPriority()));
             }
         }
     }
@@ -174,6 +232,7 @@ public class ItemChannelSettings implements IChannelSettings {
     @Override
     public void update(Map<String, Object> data) {
         channelMode = ChannelMode.valueOf(((String)data.get(TAG_MODE)).toUpperCase());
+        roundRobinOffset = 0;
     }
 
     @Nullable
