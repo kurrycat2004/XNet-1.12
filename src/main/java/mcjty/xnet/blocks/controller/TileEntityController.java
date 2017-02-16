@@ -77,19 +77,21 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     @Override
     public void update() {
         if (!getWorld().isRemote) {
+            boolean dirty = false;
             for (int i = 0; i < MAX_CHANNELS; i++) {
                 if (channels[i] != null && channels[i].isEnabled()) {
                     channels[i].getChannelSettings().tick(i, this);
-                    markDirtyQuick();
+                    dirty = true;
                 }
+            }
+            if (dirty) {
+                markDirtyQuick();
             }
         }
     }
 
     public void markDirtyQuick() {
-        if (this.world != null) {
-            this.world.markChunkDirty(this.pos, this);
-        }
+        getWorld().markChunkDirty(this.pos, this);
     }
 
 

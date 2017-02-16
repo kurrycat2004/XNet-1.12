@@ -14,7 +14,7 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
     private int energy = 0;
     private int inputFromSide[] = new int[] { 0, 0, 0, 0, 0, 0 };
 
-    public static final int MAX_ENERGY = 100000;    // @todo configurable?
+    public static final int MAX_ENERGY = 1000000;    // @todo configurable?
 
     @Override
     public void readFromNBT(NBTTagCompound tagCompound) {
@@ -114,7 +114,7 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
                 if (sidedHandlers[facing.ordinal()] == null) {
                     createSidedHandler(facing);
                 }
-                return (T) sidedHandlers[facing.ordinal()];
+                return CapabilityEnergy.ENERGY.cast(sidedHandlers[facing.ordinal()]);
             }
         }
         return super.getCapability(capability, facing);
