@@ -101,6 +101,10 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
 
         refresh();
         listDirty = 0;
+
+        int currentRF = GenericEnergyStorageTileEntity.getCurrentRF();
+        energyBar.setValue(currentRF);
+        tileEntity.requestRfFromServer(XNet.MODID);
     }
 
     private void initRedstoneMode() {
@@ -434,6 +438,8 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
             int y = (int) window.getToplevel().getBounds().getY();
             RenderHelper.drawVerticalGradientRect(x+channel * 14 + 41, y+22, x+channel * 14 + 41+12, y+230, 0x33aaffff, 0x33aaffff);
         }
+        int currentRF = GenericEnergyStorageTileEntity.getCurrentRF();
+        energyBar.setValue(currentRF);
         tileEntity.requestRfFromServer(XNet.MODID);
     }
 }
