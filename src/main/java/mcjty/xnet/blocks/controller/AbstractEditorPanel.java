@@ -110,6 +110,7 @@ public abstract class AbstractEditorPanel implements IEditorGui {
                 .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
         data.put(tag, value);
         text.addTextEnterEvent((parent, newText) -> update(tag, newText));
+        text.addTextEvent((parent, newText) -> update(tag, newText));
         panel.addChild(text);
         components.put(tag, text);
         x += w;
@@ -136,6 +137,7 @@ public abstract class AbstractEditorPanel implements IEditorGui {
                 .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
         data.put(tag, value);
         text.addTextEnterEvent((parent, newText) -> update(tag, parseInt(newText)));
+        text.addTextEvent((parent, newText) -> update(tag, parseInt(newText)));
         panel.addChild(text);
         components.put(tag, text);
         x += w;
@@ -162,6 +164,7 @@ public abstract class AbstractEditorPanel implements IEditorGui {
                 .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
         data.put(tag, value);
         text.addTextEnterEvent((parent, newText) -> update(tag, parseDouble(newText)));
+        text.addTextEvent((parent, newText) -> update(tag, parseDouble(newText)));
         panel.addChild(text);
         components.put(tag, text);
         x += w;

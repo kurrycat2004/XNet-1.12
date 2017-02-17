@@ -106,11 +106,6 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         }
     }
 
-    public void markDirtyQuick() {
-        getWorld().markChunkDirty(this.pos, this);
-    }
-
-
     private void cleanCache(int channel) {
         cachedConnectors[channel] = null;
         channels[channel].getChannelSettings().cleanCache();

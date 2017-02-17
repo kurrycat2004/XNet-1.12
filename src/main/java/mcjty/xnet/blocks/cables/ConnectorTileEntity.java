@@ -55,11 +55,6 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         }
     }
 
-    public void markDirtyQuick() {
-        getWorld().markChunkDirty(this.pos, this);
-    }
-
-
     @Override
     public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate) {
         return 0;
