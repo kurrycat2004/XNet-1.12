@@ -58,6 +58,7 @@ public class EnergyChannelSettings implements IChannelSettings {
         for (Map.Entry<SidedConsumer, EnergyConnectorSettings> entry : energyExtractors.entrySet()) {
             BlockPos consumerPosition = context.findConsumerPosition(entry.getKey().getConsumerId());
             if (consumerPosition != null) {
+
                 EnumFacing side = entry.getKey().getSide();
                 BlockPos pos = consumerPosition.offset(side);
                 TileEntity te = context.getControllerWorld().getTileEntity(pos);
@@ -65,12 +66,21 @@ public class EnergyChannelSettings implements IChannelSettings {
                 if (EnergyTools.isEnergyTE(te)) {
                     EnergyConnectorSettings settings = entry.getValue();
                     ConnectorTileEntity connectorTE = (ConnectorTileEntity) context.getControllerWorld().getTileEntity(consumerPosition);
+
+                    Integer count = settings.getMinmax();
+                    if (count != null) {
+                        EnergyTools.EnergyLevel level = EnergyTools.getEnergyLevel(te);
+                        if (level.getEnergy() < count) {
+                            continue;
+                        }
+                    }
+
                     Integer rate = settings.getRate();
                     if (rate == null) {
                         rate = 1000000000;
                     }
                     connectorTE.setEnergyInputFrom(side, rate);
-                    int tosend = Math.max(rate, connectorTE.getEnergy());
+                    int tosend = Math.min(rate, connectorTE.getEnergy());
                     if (tosend > 0) {
                         int actuallysent = insertEnergy(context, tosend);
                         connectorTE.setEnergy(connectorTE.getEnergy() - actuallysent);
@@ -81,7 +91,7 @@ public class EnergyChannelSettings implements IChannelSettings {
     }
 
     private int insertEnergy(@Nonnull IControllerContext context, int energy) {
-        int total = energy;
+        int total = 0;
         for (Pair<SidedConsumer, EnergyConnectorSettings> entry : energyConsumers) {
             EnergyConnectorSettings settings = entry.getValue();
             BlockPos consumerPosition = context.findConsumerPosition(entry.getKey().getConsumerId());
@@ -91,19 +101,29 @@ public class EnergyChannelSettings implements IChannelSettings {
                 TileEntity te = context.getControllerWorld().getTileEntity(pos);
                 // @todo report error somewhere?
                 if (EnergyTools.isEnergyTE(te)) {
+                    Integer count = settings.getMinmax();
+                    if (count != null) {
+                        EnergyTools.EnergyLevel level = EnergyTools.getEnergyLevel(te);
+                        if (level.getEnergy() >= count) {
+                            continue;
+                        }
+                    }
+
                     Integer rate = settings.getRate();
                     if (rate == null) {
                         rate = 1000000000;
                     }
-                    int totransfer = Math.max(rate, energy);
-                    energy -= EnergyTools.receiveEnergy(te, side.getOpposite(), totransfer);
+                    int totransfer = Math.min(rate, energy);
+                    int e = EnergyTools.receiveEnergy(te, side.getOpposite(), totransfer);
+                    energy -= e;
+                    total += e;
                     if (energy <= 0) {
                         return total;
                     }
                 }
             }
         }
-        return total - energy;
+        return total;
     }
 
     @Override

@@ -40,17 +40,25 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
 
     public void setEnergy(int energy) {
         if (this.energy != energy) {
+            if (energy < 0) {
+                energy = 0;
+            }
             this.energy = energy;
-            markDirty();
+            markDirtyQuick();
         }
     }
 
     public void setEnergyInputFrom(EnumFacing from, int rate) {
         if (inputFromSide[from.ordinal()] != rate) {
             inputFromSide[from.ordinal()] = rate;
-            markDirty();
+            markDirtyQuick();
         }
     }
+
+    public void markDirtyQuick() {
+        getWorld().markChunkDirty(this.pos, this);
+    }
+
 
     @Override
     public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate) {
@@ -73,7 +81,7 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
             if (!simulate && energy != newenergy) {
                 energy = newenergy;
                 inputFromSide[from.ordinal()] = 0;
-                markDirty();
+                markDirtyQuick();
             }
             return toreceive;
         }

@@ -130,14 +130,13 @@ public class ItemChannelSettings implements IChannelSettings {
                     // @todo report error somewhere?
                     if (handler != null) {
                         Integer count = settings.getCount();
-                        boolean ok;
                         if (count != null) {
                             int amount = countItems(handler, settings.getMatcher());
-                            ok = amount < count;
-                        } else {
-                            ok = true;
+                            if (amount >= count) {
+                                continue;
+                            }
                         }
-                        if (ok && ItemStackTools.isEmpty(ItemHandlerHelper.insertItem(handler, stack, true))) {
+                        if (ItemStackTools.isEmpty(ItemHandlerHelper.insertItem(handler, stack, true))) {
                             return entry;
                         }
                     }
