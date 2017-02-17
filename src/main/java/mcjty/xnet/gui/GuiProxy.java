@@ -1,6 +1,10 @@
 package mcjty.xnet.gui;
 
+import mcjty.lib.container.EmptyContainer;
 import mcjty.lib.container.GenericBlock;
+import mcjty.xnet.blocks.cables.ConnectorBlock;
+import mcjty.xnet.blocks.cables.ConnectorTileEntity;
+import mcjty.xnet.blocks.cables.GuiConnector;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -12,6 +16,7 @@ public class GuiProxy implements IGuiHandler {
 
     public static final int GUI_MANUAL_MAIN = 0;
     public static final int GUI_CONTROLLER = 1;
+    public static final int GUI_CONNECTOR = 2;
 
     @Override
     public Object getServerGuiElement(int guiid, EntityPlayer entityPlayer, World world, int x, int y, int z) {
@@ -21,6 +26,8 @@ public class GuiProxy implements IGuiHandler {
             GenericBlock genericBlock = (GenericBlock) block;
             TileEntity te = world.getTileEntity(pos);
             return genericBlock.createServerContainer(entityPlayer, te);
+        } else if (block instanceof ConnectorBlock) {
+            return new EmptyContainer(entityPlayer, null);
         }
         return null;
     }
@@ -33,6 +40,9 @@ public class GuiProxy implements IGuiHandler {
             GenericBlock genericBlock = (GenericBlock) block;
             TileEntity te = world.getTileEntity(pos);
             return genericBlock.createClientGui(entityPlayer, te);
+        } else if (block instanceof ConnectorBlock) {
+            TileEntity te = world.getTileEntity(pos);
+            return new GuiConnector((ConnectorTileEntity) te, new EmptyContainer(entityPlayer, null));
         }
         return null;
     }

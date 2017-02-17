@@ -3,16 +3,23 @@ package mcjty.xnet.blocks.cables;
 import cofh.api.energy.IEnergyProvider;
 import cofh.api.energy.IEnergyReceiver;
 import mcjty.lib.entity.GenericTileEntity;
+import mcjty.lib.network.Argument;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
+import java.util.Map;
+
 public class ConnectorTileEntity extends GenericTileEntity implements IEnergyProvider, IEnergyReceiver {
+
+    public static final String CMD_SETNAME = "setName";
 
     private int energy = 0;
     private int inputFromSide[] = new int[] { 0, 0, 0, 0, 0, 0 };
+    private String name = "";
 
     public static final int MAX_ENERGY = 1000000;    // @todo configurable?
 
@@ -24,6 +31,7 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         if (inputFromSide.length != 6) {
             inputFromSide = new int[] { 0, 0, 0, 0, 0, 0 };
         }
+        name = tagCompound.getString("name");
     }
 
     @Override
@@ -31,7 +39,12 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         super.writeToNBT(tagCompound);
         tagCompound.setInteger("energy", energy);
         tagCompound.setIntArray("inputs", inputFromSide);
+        tagCompound.setString("name", name);
         return tagCompound;
+    }
+
+    public String getConnectorName() {
+        return name;
     }
 
     public int getEnergy() {
@@ -102,6 +115,20 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
     }
 
     private IEnergyStorage[] sidedHandlers = new IEnergyStorage[6];
+
+    @Override
+    public boolean execute(EntityPlayerMP playerMP, String command, Map<String, Argument> args) {
+        boolean rc = super.execute(playerMP, command, args);
+        if (rc) {
+            return true;
+        }
+        if (CMD_SETNAME.equals(command)) {
+            this.name = args.get("name").getString();
+            markDirtyClient();
+            return true;
+        }
+        return false;
+    }
 
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {

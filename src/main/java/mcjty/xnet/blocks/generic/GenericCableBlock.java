@@ -28,6 +28,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -54,6 +55,9 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
 
     public static final ColorId STANDARD_COLOR = new ColorId(1);
 
+    public static final AxisAlignedBB EMPTY = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
+
+
     public GenericCableBlock(Material material, String name) {
         super(material);
         setHardness(2.0f);
@@ -75,6 +79,11 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
     }
 
+
+    @Override
+    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
+        return EMPTY;
+    }
 
     @Override
     @SideOnly(Side.CLIENT)

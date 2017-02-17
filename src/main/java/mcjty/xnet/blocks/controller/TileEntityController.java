@@ -2,6 +2,7 @@ package mcjty.xnet.blocks.controller;
 
 import mcjty.lib.entity.GenericEnergyReceiverTileEntity;
 import mcjty.lib.network.Argument;
+import mcjty.lib.varia.BlockPosTools;
 import mcjty.typed.Type;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelType;
@@ -12,6 +13,7 @@ import mcjty.xnet.api.keys.NetworkId;
 import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.api.keys.SidedPos;
 import mcjty.xnet.blocks.cables.ConnectorBlock;
+import mcjty.xnet.blocks.cables.ConnectorTileEntity;
 import mcjty.xnet.logic.*;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
@@ -19,6 +21,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
@@ -201,13 +204,20 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         Set<ConnectedBlockClientInfo> set = new HashSet<>();
         for (BlockPos consumerPos : worldBlob.getConsumers(networkId)) {
             ConsumerId consumerId = worldBlob.getConsumerAt(consumerPos);
+            String name = "";
+            TileEntity te = getWorld().getTileEntity(consumerPos);
+            if (te instanceof ConnectorTileEntity) {
+                // Should always be the case. @todo error?
+                name = ((ConnectorTileEntity) te).getConnectorName();
+                XNet.logger.warn("What? The connector at " + BlockPosTools.toString(consumerPos) + " is not a connector?");
+            }
             for (EnumFacing facing : EnumFacing.values()) {
                 BlockPos pos = consumerPos.offset(facing);
                 if (ConnectorBlock.isConnectable(getWorld(), pos)) {
                     SidedPos sidedPos = new SidedPos(pos, facing.getOpposite());
                     IBlockState state = getWorld().getBlockState(pos);
                     ItemStack item = state.getBlock().getItem(getWorld(), pos, state);
-                    ConnectedBlockClientInfo info = new ConnectedBlockClientInfo(sidedPos, item);
+                    ConnectedBlockClientInfo info = new ConnectedBlockClientInfo(sidedPos, item, name);
                     set.add(info);
                 }
             }

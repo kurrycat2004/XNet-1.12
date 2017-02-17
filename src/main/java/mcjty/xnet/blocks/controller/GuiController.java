@@ -13,7 +13,7 @@ import mcjty.lib.gui.widgets.Button;
 import mcjty.lib.gui.widgets.Label;
 import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.network.Argument;
-import mcjty.lib.varia.RedstoneMode;
+import mcjty.lib.varia.BlockPosTools;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.api.gui.IndicatorIcon;
@@ -24,9 +24,11 @@ import mcjty.xnet.logic.*;
 import mcjty.xnet.network.PacketGetChannels;
 import mcjty.xnet.network.PacketGetConnectedBlocks;
 import mcjty.xnet.network.XNetMessages;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
 
 import java.awt.*;
 import java.util.List;
@@ -42,7 +44,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     public static final String TAG_FACING = "facing";
     public static final String TAG_ENABLED = "enabled";
 
-    private WidgetList list;
+    private WidgetList connectorList;
     private int listDirty;
 
     private Panel channelEditPanel;
@@ -58,7 +60,6 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
 
 
     private EnergyBar energyBar;
-    private ImageChoiceLabel redstoneMode;
 
     public static final ResourceLocation iconGuiElements = new ResourceLocation(XNet.MODID, "textures/gui/guielements.png");
     private static final ResourceLocation mainBackground = new ResourceLocation(XNet.MODID, "textures/gui/controller.png");
@@ -85,7 +86,6 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                 .setBackgroundLayout(true, SIDEWIDTH);
         toplevel.setBounds(new Rectangle(guiLeft-SIDEWIDTH, guiTop, xSize+SIDEWIDTH, ySize));
 
-        initRedstoneMode();
         initEnergyBar();
         Panel listPanel = initConnectorListPanel();
         Panel channelSelectionPanel = initChannelSelectionPanel();
@@ -105,16 +105,6 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         int currentRF = GenericEnergyStorageTileEntity.getCurrentRF();
         energyBar.setValue(currentRF);
         tileEntity.requestRfFromServer(XNet.MODID);
-    }
-
-    private void initRedstoneMode() {
-        // Redstone mode is only put on gui in some cases
-        redstoneMode = new ImageChoiceLabel(mc, this).
-//                addChoiceEvent((parent, newChoice) -> changeRedstoneMode()).
-                addChoice(RedstoneMode.REDSTONE_IGNORED.getDescription(), "Redstone mode:\nIgnored", iconGuiElements, 0, 0).
-                addChoice(RedstoneMode.REDSTONE_OFFREQUIRED.getDescription(), "Redstone mode:\nOff to activate", iconGuiElements, 16, 0).
-                addChoice(RedstoneMode.REDSTONE_ONREQUIRED.getDescription(), "Redstone mode:\nOn to activate", iconGuiElements, 32, 0);
-        redstoneMode.setLayoutHint(new PositionalLayout.PositionalHint(66, 2, 16, 16));
     }
 
     private void initEnergyBar() {
@@ -139,17 +129,17 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     }
 
     private Panel initConnectorListPanel() {
-        list = new WidgetList(mc, this).addSelectionEvent(new DefaultSelectionEvent() {
+        connectorList = new WidgetList(mc, this).addSelectionEvent(new DefaultSelectionEvent() {
             @Override
             public void select(Widget parent, int index) {
 //                setSelectedBlock(index);
             }
         });
-        list.setPropagateEventsToChildren(true);
-        Slider listSlider = new Slider(mc, this).setDesiredWidth(10).setVertical().setScrollable(list);
+        connectorList.setPropagateEventsToChildren(true);
+        Slider listSlider = new Slider(mc, this).setDesiredWidth(10).setVertical().setScrollable(connectorList);
         return new Panel(mc, this)
                 .setLayout(new HorizontalLayout().setHorizontalMargin(3).setSpacing(1))
-                .addChild(list)
+                .addChild(connectorList)
                 .addChild(listSlider)
                 .setLayoutHint(new PositionalLayout.PositionalHint(2, 20, 169, 214));
     }
@@ -355,24 +345,38 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         }
         needsRefresh = false;
 
-        list.removeChildren();
+        connectorList.removeChildren();
 
-        int sel = list.getSelected();
+        int sel = connectorList.getSelected();
         BlockPos prevPos = null;
 
         for (ConnectedBlockClientInfo connectedBlock : fromServer_connectedBlocks) {
             SidedPos sidedPos = connectedBlock.getPos();
             BlockPos coordinate = sidedPos.getPos();
+            String name = connectedBlock.getName();
+            String blockUnlocName = connectedBlock.getBlockUnlocName();
+            String blockName = I18n.format(blockUnlocName).trim();
 
             int color = StyleConfig.colorTextInListNormal;
 
             Panel panel = new Panel(mc, this).setLayout(new HorizontalLayout().setHorizontalMargin(0).setSpacing(0));
+            BlockRender br;
             if (coordinate.equals(prevPos)) {
-                panel.addChild(new BlockRender(mc, this));
+                br = new BlockRender(mc, this);
             } else {
-                panel.addChild(new BlockRender(mc, this).setRenderItem(connectedBlock.getConnectedBlock()));
+                br = new BlockRender(mc, this).setRenderItem(connectedBlock.getConnectedBlock());
                 prevPos = coordinate;
             }
+            panel.addChild(br);
+            if (!name.isEmpty()) {
+                br.setTooltips(TextFormatting.GREEN + "Connector: " + TextFormatting.WHITE + name,
+                        TextFormatting.GREEN + "Block: " + TextFormatting.WHITE + blockName,
+                        TextFormatting.GREEN + "Position: " + TextFormatting.WHITE + BlockPosTools.toString(coordinate));
+            } else {
+                br.setTooltips(TextFormatting.GREEN + "Block: " + TextFormatting.WHITE + blockName,
+                        TextFormatting.GREEN + "Position: " + TextFormatting.WHITE + BlockPosTools.toString(coordinate));
+            }
+
             panel.addChild(new Label(mc, this).setText(sidedPos.getSide().getName().substring(0, 1).toUpperCase()).setColor(color).setDesiredWidth(18));
             for (int i = 0 ; i < MAX_CHANNELS ; i++) {
                 Button but = new Button(mc, this).setDesiredWidth(14);
@@ -394,10 +398,10 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                 });
                 panel.addChild(but);
             }
-            list.addChild(panel);
+            connectorList.addChild(panel);
         }
 
-        list.setSelected(sel);
+        connectorList.setSelected(sel);
     }
 
     private boolean listsReady() {

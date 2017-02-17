@@ -1,11 +1,16 @@
 package mcjty.xnet.blocks.cables;
 
 import mcjty.lib.tools.ItemStackTools;
+import mcjty.theoneprobe.api.IProbeHitData;
+import mcjty.theoneprobe.api.IProbeInfo;
+import mcjty.theoneprobe.api.ProbeMode;
+import mcjty.theoneprobe.api.TextStyleClass;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.keys.ConsumerId;
 import mcjty.xnet.blocks.controller.TileEntityController;
 import mcjty.xnet.blocks.generic.GenericCableBlock;
 import mcjty.xnet.blocks.generic.GenericCableISBM;
+import mcjty.xnet.gui.GuiProxy;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
 import net.minecraft.block.Block;
@@ -16,13 +21,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -60,6 +66,26 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
     @Override
     public TileEntity createTileEntity(World world, IBlockState metadata) {
         return new ConnectorTileEntity();
+    }
+
+    @Override
+    protected boolean clOnBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+        if (!world.isRemote) {
+            player.openGui(XNet.instance, GuiProxy.GUI_CONNECTOR, world, pos.getX(), pos.getY(), pos.getZ());
+        }
+        return true;
+    }
+
+    @Override
+    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data) {
+        super.addProbeInfo(mode, probeInfo, player, world, blockState, data);
+        TileEntity te = world.getTileEntity(data.getPos());
+        if (te instanceof ConnectorTileEntity) {
+            String name = ((ConnectorTileEntity) te).getConnectorName();
+            if (!name.isEmpty()) {
+                probeInfo.text(TextStyleClass.LABEL + "Name: " + TextStyleClass.INFO + name);
+            }
+        }
     }
 
     @Override
