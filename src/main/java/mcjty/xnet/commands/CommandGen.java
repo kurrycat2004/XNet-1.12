@@ -3,20 +3,14 @@ package mcjty.xnet.commands;
 import mcjty.lib.compat.CompatCommand;
 import mcjty.lib.compat.CompatCommandBase;
 import mcjty.lib.tools.ItemStackTools;
-import mcjty.rftools.blocks.teleporter.TeleportDestination;
-import mcjty.rftools.blocks.teleporter.TeleportationTools;
 import mcjty.xnet.blocks.cables.NetCableSetup;
-import mcjty.xnet.init.ModBlocks;
 import mcjty.xnet.multiblock.XNetBlobData;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -24,6 +18,9 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+//import mcjty.rftools.blocks.teleporter.TeleportDestination;
+//import mcjty.rftools.blocks.teleporter.TeleportationTools;
 
 public class CommandGen implements CompatCommand {
 
@@ -62,7 +59,7 @@ public class CommandGen implements CompatCommand {
             pos = pos.offset(facing);
         }
 
-        TeleportationTools.performTeleport(player, new TeleportDestination(pos, 0), 0, 0, true);
+//        TeleportationTools.performTeleport(player, new TeleportDestination(pos, 0), 0, 0, true);
         System.out.println("done");
     }
 
