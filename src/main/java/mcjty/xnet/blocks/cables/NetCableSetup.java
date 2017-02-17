@@ -34,7 +34,7 @@ public class NetCableSetup {
 
     public static void initCrafting() {
         ItemStack lapisStack = new ItemStack(Items.DYE, 1, 4);
-        GameRegistry.addRecipe(new ItemStack(netCableBlock, 8), "srs", "rgr", "srs", 'r', Items.REDSTONE, 's', Items.STRING, 'g', Items.GOLD_NUGGET);
+        GameRegistry.addRecipe(new ItemStack(netCableBlock, 16), "srs", "rgr", "srs", 'r', Items.REDSTONE, 's', Items.STRING, 'g', Items.GOLD_NUGGET);
         GameRegistry.addRecipe(new ItemStack(connectorBlock, 1), "lRl", "rgr", "lrl", 'r', Items.REDSTONE, 'l', lapisStack, 'g', Items.GOLD_INGOT, 'R', Blocks.CHEST);
         GameRegistry.addRecipe(new ItemStack(advancedConnectorBlock, 1), "ce", 'c', connectorBlock, 'e', Items.ENDER_PEARL);
     }

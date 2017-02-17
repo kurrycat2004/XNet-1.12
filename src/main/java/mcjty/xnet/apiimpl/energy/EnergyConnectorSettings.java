@@ -81,7 +81,7 @@ public class EnergyConnectorSettings implements IConnectorSettings {
     }
 
     private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_RATE, TAG_MINMAX, TAG_PRIORITY);
-    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_RATE, TAG_MINMAX);
+    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_RATE, TAG_MINMAX, TAG_PRIORITY);
 
     @Override
     public boolean isEnabled(String tag) {

@@ -18,7 +18,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +33,7 @@ public class EnergyChannelSettings implements IChannelSettings {
     private ChannelMode channelMode = ChannelMode.DISTRIBUTE;
 
     // Cache data
-    private Map<SidedConsumer, EnergyConnectorSettings> energyExtractors = null;
+    private List<Pair<SidedConsumer, EnergyConnectorSettings>> energyExtractors = null;
     private List<Pair<SidedConsumer, EnergyConnectorSettings>> energyConsumers = null;
 
     public ChannelMode getChannelMode() {
@@ -54,8 +53,11 @@ public class EnergyChannelSettings implements IChannelSettings {
     @Override
     public void tick(int channel, IControllerContext context) {
         updateCache(channel, context);
-        // @todo optimize
-        for (Map.Entry<SidedConsumer, EnergyConnectorSettings> entry : energyExtractors.entrySet()) {
+
+        // First find out how much energy we have to distribute in total
+        int totalToDistribute = 0;
+        List<Pair<ConnectorTileEntity, Integer>> energyProducers = new ArrayList<>();
+        for (Pair<SidedConsumer, EnergyConnectorSettings> entry : energyExtractors) {
             BlockPos consumerPosition = context.findConsumerPosition(entry.getKey().getConsumerId());
             if (consumerPosition != null) {
 
@@ -80,12 +82,37 @@ public class EnergyChannelSettings implements IChannelSettings {
                         rate = 1000000000;
                     }
                     connectorTE.setEnergyInputFrom(side, rate);
+
                     int tosend = Math.min(rate, connectorTE.getEnergy());
                     if (tosend > 0) {
-                        int actuallysent = insertEnergy(context, tosend);
-                        connectorTE.setEnergy(connectorTE.getEnergy() - actuallysent);
+                        totalToDistribute += tosend;
+                        energyProducers.add(Pair.of(connectorTE, tosend));
                     }
                 }
+            }
+        }
+
+        if (totalToDistribute <= 0) {
+            // Nothing to do
+            return;
+        }
+
+        int actuallyConsumed = insertEnergy(context, totalToDistribute);
+        if (actuallyConsumed <= 0) {
+            // Nothing was done
+            return;
+        }
+
+        // Now we need to actually fetch the energy from the producers
+        for (Pair<ConnectorTileEntity, Integer> entry : energyProducers) {
+            ConnectorTileEntity connectorTE = entry.getKey();
+            int amount = entry.getValue();
+
+            int actuallySpent = Math.min(amount, actuallyConsumed);
+            connectorTE.setEnergy(connectorTE.getEnergy() - actuallySpent);
+            actuallyConsumed -= actuallySpent;
+            if (actuallyConsumed <= 0) {
+                break;
             }
         }
     }
@@ -134,17 +161,18 @@ public class EnergyChannelSettings implements IChannelSettings {
 
     private void updateCache(int channel, IControllerContext context) {
         if (energyExtractors == null) {
-            energyExtractors = new HashMap<>();
+            energyExtractors = new ArrayList<>();
             energyConsumers = new ArrayList<>();
             Map<SidedConsumer, IConnectorSettings> connectors = context.getConnectors(channel);
             for (Map.Entry<SidedConsumer, IConnectorSettings> entry : connectors.entrySet()) {
                 EnergyConnectorSettings con = (EnergyConnectorSettings) entry.getValue();
                 if (con.getEnergyMode() == EnergyConnectorSettings.EnergyMode.EXT) {
-                    energyExtractors.put(entry.getKey(), con);
+                    energyExtractors.add(Pair.of(entry.getKey(), con));
                 } else {
                     energyConsumers.add(Pair.of(entry.getKey(), con));
                 }
             }
+            energyExtractors.sort((o1, o2) -> o2.getRight().getPriority().compareTo(o1.getRight().getPriority()));
             energyConsumers.sort((o1, o2) -> o2.getRight().getPriority().compareTo(o1.getRight().getPriority()));
         }
     }
