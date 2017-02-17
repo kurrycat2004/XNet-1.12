@@ -95,7 +95,10 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
 
     @Override
     public boolean canConnectEnergy(EnumFacing from) {
-        return false;
+        if (from == null) {
+            return false;
+        }
+        return inputFromSide[from.ordinal()] > 0;
     }
 
     private IEnergyStorage[] sidedHandlers = new IEnergyStorage[6];
