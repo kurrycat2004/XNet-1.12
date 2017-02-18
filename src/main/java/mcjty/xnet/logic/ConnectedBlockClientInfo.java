@@ -31,7 +31,7 @@ public class ConnectedBlockClientInfo {
     }
 
     public ConnectedBlockClientInfo(@Nonnull ByteBuf buf) {
-        pos = new SidedPos(NetworkTools.readPos(buf), EnumFacing.values()[buf.readByte()]);
+        pos = new SidedPos(NetworkTools.readPos(buf), EnumFacing.VALUES[buf.readByte()]);
         connectedBlock = NetworkTools.readItemStack(buf);
         name = NetworkTools.readStringUTF8(buf);
         blockName = NetworkTools.readStringUTF8(buf);

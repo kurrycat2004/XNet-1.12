@@ -87,7 +87,7 @@ public class ChannelInfo {
                 continue;
             }
             ConsumerId consumerId = new ConsumerId(tc.getInteger("consumerId"));
-            EnumFacing side = EnumFacing.values()[tc.getInteger("side")];
+            EnumFacing side = EnumFacing.VALUES[tc.getInteger("side")];
             SidedConsumer key = new SidedConsumer(consumerId, side);
             ConnectorInfo connectorInfo = new ConnectorInfo(type, key);
             connectorInfo.readFromNBT(tc);

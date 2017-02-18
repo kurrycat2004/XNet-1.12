@@ -33,7 +33,7 @@ public class ConnectorClientInfo {
     }
 
     public ConnectorClientInfo(@Nonnull ByteBuf buf) {
-        pos = new SidedPos(NetworkTools.readPos(buf), EnumFacing.values()[buf.readByte()]);
+        pos = new SidedPos(NetworkTools.readPos(buf), EnumFacing.VALUES[buf.readByte()]);
         consumerId = new ConsumerId(buf.readInt());
         IChannelType t = XNet.xNetApi.findType(NetworkTools.readString(buf));
         if (t == null) {

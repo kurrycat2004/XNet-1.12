@@ -45,7 +45,7 @@ public class ChannelClientInfo {
 
         int size = buf.readInt();
         for (int i = 0 ; i < size ; i++) {
-            SidedConsumer key = new SidedConsumer(new ConsumerId(buf.readInt()), EnumFacing.values()[buf.readByte()]);
+            SidedConsumer key = new SidedConsumer(new ConsumerId(buf.readInt()), EnumFacing.VALUES[buf.readByte()]);
             ConnectorClientInfo info = new ConnectorClientInfo(buf);
             connectors.put(key, info);
         }

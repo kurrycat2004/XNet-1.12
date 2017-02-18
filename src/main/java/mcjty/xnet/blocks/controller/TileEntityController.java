@@ -211,7 +211,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                 name = ((ConnectorTileEntity) te).getConnectorName();
                 XNet.logger.warn("What? The connector at " + BlockPosTools.toString(consumerPos) + " is not a connector?");
             }
-            for (EnumFacing facing : EnumFacing.values()) {
+            for (EnumFacing facing : EnumFacing.VALUES) {
                 BlockPos pos = consumerPos.offset(facing);
                 if (ConnectorBlock.isConnectable(getWorld(), pos)) {
                     SidedPos sidedPos = new SidedPos(pos, facing.getOpposite());
@@ -355,7 +355,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             return true;
         } else if (CMD_CREATECONNECTOR.equals(command)) {
             int channel = args.get("channel").getInteger();
-            SidedPos pos = new SidedPos(args.get("pos").getCoordinate(), EnumFacing.values()[args.get("side").getInteger()]);
+            SidedPos pos = new SidedPos(args.get("pos").getCoordinate(), EnumFacing.VALUES[args.get("side").getInteger()]);
             createConnector(channel, pos);
             return true;
         } else if (CMD_REMOVECHANNEL.equals(command)) {
@@ -363,12 +363,12 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             removeChannel(index);
             return true;
         } else if (CMD_REMOVECONNECTOR.equals(command)) {
-            SidedPos pos = new SidedPos(args.get("pos").getCoordinate(), EnumFacing.values()[args.get("side").getInteger()]);
+            SidedPos pos = new SidedPos(args.get("pos").getCoordinate(), EnumFacing.VALUES[args.get("side").getInteger()]);
             int channel = args.get("channel").getInteger();
             removeConnector(channel, pos);
             return true;
         } else if (CMD_UPDATECONNECTOR.equals(command)) {
-            SidedPos pos = new SidedPos(args.get("pos").getCoordinate(), EnumFacing.values()[args.get("side").getInteger()]);
+            SidedPos pos = new SidedPos(args.get("pos").getCoordinate(), EnumFacing.VALUES[args.get("side").getInteger()]);
             int channel = args.get("channel").getInteger();
             updateConnector(channel, pos, args);
             return true;

@@ -292,7 +292,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                             .addButtonEvent(parent -> removeConnector(editingConnector));
 
                     ControllerEditorPanel editor = new ControllerEditorPanel(connectorEditPanel, mc, this, editingChannel, editingConnector);
-                    editor.choices(TAG_FACING, "Side from which to operate", side, EnumFacing.values());
+                    editor.choices(TAG_FACING, "Side from which to operate", side, EnumFacing.VALUES);
 
                     connectorInfo.getConnectorSettings().createGui(editor);
                     connectorEditPanel.addChild(remove);
