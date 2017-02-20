@@ -4,9 +4,11 @@ import mcjty.lib.tools.ItemStackTools;
 import mcjty.xnet.api.channels.IChannelSettings;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.channels.IControllerContext;
+import mcjty.xnet.api.channels.RSMode;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.keys.SidedConsumer;
+import mcjty.xnet.blocks.cables.ConnectorTileEntity;
 import mcjty.xnet.blocks.controller.GuiController;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -80,15 +82,24 @@ public class ItemChannelSettings implements IChannelSettings {
         updateCache(channel, context);
         // @todo optimize
         for (Map.Entry<SidedConsumer, ItemConnectorSettings> entry : itemExtractors.entrySet()) {
-            BlockPos consumerPosition = context.findConsumerPosition(entry.getKey().getConsumerId());
-            if (consumerPosition != null) {
+            BlockPos extractorPos = context.findConsumerPosition(entry.getKey().getConsumerId());
+            if (extractorPos != null) {
                 EnumFacing side = entry.getKey().getSide();
-                BlockPos pos = consumerPosition.offset(side);
+                BlockPos pos = extractorPos.offset(side);
                 TileEntity te = context.getControllerWorld().getTileEntity(pos);
                 IItemHandler handler = getItemHandlerAt(te, side.getOpposite());
                 // @todo report error somewhere?
                 if (handler != null) {
                     ItemConnectorSettings settings = entry.getValue();
+
+                    RSMode rsMode = settings.getRsMode();
+                    if (rsMode != RSMode.IGNORED) {
+                        ConnectorTileEntity connector = (ConnectorTileEntity) context.getControllerWorld().getTileEntity(extractorPos);
+                        if ((rsMode == RSMode.ON) != (connector.getPowerLevel() > 0)) {
+                            continue;
+                        }
+                    }
+
                     if (d % settings.getSpeed() != 0) {
                         continue;
                     }
@@ -121,10 +132,18 @@ public class ItemChannelSettings implements IChannelSettings {
             ItemConnectorSettings settings = entry.getValue();
 
             if (settings.getMatcher().test(stack)) {
-                BlockPos consumerPosition = context.findConsumerPosition(entry.getKey().getConsumerId());
-                if (consumerPosition != null) {
+                BlockPos consumerPos = context.findConsumerPosition(entry.getKey().getConsumerId());
+                if (consumerPos != null) {
+                    RSMode rsMode = settings.getRsMode();
+                    if (rsMode != RSMode.IGNORED) {
+                        ConnectorTileEntity connector = (ConnectorTileEntity) context.getControllerWorld().getTileEntity(consumerPos);
+                        if ((rsMode == RSMode.ON) != (connector.getPowerLevel() > 0)) {
+                            continue;
+                        }
+                    }
+
                     EnumFacing side = entry.getKey().getSide();
-                    BlockPos pos = consumerPosition.offset(side);
+                    BlockPos pos = consumerPos.offset(side);
                     TileEntity te = context.getControllerWorld().getTileEntity(pos);
                     IItemHandler handler = getItemHandlerAt(te, side.getOpposite());
                     // @todo report error somewhere?

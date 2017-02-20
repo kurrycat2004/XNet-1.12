@@ -4,6 +4,7 @@ import mcjty.lib.varia.EnergyTools;
 import mcjty.xnet.api.channels.IChannelSettings;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.channels.IControllerContext;
+import mcjty.xnet.api.channels.RSMode;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.keys.SidedConsumer;
@@ -69,6 +70,13 @@ public class EnergyChannelSettings implements IChannelSettings {
                     EnergyConnectorSettings settings = entry.getValue();
                     ConnectorTileEntity connectorTE = (ConnectorTileEntity) context.getControllerWorld().getTileEntity(consumerPosition);
 
+                    RSMode rsMode = settings.getRsMode();
+                    if (rsMode != RSMode.IGNORED) {
+                        if ((rsMode == RSMode.ON) != (connectorTE.getPowerLevel() > 0)) {
+                            continue;
+                        }
+                    }
+
                     Integer count = settings.getMinmax();
                     if (count != null) {
                         EnergyTools.EnergyLevel level = EnergyTools.getEnergyLevel(te);
@@ -121,13 +129,22 @@ public class EnergyChannelSettings implements IChannelSettings {
         int total = 0;
         for (Pair<SidedConsumer, EnergyConnectorSettings> entry : energyConsumers) {
             EnergyConnectorSettings settings = entry.getValue();
-            BlockPos consumerPosition = context.findConsumerPosition(entry.getKey().getConsumerId());
-            if (consumerPosition != null) {
+            BlockPos extractorPos = context.findConsumerPosition(entry.getKey().getConsumerId());
+            if (extractorPos != null) {
                 EnumFacing side = entry.getKey().getSide();
-                BlockPos pos = consumerPosition.offset(side);
+                BlockPos pos = extractorPos.offset(side);
                 TileEntity te = context.getControllerWorld().getTileEntity(pos);
                 // @todo report error somewhere?
                 if (EnergyTools.isEnergyTE(te)) {
+
+                    RSMode rsMode = settings.getRsMode();
+                    if (rsMode != RSMode.IGNORED) {
+                        ConnectorTileEntity connector = (ConnectorTileEntity) context.getControllerWorld().getTileEntity(extractorPos);
+                        if ((rsMode == RSMode.ON) != (connector.getPowerLevel() > 0)) {
+                            continue;
+                        }
+                    }
+
                     Integer count = settings.getMinmax();
                     if (count != null) {
                         EnergyTools.EnergyLevel level = EnergyTools.getEnergyLevel(te);

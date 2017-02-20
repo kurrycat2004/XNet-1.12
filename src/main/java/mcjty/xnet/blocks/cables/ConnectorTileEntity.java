@@ -43,6 +43,10 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         return tagCompound;
     }
 
+    public int getPowerLevel() {
+        return powerLevel;
+    }
+
     public String getConnectorName() {
         return name;
     }

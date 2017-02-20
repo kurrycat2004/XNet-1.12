@@ -1,5 +1,6 @@
 package mcjty.xnet.blocks.cables;
 
+import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.tools.ItemStackTools;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
@@ -109,6 +110,25 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
         ModelResourceLocation itemModelResourceLocation = new ModelResourceLocation(getRegistryName(), "inventory");
         final int DEFAULT_ITEM_SUBTYPE = 0;
         Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(itemBlock, DEFAULT_ITEM_SUBTYPE, itemModelResourceLocation);
+    }
+
+    @Override
+    protected void clOnNeighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn) {
+        checkRedstone(world, pos);
+    }
+
+    @Override
+    public boolean shouldCheckWeakPower(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+        return false;
+    }
+
+    private void checkRedstone(World world, BlockPos pos) {
+        TileEntity te = world.getTileEntity(pos);
+        if (te instanceof ConnectorTileEntity) {
+            int powered = world.isBlockIndirectlyGettingPowered(pos);
+            ConnectorTileEntity genericTileEntity = (ConnectorTileEntity) te;
+            genericTileEntity.setPowerInput(powered);
+        }
     }
 
     @Override

@@ -107,6 +107,10 @@ public class EnergyConnectorSettings implements IConnectorSettings {
         return minmax;
     }
 
+    public RSMode getRsMode() {
+        return rsMode;
+    }
+
     @Override
     public void update(Map<String, Object> data) {
         energyMode = EnergyMode.valueOf(((String)data.get(TAG_MODE)).toUpperCase());
