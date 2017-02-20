@@ -34,6 +34,10 @@ public abstract class AbstractEditorPanel implements IEditorGui {
 
     protected abstract void update(String tag, Object value);
 
+    public Widget getComponent(String tag) {
+        return components.get(tag);
+    }
+
     protected void performUpdate(Argument[] args, int i, String cmd) {
         for (Map.Entry<String, Object> entry : data.entrySet()) {
             Object o = entry.getValue();

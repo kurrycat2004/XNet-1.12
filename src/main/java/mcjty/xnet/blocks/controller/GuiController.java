@@ -297,6 +297,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                     connectorInfo.getConnectorSettings().createGui(editor);
                     connectorEditPanel.addChild(remove);
                     editor.setState(connectorInfo.getConnectorSettings());
+                    editor.getComponent(TAG_FACING).setEnabled(clientInfo.isAdvanced());
                 } else {
                     Button create = new Button(mc, this)
                             .setText("Create")

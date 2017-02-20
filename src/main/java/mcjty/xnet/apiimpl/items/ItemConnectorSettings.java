@@ -10,12 +10,15 @@ import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.blocks.controller.GuiController;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+
+import static mcjty.xnet.blocks.controller.GuiController.TAG_FACING;
 
 public class ItemConnectorSettings implements IConnectorSettings {
 
@@ -54,17 +57,13 @@ public class ItemConnectorSettings implements IConnectorSettings {
     @Nullable private Integer priority = 0;
     @Nullable private Integer count = null;
     private ItemStackList filters = ItemStackList.create(FILTER_SIZE);
+    @Nullable private EnumFacing facingOverride = null; // Only available on advanced connectors
 
     // Cached matcher for items
     private Predicate<ItemStack> matcher = null;
 
     public ItemMode getItemMode() {
         return itemMode;
-    }
-
-    @Override
-    public boolean supportsGhostSlots() {
-        return true;
     }
 
     @Nullable
@@ -184,6 +183,8 @@ public class ItemConnectorSettings implements IConnectorSettings {
             filters.set(i, (ItemStack) data.get(TAG_FILTER+i));
         }
         matcher = null;
+        Integer facing = (Integer) data.get(TAG_FACING);
+        facingOverride = (facing == null || facing == -1) ? null : EnumFacing.VALUES[facing];
     }
 
     @Override
@@ -218,6 +219,11 @@ public class ItemConnectorSettings implements IConnectorSettings {
             }
         }
         matcher = null;
+        if (tag.hasKey("facingOverride")) {
+            facingOverride = EnumFacing.VALUES[tag.getByte("facingOverride")];
+        } else {
+            facingOverride = null;
+        }
     }
 
     @Override
@@ -242,6 +248,9 @@ public class ItemConnectorSettings implements IConnectorSettings {
                 filters.get(i).writeToNBT(itemTag);
                 tag.setTag("filter" + i, itemTag);
             }
+        }
+        if (facingOverride != null) {
+            tag.setByte("facingOverride", (byte) facingOverride.ordinal());
         }
     }
 }

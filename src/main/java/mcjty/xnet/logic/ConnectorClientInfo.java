@@ -22,14 +22,18 @@ public class ConnectorClientInfo {
     @Nonnull private final IChannelType channelType;
     @Nonnull private final IConnectorSettings connectorSettings;
 
+    private final boolean advanced;
+
 
     public ConnectorClientInfo(@Nonnull SidedPos pos, @Nonnull ConsumerId consumerId,
                                @Nonnull IChannelType channelType,
-                               @Nonnull IConnectorSettings connectorSettings) {
+                               @Nonnull IConnectorSettings connectorSettings,
+                               boolean advanced) {
         this.pos = pos;
         this.consumerId = consumerId;
         this.channelType = channelType;
         this.connectorSettings = connectorSettings;
+        this.advanced = advanced;
     }
 
     public ConnectorClientInfo(@Nonnull ByteBuf buf) {
@@ -39,8 +43,9 @@ public class ConnectorClientInfo {
         if (t == null) {
             throw new RuntimeException("Cannot happen!");
         }
-        NBTTagCompound tag = NetworkTools.readTag(buf);
         channelType = t;
+        advanced = buf.readBoolean();
+        NBTTagCompound tag = NetworkTools.readTag(buf);
         connectorSettings = channelType.createConnector();
         connectorSettings.readFromNBT(tag);
     }
@@ -50,6 +55,7 @@ public class ConnectorClientInfo {
         buf.writeByte(pos.getSide().ordinal());
         buf.writeInt(consumerId.getId());
         NetworkTools.writeString(buf, channelType.getID());
+        buf.writeBoolean(advanced);
         NBTTagCompound tag = new NBTTagCompound();
         connectorSettings.writeToNBT(tag);
         NetworkTools.writeTag(buf, tag);
@@ -68,5 +74,9 @@ public class ConnectorClientInfo {
     @Nonnull
     public IConnectorSettings getConnectorSettings() {
         return connectorSettings;
+    }
+
+    public boolean isAdvanced() {
+        return advanced;
     }
 }

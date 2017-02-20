@@ -37,15 +37,6 @@ public class EnergyConnectorSettings implements IConnectorSettings {
         return energyMode;
     }
 
-    public void setEnergyMode(EnergyMode energyMode) {
-        this.energyMode = energyMode;
-    }
-
-    @Override
-    public boolean supportsGhostSlots() {
-        return false;
-    }
-
     @Nullable
     @Override
     public IndicatorIcon getIndicatorIcon() {

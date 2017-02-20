@@ -12,11 +12,6 @@ import java.util.Map;
  */
 public interface IConnectorSettings {
 
-    /**
-     * Return true if this connector need the ghost slots from the controller
-     */
-    boolean supportsGhostSlots();
-
     void readFromNBT(NBTTagCompound tag);
 
     void writeToNBT(NBTTagCompound tag);
