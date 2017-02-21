@@ -37,12 +37,17 @@ public class EnergyConnectorSettings implements IConnectorSettings {
     @Nullable private Integer rate = null;
     @Nullable private Integer minmax = null;
 
-    @Nonnull final private EnumFacing side;
+    @Nonnull private final EnumFacing side;
     @Nullable private EnumFacing facingOverride = null; // Only available on advanced connectors
 
     public EnergyConnectorSettings(boolean advanced, @Nonnull EnumFacing side) {
         this.advanced = advanced;
         this.side = side;
+    }
+
+    @Nonnull
+    public EnumFacing getFacing() {
+        return facingOverride == null ? side : facingOverride;
     }
 
     public EnergyMode getEnergyMode() {
@@ -89,12 +94,15 @@ public class EnergyConnectorSettings implements IConnectorSettings {
 
     @Override
     public boolean isEnabled(String tag) {
-        if (tag.equals(TAG_FACING)) {
-            return advanced;
-        }
         if (energyMode == EnergyMode.INS) {
+            if (tag.equals(TAG_FACING)) {
+                return advanced;
+            }
             return INSERT_TAGS.contains(tag);
         } else {
+            if (tag.equals(TAG_FACING)) {
+                return false;           // We cannot extract from different sides
+            }
             return EXTRACT_TAGS.contains(tag);
         }
     }

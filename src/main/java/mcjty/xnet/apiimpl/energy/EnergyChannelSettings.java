@@ -1,5 +1,6 @@
 package mcjty.xnet.apiimpl.energy;
 
+import cofh.api.energy.IEnergyHandler;
 import mcjty.lib.varia.EnergyTools;
 import mcjty.xnet.api.channels.IChannelSettings;
 import mcjty.xnet.api.channels.IConnectorSettings;
@@ -14,6 +15,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.IEnergyStorage;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
@@ -66,7 +69,7 @@ public class EnergyChannelSettings implements IChannelSettings {
                 BlockPos pos = consumerPosition.offset(side);
                 TileEntity te = context.getControllerWorld().getTileEntity(pos);
                 // @todo report error somewhere?
-                if (EnergyTools.isEnergyTE(te)) {
+                if (isEnergyTE(te, side.getOpposite())) {
                     EnergyConnectorSettings settings = entry.getValue();
                     ConnectorTileEntity connectorTE = (ConnectorTileEntity) context.getControllerWorld().getTileEntity(consumerPosition);
 
@@ -79,8 +82,8 @@ public class EnergyChannelSettings implements IChannelSettings {
 
                     Integer count = settings.getMinmax();
                     if (count != null) {
-                        EnergyTools.EnergyLevel level = EnergyTools.getEnergyLevel(te);
-                        if (level.getEnergy() < count) {
+                        int level = getEnergyLevel(te, side.getOpposite());
+                        if (level < count) {
                             continue;
                         }
                     }
@@ -135,7 +138,7 @@ public class EnergyChannelSettings implements IChannelSettings {
                 BlockPos pos = extractorPos.offset(side);
                 TileEntity te = context.getControllerWorld().getTileEntity(pos);
                 // @todo report error somewhere?
-                if (EnergyTools.isEnergyTE(te)) {
+                if (isEnergyTE(te, settings.getFacing())) {
 
                     RSMode rsMode = settings.getRsMode();
                     if (rsMode != RSMode.IGNORED) {
@@ -147,8 +150,8 @@ public class EnergyChannelSettings implements IChannelSettings {
 
                     Integer count = settings.getMinmax();
                     if (count != null) {
-                        EnergyTools.EnergyLevel level = EnergyTools.getEnergyLevel(te);
-                        if (level.getEnergy() >= count) {
+                        int level = getEnergyLevel(te, settings.getFacing());
+                        if (level >= count) {
                             continue;
                         }
                     }
@@ -158,7 +161,7 @@ public class EnergyChannelSettings implements IChannelSettings {
                         rate = 1000000000;
                     }
                     int totransfer = Math.min(rate, energy);
-                    int e = EnergyTools.receiveEnergy(te, side.getOpposite(), totransfer);
+                    int e = EnergyTools.receiveEnergy(te, settings.getFacing(), totransfer);
                     energy -= e;
                     total += e;
                     if (energy <= 0) {
@@ -169,6 +172,24 @@ public class EnergyChannelSettings implements IChannelSettings {
         }
         return total;
     }
+
+    private static boolean isEnergyTE(TileEntity te, @Nonnull EnumFacing side) {
+        return te instanceof IEnergyHandler || (te != null && te.hasCapability(CapabilityEnergy.ENERGY, side));
+    }
+
+    public static int getEnergyLevel(TileEntity tileEntity, @Nonnull EnumFacing side) {
+        if (tileEntity instanceof IEnergyHandler) {
+            IEnergyHandler handler = (IEnergyHandler) tileEntity;
+            return handler.getEnergyStored(EnumFacing.DOWN);
+        } else if (tileEntity != null && tileEntity.hasCapability(CapabilityEnergy.ENERGY, side)) {
+            IEnergyStorage energy = tileEntity.getCapability(CapabilityEnergy.ENERGY, side);
+            return energy.getEnergyStored();
+        } else {
+            return 0;
+        }
+    }
+
+
 
     @Override
     public void cleanCache() {

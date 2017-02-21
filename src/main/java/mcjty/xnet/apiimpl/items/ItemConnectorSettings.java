@@ -59,7 +59,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
     @Nullable private Integer count = null;
     private ItemStackList filters = ItemStackList.create(FILTER_SIZE);
 
-    @Nonnull final private EnumFacing side;
+    @Nonnull private final EnumFacing side;
     @Nullable private EnumFacing facingOverride = null; // Only available on advanced connectors
 
     // Cached matcher for items
@@ -67,6 +67,11 @@ public class ItemConnectorSettings implements IConnectorSettings {
 
     public ItemMode getItemMode() {
         return itemMode;
+    }
+
+    @Nonnull
+    public EnumFacing getFacing() {
+        return facingOverride == null ? side : facingOverride;
     }
 
     public ItemConnectorSettings(boolean advanced, @Nonnull EnumFacing side) {

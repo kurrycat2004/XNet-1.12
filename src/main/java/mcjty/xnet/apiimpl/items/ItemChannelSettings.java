@@ -87,10 +87,10 @@ public class ItemChannelSettings implements IChannelSettings {
                 EnumFacing side = entry.getKey().getSide();
                 BlockPos pos = extractorPos.offset(side);
                 TileEntity te = context.getControllerWorld().getTileEntity(pos);
-                IItemHandler handler = getItemHandlerAt(te, side.getOpposite());
+                ItemConnectorSettings settings = entry.getValue();
+                IItemHandler handler = getItemHandlerAt(te, settings.getFacing());
                 // @todo report error somewhere?
                 if (handler != null) {
-                    ItemConnectorSettings settings = entry.getValue();
 
                     RSMode rsMode = settings.getRsMode();
                     if (rsMode != RSMode.IGNORED) {
@@ -145,7 +145,7 @@ public class ItemChannelSettings implements IChannelSettings {
                     EnumFacing side = entry.getKey().getSide();
                     BlockPos pos = consumerPos.offset(side);
                     TileEntity te = context.getControllerWorld().getTileEntity(pos);
-                    IItemHandler handler = getItemHandlerAt(te, side.getOpposite());
+                    IItemHandler handler = getItemHandlerAt(te, settings.getFacing());
                     // @todo report error somewhere?
                     if (handler != null) {
                         Integer count = settings.getCount();
