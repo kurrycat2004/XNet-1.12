@@ -46,7 +46,7 @@ public class ConnectorClientInfo {
         channelType = t;
         advanced = buf.readBoolean();
         NBTTagCompound tag = NetworkTools.readTag(buf);
-        connectorSettings = channelType.createConnector();
+        connectorSettings = channelType.createConnector(advanced, pos.getSide());
         connectorSettings.readFromNBT(tag);
     }
 

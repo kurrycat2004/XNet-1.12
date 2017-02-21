@@ -41,7 +41,6 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     public static final int WIDTH = 256;
     public static final int HEIGHT = 236;
 
-    public static final String TAG_FACING = "facing";
     public static final String TAG_ENABLED = "enabled";
 
     private WidgetList connectorList;
@@ -292,12 +291,10 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                             .addButtonEvent(parent -> removeConnector(editingConnector));
 
                     ControllerEditorPanel editor = new ControllerEditorPanel(connectorEditPanel, mc, this, editingChannel, editingConnector);
-                    editor.choices(TAG_FACING, "Side from which to operate", side, EnumFacing.VALUES);
 
                     connectorInfo.getConnectorSettings().createGui(editor);
                     connectorEditPanel.addChild(remove);
                     editor.setState(connectorInfo.getConnectorSettings());
-                    editor.getComponent(TAG_FACING).setEnabled(clientInfo.isAdvanced());
                 } else {
                     Button create = new Button(mc, this)
                             .setText("Create")

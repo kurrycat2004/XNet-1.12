@@ -10,15 +10,21 @@ public class ConnectorInfo {
     private final IChannelType type;
     private final SidedConsumer id;
     private final IConnectorSettings connectorSettings;
+    private final boolean advanced;
 
-    public ConnectorInfo(IChannelType type, SidedConsumer id) {
+    public ConnectorInfo(IChannelType type, SidedConsumer id, boolean advanced) {
         this.type = type;
         this.id = id;
-        connectorSettings = type.createConnector();
+        this.advanced = advanced;
+        connectorSettings = type.createConnector(advanced, id.getSide().getOpposite());
     }
 
     public IChannelType getType() {
         return type;
+    }
+
+    public boolean isAdvanced() {
+        return advanced;
     }
 
     public IConnectorSettings getConnectorSettings() {

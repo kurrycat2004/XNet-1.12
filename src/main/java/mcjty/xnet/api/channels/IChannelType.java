@@ -19,7 +19,7 @@ public interface IChannelType {
     boolean supportsBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nullable EnumFacing side);
 
     @Nonnull
-    IConnectorSettings createConnector();
+    IConnectorSettings createConnector(boolean advanced, @Nonnull EnumFacing side);
 
     @Nonnull
     IChannelSettings createChannel();

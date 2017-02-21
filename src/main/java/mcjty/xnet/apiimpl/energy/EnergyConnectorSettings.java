@@ -7,6 +7,7 @@ import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.blocks.controller.GuiController;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -15,6 +16,7 @@ import java.util.Set;
 
 public class EnergyConnectorSettings implements IConnectorSettings {
 
+    public static final String TAG_FACING = "facing";
     public static final String TAG_MODE = "mode";
     public static final String TAG_RS = "rs";
     public static final String TAG_RATE = "rate";
@@ -26,12 +28,22 @@ public class EnergyConnectorSettings implements IConnectorSettings {
         EXT
     }
 
+    private final boolean advanced;
+
     private EnergyMode energyMode = EnergyMode.INS;
     private RSMode rsMode = RSMode.IGNORED;
 
     @Nullable private Integer priority = 0;
     @Nullable private Integer rate = null;
     @Nullable private Integer minmax = null;
+
+    @Nonnull final private EnumFacing side;
+    @Nullable private EnumFacing facingOverride = null; // Only available on advanced connectors
+
+    public EnergyConnectorSettings(boolean advanced, @Nonnull EnumFacing side) {
+        this.advanced = advanced;
+        this.side = side;
+    }
 
     public EnergyMode getEnergyMode() {
         return energyMode;
@@ -58,6 +70,7 @@ public class EnergyConnectorSettings implements IConnectorSettings {
     @Override
     public void createGui(IEditorGui gui) {
         gui
+                .choices(TAG_FACING, "Side from which to operate", facingOverride == null ? side : facingOverride, EnumFacing.VALUES)
                 .choices(TAG_MODE, "Insert or extract mode", energyMode, EnergyMode.values())
                 .shift(10)
                 .redstoneMode(TAG_RS, rsMode).nl()
@@ -76,6 +89,9 @@ public class EnergyConnectorSettings implements IConnectorSettings {
 
     @Override
     public boolean isEnabled(String tag) {
+        if (tag.equals(TAG_FACING)) {
+            return advanced;
+        }
         if (energyMode == EnergyMode.INS) {
             return INSERT_TAGS.contains(tag);
         } else {
@@ -109,6 +125,8 @@ public class EnergyConnectorSettings implements IConnectorSettings {
         rate = (Integer) data.get(TAG_RATE);
         minmax = (Integer) data.get(TAG_MINMAX);
         priority = (Integer) data.get(TAG_PRIORITY);
+        String facing = (String) data.get(TAG_FACING);
+        facingOverride = facing == null ? null : EnumFacing.byName(facing);
     }
 
     @Override
@@ -130,6 +148,9 @@ public class EnergyConnectorSettings implements IConnectorSettings {
         } else {
             minmax = null;
         }
+        if (tag.hasKey("facingOverride")) {
+            facingOverride = EnumFacing.VALUES[tag.getByte("facingOverride")];
+        }
     }
 
     @Override
@@ -144,6 +165,9 @@ public class EnergyConnectorSettings implements IConnectorSettings {
         }
         if (minmax != null) {
             tag.setInteger("minmax", minmax);
+        }
+        if (facingOverride != null) {
+            tag.setByte("facingOverride", (byte) facingOverride.ordinal());
         }
     }
 }

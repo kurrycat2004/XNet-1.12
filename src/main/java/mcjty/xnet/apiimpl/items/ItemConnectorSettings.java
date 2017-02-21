@@ -18,10 +18,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import static mcjty.xnet.blocks.controller.GuiController.TAG_FACING;
-
 public class ItemConnectorSettings implements IConnectorSettings {
 
+    public static final String TAG_FACING = "facing";
     public static final String TAG_MODE = "mode";
     public static final String TAG_STACK = "stack";
     public static final String TAG_SPEED = "speed";
@@ -46,6 +45,8 @@ public class ItemConnectorSettings implements IConnectorSettings {
         STACK
     }
 
+    private final boolean advanced;
+
     private ItemMode itemMode = ItemMode.INS;
     private int speed = 2;
     private StackMode stackMode = StackMode.SINGLE;
@@ -57,6 +58,8 @@ public class ItemConnectorSettings implements IConnectorSettings {
     @Nullable private Integer priority = 0;
     @Nullable private Integer count = null;
     private ItemStackList filters = ItemStackList.create(FILTER_SIZE);
+
+    @Nonnull final private EnumFacing side;
     @Nullable private EnumFacing facingOverride = null; // Only available on advanced connectors
 
     // Cached matcher for items
@@ -64,6 +67,11 @@ public class ItemConnectorSettings implements IConnectorSettings {
 
     public ItemMode getItemMode() {
         return itemMode;
+    }
+
+    public ItemConnectorSettings(boolean advanced, @Nonnull EnumFacing side) {
+        this.advanced = advanced;
+        this.side = side;
     }
 
     @Nullable
@@ -87,6 +95,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
     @Override
     public void createGui(IEditorGui gui) {
         gui
+                .choices(TAG_FACING, "Side from which to operate", facingOverride == null ? side : facingOverride, EnumFacing.VALUES)
                 .choices(TAG_MODE, "Insert or extract mode", itemMode, ItemMode.values())
                 .choices(TAG_STACK, "Single item or entire stack", stackMode, StackMode.values())
                 .choices(TAG_SPEED, "Number of ticks for each operation", Integer.toString(speed * 10),
@@ -157,6 +166,9 @@ public class ItemConnectorSettings implements IConnectorSettings {
         if (tag.startsWith(TAG_FILTER)) {
             return true;
         }
+        if (tag.equals(TAG_FACING)) {
+            return advanced;
+        }
         if (itemMode == ItemMode.INS) {
             return INSERT_TAGS.contains(tag);
         } else {
@@ -183,8 +195,8 @@ public class ItemConnectorSettings implements IConnectorSettings {
             filters.set(i, (ItemStack) data.get(TAG_FILTER+i));
         }
         matcher = null;
-        Integer facing = (Integer) data.get(TAG_FACING);
-        facingOverride = (facing == null || facing == -1) ? null : EnumFacing.VALUES[facing];
+        String facing = (String) data.get(TAG_FACING);
+        facingOverride = facing == null ? null : EnumFacing.byName(facing);
     }
 
     @Override
@@ -221,8 +233,6 @@ public class ItemConnectorSettings implements IConnectorSettings {
         matcher = null;
         if (tag.hasKey("facingOverride")) {
             facingOverride = EnumFacing.VALUES[tag.getByte("facingOverride")];
-        } else {
-            facingOverride = null;
         }
     }
 

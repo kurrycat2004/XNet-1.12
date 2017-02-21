@@ -204,12 +204,12 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
         Set<ConnectedBlockClientInfo> set = new HashSet<>();
         for (BlockPos consumerPos : worldBlob.getConsumers(networkId)) {
-            ConsumerId consumerId = worldBlob.getConsumerAt(consumerPos);
             String name = "";
             TileEntity te = getWorld().getTileEntity(consumerPos);
             if (te instanceof ConnectorTileEntity) {
                 // Should always be the case. @todo error?
                 name = ((ConnectorTileEntity) te).getConnectorName();
+            } else {
                 XNet.logger.warn("What? The connector at " + BlockPosTools.toString(consumerPos) + " is not a connector?");
             }
             for (EnumFacing facing : EnumFacing.VALUES) {
@@ -334,12 +334,14 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
     private void createConnector(int channel, SidedPos pos) {
         WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
-        ConsumerId consumerId = worldBlob.getConsumerAt(pos.getPos().offset(pos.getSide()));
+        BlockPos consumerPos = pos.getPos().offset(pos.getSide());
+        ConsumerId consumerId = worldBlob.getConsumerAt(consumerPos);
         if (consumerId == null) {
             throw new RuntimeException("What?");
         }
         SidedConsumer id = new SidedConsumer(consumerId, pos.getSide().getOpposite());
-        channels[channel].createConnector(id);
+        boolean advanced = getWorld().getBlockState(consumerPos).getBlock() == NetCableSetup.advancedConnectorBlock;
+        channels[channel].createConnector(id, advanced);
         cleanCache(channel);
         markDirtyQuick();
     }

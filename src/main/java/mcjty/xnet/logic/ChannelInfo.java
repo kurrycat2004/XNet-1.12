@@ -48,8 +48,8 @@ public class ChannelInfo {
         return connectors;
     }
 
-    public ConnectorInfo createConnector(SidedConsumer id) {
-        ConnectorInfo info = new ConnectorInfo(type, id);
+    public ConnectorInfo createConnector(SidedConsumer id, boolean advanced) {
+        ConnectorInfo info = new ConnectorInfo(type, id, advanced);
         connectors.put(id, info);
         return info;
     }
@@ -65,6 +65,7 @@ public class ChannelInfo {
             tc.setInteger("consumerId", entry.getKey().getConsumerId().getId());
             tc.setInteger("side", entry.getKey().getSide().ordinal());
             tc.setString("type", connectorInfo.getType().getID());
+            tc.setBoolean("advanced", connectorInfo.isAdvanced());
             conlist.appendTag(tc);
         }
         tag.setTag("connectors", conlist);
@@ -89,7 +90,8 @@ public class ChannelInfo {
             ConsumerId consumerId = new ConsumerId(tc.getInteger("consumerId"));
             EnumFacing side = EnumFacing.VALUES[tc.getInteger("side")];
             SidedConsumer key = new SidedConsumer(consumerId, side);
-            ConnectorInfo connectorInfo = new ConnectorInfo(type, key);
+            boolean advanced = tc.getBoolean("advanced");
+            ConnectorInfo connectorInfo = new ConnectorInfo(type, key, advanced);
             connectorInfo.readFromNBT(tc);
             connectors.put(key, connectorInfo);
         }
