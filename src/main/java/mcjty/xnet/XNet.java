@@ -39,6 +39,8 @@ public class XNet implements ModBase {
     public static final String MIN_MCJTYLIB_VER = "2.3.8";
     public static final String COMPATLAYER_VER = "0.2.1";
 
+    public static final String SHIFT_MESSAGE = "<Press Shift>";
+
     @SidedProxy(clientSide = "mcjty.xnet.proxy.ClientProxy", serverSide = "mcjty.xnet.proxy.ServerProxy")
     public static CommonProxy proxy;
 

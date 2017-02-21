@@ -10,6 +10,7 @@ import mcjty.xnet.api.keys.ConsumerId;
 import mcjty.xnet.blocks.controller.TileEntityController;
 import mcjty.xnet.blocks.generic.GenericCableBlock;
 import mcjty.xnet.blocks.generic.GenericCableISBM;
+import mcjty.xnet.config.GeneralConfiguration;
 import mcjty.xnet.gui.GuiProxy;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
@@ -30,6 +31,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
@@ -38,6 +40,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
+import org.lwjgl.input.Keyboard;
 
 import java.util.List;
 
@@ -184,6 +187,27 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
         }
 
         return drops;
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, EntityPlayer player, List<String> tooltip, boolean adv) {
+        super.addInformation(stack, player, tooltip, adv);
+
+        if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+            tooltip.add(TextFormatting.BLUE + "Place connector next to block or");
+            tooltip.add(TextFormatting.BLUE + "machine that should be connected");
+            tooltip.add(TextFormatting.BLUE + "to the network");
+            boolean advanced = this == NetCableSetup.advancedConnectorBlock;
+            int maxrf = advanced ? GeneralConfiguration.maxRfAdvancedConnector : GeneralConfiguration.maxRfConnector;
+            tooltip.add(TextFormatting.GRAY + "" + TextFormatting.BOLD + "Max RF: " + TextFormatting.WHITE + maxrf);
+            if (advanced) {
+                tooltip.add(TextFormatting.GRAY + "Allow access to different sides");
+                tooltip.add(TextFormatting.GRAY + "Supports faster item transfer");
+            }
+        } else {
+            tooltip.add(TextFormatting.WHITE + XNet.SHIFT_MESSAGE);
+        }
+
     }
 
     @Override
