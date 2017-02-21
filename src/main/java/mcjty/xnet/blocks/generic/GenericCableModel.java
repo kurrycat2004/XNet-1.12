@@ -14,7 +14,7 @@ import net.minecraftforge.common.model.TRSRTransformation;
 import java.util.Collection;
 import java.util.Collections;
 
-public class GenericModel implements IModel {
+public class GenericCableModel implements IModel {
     @Override
     public IBakedModel bake(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
         return new GenericCableISBM(state, format, bakedTextureGetter);
