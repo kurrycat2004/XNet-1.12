@@ -99,12 +99,18 @@ public class ItemConnectorSettings implements IConnectorSettings {
 
     @Override
     public void createGui(IEditorGui gui) {
+        String[] speeds;
+        if (advanced) {
+            speeds = new String[] { "10", "20", "60", "100", "200" };
+        } else {
+            speeds = new String[] { "20", "60", "100", "200" };
+        }
+
         gui
                 .choices(TAG_FACING, "Side from which to operate", facingOverride == null ? side : facingOverride, EnumFacing.VALUES)
                 .choices(TAG_MODE, "Insert or extract mode", itemMode, ItemMode.values())
                 .choices(TAG_STACK, "Single item or entire stack", stackMode, StackMode.values())
-                .choices(TAG_SPEED, "Number of ticks for each operation", Integer.toString(speed * 10),
-                        "10", "20", "60", "100", "200")
+                .choices(TAG_SPEED, "Number of ticks for each operation", Integer.toString(speed * 10), speeds)
                 .nl()
 
                 .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority).shift(10)
