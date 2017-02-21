@@ -1,6 +1,5 @@
 package mcjty.xnet.blocks.cables;
 
-import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.tools.ItemStackTools;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;

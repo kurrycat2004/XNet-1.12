@@ -4,6 +4,7 @@ import cofh.api.energy.IEnergyProvider;
 import cofh.api.energy.IEnergyReceiver;
 import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.network.Argument;
+import mcjty.xnet.config.GeneralConfiguration;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -20,8 +21,6 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
     private int energy = 0;
     private int inputFromSide[] = new int[] { 0, 0, 0, 0, 0, 0 };
     private String name = "";
-
-    public static final int MAX_ENERGY = 1000000;    // @todo configurable?
 
     @Override
     public void readFromNBT(NBTTagCompound tagCompound) {
@@ -72,6 +71,10 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         }
     }
 
+    public int getMaxEnergy() {
+        return GeneralConfiguration.maxRfConnector;
+    }
+
     @Override
     public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate) {
         return 0;
@@ -86,9 +89,9 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         if (m > 0) {
             int toreceive = Math.min(maxReceive, m);
             int newenergy = energy + toreceive;
-            if (newenergy > MAX_ENERGY) {
-                toreceive -= newenergy - MAX_ENERGY;
-                newenergy = MAX_ENERGY;
+            if (newenergy > getMaxEnergy()) {
+                toreceive -= newenergy - getMaxEnergy();
+                newenergy = getMaxEnergy();
             }
             if (!simulate && energy != newenergy) {
                 energy = newenergy;
