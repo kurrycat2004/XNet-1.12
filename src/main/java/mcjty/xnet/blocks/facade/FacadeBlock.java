@@ -20,12 +20,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
@@ -115,6 +118,27 @@ public class FacadeBlock extends NetCableBlock implements ITileEntityProvider {
         ModelResourceLocation itemModelResourceLocation = new ModelResourceLocation(getRegistryName(), "inventory");
         final int DEFAULT_ITEM_SUBTYPE = 0;
         Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(itemBlock, DEFAULT_ITEM_SUBTYPE, itemModelResourceLocation);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+        return Blocks.COBBLESTONE.shouldSideBeRendered(blockState, blockAccess, pos, side);
+    }
+
+    @Override
+    public boolean isBlockNormalCube(IBlockState blockState) {
+        return Blocks.COBBLESTONE.isBlockNormalCube(blockState);
+    }
+
+    @Override
+    public boolean isOpaqueCube(IBlockState blockState) {
+        return Blocks.COBBLESTONE.isOpaqueCube(blockState);
+    }
+
+    @Override
+    public boolean isFullCube(IBlockState state) {
+        return Blocks.COBBLESTONE.isFullCube(state);
     }
 
 
