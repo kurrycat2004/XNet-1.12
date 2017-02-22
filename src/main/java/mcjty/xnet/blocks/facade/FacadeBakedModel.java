@@ -19,6 +19,7 @@ public class FacadeBakedModel implements IBakedModel {
     public static final ModelResourceLocation modelFacade = new ModelResourceLocation(XNet.MODID + ":" + FacadeBlock.FACADE);
 
     private VertexFormat format;
+    private IBakedModel facadeModel = null;
 
     public FacadeBakedModel(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
         this.format = format;
@@ -26,40 +27,47 @@ public class FacadeBakedModel implements IBakedModel {
 
     @Override
     public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
-        IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(Blocks.COBBLESTONE.getDefaultState());
+        IBakedModel model = getModel();
         return model.getQuads(state, side, rand);
+    }
+
+    private IBakedModel getModel() {
+        if (facadeModel == null) {
+            facadeModel = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(Blocks.COBBLESTONE.getDefaultState());
+        }
+        return facadeModel;
     }
 
 
     @Override
     public boolean isAmbientOcclusion() {
-        return true;
+        return getModel().isAmbientOcclusion();
     }
 
     @Override
     public boolean isGui3d() {
-        return false;
+        return getModel().isGui3d();
     }
 
     @Override
     public boolean isBuiltInRenderer() {
-        return false;
+        return getModel().isBuiltInRenderer();
     }
 
     @Override
     public TextureAtlasSprite getParticleTexture() {
-        IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(Blocks.COBBLESTONE.getDefaultState());
+        IBakedModel model = getModel();
         return model.getParticleTexture();
     }
 
     @Override
     public ItemCameraTransforms getItemCameraTransforms() {
-        return ItemCameraTransforms.DEFAULT;
+        return getModel().getItemCameraTransforms();
     }
 
     @Override
     public ItemOverrideList getOverrides() {
-        return null;
+        return getModel().getOverrides();
     }
 
 }
