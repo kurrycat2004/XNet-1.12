@@ -16,7 +16,7 @@ import java.util.List;
 
 public class FacadeBakedModel implements IBakedModel {
 
-    public static final ModelResourceLocation modelFacade = new ModelResourceLocation(XNet.MODID + ":" + "facade");
+    public static final ModelResourceLocation modelFacade = new ModelResourceLocation(XNet.MODID + ":" + FacadeBlock.FACADE);
 
     private VertexFormat format;
 

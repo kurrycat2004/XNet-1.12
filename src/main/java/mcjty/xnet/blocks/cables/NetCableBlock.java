@@ -29,6 +29,10 @@ public class NetCableBlock extends GenericCableBlock {
         super(Material.CLOTH, NETCABLE);
     }
 
+    public NetCableBlock(Material material, String name) {
+        super(material, name);
+    }
+
     @Override
     @SideOnly(Side.CLIENT)
     public void initModel() {
@@ -54,6 +58,11 @@ public class NetCableBlock extends GenericCableBlock {
 
     @Override
     protected IBlockState clGetStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+        return getPlacementState(world, pos, facing, hitX, hitY, hitZ, meta, placer);
+
+    }
+
+    public IBlockState getPlacementState(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
         // When our block is placed down we force a re-render of adjacent blocks to make sure their ISBM model is updated
         world.markBlockRangeForRenderUpdate(pos.add(-1, -1, -1), pos.add(1, 1, 1));
         return super.clGetStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, placer);

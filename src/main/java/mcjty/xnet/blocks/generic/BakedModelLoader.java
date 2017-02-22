@@ -3,6 +3,7 @@ package mcjty.xnet.blocks.generic;
 import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.blocks.cables.NetCableBlock;
+import mcjty.xnet.blocks.facade.FacadeBlock;
 import mcjty.xnet.blocks.facade.FacadeModel;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
@@ -22,12 +23,12 @@ public class BakedModelLoader implements ICustomModelLoader {
         }
         return ConnectorBlock.CONNECTOR.equals(modelLocation.getResourcePath()) ||
                 NetCableBlock.NETCABLE.equals(modelLocation.getResourcePath()) ||
-                "facade".equals(modelLocation.getResourcePath());
+                FacadeBlock.FACADE.equals(modelLocation.getResourcePath());
     }
 
     @Override
     public IModel loadModel(ResourceLocation modelLocation) throws Exception {
-        if ("facade".equals(modelLocation.getResourcePath())) {
+        if (FacadeBlock.FACADE.equals(modelLocation.getResourcePath())) {
             return FACADE_MODEL;
         } else {
             return GENERIC_MODEL;
