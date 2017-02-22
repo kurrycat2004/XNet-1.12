@@ -8,6 +8,7 @@ import mcjty.xnet.XNet;
 import mcjty.xnet.api.keys.ConsumerId;
 import mcjty.xnet.api.keys.NetworkId;
 import mcjty.xnet.blocks.cables.NetCableBlock;
+import mcjty.xnet.blocks.cables.NetCableSetup;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
 import mcp.mobius.waila.api.IWailaConfigHandler;
@@ -24,6 +25,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
@@ -85,8 +87,13 @@ public class FacadeBlock extends NetCableBlock implements ITileEntityProvider {
         }
     }
 
+    @Override
+    public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
+        this.onBlockHarvested(world, pos, state, player);
+        return world.setBlockState(pos, NetCableSetup.netCableBlock.getDefaultState(), world.isRemote ? 11 : 3);
+    }
 
-
+    @Override
     @SideOnly(Side.CLIENT)
     public void initModel() {
         // To make sure that our ISBM model is chosen for all states we use this custom state mapper:
@@ -99,6 +106,7 @@ public class FacadeBlock extends NetCableBlock implements ITileEntityProvider {
         ModelLoader.setCustomStateMapper(this, ignoreState);
     }
 
+    @Override
     @SideOnly(Side.CLIENT)
     public void initItemModel() {
         // For our item model we want to use a normal json model. This has to be called in

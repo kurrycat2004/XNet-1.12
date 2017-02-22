@@ -1,12 +1,11 @@
 package mcjty.xnet.blocks.facade;
 
-import mcjty.lib.compat.CompatBlock;
 import mcjty.lib.compat.CompatItemBlock;
+import mcjty.lib.tools.ItemStackTools;
 import mcjty.xnet.blocks.cables.NetCableSetup;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
@@ -33,7 +32,7 @@ public class FacadeItemBlock extends CompatItemBlock {
 
         ItemStack itemstack = player.getHeldItem(hand);
 
-        if (!itemstack.isEmpty() && player.canPlayerEdit(pos, facing, itemstack) && world.mayPlace(this.block, pos, false, facing, null)) {
+        if (ItemStackTools.isValid(itemstack)) {
             int i = this.getMetadata(itemstack.getMetadata());
             FacadeBlock facadeBlock = (FacadeBlock) this.block;
             IBlockState placementState = facadeBlock.getPlacementState(world, pos, facing, hitX, hitY, hitZ, i, player);
