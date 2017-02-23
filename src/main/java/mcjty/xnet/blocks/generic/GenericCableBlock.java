@@ -11,6 +11,9 @@ import mcjty.xnet.XNet;
 import mcjty.xnet.api.keys.ConsumerId;
 import mcjty.xnet.api.keys.NetworkId;
 import mcjty.xnet.blocks.cables.ConnectorType;
+import mcjty.xnet.blocks.facade.FacadeBlockId;
+import mcjty.xnet.blocks.facade.FacadeProperty;
+import mcjty.xnet.blocks.facade.IFacadeSupport;
 import mcjty.xnet.multiblock.ColorId;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
@@ -24,9 +27,11 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -40,6 +45,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Set;
 
@@ -52,6 +58,9 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
     public static final UnlistedPropertyBlockType EAST = new UnlistedPropertyBlockType("east");
     public static final UnlistedPropertyBlockType UP = new UnlistedPropertyBlockType("up");
     public static final UnlistedPropertyBlockType DOWN = new UnlistedPropertyBlockType("down");
+
+    public static final FacadeProperty FACADEID = new FacadeProperty("facadeid");
+
 
     public static final ColorId STANDARD_COLOR = new ColorId(1);
 
@@ -77,6 +86,16 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
     @SideOnly(Side.CLIENT)
     public void initModel() {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
+    }
+
+    @Nullable
+    protected IBlockState getMimicBlock(IBlockAccess blockAccess, BlockPos pos) {
+        TileEntity te = blockAccess.getTileEntity(pos);
+        if (te instanceof IFacadeSupport) {
+            return ((IFacadeSupport) te).getMimicBlock();
+        } else {
+            return null;
+        }
     }
 
 
@@ -163,7 +182,8 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
     @Override
     protected BlockStateContainer createBlockState() {
         IProperty[] listedProperties = new IProperty[0]; // no listed properties
-        IUnlistedProperty[] unlistedProperties = new IUnlistedProperty[] { NORTH, SOUTH, WEST, EAST, UP, DOWN };
+        IUnlistedProperty[] unlistedProperties = new IUnlistedProperty[] { NORTH, SOUTH, WEST, EAST, UP, DOWN,
+            FACADEID};
         return new ExtendedBlockState(this, listedProperties, unlistedProperties);
     }
 

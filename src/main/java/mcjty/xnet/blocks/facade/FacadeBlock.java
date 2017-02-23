@@ -16,8 +16,6 @@ import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -34,9 +32,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
-import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -48,13 +44,12 @@ import java.util.Set;
 
 public class FacadeBlock extends NetCableBlock implements ITileEntityProvider {
 
-    public static final FacadeProperty FACADEID = new FacadeProperty("facadeid");
-
     public static final String FACADE = "facade";
 
     public FacadeBlock() {
         super(Material.IRON, FACADE);
         initTileEntity();
+        setHardness(0.8f);
     }
 
     @Override
@@ -120,26 +115,10 @@ public class FacadeBlock extends NetCableBlock implements ITileEntityProvider {
     }
 
     @Override
-    protected BlockStateContainer createBlockState() {
-        IProperty[] listedProperties = new IProperty[0]; // no listed properties
-        IUnlistedProperty[] unlistedProperties = new IUnlistedProperty[] { FACADEID };
-        return new ExtendedBlockState(this, listedProperties, unlistedProperties);
-    }
-
-    @Override
     public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
         IBlockState mimicBlock = getMimicBlock(world, pos);
         return extendedBlockState.withProperty(FACADEID, new FacadeBlockId(mimicBlock.getBlock().getRegistryName().toString(), mimicBlock.getBlock().getMetaFromState(mimicBlock)));
-    }
-
-    private IBlockState getMimicBlock(IBlockAccess blockAccess, BlockPos pos) {
-        TileEntity te = blockAccess.getTileEntity(pos);
-        if (te instanceof FacadeTileEntity) {
-            return ((FacadeTileEntity) te).getMimicBlock();
-        } else {
-            return Blocks.COBBLESTONE.getDefaultState();
-        }
     }
 
     @Override

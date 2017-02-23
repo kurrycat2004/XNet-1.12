@@ -25,6 +25,9 @@ public class ModRecipes {
         GameRegistry.addRecipe(new ItemStack(ModBlocks.controllerBlock), "RCR", "rMr", "igi",
                 'M', machineFrame, 'R', Items.REPEATER, 'C', Items.COMPARATOR, 'r', Items.REDSTONE,
                 'i', Items.IRON_INGOT, 'g', Items.GOLD_INGOT);
+
+        GameRegistry.addRecipe(new ItemStack(ModBlocks.facadeBlock, 16), "pwp", "wXw", "pwp",
+                'p', Items.PAPER, 'w', Blocks.WOOL, 'X', Blocks.GLASS);
     }
 
 }

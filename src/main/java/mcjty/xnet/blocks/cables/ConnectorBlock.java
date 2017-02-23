@@ -8,10 +8,12 @@ import mcjty.theoneprobe.api.TextStyleClass;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.keys.ConsumerId;
 import mcjty.xnet.blocks.controller.TileEntityController;
+import mcjty.xnet.blocks.facade.FacadeBlockId;
 import mcjty.xnet.blocks.generic.GenericCableBlock;
 import mcjty.xnet.blocks.generic.GenericCableISBM;
 import mcjty.xnet.config.GeneralConfiguration;
 import mcjty.xnet.gui.GuiProxy;
+import mcjty.xnet.init.ModBlocks;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
 import net.minecraft.block.Block;
@@ -35,6 +37,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -42,6 +45,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import org.lwjgl.input.Keyboard;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class ConnectorBlock extends GenericCableBlock implements ITileEntityProvider {
@@ -80,6 +84,40 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
     }
 
     @Override
+    public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity te, ItemStack stack) {
+        if (te instanceof ConnectorTileEntity) {
+            // If we are in mimic mode then the drop will be the facade as the connector will remain there
+            if (((ConnectorTileEntity) te).getMimicBlock() != null) {
+                ItemStack item = new ItemStack(ModBlocks.facadeBlock);
+                spawnAsEntity(worldIn, pos, item);
+                return;
+            }
+        }
+        super.harvestBlock(worldIn, player, pos, state, te, stack);
+    }
+
+
+    @Override
+    public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
+        TileEntity te = world.getTileEntity(pos);
+        if (te instanceof ConnectorTileEntity) {
+            ConnectorTileEntity connectorTileEntity = (ConnectorTileEntity) te;
+            if (connectorTileEntity.getMimicBlock() == null) {
+                this.onBlockHarvested(world, pos, state, player);
+                return world.setBlockState(pos, net.minecraft.init.Blocks.AIR.getDefaultState(), world.isRemote ? 11 : 3);
+            } else {
+                // We are in mimic mode. Don't remove the connector but instead set mimic to null
+                this.onBlockHarvested(world, pos, state, player);
+                connectorTileEntity.setMimicBlock(null);
+            }
+        } else {
+            return super.removedByPlayer(state, world, pos, player, willHarvest);
+        }
+        return true;
+    }
+
+
+    @Override
     public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data) {
         super.addProbeInfo(mode, probeInfo, player, world, blockState, data);
         TileEntity te = world.getTileEntity(data.getPos());
@@ -90,6 +128,19 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
             }
         }
     }
+
+
+    @Override
+    public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
+        IExtendedBlockState extendedBlockState = (IExtendedBlockState) super.getExtendedState(state, world, pos);
+        IBlockState mimicBlock = getMimicBlock(world, pos);
+        if (mimicBlock != null) {
+            return extendedBlockState.withProperty(FACADEID, new FacadeBlockId(mimicBlock.getBlock().getRegistryName().toString(), mimicBlock.getBlock().getMetaFromState(mimicBlock)));
+        } else {
+            return extendedBlockState;
+        }
+    }
+
 
     @Override
     @SideOnly(Side.CLIENT)
@@ -168,6 +219,18 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
         }
         return false;
     }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+        IBlockState mimicBlock = getMimicBlock(blockAccess, pos);
+        if (mimicBlock == null) {
+            return false;
+        } else {
+            return mimicBlock.shouldSideBeRendered(blockAccess, pos, side);
+        }
+    }
+
 
     @Override
     public List<ItemStack> getDrops(IBlockAccess blockAccess, BlockPos pos, IBlockState state, int fortune) {

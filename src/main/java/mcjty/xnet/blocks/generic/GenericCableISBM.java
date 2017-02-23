@@ -5,6 +5,8 @@ import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.cables.ConnectorType;
 import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.blocks.cables.NetCableBlock;
+import mcjty.xnet.blocks.facade.FacadeBlockId;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.*;
@@ -16,6 +18,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
 import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -156,13 +159,20 @@ public class GenericCableISBM implements IBakedModel {
     @Override
     public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
 
+        IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
+        FacadeBlockId facadeId = extendedBlockState.getValue(GenericCableBlock.FACADEID);
+        if (facadeId != null) {
+            Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(facadeId.getRegistryName()));
+            IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(block.getStateFromMeta(facadeId.getMeta()));
+            return model.getQuads(state, side, rand);
+        }
+
         if (side != null) {
             return Collections.emptyList();
         }
 
         // Called with the blockstate from our block. Here we get the values of the six properties and pass that to
         // our baked model implementation.
-        IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
         ConnectorType north = extendedBlockState.getValue(GenericCableBlock.NORTH);
         ConnectorType south = extendedBlockState.getValue(GenericCableBlock.SOUTH);
         ConnectorType west = extendedBlockState.getValue(GenericCableBlock.WEST);

@@ -4,9 +4,14 @@ import cofh.api.energy.IEnergyProvider;
 import cofh.api.energy.IEnergyReceiver;
 import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.network.Argument;
+import mcjty.xnet.blocks.facade.IFacadeSupport;
+import mcjty.xnet.blocks.facade.MimicBlockSupport;
 import mcjty.xnet.config.GeneralConfiguration;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -14,13 +19,42 @@ import net.minecraftforge.energy.IEnergyStorage;
 
 import java.util.Map;
 
-public class ConnectorTileEntity extends GenericTileEntity implements IEnergyProvider, IEnergyReceiver {
+public class ConnectorTileEntity extends GenericTileEntity implements IEnergyProvider, IEnergyReceiver,
+        IFacadeSupport {
 
     public static final String CMD_SETNAME = "setName";
+
+    private MimicBlockSupport mimicBlockSupport = new MimicBlockSupport();
 
     private int energy = 0;
     private int inputFromSide[] = new int[] { 0, 0, 0, 0, 0, 0 };
     private String name = "";
+
+    @Override
+    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet) {
+        IBlockState oldMimicBlock = mimicBlockSupport.getMimicBlock();
+
+        super.onDataPacket(net, packet);
+
+        if (getWorld().isRemote) {
+            // If needed send a render update.
+            if (!mimicBlockSupport.getMimicBlock().equals(oldMimicBlock)) {
+                getWorld().markBlockRangeForRenderUpdate(getPos(), getPos());
+            }
+        }
+    }
+
+
+    @Override
+    public IBlockState getMimicBlock() {
+        return mimicBlockSupport.getMimicBlock();
+    }
+
+    public void setMimicBlock(IBlockState mimicBlock) {
+        mimicBlockSupport.setMimicBlock(mimicBlock);
+        markDirtyClient();
+    }
+
 
     @Override
     public void readFromNBT(NBTTagCompound tagCompound) {
@@ -31,6 +65,7 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
             inputFromSide = new int[] { 0, 0, 0, 0, 0, 0 };
         }
         name = tagCompound.getString("name");
+        mimicBlockSupport.readFromNBT(tagCompound);
     }
 
     @Override
@@ -39,6 +74,7 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         tagCompound.setInteger("energy", energy);
         tagCompound.setIntArray("inputs", inputFromSide);
         tagCompound.setString("name", name);
+        mimicBlockSupport.writeToNBT(tagCompound);
         return tagCompound;
     }
 

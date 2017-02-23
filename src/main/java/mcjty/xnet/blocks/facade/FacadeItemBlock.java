@@ -3,6 +3,7 @@ package mcjty.xnet.blocks.facade;
 import mcjty.lib.compat.CompatItemBlock;
 import mcjty.lib.tools.ChatTools;
 import mcjty.lib.tools.ItemStackTools;
+import mcjty.xnet.blocks.cables.ConnectorTileEntity;
 import mcjty.xnet.blocks.cables.NetCableSetup;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
@@ -52,7 +53,7 @@ public class FacadeItemBlock extends CompatItemBlock {
         super.addInformation(stack, playerIn, tooltip, advanced);
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null || !tagCompound.hasKey("regName")) {
-            tooltip.add(TextFormatting.BLUE + "Right click on block to mimic");
+            tooltip.add(TextFormatting.BLUE + "Right or sneak-right click on block to mimic");
         } else {
             String regName = tagCompound.getString("regName");
             int meta = tagCompound.getInteger("meta");
@@ -73,27 +74,39 @@ public class FacadeItemBlock extends CompatItemBlock {
 
         if (ItemStackTools.isValid(itemstack)) {
 
-            if (block != NetCableSetup.netCableBlock) {
-                setMimicBlock(itemstack, state);
-                ChatTools.addChatMessage(player, new TextComponentString("Facade is now mimicing " + block.getLocalizedName()));
-                return EnumActionResult.SUCCESS;
-            }
+            if (block == NetCableSetup.netCableBlock) {
+                int i = this.getMetadata(itemstack.getMetadata());
+                FacadeBlock facadeBlock = (FacadeBlock) this.block;
+                IBlockState placementState = facadeBlock.getPlacementState(world, pos, facing, hitX, hitY, hitZ, i, player);
 
-            int i = this.getMetadata(itemstack.getMetadata());
-            FacadeBlock facadeBlock = (FacadeBlock) this.block;
-            IBlockState placementState = facadeBlock.getPlacementState(world, pos, facing, hitX, hitY, hitZ, i, player);
-
-            if (placeBlockAt(itemstack, player, world, pos, facing, hitX, hitY, hitZ, placementState)) {
-                // @todo
-                SoundType soundtype = world.getBlockState(pos).getBlock().getSoundType(world.getBlockState(pos), world, pos, player);
-                world.playSound(player, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
-                itemstack.shrink(1);
+                if (placeBlockAt(itemstack, player, world, pos, facing, hitX, hitY, hitZ, placementState)) {
+                    SoundType soundtype = world.getBlockState(pos).getBlock().getSoundType(world.getBlockState(pos), world, pos, player);
+                    world.playSound(player, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
+                    TileEntity te = world.getTileEntity(pos);
+                    if (te instanceof FacadeTileEntity) {
+                        ((FacadeTileEntity) te).setMimicBlock(getMimicBlock(itemstack));
+                    }
+                    itemstack.shrink(1);
+                }
+            } else if (block == NetCableSetup.connectorBlock) {
                 TileEntity te = world.getTileEntity(pos);
-                if (te instanceof FacadeTileEntity) {
-                    ((FacadeTileEntity) te).setMimicBlock(getMimicBlock(itemstack));
+                if (te instanceof ConnectorTileEntity) {
+                    ConnectorTileEntity connectorTileEntity = (ConnectorTileEntity) te;
+                    if (connectorTileEntity.getMimicBlock() == null) {
+                        connectorTileEntity.setMimicBlock(getMimicBlock(itemstack));
+                        SoundType soundtype = world.getBlockState(pos).getBlock().getSoundType(world.getBlockState(pos), world, pos, player);
+                        world.playSound(player, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
+                        itemstack.shrink(1);
+                    } else {
+                        return EnumActionResult.FAIL;
+                    }
+                }
+            } else {
+                setMimicBlock(itemstack, state);
+                if (world.isRemote) {
+                    ChatTools.addChatMessage(player, new TextComponentString("Facade is now mimicing " + block.getLocalizedName()));
                 }
             }
-
             return EnumActionResult.SUCCESS;
         } else {
             return EnumActionResult.FAIL;

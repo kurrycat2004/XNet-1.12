@@ -164,7 +164,9 @@ public class ChunkBlob {
     public boolean createCableSegment(BlockPos pos, ColorId color) {
         IntPos posId = new IntPos(pos);
         if (blobAllocations.containsKey(posId)) {
-            throw new IllegalArgumentException("There is already a cablesegment at " + BlockPosTools.toString(pos) + "!");
+            // @todo
+            System.out.println("There is already a cablesegment at " + BlockPosTools.toString(pos) + "!");
+            return getBorderPositions().contains(posId);
         }
 
         Set<BlobId> ids = new HashSet<>();
@@ -241,7 +243,9 @@ public class ChunkBlob {
     public boolean removeCableSegment(BlockPos pos) {
         IntPos posId = new IntPos(pos);
         if (!blobAllocations.containsKey(posId)) {
-            throw new IllegalArgumentException("There is no cablesegment at " + BlockPosTools.toString(pos) + "!");
+            // @todo
+            System.out.println("There is no cablesegment at " + BlockPosTools.toString(pos) + "!");
+            return getBorderPositions().contains(posId);
         }
         networkConsumers.remove(posId);
         cachedConsumers = null;
