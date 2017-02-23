@@ -27,7 +27,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -103,16 +102,13 @@ public class FacadeBlock extends NetCableBlock implements ITileEntityProvider {
     @Override
     public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity te, ItemStack stack) {
         ItemStack item = new ItemStack(ModBlocks.facadeBlock);
-        NBTTagCompound tagCompound = new NBTTagCompound();
         IBlockState mimicBlock;
         if (te instanceof FacadeTileEntity) {
             mimicBlock = ((FacadeTileEntity) te).getMimicBlock();
         } else {
             mimicBlock = Blocks.COBBLESTONE.getDefaultState();
         }
-        tagCompound.setString("regName", mimicBlock.getBlock().getRegistryName().toString());
-        tagCompound.setInteger("meta", mimicBlock.getBlock().getMetaFromState(mimicBlock));
-        item.setTagCompound(tagCompound);
+        FacadeItemBlock.setMimicBlock(item, mimicBlock);
 
         spawnAsEntity(worldIn, pos, item);
     }

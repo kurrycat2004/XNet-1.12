@@ -23,7 +23,6 @@ public class FacadeBakedModel implements IBakedModel {
     public static final ModelResourceLocation modelFacade = new ModelResourceLocation(XNet.MODID + ":" + FacadeBlock.FACADE);
 
     private VertexFormat format;
-    private IBakedModel facadeModel = null;
     private static TextureAtlasSprite spriteCable;
 
     public FacadeBakedModel(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
@@ -52,11 +51,9 @@ public class FacadeBakedModel implements IBakedModel {
 
     private IBakedModel getModel(@Nonnull FacadeBlockId facadeId) {
         initTextures();
-        if (facadeModel == null) {
-            Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(facadeId.getRegistryName()));
-            facadeModel = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(block.getStateFromMeta(facadeId.getMeta()));
-        }
-        return facadeModel;
+        Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(facadeId.getRegistryName()));
+        IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(block.getStateFromMeta(facadeId.getMeta()));
+        return model;
     }
 
 
