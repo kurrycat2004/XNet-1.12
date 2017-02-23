@@ -8,6 +8,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -27,7 +28,11 @@ public class FacadeItemBlock extends CompatItemBlock {
         Block block = state.getBlock();
 
         if (block != NetCableSetup.netCableBlock) {
-            return EnumActionResult.FAIL;
+            TileEntity te = world.getTileEntity(pos);
+            if (te instanceof FacadeTileEntity) {
+                ((FacadeTileEntity) te).setMimicBlock(state);
+            }
+            return EnumActionResult.SUCCESS;
         }
 
         ItemStack itemstack = player.getHeldItem(hand);
