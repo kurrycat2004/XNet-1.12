@@ -9,8 +9,9 @@ import mcjty.xnet.XNet;
 import mcjty.xnet.api.keys.ConsumerId;
 import mcjty.xnet.blocks.controller.TileEntityController;
 import mcjty.xnet.blocks.facade.FacadeBlockId;
-import mcjty.xnet.blocks.generic.GenericCableBlock;
+import mcjty.xnet.blocks.facade.FacadeItemBlock;
 import mcjty.xnet.blocks.generic.GenericCableBakedModel;
+import mcjty.xnet.blocks.generic.GenericCableBlock;
 import mcjty.xnet.config.GeneralConfiguration;
 import mcjty.xnet.gui.GuiProxy;
 import mcjty.xnet.init.ModBlocks;
@@ -87,8 +88,11 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
     public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity te, ItemStack stack) {
         if (te instanceof ConnectorTileEntity) {
             // If we are in mimic mode then the drop will be the facade as the connector will remain there
-            if (((ConnectorTileEntity) te).getMimicBlock() != null) {
+            ConnectorTileEntity connectorTileEntity = (ConnectorTileEntity) te;
+            if (connectorTileEntity.getMimicBlock() != null) {
                 ItemStack item = new ItemStack(ModBlocks.facadeBlock);
+                FacadeItemBlock.setMimicBlock(item, connectorTileEntity.getMimicBlock());
+                connectorTileEntity.setMimicBlock(null);
                 spawnAsEntity(worldIn, pos, item);
                 return;
             }
@@ -106,9 +110,8 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
                 this.onBlockHarvested(world, pos, state, player);
                 return world.setBlockState(pos, net.minecraft.init.Blocks.AIR.getDefaultState(), world.isRemote ? 11 : 3);
             } else {
-                // We are in mimic mode. Don't remove the connector but instead set mimic to null
+                // We are in mimic mode. Don't remove the connector
                 this.onBlockHarvested(world, pos, state, player);
-                connectorTileEntity.setMimicBlock(null);
             }
         } else {
             return super.removedByPlayer(state, world, pos, player, willHarvest);
