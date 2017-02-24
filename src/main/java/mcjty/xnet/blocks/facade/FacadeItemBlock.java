@@ -54,6 +54,7 @@ public class FacadeItemBlock extends CompatItemBlock {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null || !tagCompound.hasKey("regName")) {
             tooltip.add(TextFormatting.BLUE + "Right or sneak-right click on block to mimic");
+            tooltip.add(TextFormatting.BLUE + "Right or sneak-right click on cable/connector to hide");
         } else {
             String regName = tagCompound.getString("regName");
             int meta = tagCompound.getInteger("meta");

@@ -70,7 +70,7 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
 
     public GenericCableBlock(Material material, String name) {
         super(material);
-        setHardness(2.0f);
+        setHardness(1.0f);
         setSoundType(SoundType.METAL);
         setHarvestLevel("pickaxe", 0);
         setUnlocalizedName(XNet.MODID + "." + name);

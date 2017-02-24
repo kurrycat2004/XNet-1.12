@@ -1,19 +1,9 @@
 package mcjty.xnet.blocks.facade;
 
-import mcjty.theoneprobe.api.IProbeHitData;
-import mcjty.theoneprobe.api.IProbeInfo;
-import mcjty.theoneprobe.api.ProbeMode;
-import mcjty.theoneprobe.api.TextStyleClass;
 import mcjty.xnet.XNet;
-import mcjty.xnet.api.keys.ConsumerId;
-import mcjty.xnet.api.keys.NetworkId;
 import mcjty.xnet.blocks.cables.NetCableBlock;
 import mcjty.xnet.blocks.cables.NetCableSetup;
 import mcjty.xnet.init.ModBlocks;
-import mcjty.xnet.multiblock.WorldBlob;
-import mcjty.xnet.multiblock.XNetBlobData;
-import mcp.mobius.waila.api.IWailaConfigHandler;
-import mcp.mobius.waila.api.IWailaDataAccessor;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -40,8 +30,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Set;
 
 public class FacadeBlock extends NetCableBlock implements ITileEntityProvider {
 
@@ -70,29 +58,6 @@ public class FacadeBlock extends NetCableBlock implements ITileEntityProvider {
     @Override
     public TileEntity createTileEntity(World world, IBlockState metadata) {
         return new FacadeTileEntity();
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
-        return currenttip;
-    }
-
-    @Override
-    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data) {
-        WorldBlob worldBlob = XNetBlobData.getBlobData(world).getWorldBlob(world);
-
-        Set<NetworkId> networks = worldBlob.getNetworksAt(data.getPos());
-        if (networks != null && !networks.isEmpty()) {
-            for (NetworkId network : networks) {
-                probeInfo.text(TextStyleClass.LABEL + "Network: " + TextStyleClass.INFO + network.getId());
-            }
-        }
-
-        ConsumerId consumerId = worldBlob.getConsumerAt(data.getPos());
-        if (consumerId != null) {
-            probeInfo.text(TextStyleClass.LABEL + "Consumer: " + TextStyleClass.INFO + consumerId.getId());
-        }
     }
 
     @Override
@@ -125,13 +90,6 @@ public class FacadeBlock extends NetCableBlock implements ITileEntityProvider {
             return extendedBlockState;
         }
     }
-
-    @Override
-    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-        // Placing a facade has no effect on blob network
-        originalOnBlockPlacedBy(world, pos, state, placer, stack);
-    }
-
 
     @Override
     public void breakBlock(World world, BlockPos pos, IBlockState state) {

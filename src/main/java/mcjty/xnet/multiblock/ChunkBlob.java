@@ -132,10 +132,11 @@ public class ChunkBlob {
     }
 
     public void check(World world) {
+        System.out.println("Checking chunk: " + chunkPos);
         for (int cx = 0 ; cx < 16 ; cx++) {
             for (int cz = 0 ; cz < 16 ; cz++) {
                 for (int cy = 0 ; cy < 256 ; cy++) {
-                    BlockPos pos = chunkPos.getBlock(cx, cz, cy);
+                    BlockPos pos = chunkPos.getBlock(cx, cy, cz);
                     Block block = world.getBlockState(pos).getBlock();
                     boolean hasid = block == NetCableSetup.connectorBlock || block == NetCableSetup.advancedConnectorBlock || block == NetCableSetup.netCableBlock || block == ModBlocks.controllerBlock || block == ModBlocks.facadeBlock;
                     if (hasid != blobAllocations.containsKey(new IntPos(pos))) {
