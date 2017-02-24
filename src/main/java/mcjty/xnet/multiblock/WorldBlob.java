@@ -9,6 +9,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -49,6 +50,16 @@ public class WorldBlob {
     public ConsumerId newConsumer() {
         lastConsumerId++;
         return new ConsumerId(lastConsumerId);
+    }
+
+    @Nullable
+    public BlobId getBlobAt(@Nonnull BlockPos pos) {
+        ChunkBlob blob = getBlob(pos);
+        if (blob == null) {
+            return null;
+        }
+        IntPos intPos = new IntPos(pos);
+        return blob.getBlobIdForPosition(intPos);
     }
 
     @Nullable
@@ -145,8 +156,10 @@ public class WorldBlob {
         if (blob.createCableSegment(pos, color)) {
             recalculateNetwork(blob);
         } else {
-            blob.fixNetworkAllocations();
-            removeCachedNetworksForBlob(blob);
+            recalculateNetwork(blob);
+            // @todo optimize this case?
+//            blob.fixNetworkAllocations();
+//            removeCachedNetworksForBlob(blob);
         }
     }
 
@@ -246,6 +259,12 @@ public class WorldBlob {
                 }
             }
 
+        }
+    }
+
+    public void checkNetwork(World world) {
+        for (Map.Entry<Long, ChunkBlob> entry : chunkBlobMap.entrySet()) {
+            entry.getValue().check(world);
         }
     }
 

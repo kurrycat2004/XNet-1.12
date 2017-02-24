@@ -18,7 +18,7 @@ public class FacadeTileEntity extends GenericTileEntity implements IFacadeSuppor
 
         if (getWorld().isRemote) {
             // If needed send a render update.
-            if (!mimicBlockSupport.getMimicBlock().equals(oldMimicBlock)) {
+            if (mimicBlockSupport.getMimicBlock() != oldMimicBlock) {
                 getWorld().markBlockRangeForRenderUpdate(getPos(), getPos());
             }
         }

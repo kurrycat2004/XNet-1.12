@@ -3,10 +3,14 @@ package mcjty.xnet.multiblock;
 import mcjty.lib.varia.BlockPosTools;
 import mcjty.xnet.api.keys.ConsumerId;
 import mcjty.xnet.api.keys.NetworkId;
+import mcjty.xnet.blocks.cables.NetCableSetup;
+import mcjty.xnet.init.ModBlocks;
+import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagIntArray;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -78,6 +82,11 @@ public class ChunkBlob {
         return cachedBorderPositions;
     }
 
+    @Nullable
+    public BlobId getBlobIdForPosition(@Nonnull IntPos pos) {
+        return blobAllocations.get(pos);
+    }
+
     @Nonnull
     public Set<NetworkId> getNetworks() {
         if (cachedNetworks == null) {
@@ -119,6 +128,25 @@ public class ChunkBlob {
             return cachedConsumers.get(network);
         } else {
             return Collections.emptySet();
+        }
+    }
+
+    public void check(World world) {
+        for (int cx = 0 ; cx < 16 ; cx++) {
+            for (int cz = 0 ; cz < 16 ; cz++) {
+                for (int cy = 0 ; cy < 256 ; cy++) {
+                    BlockPos pos = chunkPos.getBlock(cx, cz, cy);
+                    Block block = world.getBlockState(pos).getBlock();
+                    boolean hasid = block == NetCableSetup.connectorBlock || block == NetCableSetup.advancedConnectorBlock || block == NetCableSetup.netCableBlock || block == ModBlocks.controllerBlock || block == ModBlocks.facadeBlock;
+                    if (hasid != blobAllocations.containsKey(new IntPos(pos))) {
+                        if (hasid) {
+                            System.out.println("Allocation at " + BlockPosTools.toString(pos) + " but no cable there!");
+                        } else {
+                            System.out.println("Missing allocation at " + BlockPosTools.toString(pos) + "!");
+                        }
+                    }
+                }
+            }
         }
     }
 

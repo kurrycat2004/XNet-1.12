@@ -20,6 +20,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -118,8 +119,27 @@ public class FacadeBlock extends NetCableBlock implements ITileEntityProvider {
     public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
         IBlockState mimicBlock = getMimicBlock(world, pos);
-        return extendedBlockState.withProperty(FACADEID, new FacadeBlockId(mimicBlock.getBlock().getRegistryName().toString(), mimicBlock.getBlock().getMetaFromState(mimicBlock)));
+        if (mimicBlock != null) {
+            return extendedBlockState.withProperty(FACADEID, new FacadeBlockId(mimicBlock.getBlock().getRegistryName().toString(), mimicBlock.getBlock().getMetaFromState(mimicBlock)));
+        } else {
+            return extendedBlockState;
+        }
     }
+
+    @Override
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+        // Placing a facade has no effect on blob network
+        originalOnBlockPlacedBy(world, pos, state, placer, stack);
+    }
+
+
+    @Override
+    public void breakBlock(World world, BlockPos pos, IBlockState state) {
+        // Breaking a facade has no effect on blob network
+        originalBreakBlock(world, pos, state);
+    }
+
+
 
     @Override
     @SideOnly(Side.CLIENT)

@@ -14,6 +14,7 @@ import mcjty.xnet.blocks.cables.ConnectorType;
 import mcjty.xnet.blocks.facade.FacadeBlockId;
 import mcjty.xnet.blocks.facade.FacadeProperty;
 import mcjty.xnet.blocks.facade.IFacadeSupport;
+import mcjty.xnet.multiblock.BlobId;
 import mcjty.xnet.multiblock.ColorId;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
@@ -114,6 +115,13 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
     public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data) {
         WorldBlob worldBlob = XNetBlobData.getBlobData(world).getWorldBlob(world);
 
+        if (mode == ProbeMode.EXTENDED) {
+            BlobId blobId = worldBlob.getBlobAt(data.getPos());
+            if (blobId != null) {
+                probeInfo.text(TextStyleClass.LABEL + "Blob: " + TextStyleClass.INFO + blobId.getId());
+            }
+        }
+
         Set<NetworkId> networks = worldBlob.getNetworksAt(data.getPos());
         if (networks != null && !networks.isEmpty()) {
             for (NetworkId network : networks) {
@@ -133,10 +141,14 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
 
     @Override
     public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-        super.onBlockPlacedBy(world, pos, state, placer, stack);
+        originalOnBlockPlacedBy(world, pos, state, placer, stack);
         if (!world.isRemote) {
             createCableSegment(world, pos, stack);
         }
+    }
+
+    protected void originalOnBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+        super.onBlockPlacedBy(world, pos, state, placer, stack);
     }
 
     public void createCableSegment(World world, BlockPos pos, ItemStack stack) {
@@ -155,6 +167,10 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
             blobData.save(world);
         }
 
+        originalBreakBlock(world, pos, state);
+    }
+
+    protected void originalBreakBlock(World world, BlockPos pos, IBlockState state) {
         super.breakBlock(world, pos, state);
     }
 

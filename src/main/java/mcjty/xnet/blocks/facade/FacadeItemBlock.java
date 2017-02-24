@@ -86,7 +86,7 @@ public class FacadeItemBlock extends CompatItemBlock {
                     if (te instanceof FacadeTileEntity) {
                         ((FacadeTileEntity) te).setMimicBlock(getMimicBlock(itemstack));
                     }
-                    itemstack.shrink(1);
+                    ItemStackTools.incStackSize(itemstack, -1);
                 }
             } else if (block == NetCableSetup.connectorBlock) {
                 TileEntity te = world.getTileEntity(pos);
@@ -96,7 +96,7 @@ public class FacadeItemBlock extends CompatItemBlock {
                         connectorTileEntity.setMimicBlock(getMimicBlock(itemstack));
                         SoundType soundtype = world.getBlockState(pos).getBlock().getSoundType(world.getBlockState(pos), world, pos, player);
                         world.playSound(player, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
-                        itemstack.shrink(1);
+                        ItemStackTools.incStackSize(itemstack, -1);
                     } else {
                         return EnumActionResult.FAIL;
                     }

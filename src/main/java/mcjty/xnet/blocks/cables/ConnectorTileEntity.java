@@ -38,7 +38,7 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
 
         if (getWorld().isRemote) {
             // If needed send a render update.
-            if (!mimicBlockSupport.getMimicBlock().equals(oldMimicBlock)) {
+            if (mimicBlockSupport.getMimicBlock() != oldMimicBlock) {
                 getWorld().markBlockRangeForRenderUpdate(getPos(), getPos());
             }
         }
