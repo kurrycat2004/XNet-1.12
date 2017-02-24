@@ -10,7 +10,7 @@ import mcjty.xnet.api.keys.ConsumerId;
 import mcjty.xnet.blocks.controller.TileEntityController;
 import mcjty.xnet.blocks.facade.FacadeBlockId;
 import mcjty.xnet.blocks.generic.GenericCableBlock;
-import mcjty.xnet.blocks.generic.GenericCableISBM;
+import mcjty.xnet.blocks.generic.GenericCableBakedModel;
 import mcjty.xnet.config.GeneralConfiguration;
 import mcjty.xnet.gui.GuiProxy;
 import mcjty.xnet.init.ModBlocks;
@@ -149,7 +149,7 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
         StateMapperBase ignoreState = new StateMapperBase() {
             @Override
             protected ModelResourceLocation getModelResourceLocation(IBlockState iBlockState) {
-                return GenericCableISBM.modelConnector;
+                return GenericCableBakedModel.modelConnector;
             }
         };
         ModelLoader.setCustomStateMapper(this, ignoreState);

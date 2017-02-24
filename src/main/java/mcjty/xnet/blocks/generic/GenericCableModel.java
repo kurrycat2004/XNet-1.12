@@ -17,7 +17,7 @@ import java.util.Collections;
 public class GenericCableModel implements IModel {
     @Override
     public IBakedModel bake(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
-        return new GenericCableISBM(state, format, bakedTextureGetter);
+        return new GenericCableBakedModel(state, format, bakedTextureGetter);
     }
 
     @Override

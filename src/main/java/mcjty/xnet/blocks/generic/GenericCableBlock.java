@@ -11,7 +11,6 @@ import mcjty.xnet.XNet;
 import mcjty.xnet.api.keys.ConsumerId;
 import mcjty.xnet.api.keys.NetworkId;
 import mcjty.xnet.blocks.cables.ConnectorType;
-import mcjty.xnet.blocks.facade.FacadeBlockId;
 import mcjty.xnet.blocks.facade.FacadeProperty;
 import mcjty.xnet.blocks.facade.IFacadeSupport;
 import mcjty.xnet.multiblock.BlobId;
@@ -28,7 +27,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -36,6 +34,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
@@ -65,7 +65,26 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
 
     public static final ColorId STANDARD_COLOR = new ColorId(1);
 
-    public static final AxisAlignedBB EMPTY = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
+    public static final AxisAlignedBB AABB_EMPTY = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
+    public static final AxisAlignedBB AABB_CENTER = new AxisAlignedBB(.4, .4, .4, .6, .6, .6);
+
+    public static final AxisAlignedBB AABBS[] = new AxisAlignedBB[]{
+            new AxisAlignedBB(.4, 0, .4, .6, .4, .6),
+            new AxisAlignedBB(.4, .6, .4, .6, 1, .6),
+            new AxisAlignedBB(.4, .4, 0, .6, .6, .4),
+            new AxisAlignedBB(.4, .4, .6, .6, .6, 1),
+            new AxisAlignedBB(0, .4, .4, .4, .6, .6),
+            new AxisAlignedBB(.6, .4, .4, 1, .6, .6)
+    };
+
+    public static final AxisAlignedBB AABBS_CONNECTOR[] = new AxisAlignedBB[]{
+            new AxisAlignedBB(.2, 0, .2, .8, .1, .8),
+            new AxisAlignedBB(.2, .9, .2, .8, 1, .8),
+            new AxisAlignedBB(.2, .2, 0, .8, .8, .1),
+            new AxisAlignedBB(.2, .2, .9, .8, .8, 1),
+            new AxisAlignedBB(0, .2, .2, .1, .8, .8),
+            new AxisAlignedBB(.9, .2, .2, 1, .8, .8)
+    };
 
 
     public GenericCableBlock(Material material, String name) {
@@ -102,7 +121,44 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
 
     @Override
     public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
-        return EMPTY;
+        return AABB_EMPTY;
+    }
+
+    @Nullable
+    @Override
+    public RayTraceResult collisionRayTrace(IBlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {
+        Vec3d vec3d = start.subtract(pos.getX(), pos.getY(), pos.getZ());
+        Vec3d vec3d1 = end.subtract(pos.getX(), pos.getY(), pos.getZ());
+        RayTraceResult rc = checkIntersect(pos, vec3d, vec3d1, AABB_CENTER);
+        if (rc != null) {
+            return rc;
+        }
+
+        for (EnumFacing facing : EnumFacing.VALUES) {
+            ConnectorType type = getConnectorType(world, pos.offset(facing));
+            if (type != ConnectorType.NONE) {
+                rc = checkIntersect(pos, vec3d, vec3d1, AABBS[facing.ordinal()]);
+                if (rc != null) {
+                    return rc;
+                }
+            }
+            if (type == ConnectorType.BLOCK) {
+                rc = checkIntersect(pos, vec3d, vec3d1, AABBS_CONNECTOR[facing.ordinal()]);
+                if (rc != null) {
+                    return rc;
+                }
+            }
+        }
+        return null;
+    }
+
+    private RayTraceResult checkIntersect(BlockPos pos, Vec3d vec3d, Vec3d vec3d1, AxisAlignedBB boundingBox) {
+        RayTraceResult raytraceresult = boundingBox.calculateIntercept(vec3d, vec3d1);
+        return raytraceresult == null ? null : new RayTraceResult(raytraceresult.hitVec.addVector(pos.getX(), pos.getY(), pos.getZ()), raytraceresult.sideHit, pos);
+    }
+
+    protected RayTraceResult originalCollisionRayTrace(IBlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {
+        return super.collisionRayTrace(blockState, world, pos, start, end);
     }
 
     @Override

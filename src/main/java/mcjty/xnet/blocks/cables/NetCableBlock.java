@@ -2,7 +2,7 @@ package mcjty.xnet.blocks.cables;
 
 import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.generic.GenericCableBlock;
-import mcjty.xnet.blocks.generic.GenericCableISBM;
+import mcjty.xnet.blocks.generic.GenericCableBakedModel;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -40,7 +40,7 @@ public class NetCableBlock extends GenericCableBlock {
         StateMapperBase ignoreState = new StateMapperBase() {
             @Override
             protected ModelResourceLocation getModelResourceLocation(IBlockState iBlockState) {
-                return GenericCableISBM.modelCable;
+                return GenericCableBakedModel.modelCable;
             }
         };
         ModelLoader.setCustomStateMapper(this, ignoreState);

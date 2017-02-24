@@ -20,6 +20,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
@@ -48,6 +50,13 @@ public class FacadeBlock extends NetCableBlock implements ITileEntityProvider {
 
     protected void initTileEntity() {
         GameRegistry.registerTileEntity(FacadeTileEntity.class, XNet.MODID + "_facade");
+    }
+
+    @Nullable
+    @Override
+    public RayTraceResult collisionRayTrace(IBlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {
+        // We do not want the raytracing that happens in the GenericCableBlock
+        return super.originalCollisionRayTrace(blockState, world, pos, start, end);
     }
 
     @Override

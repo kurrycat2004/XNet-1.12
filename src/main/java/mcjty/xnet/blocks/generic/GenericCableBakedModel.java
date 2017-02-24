@@ -26,7 +26,7 @@ import java.util.List;
 
 import static mcjty.xnet.blocks.generic.CablePatterns.SpriteIdx.*;
 
-public class GenericCableISBM implements IBakedModel {
+public class GenericCableBakedModel implements IBakedModel {
 
     public static final ModelResourceLocation modelConnector = new ModelResourceLocation(XNet.MODID + ":" + ConnectorBlock.CONNECTOR);
     public static final ModelResourceLocation modelCable = new ModelResourceLocation(XNet.MODID + ":" + NetCableBlock.NETCABLE);
@@ -96,7 +96,7 @@ public class GenericCableISBM implements IBakedModel {
     }
 
 
-    public GenericCableISBM(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
+    public GenericCableBakedModel(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
         this.format = format;
     }
 
@@ -187,7 +187,7 @@ public class GenericCableISBM implements IBakedModel {
         if (connectorTexture != null) {
             spriteEnergy = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(connectorTexture);
         }
-        java.util.function.Function<CablePatterns.SpriteIdx, TextureAtlasSprite> getSprite = GenericCableISBM::getSpriteNormal;
+        java.util.function.Function<CablePatterns.SpriteIdx, TextureAtlasSprite> getSprite = GenericCableBakedModel::getSpriteNormal;
 
         List<BakedQuad> quads = new ArrayList<>();
 
