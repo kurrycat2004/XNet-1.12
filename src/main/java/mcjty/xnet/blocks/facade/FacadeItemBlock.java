@@ -19,6 +19,8 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -46,6 +48,12 @@ public class FacadeItemBlock extends CompatItemBlock {
             Block value = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(regName));
             return value.getStateFromMeta(meta);
         }
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public boolean canPlaceBlockOnSide(World worldIn, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
+        return true;
     }
 
     @Override
