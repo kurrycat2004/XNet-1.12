@@ -127,6 +127,10 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
     @Nullable
     @Override
     public RayTraceResult collisionRayTrace(IBlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {
+        if (getMimicBlock(world, pos) != null) {
+            // In mimic mode we use original raytrace mode
+            return originalCollisionRayTrace(blockState, world, pos, start, end);
+        }
         Vec3d vec3d = start.subtract(pos.getX(), pos.getY(), pos.getZ());
         Vec3d vec3d1 = end.subtract(pos.getX(), pos.getY(), pos.getZ());
         RayTraceResult rc = checkIntersect(pos, vec3d, vec3d1, AABB_CENTER);
