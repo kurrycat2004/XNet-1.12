@@ -127,12 +127,8 @@ public class WorldBlob {
      */
     public void createNetworkProvider(BlockPos pos, ColorId color, NetworkId network) {
         ChunkBlob blob = getOrCreateBlob(pos);
-        if (blob.createNetworkProvider(pos, color, network)) {
-            recalculateNetwork(blob);
-        } else {
-            blob.fixNetworkAllocations();
-            removeCachedNetworksForBlob(blob);
-        }
+        blob.createNetworkProvider(pos, color, network);
+        recalculateNetwork(blob);
     }
 
     /**
@@ -140,12 +136,8 @@ public class WorldBlob {
      */
     public void createNetworkConsumer(BlockPos pos, ColorId color, ConsumerId consumer) {
         ChunkBlob blob = getOrCreateBlob(pos);
-        if (blob.createNetworkConsumer(pos, color, consumer)) {
-            recalculateNetwork(blob);
-        } else {
-            blob.fixNetworkAllocations();
-            removeCachedNetworksForBlob(blob);
-        }
+        blob.createNetworkConsumer(pos, color, consumer);
+        recalculateNetwork(blob);
     }
 
     /**
@@ -182,11 +174,8 @@ public class WorldBlob {
 
     public void removeCableSegment(BlockPos pos) {
         ChunkBlob blob = getOrCreateBlob(pos);
-        if (blob.removeCableSegment(pos)) {
-            recalculateNetwork();
-        } else {
-            blob.fixNetworkAllocations();
-        }
+        blob.removeCableSegment(pos);
+        recalculateNetwork();
     }
 
     /**
