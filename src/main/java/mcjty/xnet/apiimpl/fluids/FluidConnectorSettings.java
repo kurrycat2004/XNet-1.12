@@ -22,6 +22,7 @@ public class FluidConnectorSettings implements IConnectorSettings {
     public static final String TAG_RATE = "rate";
     public static final String TAG_MINMAX = "minmax";
     public static final String TAG_PRIORITY = "priority";
+    public static final String TAG_SPEED = "speed";
 
     enum FluidMode {
         INS,
@@ -36,6 +37,7 @@ public class FluidConnectorSettings implements IConnectorSettings {
     @Nullable private Integer priority = 0;
     @Nullable private Integer rate = null;
     @Nullable private Integer minmax = null;
+    private int speed = 2;
 
     @Nonnull private final EnumFacing side;
     @Nullable private EnumFacing facingOverride = null; // Only available on advanced connectors
@@ -74,23 +76,31 @@ public class FluidConnectorSettings implements IConnectorSettings {
 
     @Override
     public void createGui(IEditorGui gui) {
+        String[] speeds;
+        if (advanced) {
+            speeds = new String[] { "10", "20", "60", "100", "200" };
+        } else {
+            speeds = new String[] { "20", "60", "100", "200" };
+        }
+
         gui
                 .choices(TAG_FACING, "Side from which to operate", facingOverride == null ? side : facingOverride, EnumFacing.VALUES)
                 .choices(TAG_MODE, "Insert or extract mode", fluidMode, FluidMode.values())
+                .choices(TAG_SPEED, "Number of ticks for each operation", Integer.toString(speed * 10), speeds)
                 .shift(10)
                 .redstoneMode(TAG_RS, rsMode).nl()
 
                 .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority).nl()
 
                 .label("Rate")
-                .integer(TAG_RATE, fluidMode == FluidMode.EXT ? "Max energy extraction rate" : "Max energy insertion rate", rate)
+                .integer(TAG_RATE, fluidMode == FluidMode.EXT ? "Max fluid extraction rate" : "Max fluid insertion rate", rate)
                 .shift(10)
                 .label(fluidMode == FluidMode.EXT ? "Min" : "Max")
-                .integer(TAG_MINMAX, fluidMode == FluidMode.EXT ? "Disable extraction if energy is too low" : "Disable insertion if energy is too high", minmax);
+                .integer(TAG_MINMAX, fluidMode == FluidMode.EXT ? "Disable extraction if fluid is too low" : "Disable insertion if fluid is too high", minmax);
     }
 
     private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_RATE, TAG_MINMAX, TAG_PRIORITY);
-    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_RATE, TAG_MINMAX, TAG_PRIORITY);
+    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_RATE, TAG_MINMAX, TAG_PRIORITY, TAG_SPEED);
 
     @Override
     public boolean isEnabled(String tag) {
@@ -135,11 +145,15 @@ public class FluidConnectorSettings implements IConnectorSettings {
         priority = (Integer) data.get(TAG_PRIORITY);
         String facing = (String) data.get(TAG_FACING);
         facingOverride = facing == null ? null : EnumFacing.byName(facing);
+        speed = Integer.parseInt((String) data.get(TAG_SPEED)) / 10;
+        if (speed == 0) {
+            speed = 2;
+        }
     }
 
     @Override
     public void readFromNBT(NBTTagCompound tag) {
-        fluidMode = FluidMode.values()[tag.getByte("itemMode")];
+        fluidMode = FluidMode.values()[tag.getByte("fluidMode")];
         rsMode = RSMode.values()[tag.getByte("rsMode")];
         if (tag.hasKey("priority")) {
             priority = tag.getInteger("priority");
@@ -159,11 +173,15 @@ public class FluidConnectorSettings implements IConnectorSettings {
         if (tag.hasKey("facingOverride")) {
             facingOverride = EnumFacing.VALUES[tag.getByte("facingOverride")];
         }
+        speed = tag.getInteger("speed");
+        if (speed == 0) {
+            speed = 2;
+        }
     }
 
     @Override
     public void writeToNBT(NBTTagCompound tag) {
-        tag.setByte("itemMode", (byte) fluidMode.ordinal());
+        tag.setByte("fluidMode", (byte) fluidMode.ordinal());
         tag.setByte("rsMode", (byte) rsMode.ordinal());
         if (priority != null) {
             tag.setInteger("priority", priority);
@@ -177,5 +195,6 @@ public class FluidConnectorSettings implements IConnectorSettings {
         if (facingOverride != null) {
             tag.setByte("facingOverride", (byte) facingOverride.ordinal());
         }
+        tag.setInteger("speed", speed);
     }
 }

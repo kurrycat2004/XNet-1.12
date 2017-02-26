@@ -7,6 +7,7 @@ import mcjty.lib.network.PacketHandler;
 import mcjty.lib.varia.WrenchChecker;
 import mcjty.xnet.XNet;
 import mcjty.xnet.apiimpl.energy.EnergyChannelType;
+import mcjty.xnet.apiimpl.fluids.FluidChannelType;
 import mcjty.xnet.apiimpl.items.ItemChannelType;
 import mcjty.xnet.config.GeneralConfiguration;
 import mcjty.xnet.gui.GuiProxy;
@@ -51,6 +52,7 @@ public abstract class CommonProxy {
 
         XNet.xNetApi.registerChannelType(new ItemChannelType());
         XNet.xNetApi.registerChannelType(new EnergyChannelType());
+        XNet.xNetApi.registerChannelType(new FluidChannelType());
     }
 
     private void readMainConfig() {
