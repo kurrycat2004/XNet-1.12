@@ -56,6 +56,30 @@ public class FluidConnectorSettings implements IConnectorSettings {
         return fluidMode;
     }
 
+    public int getSpeed() {
+        return speed;
+    }
+
+    @Nonnull
+    public Integer getPriority() {
+        return priority == null ? 0 : priority;
+    }
+
+    @Nonnull
+    public Integer getRate() {
+        return rate == null ? 1000 : rate;
+    }
+
+    @Nullable
+    public Integer getMinmax() {
+        return minmax;
+    }
+
+    public RSMode getRsMode() {
+        return rsMode;
+    }
+
+
     @Nullable
     @Override
     public IndicatorIcon getIndicatorIcon() {
@@ -115,25 +139,6 @@ public class FluidConnectorSettings implements IConnectorSettings {
             }
             return EXTRACT_TAGS.contains(tag);
         }
-    }
-
-    @Nonnull
-    public Integer getPriority() {
-        return priority == null ? 0 : priority;
-    }
-
-    @Nullable
-    public Integer getRate() {
-        return rate;
-    }
-
-    @Nullable
-    public Integer getMinmax() {
-        return minmax;
-    }
-
-    public RSMode getRsMode() {
-        return rsMode;
     }
 
     @Override
