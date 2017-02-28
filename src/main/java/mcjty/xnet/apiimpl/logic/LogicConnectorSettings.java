@@ -10,6 +10,7 @@ import net.minecraft.util.EnumFacing;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,11 +20,10 @@ public class LogicConnectorSettings implements IConnectorSettings {
     public static final String TAG_FACING = "facing";
     public static final String TAG_MODE = "mode";
 
-    enum Mode {
-        SENSOR,
-        ACT
-    }
+    public static final int SENSORS = 5;
+
     enum Color {
+        WHITE,
         RED,
         GREEN,
         BLUE,
@@ -32,8 +32,6 @@ public class LogicConnectorSettings implements IConnectorSettings {
         CYAN,
         PURPLE
     }
-
-    private Mode mode = Mode.SENSOR;
 
     private List<Sensor> sensors = null;
 
@@ -45,6 +43,10 @@ public class LogicConnectorSettings implements IConnectorSettings {
     public LogicConnectorSettings(boolean advanced, @Nonnull EnumFacing side) {
         this.advanced = advanced;
         this.side = side;
+        sensors = new ArrayList<>(SENSORS);
+        for (int i = 0 ; i < SENSORS ; i++) {
+            sensors.add(new Sensor());
+        }
     }
 
     @Nonnull
@@ -56,13 +58,7 @@ public class LogicConnectorSettings implements IConnectorSettings {
     @Nullable
     @Override
     public IndicatorIcon getIndicatorIcon() {
-        switch (mode) {
-            case SENSOR:
-                return new IndicatorIcon(GuiController.iconGuiElements, 0, 70, 13, 10);
-            case ACT:
-                return new IndicatorIcon(GuiController.iconGuiElements, 13, 70, 13, 10);
-        }
-        return null;
+        return new IndicatorIcon(GuiController.iconGuiElements, 26, 70, 13, 10);
     }
 
     @Nullable
@@ -72,38 +68,32 @@ public class LogicConnectorSettings implements IConnectorSettings {
     }
 
     private static Set<String> SENSOR_TAGS = ImmutableSet.of(TAG_MODE);
-    private static Set<String> ACT_TAGS = ImmutableSet.of(TAG_MODE);
 
     @Override
     public boolean isEnabled(String tag) {
         if (tag.equals(TAG_FACING)) {
             return advanced;
         }
-        if (mode == Mode.SENSOR) {
-            return SENSOR_TAGS.contains(tag);
-        } else {
-            return ACT_TAGS.contains(tag);
-        }
+        return SENSOR_TAGS.contains(tag);
     }
 
     @Override
     public void createGui(IEditorGui gui) {
         gui
-                .choices(TAG_FACING, "Side from which to operate", facingOverride == null ? side : facingOverride, EnumFacing.VALUES)
-                .choices(TAG_MODE, "Sensor or act", mode, Mode.values());
-
+                .choices(TAG_FACING, "Side from which to operate", facingOverride == null ? side : facingOverride, EnumFacing.VALUES);
+        for (Sensor sensor : sensors) {
+            sensor.createGui(gui);
+        }
     }
 
     @Override
     public void update(Map<String, Object> data) {
-        mode = Mode.valueOf(((String)data.get(TAG_MODE)).toUpperCase());
         String facing = (String) data.get(TAG_FACING);
         facingOverride = facing == null ? null : EnumFacing.byName(facing);
     }
 
     @Override
     public void readFromNBT(NBTTagCompound tag) {
-        mode = Mode.values()[tag.getByte("mode")];
         if (tag.hasKey("facingOverride")) {
             facingOverride = EnumFacing.VALUES[tag.getByte("facingOverride")];
         }
@@ -111,7 +101,6 @@ public class LogicConnectorSettings implements IConnectorSettings {
 
     @Override
     public void writeToNBT(NBTTagCompound tag) {
-        tag.setByte("mode", (byte) mode.ordinal());
         if (facingOverride != null) {
             tag.setByte("facingOverride", (byte) facingOverride.ordinal());
         }
