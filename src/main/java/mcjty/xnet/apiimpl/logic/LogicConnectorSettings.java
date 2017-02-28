@@ -10,6 +10,7 @@ import net.minecraft.util.EnumFacing;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,8 +23,21 @@ public class LogicConnectorSettings implements IConnectorSettings {
         SENSOR,
         ACT
     }
+    enum Color {
+        RED,
+        GREEN,
+        BLUE,
+        YELLOW,
+        ORANGE,
+        CYAN,
+        PURPLE
+    }
 
     private Mode mode = Mode.SENSOR;
+
+    private List<Sensor> sensors = null;
+
+
     private final boolean advanced;
     @Nonnull private final EnumFacing side;
     @Nullable private EnumFacing facingOverride = null; // Only available on advanced connectors
