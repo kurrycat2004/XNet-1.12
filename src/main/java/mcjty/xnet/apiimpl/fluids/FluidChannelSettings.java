@@ -1,5 +1,6 @@
 package mcjty.xnet.apiimpl.fluids;
 
+import mcjty.lib.tools.ItemStackTools;
 import mcjty.xnet.api.channels.IChannelSettings;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.channels.IControllerContext;
@@ -9,6 +10,7 @@ import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.blocks.cables.ConnectorTileEntity;
 import mcjty.xnet.blocks.controller.GuiController;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -16,6 +18,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
+import net.minecraftforge.items.IItemHandler;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
@@ -97,21 +101,22 @@ public class FluidChannelSettings implements IChannelSettings {
                         continue;
                     }
 
-//                    Predicate<ItemStack> extractMatcher = settings.getMatcher();
+                    FluidStack extractMatcher = settings.getMatcher();
 
-//                    Integer count = settings.getMinmax();
-//                    if (count != null) {
-//                        int amount = countItems(handler, extractMatcher);
-//                        if (amount < count) {
-//                            continue;
-//                        }
-//                    }
+                    Integer count = settings.getMinmax();
+                    if (count != null) {
+                        int amount = countFluid(handler, extractMatcher);
+                        if (amount < count) {
+                            continue;
+                        }
+                    }
 
-                    FluidStack stack = fetchFluid(handler, true, fluidStack -> true, settings.getRate());
+                    FluidStack stack = fetchFluid(handler, true, extractMatcher, settings.getRate());
                     if (stack != null) {
-                        Pair<SidedConsumer, FluidConnectorSettings> inserted = insertFluidSimulate(context, stack);
-                        if (inserted != null) {
-                            insertFluidReal(context, inserted, fetchFluid(handler, false, fluidStack -> true, settings.getRate()));
+                        List<Pair<SidedConsumer, FluidConnectorSettings>> inserted = new ArrayList<>();
+                        int remaining = insertFluidSimulate(inserted, context, stack);
+                        if (!inserted.isEmpty()) {
+                            insertFluidReal(context, inserted, fetchFluid(handler, false, extractMatcher, stack.amount - remaining));
                         }
                     }
                 }
@@ -131,17 +136,19 @@ public class FluidChannelSettings implements IChannelSettings {
         fluidConsumers = null;
     }
 
-    private FluidStack fetchFluid(IFluidHandler handler, boolean simulate, Predicate<FluidStack> matcher, int rate) {
+    private FluidStack fetchFluid(IFluidHandler handler, boolean simulate, @Nullable FluidStack matcher, int rate) {
         return handler.drain(rate, !simulate);
     }
 
-    private Pair<SidedConsumer, FluidConnectorSettings> insertFluidSimulate(@Nonnull IControllerContext context, @Nonnull FluidStack stack) {
+    // Returns what could not be filled
+    private int insertFluidSimulate(@Nonnull List<Pair<SidedConsumer, FluidConnectorSettings>> inserted, @Nonnull IControllerContext context, @Nonnull FluidStack stack) {
+        int amount = stack.amount;
         for (int j = 0 ; j < fluidConsumers.size() ; j++) {
             int i = (j + roundRobinOffset)  % fluidConsumers.size();
             Pair<SidedConsumer, FluidConnectorSettings> entry = fluidConsumers.get(i);
             FluidConnectorSettings settings = entry.getValue();
 
-            if (true) { //settings.getMatcher().test(stack)) {
+            if (settings.getMatcher() == null || settings.getMatcher().equals(stack)) {
                 BlockPos consumerPos = context.findConsumerPosition(entry.getKey().getConsumerId());
                 if (consumerPos != null) {
                     RSMode rsMode = settings.getRsMode();
@@ -159,33 +166,62 @@ public class FluidChannelSettings implements IChannelSettings {
                     // @todo report error somewhere?
                     if (handler != null) {
                         Integer count = settings.getMinmax();
-//                        if (count != null) {
-//                            int amount = countItems(handler, settings.getMatcher());
-//                            if (amount >= count) {
-//                                continue;
-//                            }
-//                        }
+                        if (count != null) {
+                            int a = countFluid(handler, settings.getMatcher());
+                            if (a >= count) {
+                                continue;
+                            }
+                        }
 
-                        int filled = handler.fill(stack, false);
-                        if (filled == stack.amount) {
-                            return entry;
+                        FluidStack copy = stack.copy();
+                        copy.amount = Math.min(settings.getRate(), amount);
+
+                        int filled = handler.fill(copy, false);
+                        if (filled > 0) {
+                            inserted.add(entry);
+                            amount -= filled;
+                            if (amount <= 0) {
+                                return 0;
+                            }
                         }
                     }
                 }
             }
         }
-        return null;
+        return amount;
     }
 
-    private void insertFluidReal(@Nonnull IControllerContext context, @Nonnull Pair<SidedConsumer, FluidConnectorSettings> entry, @Nonnull FluidStack stack) {
-        BlockPos consumerPosition = context.findConsumerPosition(entry.getKey().getConsumerId());
-        EnumFacing side = entry.getKey().getSide();
-        BlockPos pos = consumerPosition.offset(side);
-        TileEntity te = context.getControllerWorld().getTileEntity(pos);
-        IFluidHandler handler = getFluidHandlerAt(te, side.getOpposite());
-        // @todo check this check
-        if (handler.fill(stack, true) != 0) {
-            roundRobinOffset = (roundRobinOffset+1) % fluidConsumers.size();
+    private int countFluid(IFluidHandler handler, @Nullable FluidStack matcher) {
+        int cnt = 0;
+        for (IFluidTankProperties properties : handler.getTankProperties()) {
+            if (properties.getContents() != null && (matcher == null || matcher.equals(properties.getContents()))) {
+                cnt += properties.getContents().amount;
+            }
+        }
+        return cnt;
+    }
+
+
+    private void insertFluidReal(@Nonnull IControllerContext context, @Nonnull List<Pair<SidedConsumer, FluidConnectorSettings>> inserted, @Nonnull FluidStack stack) {
+        int amount = stack.amount;
+        for (Pair<SidedConsumer, FluidConnectorSettings> pair : inserted) {
+            BlockPos consumerPosition = context.findConsumerPosition(pair.getKey().getConsumerId());
+            EnumFacing side = pair.getKey().getSide();
+            FluidConnectorSettings settings = pair.getValue();
+            BlockPos pos = consumerPosition.offset(side);
+            TileEntity te = context.getControllerWorld().getTileEntity(pos);
+            IFluidHandler handler = getFluidHandlerAt(te, side.getOpposite());
+            // @todo check this check
+            FluidStack copy = stack.copy();
+            copy.amount = Math.min(settings.getRate(), amount);
+            int filled = handler.fill(copy, true);
+            if (filled > 0) {
+                roundRobinOffset = (roundRobinOffset+1) % fluidConsumers.size();
+                amount -= filled;
+                if (amount <= 0) {
+                    return;
+                }
+            }
         }
     }
 

@@ -1,13 +1,17 @@
 package mcjty.xnet.apiimpl.fluids;
 
 import com.google.common.collect.ImmutableSet;
+import mcjty.lib.tools.FluidTools;
+import mcjty.lib.tools.ItemStackTools;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.channels.RSMode;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.blocks.controller.GuiController;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fluids.FluidStack;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -22,7 +26,11 @@ public class FluidConnectorSettings implements IConnectorSettings {
     public static final String TAG_RATE = "rate";
     public static final String TAG_MINMAX = "minmax";
     public static final String TAG_PRIORITY = "priority";
+    public static final String TAG_FILTER = "flt";
     public static final String TAG_SPEED = "speed";
+
+    public static final int MAXRATE_ADVANCED = 5000;
+    public static final int MAXRATE_NORMAL = 1000;
 
     enum FluidMode {
         INS,
@@ -41,6 +49,7 @@ public class FluidConnectorSettings implements IConnectorSettings {
 
     @Nonnull private final EnumFacing side;
     @Nullable private EnumFacing facingOverride = null; // Only available on advanced connectors
+    private ItemStack filter = ItemStackTools.getEmptyStack();
 
     public FluidConnectorSettings(boolean advanced, @Nonnull EnumFacing side) {
         this.advanced = advanced;
@@ -67,7 +76,7 @@ public class FluidConnectorSettings implements IConnectorSettings {
 
     @Nonnull
     public Integer getRate() {
-        return rate == null ? 1000 : rate;
+        return rate == null ? MAXRATE_NORMAL : rate;
     }
 
     @Nullable
@@ -101,10 +110,13 @@ public class FluidConnectorSettings implements IConnectorSettings {
     @Override
     public void createGui(IEditorGui gui) {
         String[] speeds;
+        int maxrate;
         if (advanced) {
             speeds = new String[] { "10", "20", "60", "100", "200" };
+            maxrate = MAXRATE_ADVANCED;
         } else {
             speeds = new String[] { "20", "60", "100", "200" };
+            maxrate = MAXRATE_NORMAL;
         }
 
         gui
@@ -117,14 +129,18 @@ public class FluidConnectorSettings implements IConnectorSettings {
                 .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority).nl()
 
                 .label("Rate")
-                .integer(TAG_RATE, fluidMode == FluidMode.EXT ? "Max fluid extraction rate" : "Max fluid insertion rate", rate)
+                .integer(TAG_RATE, fluidMode == FluidMode.EXT ? "Fluid extraction rate (max " + maxrate + "mb)" : "Fluid insertion rate (max " + maxrate + "mb)", rate)
                 .shift(10)
                 .label(fluidMode == FluidMode.EXT ? "Min" : "Max")
-                .integer(TAG_MINMAX, fluidMode == FluidMode.EXT ? "Disable extraction if fluid is too low" : "Disable insertion if fluid is too high", minmax);
+                .integer(TAG_MINMAX, fluidMode == FluidMode.EXT ? "Disable extraction if fluid is too low" : "Disable insertion if fluid is too high", minmax)
+                .nl()
+                .label("Filter")
+                .ghostSlot(TAG_FILTER, filter);
+
     }
 
-    private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_RATE, TAG_MINMAX, TAG_PRIORITY);
-    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_RATE, TAG_MINMAX, TAG_PRIORITY, TAG_SPEED);
+    private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_RATE, TAG_MINMAX, TAG_PRIORITY, TAG_FILTER);
+    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_RATE, TAG_MINMAX, TAG_PRIORITY, TAG_FILTER, TAG_SPEED);
 
     @Override
     public boolean isEnabled(String tag) {
@@ -141,11 +157,31 @@ public class FluidConnectorSettings implements IConnectorSettings {
         }
     }
 
+    @Nullable
+    public FluidStack getMatcher() {
+        // @todo optimize/cache this?
+        if (ItemStackTools.isValid(filter)) {
+            return FluidTools.convertBucketToFluid(filter);
+        } else {
+            return null;
+        }
+    }
+
+
     @Override
     public void update(Map<String, Object> data) {
         fluidMode = FluidMode.valueOf(((String)data.get(TAG_MODE)).toUpperCase());
         rsMode = RSMode.valueOf(((String)data.get(TAG_RS)).toUpperCase());
         rate = (Integer) data.get(TAG_RATE);
+        int maxrate;
+        if (advanced) {
+            maxrate = MAXRATE_ADVANCED;
+        } else {
+            maxrate = MAXRATE_NORMAL;
+        }
+        if (rate != null && rate > maxrate) {
+            rate = maxrate;
+        }
         minmax = (Integer) data.get(TAG_MINMAX);
         priority = (Integer) data.get(TAG_PRIORITY);
         String facing = (String) data.get(TAG_FACING);
@@ -153,6 +189,10 @@ public class FluidConnectorSettings implements IConnectorSettings {
         speed = Integer.parseInt((String) data.get(TAG_SPEED)) / 10;
         if (speed == 0) {
             speed = 2;
+        }
+        filter = (ItemStack) data.get(TAG_FILTER);
+        if (filter == null) {
+            filter = ItemStackTools.getEmptyStack();
         }
     }
 
@@ -182,6 +222,12 @@ public class FluidConnectorSettings implements IConnectorSettings {
         if (speed == 0) {
             speed = 2;
         }
+        if (tag.hasKey("filter")) {
+            NBTTagCompound itemTag = tag.getCompoundTag("filter");
+            filter = ItemStackTools.loadFromNBT(itemTag);
+        } else {
+            filter = ItemStackTools.getEmptyStack();
+        }
     }
 
     @Override
@@ -201,5 +247,10 @@ public class FluidConnectorSettings implements IConnectorSettings {
             tag.setByte("facingOverride", (byte) facingOverride.ordinal());
         }
         tag.setInteger("speed", speed);
+        if (ItemStackTools.isValid(filter)) {
+            NBTTagCompound itemTag = new NBTTagCompound();
+            filter.writeToNBT(itemTag);
+            tag.setTag("filter", itemTag);
+        }
     }
 }

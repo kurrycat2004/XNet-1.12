@@ -113,7 +113,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
                 .choices(TAG_SPEED, "Number of ticks for each operation", Integer.toString(speed * 10), speeds)
                 .nl()
 
-                .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority).shift(10)
+                .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority).shift(5)
                 .label("Count")
                 .integer(TAG_COUNT, itemMode == ItemMode.EXT ? "Amount in destination inventory to keep" : "Max amount in destination inventory", count)
                 .shift(10)

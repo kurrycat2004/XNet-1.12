@@ -134,7 +134,7 @@ public abstract class AbstractEditorPanel implements IEditorGui {
 
     @Override
     public IEditorGui integer(String tag, String tooltip, Integer value) {
-        int w = 30;
+        int w = 36;
         fitWidth(w);
         TextField text = new TextField(mc, gui).setText(value == null ? "" : value.toString())
                 .setTooltips(tooltip)
