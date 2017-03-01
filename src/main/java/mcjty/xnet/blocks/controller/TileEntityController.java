@@ -5,6 +5,7 @@ import mcjty.lib.network.Argument;
 import mcjty.lib.varia.BlockPosTools;
 import mcjty.typed.Type;
 import mcjty.xnet.XNet;
+import mcjty.xnet.api.channels.Color;
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.channels.IControllerContext;
@@ -53,6 +54,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     private NetworkId networkId;
 
     private final ChannelInfo[] channels = new ChannelInfo[MAX_CHANNELS];
+    private int colors = 0;
 
     // Cached/transient data
     private Map<SidedConsumer, IConnectorSettings> cachedConnectors[] = new Map[MAX_CHANNELS];
@@ -92,6 +94,20 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                 }
             }
         }
+    }
+
+    @Override
+    public void setColor(Color color, boolean onOff) {
+        int newcolors = onOff ? (colors | (1 << color.ordinal())) : (colors & ~(1 << color.ordinal()));
+        if (colors != newcolors) {
+            colors = newcolors;
+            markDirtyQuick();
+        }
+    }
+
+    @Override
+    public boolean getColor(Color color) {
+        return (colors & (1 << color.ordinal())) != 0;
     }
 
     @Override
@@ -144,6 +160,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         if (networkId != null) {
             tagCompound.setInteger("networkId", networkId.getId());
         }
+        tagCompound.setInteger("colors", colors);
 
         for (int i = 0; i < MAX_CHANNELS; i++) {
             if (channels[i] != null) {
@@ -163,6 +180,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         } else {
             networkId = null;
         }
+        colors = tagCompound.getInteger("colors");
         for (int i = 0; i < MAX_CHANNELS; i++) {
             if (tagCompound.hasKey("channel" + i)) {
                 NBTTagCompound tc = (NBTTagCompound) tagCompound.getTag("channel" + i);

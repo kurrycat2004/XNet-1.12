@@ -1,17 +1,16 @@
 package mcjty.xnet.apiimpl.logic;
 
 import mcjty.lib.tools.ItemStackTools;
+import mcjty.xnet.api.channels.Color;
 import mcjty.xnet.api.gui.IEditorGui;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fluids.FluidStack;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static mcjty.xnet.apiimpl.logic.LogicConnectorSettings.Color.BLACK;
-import static mcjty.xnet.apiimpl.logic.LogicConnectorSettings.Color.COLORS;
+import static mcjty.xnet.api.channels.Color.OFF;
+import static mcjty.xnet.api.channels.Color.COLORS;
 
 class Sensor {
 
@@ -40,7 +39,7 @@ class Sensor {
 
         private final String code;
 
-        private final static Map<String, Operator> OPERATOR_MAP = new HashMap<>();
+        private static final Map<String, Operator> OPERATOR_MAP = new HashMap<>();
         static {
             for (Operator operator : values()) {
                 OPERATOR_MAP.put(operator.code, operator);
@@ -65,14 +64,16 @@ class Sensor {
         }
     }
 
+    private final int index;
+
     private SensorMode sensorMode = SensorMode.OFF;
     private Operator operator = Operator.EQUAL;
     private int amount = 0;
-    private LogicConnectorSettings.Color outputColor = BLACK;
+    private Color outputColor = OFF;
     private ItemStack filter = ItemStackTools.getEmptyStack();
 
-    public Sensor() {
-
+    public Sensor(int index) {
+        this.index = index;
     }
 
     public SensorMode getSensorMode() {
@@ -99,54 +100,73 @@ class Sensor {
         this.amount = amount;
     }
 
-    public LogicConnectorSettings.Color getOutputColor() {
+    public Color getOutputColor() {
         return outputColor;
     }
 
-    public void setOutputColor(LogicConnectorSettings.Color outputColor) {
+    public void setOutputColor(Color outputColor) {
         this.outputColor = outputColor;
+    }
+
+    public boolean isEnabled(String tag) {
+        if ((TAG_MODE+index).equals(tag)) {
+            return true;
+        }
+        if ((TAG_OPERATOR+index).equals(tag)) {
+            return true;
+        }
+        if ((TAG_AMOUNT+index).equals(tag)) {
+            return true;
+        }
+        if ((TAG_COLOR+index).equals(tag)) {
+            return true;
+        }
+        if ((TAG_STACK+index).equals(tag)) {
+            return sensorMode == SensorMode.FLUID || sensorMode == SensorMode.ITEM;
+        }
+        return false;
     }
 
     public void createGui(IEditorGui gui) {
         gui
-                .choices(TAG_MODE, "Sensor mode", sensorMode, SensorMode.values())
-                .choices(TAG_OPERATOR, "Operator", operator, Operator.values())
-                .integer(TAG_AMOUNT, "Amount to compare with", amount)
-                .colors(TAG_COLOR, "Output color", outputColor.getColor(), COLORS)
-                .ghostSlot(TAG_STACK, filter)
+                .choices(TAG_MODE+index, "Sensor mode", sensorMode, SensorMode.values())
+                .choices(TAG_OPERATOR+index, "Operator", operator, Operator.values())
+                .integer(TAG_AMOUNT+index, "Amount to compare with", amount)
+                .colors(TAG_COLOR+index, "Output color", outputColor.getColor(), COLORS)
+                .ghostSlot(TAG_STACK+index, filter)
                 .nl();
     }
 
-    public void update(int i, Map<String, Object> data) {
-        sensorMode = SensorMode.valueOf((String) data.get(TAG_MODE+i));
-        operator = Operator.valueOfCode((String) data.get(TAG_OPERATOR+i));
-        amount = (Integer) data.get(TAG_AMOUNT+i);
-        outputColor = LogicConnectorSettings.Color.colorByValue((Integer) data.get(TAG_COLOR+i));
-        filter = (ItemStack) data.get(TAG_STACK+i);
+    public void update(Map<String, Object> data) {
+        sensorMode = SensorMode.valueOf(((String) data.get(TAG_MODE+ index)).toUpperCase());
+        operator = Operator.valueOfCode(((String) data.get(TAG_OPERATOR+ index)).toUpperCase());
+        amount = (Integer) data.get(TAG_AMOUNT+ index);
+        outputColor = Color.colorByValue((Integer) data.get(TAG_COLOR+ index));
+        filter = (ItemStack) data.get(TAG_STACK+ index);
     }
 
-    public void readFromNBT(int i, NBTTagCompound tag) {
-        sensorMode = SensorMode.values()[tag.getByte("sensorMode"+i)];
-        operator = Operator.values()[tag.getByte("operator"+i)];
-        amount = tag.getInteger("amount"+i);
-        outputColor = LogicConnectorSettings.Color.values()[tag.getByte("color"+i)];
-        if (tag.hasKey("filter" + i)) {
-            NBTTagCompound itemTag = tag.getCompoundTag("filter" + i);
+    public void readFromNBT(NBTTagCompound tag) {
+        sensorMode = SensorMode.values()[tag.getByte("sensorMode"+ index)];
+        operator = Operator.values()[tag.getByte("operator"+ index)];
+        amount = tag.getInteger("amount"+ index);
+        outputColor = Color.values()[tag.getByte("color"+ index)];
+        if (tag.hasKey("filter" + index)) {
+            NBTTagCompound itemTag = tag.getCompoundTag("filter" + index);
             filter = ItemStackTools.loadFromNBT(itemTag);
         } else {
             filter = ItemStackTools.getEmptyStack();
         }
     }
 
-    public void writeToNBT(int i, NBTTagCompound tag) {
-        tag.setByte("sensorMode"+i, (byte) sensorMode.ordinal());
-        tag.setByte("operator"+i, (byte) operator.ordinal());
-        tag.setInteger("amount"+i, amount);
-        tag.setByte("color"+i, (byte) outputColor.ordinal());
+    public void writeToNBT(NBTTagCompound tag) {
+        tag.setByte("sensorMode"+ index, (byte) sensorMode.ordinal());
+        tag.setByte("operator"+ index, (byte) operator.ordinal());
+        tag.setInteger("amount"+ index, amount);
+        tag.setByte("color"+ index, (byte) outputColor.ordinal());
         if (ItemStackTools.isValid(filter)) {
             NBTTagCompound itemTag = new NBTTagCompound();
             filter.writeToNBT(itemTag);
-            tag.setTag("filter" + i, itemTag);
+            tag.setTag("filter" + index, itemTag);
         }
     }
 

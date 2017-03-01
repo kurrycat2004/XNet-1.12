@@ -1,6 +1,7 @@
 package mcjty.xnet.apiimpl.energy;
 
 import com.google.common.collect.ImmutableSet;
+import mcjty.xnet.api.channels.Color;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.channels.RSMode;
 import mcjty.xnet.api.gui.IEditorGui;
@@ -22,6 +23,7 @@ public class EnergyConnectorSettings implements IConnectorSettings {
     public static final String TAG_RATE = "rate";
     public static final String TAG_MINMAX = "minmax";
     public static final String TAG_PRIORITY = "priority";
+    public static final String TAG_COLOR = "color";
 
     enum EnergyMode {
         INS,
@@ -32,6 +34,7 @@ public class EnergyConnectorSettings implements IConnectorSettings {
 
     private EnergyMode energyMode = EnergyMode.INS;
     private RSMode rsMode = RSMode.IGNORED;
+    private Color[] colors = new Color[] { Color.OFF, Color.OFF, Color.OFF };
 
     @Nullable private Integer priority = 0;
     @Nullable private Integer rate = null;
@@ -77,8 +80,7 @@ public class EnergyConnectorSettings implements IConnectorSettings {
         gui
                 .choices(TAG_FACING, "Side from which to operate", facingOverride == null ? side : facingOverride, EnumFacing.VALUES)
                 .choices(TAG_MODE, "Insert or extract mode", energyMode, EnergyMode.values())
-                .shift(10)
-                .redstoneMode(TAG_RS, rsMode).nl()
+                .nl()
 
                 .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority).nl()
 
@@ -86,11 +88,17 @@ public class EnergyConnectorSettings implements IConnectorSettings {
                 .integer(TAG_RATE, energyMode == EnergyMode.EXT ? "Max energy extraction rate" : "Max energy insertion rate", rate)
                 .shift(10)
                 .label(energyMode == EnergyMode.EXT ? "Min" : "Max")
-                .integer(TAG_MINMAX, energyMode == EnergyMode.EXT ? "Disable extraction if energy is too low" : "Disable insertion if energy is too high", minmax);
+                .integer(TAG_MINMAX, energyMode == EnergyMode.EXT ? "Disable extraction if energy is too low" : "Disable insertion if energy is too high", minmax)
+                .nl()
+                .shift(92)
+                .colors(TAG_COLOR+"0", "Enable on color", Color.OFF.getColor(), Color.COLORS)
+                .colors(TAG_COLOR+"1", "Enable on color", Color.OFF.getColor(), Color.COLORS)
+                .colors(TAG_COLOR+"2", "Enable on color", Color.OFF.getColor(), Color.COLORS)
+                .redstoneMode(TAG_RS, rsMode).nl();
     }
 
-    private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_RATE, TAG_MINMAX, TAG_PRIORITY);
-    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_RATE, TAG_MINMAX, TAG_PRIORITY);
+    private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_RATE, TAG_MINMAX, TAG_PRIORITY);
+    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_RATE, TAG_MINMAX, TAG_PRIORITY);
 
     @Override
     public boolean isEnabled(String tag) {
@@ -126,10 +134,17 @@ public class EnergyConnectorSettings implements IConnectorSettings {
         return rsMode;
     }
 
+    public Color[] getColors() {
+        return colors;
+    }
+
     @Override
     public void update(Map<String, Object> data) {
         energyMode = EnergyMode.valueOf(((String)data.get(TAG_MODE)).toUpperCase());
         rsMode = RSMode.valueOf(((String)data.get(TAG_RS)).toUpperCase());
+        colors[0] = Color.colorByValue((Integer) data.get(TAG_COLOR+"0"));
+        colors[1] = Color.colorByValue((Integer) data.get(TAG_COLOR+"1"));
+        colors[2] = Color.colorByValue((Integer) data.get(TAG_COLOR+"2"));
         rate = (Integer) data.get(TAG_RATE);
         minmax = (Integer) data.get(TAG_MINMAX);
         priority = (Integer) data.get(TAG_PRIORITY);
@@ -141,6 +156,9 @@ public class EnergyConnectorSettings implements IConnectorSettings {
     public void readFromNBT(NBTTagCompound tag) {
         energyMode = EnergyMode.values()[tag.getByte("itemMode")];
         rsMode = RSMode.values()[tag.getByte("rsMode")];
+        colors[0] = Color.values()[tag.getByte("color0")];
+        colors[1] = Color.values()[tag.getByte("color1")];
+        colors[2] = Color.values()[tag.getByte("color2")];
         if (tag.hasKey("priority")) {
             priority = tag.getInteger("priority");
         } else {
@@ -165,6 +183,9 @@ public class EnergyConnectorSettings implements IConnectorSettings {
     public void writeToNBT(NBTTagCompound tag) {
         tag.setByte("itemMode", (byte) energyMode.ordinal());
         tag.setByte("rsMode", (byte) rsMode.ordinal());
+        tag.setByte("color0", (byte) colors[0].ordinal());
+        tag.setByte("color1", (byte) colors[1].ordinal());
+        tag.setByte("color2", (byte) colors[2].ordinal());
         if (priority != null) {
             tag.setInteger("priority", priority);
         }

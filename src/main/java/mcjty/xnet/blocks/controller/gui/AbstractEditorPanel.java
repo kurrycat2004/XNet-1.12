@@ -208,7 +208,7 @@ public abstract class AbstractEditorPanel implements IEditorGui {
 
     @Override
     public IEditorGui colors(String tag, String tooltip, Integer current, Integer... colors) {
-        int w = 20;
+        int w = 14;
         fitWidth(w);
         ColorChoiceLabel choice = new ColorChoiceLabel(mc, gui).addColors(colors).setCurrentColor(current)
                 .setTooltips(tooltip)

@@ -3,6 +3,7 @@ package mcjty.xnet.apiimpl.fluids;
 import com.google.common.collect.ImmutableSet;
 import mcjty.lib.tools.FluidTools;
 import mcjty.lib.tools.ItemStackTools;
+import mcjty.xnet.api.channels.Color;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.channels.RSMode;
 import mcjty.xnet.api.gui.IEditorGui;
@@ -28,6 +29,7 @@ public class FluidConnectorSettings implements IConnectorSettings {
     public static final String TAG_PRIORITY = "priority";
     public static final String TAG_FILTER = "flt";
     public static final String TAG_SPEED = "speed";
+    public static final String TAG_COLOR = "color";
 
     public static final int MAXRATE_ADVANCED = 5000;
     public static final int MAXRATE_NORMAL = 1000;
@@ -41,6 +43,7 @@ public class FluidConnectorSettings implements IConnectorSettings {
 
     private FluidMode fluidMode = FluidMode.INS;
     private RSMode rsMode = RSMode.IGNORED;
+    private Color[] colors = new Color[] { Color.OFF, Color.OFF, Color.OFF };
 
     @Nullable private Integer priority = 0;
     @Nullable private Integer rate = null;
@@ -88,6 +91,10 @@ public class FluidConnectorSettings implements IConnectorSettings {
         return rsMode;
     }
 
+    public Color[] getColors() {
+        return colors;
+    }
+
 
     @Nullable
     @Override
@@ -123,8 +130,7 @@ public class FluidConnectorSettings implements IConnectorSettings {
                 .choices(TAG_FACING, "Side from which to operate", facingOverride == null ? side : facingOverride, EnumFacing.VALUES)
                 .choices(TAG_MODE, "Insert or extract mode", fluidMode, FluidMode.values())
                 .choices(TAG_SPEED, "Number of ticks for each operation", Integer.toString(speed * 10), speeds)
-                .shift(10)
-                .redstoneMode(TAG_RS, rsMode).nl()
+                .nl()
 
                 .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority).nl()
 
@@ -135,12 +141,17 @@ public class FluidConnectorSettings implements IConnectorSettings {
                 .integer(TAG_MINMAX, fluidMode == FluidMode.EXT ? "Disable extraction if fluid is too low" : "Disable insertion if fluid is too high", minmax)
                 .nl()
                 .label("Filter")
-                .ghostSlot(TAG_FILTER, filter);
+                .ghostSlot(TAG_FILTER, filter)
+                .shift(44)
+                .colors(TAG_COLOR+"0", "Enable on color", Color.OFF.getColor(), Color.COLORS)
+                .colors(TAG_COLOR+"1", "Enable on color", Color.OFF.getColor(), Color.COLORS)
+                .colors(TAG_COLOR+"2", "Enable on color", Color.OFF.getColor(), Color.COLORS)
+                .redstoneMode(TAG_RS, rsMode).nl();
 
     }
 
-    private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_RATE, TAG_MINMAX, TAG_PRIORITY, TAG_FILTER);
-    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_RATE, TAG_MINMAX, TAG_PRIORITY, TAG_FILTER, TAG_SPEED);
+    private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_RATE, TAG_MINMAX, TAG_PRIORITY, TAG_FILTER);
+    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_RATE, TAG_MINMAX, TAG_PRIORITY, TAG_FILTER, TAG_SPEED);
 
     @Override
     public boolean isEnabled(String tag) {
@@ -172,6 +183,9 @@ public class FluidConnectorSettings implements IConnectorSettings {
     public void update(Map<String, Object> data) {
         fluidMode = FluidMode.valueOf(((String)data.get(TAG_MODE)).toUpperCase());
         rsMode = RSMode.valueOf(((String)data.get(TAG_RS)).toUpperCase());
+        colors[0] = Color.colorByValue((Integer) data.get(TAG_COLOR+"0"));
+        colors[1] = Color.colorByValue((Integer) data.get(TAG_COLOR+"1"));
+        colors[2] = Color.colorByValue((Integer) data.get(TAG_COLOR+"2"));
         rate = (Integer) data.get(TAG_RATE);
         int maxrate;
         if (advanced) {
@@ -200,6 +214,9 @@ public class FluidConnectorSettings implements IConnectorSettings {
     public void readFromNBT(NBTTagCompound tag) {
         fluidMode = FluidMode.values()[tag.getByte("fluidMode")];
         rsMode = RSMode.values()[tag.getByte("rsMode")];
+        colors[0] = Color.values()[tag.getByte("color0")];
+        colors[1] = Color.values()[tag.getByte("color1")];
+        colors[2] = Color.values()[tag.getByte("color2")];
         if (tag.hasKey("priority")) {
             priority = tag.getInteger("priority");
         } else {
@@ -234,6 +251,9 @@ public class FluidConnectorSettings implements IConnectorSettings {
     public void writeToNBT(NBTTagCompound tag) {
         tag.setByte("fluidMode", (byte) fluidMode.ordinal());
         tag.setByte("rsMode", (byte) rsMode.ordinal());
+        tag.setByte("color0", (byte) colors[0].ordinal());
+        tag.setByte("color1", (byte) colors[1].ordinal());
+        tag.setByte("color2", (byte) colors[2].ordinal());
         if (priority != null) {
             tag.setInteger("priority", priority);
         }

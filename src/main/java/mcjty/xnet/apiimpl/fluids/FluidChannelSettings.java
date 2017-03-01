@@ -75,12 +75,16 @@ public class FluidChannelSettings implements IChannelSettings {
         updateCache(channel, context);
         // @todo optimize
         for (Map.Entry<SidedConsumer, FluidConnectorSettings> entry : fluidExtractors.entrySet()) {
+            FluidConnectorSettings settings = entry.getValue();
+            if (d % settings.getSpeed() != 0) {
+                continue;
+            }
+
             BlockPos extractorPos = context.findConsumerPosition(entry.getKey().getConsumerId());
             if (extractorPos != null) {
                 EnumFacing side = entry.getKey().getSide();
                 BlockPos pos = extractorPos.offset(side);
                 TileEntity te = context.getControllerWorld().getTileEntity(pos);
-                FluidConnectorSettings settings = entry.getValue();
                 IFluidHandler handler = getFluidHandlerAt(te, settings.getFacing());
                 // @todo report error somewhere?
                 if (handler != null) {
@@ -91,10 +95,6 @@ public class FluidChannelSettings implements IChannelSettings {
                         if ((rsMode == RSMode.ON) != (connector.getPowerLevel() > 0)) {
                             continue;
                         }
-                    }
-
-                    if (d % settings.getSpeed() != 0) {
-                        continue;
                     }
 
                     FluidStack extractMatcher = settings.getMatcher();
