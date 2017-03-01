@@ -4,7 +4,7 @@ import mcjty.xnet.api.channels.IChannelSettings;
 import mcjty.xnet.api.channels.IControllerContext;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
-import mcjty.xnet.blocks.controller.GuiController;
+import mcjty.xnet.blocks.controller.gui.GuiController;
 import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nullable;

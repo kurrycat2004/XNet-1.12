@@ -1,10 +1,11 @@
-package mcjty.xnet.blocks.controller;
+package mcjty.xnet.blocks.controller.gui;
 
 import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.network.Argument;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.keys.SidedPos;
+import mcjty.xnet.blocks.controller.TileEntityController;
 import net.minecraft.client.Minecraft;
 
 import java.util.Map;

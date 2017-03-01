@@ -1,4 +1,4 @@
-package mcjty.xnet.blocks.controller;
+package mcjty.xnet.blocks.controller.gui;
 
 import mcjty.lib.gui.events.BlockRenderEvent;
 import mcjty.lib.gui.layout.PositionalLayout;
@@ -207,11 +207,27 @@ public abstract class AbstractEditorPanel implements IEditorGui {
     }
 
     @Override
+    public IEditorGui colors(String tag, String tooltip, Integer current, Integer... colors) {
+        int w = 20;
+        fitWidth(w);
+        ColorChoiceLabel choice = new ColorChoiceLabel(mc, gui).addColors(colors).setCurrentColor(current)
+                .setTooltips(tooltip)
+                .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
+        data.put(tag, current);
+        choice.addChoiceEvent((parent, newChoice) -> update(tag, newChoice));
+        panel.addChild(choice);
+        components.put(tag, choice);
+        x += w;
+        return this;
+    }
+
+    @Override
     public IEditorGui choices(String tag, String tooltip, String current, String... values) {
         int w = 10;
         for (String s : values) {
             w = Math.max(w, mc.fontRenderer.getStringWidth(s) + 14);
         }
+
         fitWidth(w);
         ChoiceLabel choice = new ChoiceLabel(mc, gui).addChoices(values).setChoice(current)
                 .setTooltips(tooltip)
@@ -229,9 +245,9 @@ public abstract class AbstractEditorPanel implements IEditorGui {
         String[] strings = new String[values.length];
         int i = 0;
         for (T s : values) {
-            strings[i++] = StringUtils.capitalize(s.name().toLowerCase());
+            strings[i++] = StringUtils.capitalize(s.toString().toLowerCase());
         }
-        return choices(tag, tooltip, StringUtils.capitalize(current.name().toLowerCase()), strings);
+        return choices(tag, tooltip, StringUtils.capitalize(current.toString().toLowerCase()), strings);
     }
 
     @Override

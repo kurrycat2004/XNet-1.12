@@ -1,4 +1,4 @@
-package mcjty.xnet.blocks.controller;
+package mcjty.xnet.blocks.controller.gui;
 
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.container.GenericGuiContainer;
@@ -19,6 +19,8 @@ import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.api.keys.SidedPos;
+import mcjty.xnet.blocks.controller.ControllerContainer;
+import mcjty.xnet.blocks.controller.TileEntityController;
 import mcjty.xnet.gui.GuiProxy;
 import mcjty.xnet.logic.*;
 import mcjty.xnet.network.PacketGetChannels;

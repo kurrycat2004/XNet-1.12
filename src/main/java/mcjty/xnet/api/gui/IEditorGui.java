@@ -23,6 +23,8 @@ public interface IEditorGui {
 
     IEditorGui toggleText(String tag, String tooltip, String text, boolean value);
 
+    IEditorGui colors(String tag, String tooltip, Integer current, Integer... colors);
+
     IEditorGui choices(String tag, String tooltip, String current, String... values);
 
     <T extends Enum<T>> IEditorGui choices(String tag, String tooltip, T current, T... values);

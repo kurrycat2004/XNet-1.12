@@ -15,6 +15,7 @@ import mcjty.xnet.api.keys.SidedPos;
 import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.blocks.cables.ConnectorTileEntity;
 import mcjty.xnet.blocks.cables.NetCableSetup;
+import mcjty.xnet.blocks.controller.gui.GuiController;
 import mcjty.xnet.logic.*;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;

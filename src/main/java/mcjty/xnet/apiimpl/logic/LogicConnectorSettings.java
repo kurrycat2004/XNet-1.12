@@ -4,33 +4,54 @@ import com.google.common.collect.ImmutableSet;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
-import mcjty.xnet.blocks.controller.GuiController;
+import mcjty.xnet.blocks.controller.gui.GuiController;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class LogicConnectorSettings implements IConnectorSettings {
 
     public static final String TAG_FACING = "facing";
     public static final String TAG_MODE = "mode";
 
-    public static final int SENSORS = 5;
+    public static final int SENSORS = 4;
 
     enum Color {
-        WHITE,
-        RED,
-        GREEN,
-        BLUE,
-        YELLOW,
-        ORANGE,
-        CYAN,
-        PURPLE
+        BLACK(0x000000),
+        WHITE(0xffffff),
+        RED(0xff0000),
+        GREEN(0x00ff00),
+        BLUE(0x0000ff),
+        YELLOW(0xffff00),
+        CYAN(0x00ffff),
+        PURPLE(0xff00ff);
+
+        private final int color;
+
+        Color(int color) {
+            this.color = color;
+        }
+
+        private static final Map<Integer, Color> COLOR_MAP = new HashMap<>();
+        public static final Integer[] COLORS = new Integer[Color.values().length];
+        static {
+            for (int i = 0 ; i < Color.values().length ; i++) {
+                Color col = Color.values()[i];
+                COLORS[i] = col.color;
+                COLOR_MAP.put(col.color, col);
+            }
+        }
+
+        public int getColor() {
+            return color;
+        }
+
+        public static Color colorByValue(int color) {
+            return COLOR_MAP.get(color);
+        }
     }
 
     private List<Sensor> sensors = null;
@@ -80,7 +101,8 @@ public class LogicConnectorSettings implements IConnectorSettings {
     @Override
     public void createGui(IEditorGui gui) {
         gui
-                .choices(TAG_FACING, "Side from which to operate", facingOverride == null ? side : facingOverride, EnumFacing.VALUES);
+                .choices(TAG_FACING, "Side from which to operate", facingOverride == null ? side : facingOverride, EnumFacing.VALUES)
+                .nl();
         for (Sensor sensor : sensors) {
             sensor.createGui(gui);
         }
@@ -90,6 +112,11 @@ public class LogicConnectorSettings implements IConnectorSettings {
     public void update(Map<String, Object> data) {
         String facing = (String) data.get(TAG_FACING);
         facingOverride = facing == null ? null : EnumFacing.byName(facing);
+        int i = 0;
+        for (Sensor sensor : sensors) {
+            sensor.update(i, data);
+            i++;
+        }
     }
 
     @Override
@@ -97,12 +124,23 @@ public class LogicConnectorSettings implements IConnectorSettings {
         if (tag.hasKey("facingOverride")) {
             facingOverride = EnumFacing.VALUES[tag.getByte("facingOverride")];
         }
+        int i = 0;
+        for (Sensor sensor : sensors) {
+            sensor.readFromNBT(i, tag);
+            i++;
+        }
+
     }
 
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         if (facingOverride != null) {
             tag.setByte("facingOverride", (byte) facingOverride.ordinal());
+        }
+        int i = 0;
+        for (Sensor sensor : sensors) {
+            sensor.writeToNBT(i, tag);
+            i++;
         }
     }
 
