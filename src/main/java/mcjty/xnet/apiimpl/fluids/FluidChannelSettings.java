@@ -267,8 +267,13 @@ public class FluidChannelSettings implements IChannelSettings {
         channelMode = ChannelMode.valueOf(((String)data.get(TAG_MODE)).toUpperCase());
     }
 
+    @Override
+    public int getColors() {
+        return 0;
+    }
+
     @Nullable
-    private IFluidHandler getFluidHandlerAt(@Nullable TileEntity te, EnumFacing intSide) {
+    public static IFluidHandler getFluidHandlerAt(@Nullable TileEntity te, EnumFacing intSide) {
         if (te != null && te.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, intSide)) {
             IFluidHandler handler = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, intSide);
             if (handler != null) {

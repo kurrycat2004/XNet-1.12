@@ -55,6 +55,11 @@ public class ItemChannelSettings implements IChannelSettings {
     }
 
     @Override
+    public int getColors() {
+        return 0;
+    }
+
+    @Override
     public void readFromNBT(NBTTagCompound tag) {
         channelMode = ChannelMode.values()[tag.getByte("mode")];
         delay = tag.getInteger("delay");
@@ -102,7 +107,8 @@ public class ItemChannelSettings implements IChannelSettings {
                             continue;
                         }
                     }
-
+//                    context.getColor(settings.getColors());
+//@todo
                     Predicate<ItemStack> extractMatcher = settings.getMatcher();
 
                     Integer count = settings.getCount();
@@ -255,7 +261,7 @@ public class ItemChannelSettings implements IChannelSettings {
     }
 
     @Nullable
-    private IItemHandler getItemHandlerAt(@Nullable TileEntity te, EnumFacing intSide) {
+    public static IItemHandler getItemHandlerAt(@Nullable TileEntity te, EnumFacing intSide) {
         if (te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, intSide)) {
             IItemHandler handler = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, intSide);
             if (handler != null) {

@@ -1,16 +1,30 @@
 package mcjty.xnet.apiimpl.logic;
 
+import mcjty.lib.tools.FluidTools;
 import mcjty.lib.tools.ItemStackTools;
 import mcjty.xnet.api.channels.Color;
 import mcjty.xnet.api.gui.IEditorGui;
+import mcjty.xnet.apiimpl.energy.EnergyChannelSettings;
+import mcjty.xnet.apiimpl.fluids.FluidChannelSettings;
+import mcjty.xnet.apiimpl.items.ItemChannelSettings;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
+import net.minecraftforge.items.IItemHandler;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiPredicate;
 
-import static mcjty.xnet.api.channels.Color.OFF;
 import static mcjty.xnet.api.channels.Color.COLORS;
+import static mcjty.xnet.api.channels.Color.OFF;
 
 class Sensor {
 
@@ -30,28 +44,35 @@ class Sensor {
     }
 
     enum Operator {
-        EQUAL("="),
-        NOTEQUAL("!="),
-        LESS("<"),
-        GREATER(">"),
-        LESSOREQUAL("<="),
-        GREATOROREQUAL(">=");
+        EQUAL("=", (i1, i2) -> i1 == i2),
+        NOTEQUAL("!=", (i1, i2) -> i1 != i2),
+        LESS("<", (i1, i2) -> i1 < i2),
+        GREATER(">", (i1, i2) -> i1 > i2),
+        LESSOREQUAL("<=", (i1, i2) -> i1 <= i2),
+        GREATOROREQUAL(">=", (i1, i2) -> i1 >= i2);
 
         private final String code;
+        private final BiPredicate<Integer, Integer> matcher;
 
         private static final Map<String, Operator> OPERATOR_MAP = new HashMap<>();
+
         static {
             for (Operator operator : values()) {
                 OPERATOR_MAP.put(operator.code, operator);
             }
         }
 
-        Operator(String code) {
+        Operator(String code, BiPredicate<Integer, Integer> matcher) {
             this.code = code;
+            this.matcher = matcher;
         }
 
         public String getCode() {
             return code;
+        }
+
+        public boolean match(int i1, int i2) {
+            return matcher.test(i1, i2);
         }
 
         @Override
@@ -109,19 +130,19 @@ class Sensor {
     }
 
     public boolean isEnabled(String tag) {
-        if ((TAG_MODE+index).equals(tag)) {
+        if ((TAG_MODE + index).equals(tag)) {
             return true;
         }
-        if ((TAG_OPERATOR+index).equals(tag)) {
+        if ((TAG_OPERATOR + index).equals(tag)) {
             return true;
         }
-        if ((TAG_AMOUNT+index).equals(tag)) {
+        if ((TAG_AMOUNT + index).equals(tag)) {
             return true;
         }
-        if ((TAG_COLOR+index).equals(tag)) {
+        if ((TAG_COLOR + index).equals(tag)) {
             return true;
         }
-        if ((TAG_STACK+index).equals(tag)) {
+        if ((TAG_STACK + index).equals(tag)) {
             return sensorMode == SensorMode.FLUID || sensorMode == SensorMode.ITEM;
         }
         return false;
@@ -129,27 +150,64 @@ class Sensor {
 
     public void createGui(IEditorGui gui) {
         gui
-                .choices(TAG_MODE+index, "Sensor mode", sensorMode, SensorMode.values())
-                .choices(TAG_OPERATOR+index, "Operator", operator, Operator.values())
-                .integer(TAG_AMOUNT+index, "Amount to compare with", amount)
-                .colors(TAG_COLOR+index, "Output color", outputColor.getColor(), COLORS)
-                .ghostSlot(TAG_STACK+index, filter)
+                .choices(TAG_MODE + index, "Sensor mode", sensorMode, SensorMode.values())
+                .choices(TAG_OPERATOR + index, "Operator", operator, Operator.values())
+                .integer(TAG_AMOUNT + index, "Amount to compare with", amount)
+                .colors(TAG_COLOR + index, "Output color", outputColor.getColor(), COLORS)
+                .ghostSlot(TAG_STACK + index, filter)
                 .nl();
     }
 
+    public boolean test(@Nullable TileEntity te, @Nonnull World world, @Nonnull BlockPos pos, LogicConnectorSettings settings) {
+        switch (sensorMode) {
+            case ITEM: {
+                IItemHandler handler = ItemChannelSettings.getItemHandlerAt(te, settings.getFacing());
+                if (handler != null) {
+                    int cnt = countItem(handler, filter, amount + 1);
+                    return operator.match(cnt, amount);
+                }
+                break;
+            }
+            case FLUID: {
+                IFluidHandler handler = FluidChannelSettings.getFluidHandlerAt(te, settings.getFacing());
+                if (handler != null) {
+                    int cnt = countFluid(handler, filter, amount + 1);
+                    return operator.match(cnt, amount);
+                }
+                break;
+            }
+            case ENERGY: {
+                if (EnergyChannelSettings.isEnergyTE(te, settings.getFacing())) {
+                    int cnt = EnergyChannelSettings.getEnergyLevel(te, settings.getFacing());
+                    return operator.match(cnt, amount);
+                }
+                break;
+            }
+            case RS: {
+                int cnt = world.getRedstonePower(pos, settings.getFacing());
+                return operator.match(cnt, amount);
+            }
+            case OFF:
+            default:
+                break;
+        }
+
+        return false;
+    }
+
     public void update(Map<String, Object> data) {
-        sensorMode = SensorMode.valueOf(((String) data.get(TAG_MODE+ index)).toUpperCase());
-        operator = Operator.valueOfCode(((String) data.get(TAG_OPERATOR+ index)).toUpperCase());
-        amount = (Integer) data.get(TAG_AMOUNT+ index);
-        outputColor = Color.colorByValue((Integer) data.get(TAG_COLOR+ index));
-        filter = (ItemStack) data.get(TAG_STACK+ index);
+        sensorMode = SensorMode.valueOf(((String) data.get(TAG_MODE + index)).toUpperCase());
+        operator = Operator.valueOfCode(((String) data.get(TAG_OPERATOR + index)).toUpperCase());
+        amount = (Integer) data.get(TAG_AMOUNT + index);
+        outputColor = Color.colorByValue((Integer) data.get(TAG_COLOR + index));
+        filter = (ItemStack) data.get(TAG_STACK + index);
     }
 
     public void readFromNBT(NBTTagCompound tag) {
-        sensorMode = SensorMode.values()[tag.getByte("sensorMode"+ index)];
-        operator = Operator.values()[tag.getByte("operator"+ index)];
-        amount = tag.getInteger("amount"+ index);
-        outputColor = Color.values()[tag.getByte("color"+ index)];
+        sensorMode = SensorMode.values()[tag.getByte("sensorMode" + index)];
+        operator = Operator.values()[tag.getByte("operator" + index)];
+        amount = tag.getInteger("amount" + index);
+        outputColor = Color.values()[tag.getByte("color" + index)];
         if (tag.hasKey("filter" + index)) {
             NBTTagCompound itemTag = tag.getCompoundTag("filter" + index);
             filter = ItemStackTools.loadFromNBT(itemTag);
@@ -159,10 +217,10 @@ class Sensor {
     }
 
     public void writeToNBT(NBTTagCompound tag) {
-        tag.setByte("sensorMode"+ index, (byte) sensorMode.ordinal());
-        tag.setByte("operator"+ index, (byte) operator.ordinal());
-        tag.setInteger("amount"+ index, amount);
-        tag.setByte("color"+ index, (byte) outputColor.ordinal());
+        tag.setByte("sensorMode" + index, (byte) sensorMode.ordinal());
+        tag.setByte("operator" + index, (byte) operator.ordinal());
+        tag.setInteger("amount" + index, amount);
+        tag.setByte("color" + index, (byte) outputColor.ordinal());
         if (ItemStackTools.isValid(filter)) {
             NBTTagCompound itemTag = new NBTTagCompound();
             filter.writeToNBT(itemTag);
@@ -170,4 +228,58 @@ class Sensor {
         }
     }
 
+    // Count items. We will stop early if we have enough to satisfy the sensor
+    private int countItem(@Nonnull IItemHandler handler, ItemStack matcher, int maxNeeded) {
+        int cnt = 0;
+        for (int i = 0; i < handler.getSlots(); i++) {
+            ItemStack stack = handler.getStackInSlot(i);
+            if (ItemStackTools.isValid(stack)) {
+                if (ItemStackTools.isValid(matcher)) {
+                    // @todo oredict?
+                    if (matcher.isItemEqual(stack)) {
+                        cnt += ItemStackTools.getStackSize(stack);
+                        if (cnt >= maxNeeded) {
+                            return cnt;
+                        }
+                    }
+                } else {
+                    cnt += ItemStackTools.getStackSize(stack);
+                    if (cnt >= maxNeeded) {
+                        return cnt;
+                    }
+                }
+            }
+        }
+        return cnt;
+    }
+
+    private int countFluid(@Nonnull IFluidHandler handler, ItemStack matcher, int maxNeeded) {
+        FluidStack fluidStack;
+        if (ItemStackTools.isValid(matcher)) {
+            fluidStack = FluidTools.convertBucketToFluid(matcher);
+        } else {
+            fluidStack = null;
+        }
+        IFluidTankProperties[] properties = handler.getTankProperties();
+        int cnt = 0;
+        for (IFluidTankProperties property : properties) {
+            FluidStack contents = property.getContents();
+            if (contents != null) {
+                if (fluidStack != null) {
+                    if (fluidStack.isFluidEqual(contents)) {
+                        cnt += contents.amount;
+                        if (cnt >= maxNeeded) {
+                            return cnt;
+                        }
+                    }
+                } else {
+                    cnt += contents.amount;
+                    if (cnt >= maxNeeded) {
+                        return cnt;
+                    }
+                }
+            }
+        }
+        return cnt;
+    }
 }

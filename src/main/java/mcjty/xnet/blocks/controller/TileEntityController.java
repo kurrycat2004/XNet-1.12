@@ -97,16 +97,10 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     }
 
     @Override
-    public void setColor(Color color, boolean onOff) {
-        int newcolors = onOff ? (colors | (1 << color.ordinal())) : (colors & ~(1 << color.ordinal()));
-        if (colors != newcolors) {
-            colors = newcolors;
-            markDirtyQuick();
-        }
-    }
-
-    @Override
     public boolean getColor(Color color) {
+        if (color == null || color == Color.OFF) {
+            return true;
+        }
         return (colors & (1 << color.ordinal())) != 0;
     }
 
@@ -115,9 +109,14 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         if (!getWorld().isRemote) {
             checkNetwork();
             boolean dirty = false;
+            if (colors != 0) {
+                colors = 0;
+                markDirtyQuick();
+            }
             for (int i = 0; i < MAX_CHANNELS; i++) {
                 if (channels[i] != null && channels[i].isEnabled()) {
                     channels[i].getChannelSettings().tick(i, this);
+                    colors |= channels[i].getChannelSettings().getColors();
                     dirty = true;
                 }
             }

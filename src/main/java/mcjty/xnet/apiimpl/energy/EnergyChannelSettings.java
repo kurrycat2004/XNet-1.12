@@ -55,6 +55,11 @@ public class EnergyChannelSettings implements IChannelSettings {
     }
 
     @Override
+    public int getColors() {
+        return 0;
+    }
+
+    @Override
     public void tick(int channel, IControllerContext context) {
         updateCache(channel, context);
 
@@ -173,7 +178,7 @@ public class EnergyChannelSettings implements IChannelSettings {
         return total;
     }
 
-    private static boolean isEnergyTE(TileEntity te, @Nonnull EnumFacing side) {
+    public static boolean isEnergyTE(TileEntity te, @Nonnull EnumFacing side) {
         return te instanceof IEnergyHandler || (te != null && te.hasCapability(CapabilityEnergy.ENERGY, side));
     }
 

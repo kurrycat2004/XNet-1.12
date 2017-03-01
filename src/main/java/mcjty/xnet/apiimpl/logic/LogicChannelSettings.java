@@ -21,16 +21,32 @@ import java.util.Map;
 public class LogicChannelSettings implements IChannelSettings {
 
     private int delay = 0;
+    private int colors = 0;     // Colors for this channel
     private List<Pair<SidedConsumer, LogicConnectorSettings>> sensors = null;
 
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         delay = tag.getInteger("delay");
+        colors = tag.getInteger("colors");
     }
 
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         tag.setInteger("delay", delay);
+        tag.setInteger("colors", colors);
+    }
+
+    @Override
+    public int getColors() {
+        return colors;
+
+
+
+
+        // @todo calculate bitmask of colors!
+
+
+
     }
 
     @Override
@@ -45,6 +61,7 @@ public class LogicChannelSettings implements IChannelSettings {
         int d = delay/10;
         updateCache(channel, context);
 
+        colors = 0;
         for (Pair<SidedConsumer, LogicConnectorSettings> entry : sensors) {
             LogicConnectorSettings settings = entry.getValue();
             if (d % settings.getSpeed() != 0) {
@@ -57,18 +74,8 @@ public class LogicChannelSettings implements IChannelSettings {
                 TileEntity te = context.getControllerWorld().getTileEntity(pos);
 
                 for (Sensor sensor : settings.getSensors()) {
-                    switch (sensor.getSensorMode()) {
-                        case ITEM:
-                            break;
-                        case FLUID:
-                            break;
-                        case ENERGY:
-                            break;
-                        case RS:
-                            break;
-                        case OFF:
-                        default:
-                            break;
+                    if (sensor.test(te, context.getControllerWorld(), pos, settings)) {
+                        colors |= 1 << sensor.getOutputColor().ordinal();
                     }
                 }
             }
