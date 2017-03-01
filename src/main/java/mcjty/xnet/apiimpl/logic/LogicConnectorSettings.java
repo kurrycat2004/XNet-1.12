@@ -22,6 +22,7 @@ public class LogicConnectorSettings implements IConnectorSettings {
 
     private List<Sensor> sensors = null;
 
+    private int colors;         // Current colormask
     private int speed = 2;
     private final boolean advanced;
     @Nonnull private final EnumFacing side;
@@ -45,6 +46,13 @@ public class LogicConnectorSettings implements IConnectorSettings {
         return facingOverride == null ? side : facingOverride;
     }
 
+    public void setColors(int colors) {
+        this.colors = colors;
+    }
+
+    public int getColors() {
+        return colors;
+    }
 
     @Nullable
     @Override
@@ -118,6 +126,7 @@ public class LogicConnectorSettings implements IConnectorSettings {
         if (speed == 0) {
             speed = 2;
         }
+        colors = tag.getInteger("colors");
         for (Sensor sensor : sensors) {
             sensor.readFromNBT(tag);
         }
@@ -130,6 +139,7 @@ public class LogicConnectorSettings implements IConnectorSettings {
             tag.setByte("facingOverride", (byte) facingOverride.ordinal());
         }
         tag.setInteger("speed", speed);
+        tag.setInteger("colors", colors);
         for (Sensor sensor : sensors) {
             sensor.writeToNBT(tag);
         }

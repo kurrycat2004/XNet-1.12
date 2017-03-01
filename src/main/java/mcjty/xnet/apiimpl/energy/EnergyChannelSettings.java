@@ -84,6 +84,9 @@ public class EnergyChannelSettings implements IChannelSettings {
                             continue;
                         }
                     }
+                    if (!context.matchColor(settings.getColorsMask())) {
+                        continue;
+                    }
 
                     Integer count = settings.getMinmax();
                     if (count != null) {
@@ -151,6 +154,9 @@ public class EnergyChannelSettings implements IChannelSettings {
                         if ((rsMode == RSMode.ON) != (connector.getPowerLevel() > 0)) {
                             continue;
                         }
+                    }
+                    if (!context.matchColor(settings.getColorsMask())) {
+                        continue;
                     }
 
                     Integer count = settings.getMinmax();

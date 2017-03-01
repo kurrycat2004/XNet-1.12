@@ -44,6 +44,7 @@ public class FluidConnectorSettings implements IConnectorSettings {
     private FluidMode fluidMode = FluidMode.INS;
     private RSMode rsMode = RSMode.IGNORED;
     private Color[] colors = new Color[] { Color.OFF, Color.OFF, Color.OFF };
+    private int colorsMask = 0;
 
     @Nullable private Integer priority = 0;
     @Nullable private Integer rate = null;
@@ -95,6 +96,20 @@ public class FluidConnectorSettings implements IConnectorSettings {
         return colors;
     }
 
+    private void calculateColorsMask() {
+        colorsMask = 0;
+        for (Color color : colors) {
+            if (color != null && color != Color.OFF) {
+                colorsMask |= 1 << color.ordinal();
+            }
+        }
+    }
+
+    public int getColorsMask() {
+        return colorsMask;
+    }
+
+
 
     @Nullable
     @Override
@@ -143,9 +158,9 @@ public class FluidConnectorSettings implements IConnectorSettings {
                 .label("Filter")
                 .ghostSlot(TAG_FILTER, filter)
                 .shift(44)
-                .colors(TAG_COLOR+"0", "Enable on color", Color.OFF.getColor(), Color.COLORS)
-                .colors(TAG_COLOR+"1", "Enable on color", Color.OFF.getColor(), Color.COLORS)
-                .colors(TAG_COLOR+"2", "Enable on color", Color.OFF.getColor(), Color.COLORS)
+                .colors(TAG_COLOR+"0", "Enable on color", colors[0].getColor(), Color.COLORS)
+                .colors(TAG_COLOR+"1", "Enable on color", colors[1].getColor(), Color.COLORS)
+                .colors(TAG_COLOR+"2", "Enable on color", colors[2].getColor(), Color.COLORS)
                 .redstoneMode(TAG_RS, rsMode).nl();
 
     }
@@ -186,6 +201,7 @@ public class FluidConnectorSettings implements IConnectorSettings {
         colors[0] = Color.colorByValue((Integer) data.get(TAG_COLOR+"0"));
         colors[1] = Color.colorByValue((Integer) data.get(TAG_COLOR+"1"));
         colors[2] = Color.colorByValue((Integer) data.get(TAG_COLOR+"2"));
+        calculateColorsMask();
         rate = (Integer) data.get(TAG_RATE);
         int maxrate;
         if (advanced) {
@@ -217,6 +233,7 @@ public class FluidConnectorSettings implements IConnectorSettings {
         colors[0] = Color.values()[tag.getByte("color0")];
         colors[1] = Color.values()[tag.getByte("color1")];
         colors[2] = Color.values()[tag.getByte("color2")];
+        calculateColorsMask();
         if (tag.hasKey("priority")) {
             priority = tag.getInteger("priority");
         } else {

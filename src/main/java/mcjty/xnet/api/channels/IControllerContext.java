@@ -22,5 +22,5 @@ public interface IControllerContext {
     @Nonnull
     Map<SidedConsumer, IConnectorSettings> getConnectors(int channel);
 
-    boolean getColor(Color color);
+    boolean matchColor(int colorMask);
 }

@@ -39,14 +39,6 @@ public class LogicChannelSettings implements IChannelSettings {
     @Override
     public int getColors() {
         return colors;
-
-
-
-
-        // @todo calculate bitmask of colors!
-
-
-
     }
 
     @Override
@@ -65,8 +57,10 @@ public class LogicChannelSettings implements IChannelSettings {
         for (Pair<SidedConsumer, LogicConnectorSettings> entry : sensors) {
             LogicConnectorSettings settings = entry.getValue();
             if (d % settings.getSpeed() != 0) {
+                colors |= settings.getColors();
                 continue;
             }
+            int sensorColors = 0;
             BlockPos extractorPos = context.findConsumerPosition(entry.getKey().getConsumerId());
             if (extractorPos != null) {
                 EnumFacing side = entry.getKey().getSide();
@@ -75,10 +69,12 @@ public class LogicChannelSettings implements IChannelSettings {
 
                 for (Sensor sensor : settings.getSensors()) {
                     if (sensor.test(te, context.getControllerWorld(), pos, settings)) {
-                        colors |= 1 << sensor.getOutputColor().ordinal();
+                        sensorColors |= 1 << sensor.getOutputColor().ordinal();
                     }
                 }
             }
+            settings.setColors(sensorColors);
+            colors |= sensorColors;
         }
 
     }

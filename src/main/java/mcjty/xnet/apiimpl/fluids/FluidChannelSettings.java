@@ -96,6 +96,9 @@ public class FluidChannelSettings implements IChannelSettings {
                             continue;
                         }
                     }
+                    if (!context.matchColor(settings.getColorsMask())) {
+                        continue;
+                    }
 
                     FluidStack extractMatcher = settings.getMatcher();
 
@@ -153,6 +156,9 @@ public class FluidChannelSettings implements IChannelSettings {
                         if ((rsMode == RSMode.ON) != (connector.getPowerLevel() > 0)) {
                             continue;
                         }
+                    }
+                    if (!context.matchColor(settings.getColorsMask())) {
+                        continue;
                     }
 
                     EnumFacing side = entry.getKey().getSide();

@@ -57,6 +57,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
     private boolean nbtMode = false;
     private RSMode rsMode = RSMode.IGNORED;
     private Color[] colors = new Color[] { Color.OFF, Color.OFF, Color.OFF };
+    private int colorsMask = 0;
     private boolean blacklist = false;
     @Nullable private Integer priority = 0;
     @Nullable private Integer count = null;
@@ -120,9 +121,9 @@ public class ItemConnectorSettings implements IConnectorSettings {
                 .label("#")
                 .integer(TAG_COUNT, itemMode == ItemMode.EXT ? "Amount in destination inventory to keep" : "Max amount in destination inventory", count)
                 .shift(5)
-                .colors(TAG_COLOR+"0", "Enable on color", Color.OFF.getColor(), Color.COLORS)
-                .colors(TAG_COLOR+"1", "Enable on color", Color.OFF.getColor(), Color.COLORS)
-                .colors(TAG_COLOR+"2", "Enable on color", Color.OFF.getColor(), Color.COLORS)
+                .colors(TAG_COLOR+"0", "Enable on color", colors[0].getColor(), Color.COLORS)
+                .colors(TAG_COLOR+"1", "Enable on color", colors[1].getColor(), Color.COLORS)
+                .colors(TAG_COLOR+"2", "Enable on color", colors[2].getColor(), Color.COLORS)
                 .nl()
 
                 .toggleText(TAG_BLACKLIST, "Enable blacklist mode", "BL", blacklist).shift(2)
@@ -181,6 +182,19 @@ public class ItemConnectorSettings implements IConnectorSettings {
         return colors;
     }
 
+    private void calculateColorsMask() {
+        colorsMask = 0;
+        for (Color color : colors) {
+            if (color != null && color != Color.OFF) {
+                colorsMask |= 1 << color.ordinal();
+            }
+        }
+    }
+
+    public int getColorsMask() {
+        return colorsMask;
+    }
+
     private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_COUNT, TAG_PRIORITY, TAG_OREDICT, TAG_META, TAG_NBT, TAG_BLACKLIST);
     private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_COUNT, TAG_OREDICT, TAG_META, TAG_NBT, TAG_BLACKLIST, TAG_STACK, TAG_SPEED);
 
@@ -214,6 +228,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
         colors[0] = Color.colorByValue((Integer) data.get(TAG_COLOR+"0"));
         colors[1] = Color.colorByValue((Integer) data.get(TAG_COLOR+"1"));
         colors[2] = Color.colorByValue((Integer) data.get(TAG_COLOR+"2"));
+        calculateColorsMask();
 
         blacklist = Boolean.TRUE.equals(data.get(TAG_BLACKLIST));
         priority = (Integer) data.get(TAG_PRIORITY);
@@ -241,6 +256,7 @@ public class ItemConnectorSettings implements IConnectorSettings {
         colors[0] = Color.values()[tag.getByte("color0")];
         colors[1] = Color.values()[tag.getByte("color1")];
         colors[2] = Color.values()[tag.getByte("color2")];
+        calculateColorsMask();
         blacklist = tag.getBoolean("blacklist");
         if (tag.hasKey("priority")) {
             priority = tag.getInteger("priority");

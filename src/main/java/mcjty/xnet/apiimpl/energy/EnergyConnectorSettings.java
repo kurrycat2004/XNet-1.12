@@ -35,6 +35,7 @@ public class EnergyConnectorSettings implements IConnectorSettings {
     private EnergyMode energyMode = EnergyMode.INS;
     private RSMode rsMode = RSMode.IGNORED;
     private Color[] colors = new Color[] { Color.OFF, Color.OFF, Color.OFF };
+    private int colorsMask = 0;
 
     @Nullable private Integer priority = 0;
     @Nullable private Integer rate = null;
@@ -91,9 +92,9 @@ public class EnergyConnectorSettings implements IConnectorSettings {
                 .integer(TAG_MINMAX, energyMode == EnergyMode.EXT ? "Disable extraction if energy is too low" : "Disable insertion if energy is too high", minmax)
                 .nl()
                 .shift(92)
-                .colors(TAG_COLOR+"0", "Enable on color", Color.OFF.getColor(), Color.COLORS)
-                .colors(TAG_COLOR+"1", "Enable on color", Color.OFF.getColor(), Color.COLORS)
-                .colors(TAG_COLOR+"2", "Enable on color", Color.OFF.getColor(), Color.COLORS)
+                .colors(TAG_COLOR+"0", "Enable on color", colors[0].getColor(), Color.COLORS)
+                .colors(TAG_COLOR+"1", "Enable on color", colors[1].getColor(), Color.COLORS)
+                .colors(TAG_COLOR+"2", "Enable on color", colors[2].getColor(), Color.COLORS)
                 .redstoneMode(TAG_RS, rsMode).nl();
     }
 
@@ -138,6 +139,20 @@ public class EnergyConnectorSettings implements IConnectorSettings {
         return colors;
     }
 
+    private void calculateColorsMask() {
+        colorsMask = 0;
+        for (Color color : colors) {
+            if (color != null && color != Color.OFF) {
+                colorsMask |= 1 << color.ordinal();
+            }
+        }
+    }
+
+    public int getColorsMask() {
+        return colorsMask;
+    }
+
+
     @Override
     public void update(Map<String, Object> data) {
         energyMode = EnergyMode.valueOf(((String)data.get(TAG_MODE)).toUpperCase());
@@ -145,6 +160,7 @@ public class EnergyConnectorSettings implements IConnectorSettings {
         colors[0] = Color.colorByValue((Integer) data.get(TAG_COLOR+"0"));
         colors[1] = Color.colorByValue((Integer) data.get(TAG_COLOR+"1"));
         colors[2] = Color.colorByValue((Integer) data.get(TAG_COLOR+"2"));
+        calculateColorsMask();
         rate = (Integer) data.get(TAG_RATE);
         minmax = (Integer) data.get(TAG_MINMAX);
         priority = (Integer) data.get(TAG_PRIORITY);
@@ -159,6 +175,7 @@ public class EnergyConnectorSettings implements IConnectorSettings {
         colors[0] = Color.values()[tag.getByte("color0")];
         colors[1] = Color.values()[tag.getByte("color1")];
         colors[2] = Color.values()[tag.getByte("color2")];
+        calculateColorsMask();
         if (tag.hasKey("priority")) {
             priority = tag.getInteger("priority");
         } else {

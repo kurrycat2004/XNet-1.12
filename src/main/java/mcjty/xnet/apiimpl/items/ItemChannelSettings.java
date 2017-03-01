@@ -107,8 +107,9 @@ public class ItemChannelSettings implements IChannelSettings {
                             continue;
                         }
                     }
-//                    context.getColor(settings.getColors());
-//@todo
+                    if (!context.matchColor(settings.getColorsMask())) {
+                        continue;
+                    }
                     Predicate<ItemStack> extractMatcher = settings.getMatcher();
 
                     Integer count = settings.getCount();
@@ -145,6 +146,9 @@ public class ItemChannelSettings implements IChannelSettings {
                         if ((rsMode == RSMode.ON) != (connector.getPowerLevel() > 0)) {
                             continue;
                         }
+                    }
+                    if (!context.matchColor(settings.getColorsMask())) {
+                        continue;
                     }
 
                     EnumFacing side = entry.getKey().getSide();
