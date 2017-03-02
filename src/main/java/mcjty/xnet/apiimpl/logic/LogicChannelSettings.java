@@ -62,6 +62,7 @@ public class LogicChannelSettings implements IChannelSettings {
         for (Pair<SidedConsumer, LogicConnectorSettings> entry : sensors) {
             LogicConnectorSettings settings = entry.getValue();
             if (d % settings.getSpeed() != 0) {
+                // Use the color settings from this connector as we last remembered it
                 colors |= settings.getColorMask();
                 continue;
             }
