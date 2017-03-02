@@ -4,9 +4,11 @@ import mcjty.lib.varia.WorldTools;
 import mcjty.xnet.api.channels.IChannelSettings;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.channels.IControllerContext;
+import mcjty.xnet.api.channels.RSMode;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.keys.SidedConsumer;
+import mcjty.xnet.blocks.cables.ConnectorTileEntity;
 import mcjty.xnet.blocks.controller.gui.GuiController;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -69,14 +71,31 @@ public class LogicChannelSettings implements IChannelSettings {
                 EnumFacing side = entry.getKey().getSide();
                 BlockPos pos = extractorPos.offset(side);
                 if (!WorldTools.chunkLoaded(world, pos)) {
+                    // If it is not chunkloaded we just use the color settings as we last remembered it
+                    colors |= settings.getColorMask();
                     continue;
                 }
 
-                TileEntity te = world.getTileEntity(pos);
+                boolean sense = true;
+                RSMode rsMode = settings.getRsMode();
+                if (rsMode != RSMode.IGNORED) {
+                    ConnectorTileEntity connector = (ConnectorTileEntity) world.getTileEntity(extractorPos);
+                    if ((rsMode == RSMode.ON) != (connector.getPowerLevel() > 0)) {
+                        sense = false;
+                    }
+                }
+                if (sense && !context.matchColor(settings.getColorsMask())) {
+                    sense = false;
+                }
 
-                for (Sensor sensor : settings.getSensors()) {
-                    if (sensor.test(te, world, pos, settings)) {
-                        sensorColors |= 1 << sensor.getOutputColor().ordinal();
+                // If sense is false the sensor is disabled which means the colors from it will also be disabled
+                if (sense) {
+                    TileEntity te = world.getTileEntity(pos);
+
+                    for (Sensor sensor : settings.getSensors()) {
+                        if (sensor.test(te, world, pos, settings)) {
+                            sensorColors |= 1 << sensor.getOutputColor().ordinal();
+                        }
                     }
                 }
             }

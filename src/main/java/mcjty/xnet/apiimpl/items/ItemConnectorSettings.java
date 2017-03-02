@@ -92,7 +92,9 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
         }
 
         sideGui(gui);
-        gui
+        colorsGui(gui);
+        redstoneGui(gui);
+        gui.nl()
                 .choices(TAG_MODE, "Insert or extract mode", itemMode, ItemMode.values())
                 .choices(TAG_STACK, "Single item or entire stack", stackMode, StackMode.values())
                 .choices(TAG_SPEED, "Number of ticks for each operation", Integer.toString(speed * 10), speeds)
@@ -101,18 +103,12 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
                 .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority).shift(5)
                 .label("#")
                 .integer(TAG_COUNT, itemMode == ItemMode.EXT ? "Amount in destination inventory to keep" : "Max amount in destination inventory", count)
-                .shift(5);
-        colorsGui(gui);
-        gui
                 .nl()
 
                 .toggleText(TAG_BLACKLIST, "Enable blacklist mode", "BL", blacklist).shift(2)
                 .toggleText(TAG_OREDICT, "Ore dictionary matching", "Ore", oredictMode).shift(2)
                 .toggleText(TAG_META, "Metadata matching", "Meta", metaMode).shift(2)
                 .toggleText(TAG_NBT, "NBT matching", "NBT", nbtMode)
-                .shift(22);
-        redstoneGui(gui);
-        gui
                 .nl();
         for (int i = 0 ; i < FILTER_SIZE ; i++) {
             gui.ghostSlot(TAG_FILTER + i, filters.get(i));
@@ -155,8 +151,8 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
         return speed;
     }
 
-    private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_COUNT, TAG_PRIORITY, TAG_OREDICT, TAG_META, TAG_NBT, TAG_BLACKLIST);
-    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_COUNT, TAG_OREDICT, TAG_META, TAG_NBT, TAG_BLACKLIST, TAG_STACK, TAG_SPEED);
+    private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_COLOR+"3", TAG_COUNT, TAG_PRIORITY, TAG_OREDICT, TAG_META, TAG_NBT, TAG_BLACKLIST);
+    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_COLOR+"3", TAG_COUNT, TAG_OREDICT, TAG_META, TAG_NBT, TAG_BLACKLIST, TAG_STACK, TAG_SPEED);
 
     @Override
     public boolean isEnabled(String tag) {

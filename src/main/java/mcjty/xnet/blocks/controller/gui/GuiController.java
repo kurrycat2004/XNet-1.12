@@ -122,11 +122,11 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         channelEditPanel = new Panel(mc, this).setLayout(new PositionalLayout())
                 .setFilledRectThickness(-1)
                 .setFilledBackground(StyleConfig.colorListBackground)
-                .setLayoutHint(new PositionalLayout.PositionalHint(171, 5, 161, 52));
+                .setLayoutHint(new PositionalLayout.PositionalHint(171, 5, 161, 37));
         connectorEditPanel = new Panel(mc, this).setLayout(new PositionalLayout())
                 .setFilledRectThickness(-1)
                 .setFilledBackground(StyleConfig.colorListBackground)
-                .setLayoutHint(new PositionalLayout.PositionalHint(171, 60, 161, 93));
+                .setLayoutHint(new PositionalLayout.PositionalHint(171, 45, 161, 108));
     }
 
     private Panel initConnectorListPanel() {
@@ -245,13 +245,13 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                     editor.setState(info.getChannelSettings());
                 } else {
                     ChoiceLabel type = new ChoiceLabel(mc, this)
-                            .setLayoutHint(new PositionalLayout.PositionalHint(10, 20, 85, 14));
+                            .setLayoutHint(new PositionalLayout.PositionalHint(10, 12, 85, 14));
                     for (IChannelType channelType : XNet.xNetApi.getChannels().values()) {
                         type.addChoices(channelType.getID());       // Show names?
                     }
                     Button create = new Button(mc, this)
                             .setText("Create")
-                            .setLayoutHint(new PositionalLayout.PositionalHint(98, 20, 55, 14))
+                            .setLayoutHint(new PositionalLayout.PositionalHint(98, 12, 55, 14))
                             .addButtonEvent(parent -> createChannel(type.getCurrentChoice()));
                     channelEditPanel.addChild(type).addChild(create);
                 }

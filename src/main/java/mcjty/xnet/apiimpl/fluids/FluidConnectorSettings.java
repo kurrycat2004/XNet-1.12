@@ -101,7 +101,9 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
         }
 
         sideGui(gui);
-        gui
+        colorsGui(gui);
+        redstoneGui(gui);
+        gui.nl()
                 .choices(TAG_MODE, "Insert or extract mode", fluidMode, FluidMode.values())
                 .choices(TAG_SPEED, "Number of ticks for each operation", Integer.toString(speed * 10), speeds)
                 .nl()
@@ -115,16 +117,11 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
                 .integer(TAG_MINMAX, fluidMode == FluidMode.EXT ? "Disable extraction if fluid is too low" : "Disable insertion if fluid is too high", minmax)
                 .nl()
                 .label("Filter")
-                .ghostSlot(TAG_FILTER, filter)
-                .shift(44);
-        colorsGui(gui);
-        redstoneGui(gui);
-        gui.nl();
-
+                .ghostSlot(TAG_FILTER, filter);
     }
 
-    private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_RATE, TAG_MINMAX, TAG_PRIORITY, TAG_FILTER);
-    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_RATE, TAG_MINMAX, TAG_PRIORITY, TAG_FILTER, TAG_SPEED);
+    private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_COLOR+"3", TAG_RATE, TAG_MINMAX, TAG_PRIORITY, TAG_FILTER);
+    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_COLOR+"3", TAG_RATE, TAG_MINMAX, TAG_PRIORITY, TAG_FILTER, TAG_SPEED);
 
     @Override
     public boolean isEnabled(String tag) {

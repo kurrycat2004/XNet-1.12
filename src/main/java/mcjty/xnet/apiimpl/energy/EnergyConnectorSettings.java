@@ -60,7 +60,9 @@ public class EnergyConnectorSettings extends AbstractConnectorSettings {
     @Override
     public void createGui(IEditorGui gui) {
         sideGui(gui);
-        gui
+        colorsGui(gui);
+        redstoneGui(gui);
+        gui.nl()
                 .choices(TAG_MODE, "Insert or extract mode", energyMode, EnergyMode.values())
                 .nl()
 
@@ -70,16 +72,11 @@ public class EnergyConnectorSettings extends AbstractConnectorSettings {
                 .integer(TAG_RATE, energyMode == EnergyMode.EXT ? "Max energy extraction rate" : "Max energy insertion rate", rate)
                 .shift(10)
                 .label(energyMode == EnergyMode.EXT ? "Min" : "Max")
-                .integer(TAG_MINMAX, energyMode == EnergyMode.EXT ? "Disable extraction if energy is too low" : "Disable insertion if energy is too high", minmax)
-                .nl()
-                .shift(92);
-        colorsGui(gui);
-        redstoneGui(gui);
-        gui.nl();
+                .integer(TAG_MINMAX, energyMode == EnergyMode.EXT ? "Disable extraction if energy is too low" : "Disable insertion if energy is too high", minmax);
     }
 
-    private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_RATE, TAG_MINMAX, TAG_PRIORITY);
-    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_RATE, TAG_MINMAX, TAG_PRIORITY);
+    private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_COLOR+"3", TAG_RATE, TAG_MINMAX, TAG_PRIORITY);
+    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_COLOR+"3", TAG_RATE, TAG_MINMAX, TAG_PRIORITY);
 
     @Override
     public boolean isEnabled(String tag) {

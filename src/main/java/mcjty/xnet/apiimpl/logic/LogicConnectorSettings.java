@@ -86,7 +86,9 @@ public class LogicConnectorSettings extends AbstractConnectorSettings {
             speeds = new String[] { "20", "60", "100", "200" };
         }
         sideGui(gui);
-        gui
+        colorsGui(gui);
+        redstoneGui(gui);
+        gui.nl()
                 .choices(TAG_SPEED, "Number of ticks for each check", Integer.toString(speed * 10), speeds)
                 .nl();
         for (Sensor sensor : sensors) {
