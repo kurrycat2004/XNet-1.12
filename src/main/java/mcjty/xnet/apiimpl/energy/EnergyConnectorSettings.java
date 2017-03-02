@@ -1,11 +1,9 @@
 package mcjty.xnet.apiimpl.energy;
 
 import com.google.common.collect.ImmutableSet;
-import mcjty.xnet.api.channels.Color;
-import mcjty.xnet.api.channels.IConnectorSettings;
-import mcjty.xnet.api.channels.RSMode;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
+import mcjty.xnet.apiimpl.AbstractConnectorSettings;
 import mcjty.xnet.blocks.controller.gui.GuiController;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -15,43 +13,26 @@ import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
 
-public class EnergyConnectorSettings implements IConnectorSettings {
+public class EnergyConnectorSettings extends AbstractConnectorSettings {
 
-    public static final String TAG_FACING = "facing";
     public static final String TAG_MODE = "mode";
-    public static final String TAG_RS = "rs";
     public static final String TAG_RATE = "rate";
     public static final String TAG_MINMAX = "minmax";
     public static final String TAG_PRIORITY = "priority";
-    public static final String TAG_COLOR = "color";
 
     enum EnergyMode {
         INS,
         EXT
     }
 
-    private final boolean advanced;
-
     private EnergyMode energyMode = EnergyMode.INS;
-    private RSMode rsMode = RSMode.IGNORED;
-    private Color[] colors = new Color[] { Color.OFF, Color.OFF, Color.OFF };
-    private int colorsMask = 0;
 
     @Nullable private Integer priority = 0;
     @Nullable private Integer rate = null;
     @Nullable private Integer minmax = null;
 
-    @Nonnull private final EnumFacing side;
-    @Nullable private EnumFacing facingOverride = null; // Only available on advanced connectors
-
     public EnergyConnectorSettings(boolean advanced, @Nonnull EnumFacing side) {
-        this.advanced = advanced;
-        this.side = side;
-    }
-
-    @Nonnull
-    public EnumFacing getFacing() {
-        return facingOverride == null ? side : facingOverride;
+        super(advanced, side);
     }
 
     public EnergyMode getEnergyMode() {
@@ -78,8 +59,8 @@ public class EnergyConnectorSettings implements IConnectorSettings {
 
     @Override
     public void createGui(IEditorGui gui) {
+        sideGui(gui);
         gui
-                .choices(TAG_FACING, "Side from which to operate", facingOverride == null ? side : facingOverride, EnumFacing.VALUES)
                 .choices(TAG_MODE, "Insert or extract mode", energyMode, EnergyMode.values())
                 .nl()
 
@@ -91,11 +72,10 @@ public class EnergyConnectorSettings implements IConnectorSettings {
                 .label(energyMode == EnergyMode.EXT ? "Min" : "Max")
                 .integer(TAG_MINMAX, energyMode == EnergyMode.EXT ? "Disable extraction if energy is too low" : "Disable insertion if energy is too high", minmax)
                 .nl()
-                .shift(92)
-                .colors(TAG_COLOR+"0", "Enable on color", colors[0].getColor(), Color.COLORS)
-                .colors(TAG_COLOR+"1", "Enable on color", colors[1].getColor(), Color.COLORS)
-                .colors(TAG_COLOR+"2", "Enable on color", colors[2].getColor(), Color.COLORS)
-                .redstoneMode(TAG_RS, rsMode).nl();
+                .shift(92);
+        colorsGui(gui);
+        redstoneGui(gui);
+        gui.nl();
     }
 
     private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_RATE, TAG_MINMAX, TAG_PRIORITY);
@@ -105,7 +85,7 @@ public class EnergyConnectorSettings implements IConnectorSettings {
     public boolean isEnabled(String tag) {
         if (energyMode == EnergyMode.INS) {
             if (tag.equals(TAG_FACING)) {
-                return advanced;
+                return isAdvanced();
             }
             return INSERT_TAGS.contains(tag);
         } else {
@@ -131,51 +111,19 @@ public class EnergyConnectorSettings implements IConnectorSettings {
         return minmax;
     }
 
-    public RSMode getRsMode() {
-        return rsMode;
-    }
-
-    public Color[] getColors() {
-        return colors;
-    }
-
-    private void calculateColorsMask() {
-        colorsMask = 0;
-        for (Color color : colors) {
-            if (color != null && color != Color.OFF) {
-                colorsMask |= 1 << color.ordinal();
-            }
-        }
-    }
-
-    public int getColorsMask() {
-        return colorsMask;
-    }
-
-
     @Override
     public void update(Map<String, Object> data) {
+        super.update(data);
         energyMode = EnergyMode.valueOf(((String)data.get(TAG_MODE)).toUpperCase());
-        rsMode = RSMode.valueOf(((String)data.get(TAG_RS)).toUpperCase());
-        colors[0] = Color.colorByValue((Integer) data.get(TAG_COLOR+"0"));
-        colors[1] = Color.colorByValue((Integer) data.get(TAG_COLOR+"1"));
-        colors[2] = Color.colorByValue((Integer) data.get(TAG_COLOR+"2"));
-        calculateColorsMask();
         rate = (Integer) data.get(TAG_RATE);
         minmax = (Integer) data.get(TAG_MINMAX);
         priority = (Integer) data.get(TAG_PRIORITY);
-        String facing = (String) data.get(TAG_FACING);
-        facingOverride = facing == null ? null : EnumFacing.byName(facing);
     }
 
     @Override
     public void readFromNBT(NBTTagCompound tag) {
+        super.readFromNBT(tag);
         energyMode = EnergyMode.values()[tag.getByte("itemMode")];
-        rsMode = RSMode.values()[tag.getByte("rsMode")];
-        colors[0] = Color.values()[tag.getByte("color0")];
-        colors[1] = Color.values()[tag.getByte("color1")];
-        colors[2] = Color.values()[tag.getByte("color2")];
-        calculateColorsMask();
         if (tag.hasKey("priority")) {
             priority = tag.getInteger("priority");
         } else {
@@ -191,18 +139,12 @@ public class EnergyConnectorSettings implements IConnectorSettings {
         } else {
             minmax = null;
         }
-        if (tag.hasKey("facingOverride")) {
-            facingOverride = EnumFacing.VALUES[tag.getByte("facingOverride")];
-        }
     }
 
     @Override
     public void writeToNBT(NBTTagCompound tag) {
+        super.writeToNBT(tag);
         tag.setByte("itemMode", (byte) energyMode.ordinal());
-        tag.setByte("rsMode", (byte) rsMode.ordinal());
-        tag.setByte("color0", (byte) colors[0].ordinal());
-        tag.setByte("color1", (byte) colors[1].ordinal());
-        tag.setByte("color2", (byte) colors[2].ordinal());
         if (priority != null) {
             tag.setInteger("priority", priority);
         }
@@ -211,9 +153,6 @@ public class EnergyConnectorSettings implements IConnectorSettings {
         }
         if (minmax != null) {
             tag.setInteger("minmax", minmax);
-        }
-        if (facingOverride != null) {
-            tag.setByte("facingOverride", (byte) facingOverride.ordinal());
         }
     }
 }

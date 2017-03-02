@@ -60,7 +60,7 @@ public class LogicChannelSettings implements IChannelSettings {
         for (Pair<SidedConsumer, LogicConnectorSettings> entry : sensors) {
             LogicConnectorSettings settings = entry.getValue();
             if (d % settings.getSpeed() != 0) {
-                colors |= settings.getColors();
+                colors |= settings.getColorMask();
                 continue;
             }
             int sensorColors = 0;
@@ -80,7 +80,7 @@ public class LogicChannelSettings implements IChannelSettings {
                     }
                 }
             }
-            settings.setColors(sensorColors);
+            settings.setColorMask(sensorColors);
             colors |= sensorColors;
         }
 

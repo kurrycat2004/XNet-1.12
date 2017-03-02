@@ -1,8 +1,8 @@
 package mcjty.xnet.apiimpl.logic;
 
-import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
+import mcjty.xnet.apiimpl.AbstractConnectorSettings;
 import mcjty.xnet.blocks.controller.gui.GuiController;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -13,9 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class LogicConnectorSettings implements IConnectorSettings {
+public class LogicConnectorSettings extends AbstractConnectorSettings {
 
-    public static final String TAG_FACING = "facing";
     public static final String TAG_SPEED = "speed";
 
     public static final int SENSORS = 4;
@@ -24,13 +23,9 @@ public class LogicConnectorSettings implements IConnectorSettings {
 
     private int colors;         // Current colormask
     private int speed = 2;
-    private final boolean advanced;
-    @Nonnull private final EnumFacing side;
-    @Nullable private EnumFacing facingOverride = null; // Only available on advanced connectors
 
     public LogicConnectorSettings(boolean advanced, @Nonnull EnumFacing side) {
-        this.advanced = advanced;
-        this.side = side;
+        super(advanced, side);
         sensors = new ArrayList<>(SENSORS);
         for (int i = 0 ; i < SENSORS ; i++) {
             sensors.add(new Sensor(i));
@@ -41,16 +36,11 @@ public class LogicConnectorSettings implements IConnectorSettings {
         return sensors;
     }
 
-    @Nonnull
-    public EnumFacing getFacing() {
-        return facingOverride == null ? side : facingOverride;
-    }
-
-    public void setColors(int colors) {
+    public void setColorMask(int colors) {
         this.colors = colors;
     }
 
-    public int getColors() {
+    public int getColorMask() {
         return colors;
     }
 
@@ -69,7 +59,7 @@ public class LogicConnectorSettings implements IConnectorSettings {
     @Override
     public boolean isEnabled(String tag) {
         if (tag.equals(TAG_FACING)) {
-            return advanced;
+            return isAdvanced();
         }
         if (tag.equals(TAG_SPEED)) {
             return true;
@@ -90,13 +80,13 @@ public class LogicConnectorSettings implements IConnectorSettings {
     @Override
     public void createGui(IEditorGui gui) {
         String[] speeds;
-        if (advanced) {
+        if (isAdvanced()) {
             speeds = new String[] { "10", "20", "60", "100", "200" };
         } else {
             speeds = new String[] { "20", "60", "100", "200" };
         }
+        sideGui(gui);
         gui
-                .choices(TAG_FACING, "Side from which to operate", facingOverride == null ? side : facingOverride, EnumFacing.VALUES)
                 .choices(TAG_SPEED, "Number of ticks for each check", Integer.toString(speed * 10), speeds)
                 .nl();
         for (Sensor sensor : sensors) {
@@ -106,8 +96,8 @@ public class LogicConnectorSettings implements IConnectorSettings {
 
     @Override
     public void update(Map<String, Object> data) {
+        super.update(data);
         String facing = (String) data.get(TAG_FACING);
-        facingOverride = facing == null ? null : EnumFacing.byName(facing);
         speed = Integer.parseInt((String) data.get(TAG_SPEED)) / 10;
         if (speed == 0) {
             speed = 2;
@@ -119,9 +109,7 @@ public class LogicConnectorSettings implements IConnectorSettings {
 
     @Override
     public void readFromNBT(NBTTagCompound tag) {
-        if (tag.hasKey("facingOverride")) {
-            facingOverride = EnumFacing.VALUES[tag.getByte("facingOverride")];
-        }
+        super.readFromNBT(tag);
         speed = tag.getInteger("speed");
         if (speed == 0) {
             speed = 2;
@@ -135,9 +123,7 @@ public class LogicConnectorSettings implements IConnectorSettings {
 
     @Override
     public void writeToNBT(NBTTagCompound tag) {
-        if (facingOverride != null) {
-            tag.setByte("facingOverride", (byte) facingOverride.ordinal());
-        }
+        super.writeToNBT(tag);
         tag.setInteger("speed", speed);
         tag.setInteger("colors", colors);
         for (Sensor sensor : sensors) {
