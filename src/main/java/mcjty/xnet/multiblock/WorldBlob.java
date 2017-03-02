@@ -82,6 +82,16 @@ public class WorldBlob {
         return blob.getNetworkConsumers().get(intPos);
     }
 
+    @Nullable
+    public ColorId getColorAt(@Nonnull BlockPos pos) {
+        ChunkBlob blob = getBlob(pos);
+        if (blob == null) {
+            return null;
+        }
+        IntPos intPos = new IntPos(pos);
+        return blob.getColorIdForPosition(intPos);
+    }
+
     @Nonnull
     public Set<BlockPos> getConsumers(NetworkId network) {
         if (!consumersOnNetwork.containsKey(network)) {

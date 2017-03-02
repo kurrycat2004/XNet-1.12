@@ -67,8 +67,6 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
     public static final PropertyEnum<CableColor> COLOR = PropertyEnum.<CableColor>create("color", CableColor.class);
 
 
-    public static final ColorId STANDARD_COLOR = new ColorId(1);
-
     public static final AxisAlignedBB AABB_EMPTY = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
     public static final AxisAlignedBB AABB_CENTER = new AxisAlignedBB(.4, .4, .4, .6, .6, .6);
 
@@ -241,7 +239,8 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
     public void createCableSegment(World world, BlockPos pos, ItemStack stack) {
         XNetBlobData blobData = XNetBlobData.getBlobData(world);
         WorldBlob worldBlob = blobData.getWorldBlob(world);
-        worldBlob.createCableSegment(pos, STANDARD_COLOR);
+        CableColor color = world.getBlockState(pos).getValue(COLOR);
+        worldBlob.createCableSegment(pos, new ColorId(color.ordinal()+1));
         blobData.save(world);
     }
 

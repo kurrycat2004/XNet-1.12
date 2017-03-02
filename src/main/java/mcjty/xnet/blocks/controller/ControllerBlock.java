@@ -5,24 +5,25 @@ import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.ProbeMode;
 import mcjty.theoneprobe.api.TextStyleClass;
+import mcjty.xnet.api.keys.NetworkId;
 import mcjty.xnet.blocks.controller.gui.GuiController;
 import mcjty.xnet.blocks.generic.GenericXNetBlock;
 import mcjty.xnet.gui.GuiProxy;
-import mcjty.xnet.api.keys.NetworkId;
+import mcjty.xnet.multiblock.ColorId;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import static mcjty.xnet.blocks.generic.GenericCableBlock.STANDARD_COLOR;
 
 public class ControllerBlock extends GenericXNetBlock<TileEntityController, ControllerContainer> {
 
@@ -45,10 +46,50 @@ public class ControllerBlock extends GenericXNetBlock<TileEntityController, Cont
     public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
         super.onBlockPlacedBy(world, pos, state, placer, stack);
         if (!world.isRemote) {
-            XNetBlobData blobData = XNetBlobData.getBlobData(world);
-            WorldBlob worldBlob = blobData.getWorldBlob(world);
+            findNeighbourConnector(world, pos);
+//            XNetBlobData blobData = XNetBlobData.getBlobData(world);
+//            WorldBlob worldBlob = blobData.getWorldBlob(world);
+//            NetworkId networkId = worldBlob.newNetwork();
+//            worldBlob.createNetworkProvider(pos, STANDARD_COLOR, networkId);
+//            blobData.save(world);
+
+//            TileEntity te = world.getTileEntity(pos);
+//            if (te instanceof TileEntityController) {
+//                ((TileEntityController) te).setNetworkId(networkId);
+//            }
+        }
+    }
+
+    @Override
+    protected void clOnNeighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn) {
+        super.clOnNeighborChanged(state, world, pos, blockIn);
+        if (!world.isRemote) {
+            findNeighbourConnector(world, pos);
+        }
+    }
+
+
+    // Check neighbour blocks for a connector and inherit the color from that
+    private void findNeighbourConnector(World world, BlockPos pos) {
+        XNetBlobData blobData = XNetBlobData.getBlobData(world);
+        WorldBlob worldBlob = blobData.getWorldBlob(world);
+        ColorId oldColor = worldBlob.getColorAt(pos);
+        ColorId newColor = null;
+        for (EnumFacing facing : EnumFacing.VALUES) {
+            ColorId color = worldBlob.getColorAt(pos.offset(facing));
+            if (color != null) {
+                if (color == oldColor) {
+                    return; // Nothing to do
+                }
+                newColor = color;
+            }
+        }
+        if (newColor != null) {
+            if (worldBlob.getBlobAt(pos) != null) {
+                worldBlob.removeCableSegment(pos);
+            }
             NetworkId networkId = worldBlob.newNetwork();
-            worldBlob.createNetworkProvider(pos, STANDARD_COLOR, networkId);
+            worldBlob.createNetworkProvider(pos, newColor, networkId);
             blobData.save(world);
 
             TileEntity te = world.getTileEntity(pos);

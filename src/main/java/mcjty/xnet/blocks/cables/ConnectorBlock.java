@@ -16,6 +16,7 @@ import mcjty.xnet.blocks.generic.GenericCableBlock;
 import mcjty.xnet.config.GeneralConfiguration;
 import mcjty.xnet.gui.GuiProxy;
 import mcjty.xnet.init.ModBlocks;
+import mcjty.xnet.multiblock.ColorId;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
 import net.minecraft.block.Block;
@@ -304,7 +305,8 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
         } else {
             consumer = worldBlob.newConsumer();
         }
-        worldBlob.createNetworkConsumer(pos, STANDARD_COLOR, consumer);
+        CableColor color = world.getBlockState(pos).getValue(COLOR);
+        worldBlob.createNetworkConsumer(pos, new ColorId(color.ordinal()+1), consumer);
         blobData.save(world);
     }
 

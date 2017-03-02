@@ -87,6 +87,15 @@ public class ChunkBlob {
         return blobAllocations.get(pos);
     }
 
+    @Nullable
+    public ColorId getColorIdForPosition(@Nonnull IntPos pos) {
+        BlobId blob = getBlobIdForPosition(pos);
+        if (blob == null) {
+            return null;
+        }
+        return blobColors.get(blob);
+    }
+
     @Nonnull
     public Set<NetworkId> getNetworks() {
         if (cachedNetworks == null) {
