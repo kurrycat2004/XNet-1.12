@@ -10,6 +10,7 @@ import mcjty.xnet.api.keys.ConsumerId;
 import mcjty.xnet.blocks.controller.TileEntityController;
 import mcjty.xnet.blocks.facade.FacadeBlockId;
 import mcjty.xnet.blocks.facade.FacadeItemBlock;
+import mcjty.xnet.blocks.generic.CableColor;
 import mcjty.xnet.blocks.generic.GenericCableBakedModel;
 import mcjty.xnet.blocks.generic.GenericCableBlock;
 import mcjty.xnet.config.GeneralConfiguration;
@@ -24,6 +25,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -47,6 +49,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import org.lwjgl.input.Keyboard;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
@@ -66,6 +69,14 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
     protected void initTileEntity() {
         GameRegistry.registerTileEntity(ConnectorTileEntity.class, XNet.MODID + "_connector");
     }
+
+    @Override
+    protected void clGetSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+        for (CableColor value : CableColor.VALUES) {
+            subItems.add(new ItemStack(itemIn, 1, value.ordinal()));
+        }
+    }
+
 
     @Override
     public TileEntity createNewTileEntity(World world, int i) {
@@ -149,6 +160,7 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
     @Override
     @SideOnly(Side.CLIENT)
     public void initModel() {
+        super.initModel();
         // To make sure that our ISBM model is chosen for all states we use this custom state mapper:
         StateMapperBase ignoreState = new StateMapperBase() {
             @Override
@@ -159,15 +171,16 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
         ModelLoader.setCustomStateMapper(this, ignoreState);
     }
 
-    @SideOnly(Side.CLIENT)
-    public void initItemModel() {
+//    @Override
+//    @SideOnly(Side.CLIENT)
+//    public void initItemModel() {
         // For our item model we want to use a normal json model. This has to be called in
         // ClientProxy.init (not preInit) so that's why it is a separate method.
-        Item itemBlock = ForgeRegistries.ITEMS.getValue(getRegistryName());
-        ModelResourceLocation itemModelResourceLocation = new ModelResourceLocation(getRegistryName(), "inventory");
-        final int DEFAULT_ITEM_SUBTYPE = 0;
-        Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(itemBlock, DEFAULT_ITEM_SUBTYPE, itemModelResourceLocation);
-    }
+//        Item itemBlock = ForgeRegistries.ITEMS.getValue(getRegistryName());
+//        ModelResourceLocation itemModelResourceLocation = new ModelResourceLocation(getRegistryName(), "inventory");
+//        final int DEFAULT_ITEM_SUBTYPE = 0;
+//        Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(itemBlock, DEFAULT_ITEM_SUBTYPE, itemModelResourceLocation);
+//    }
 
     @Override
     protected void clOnNeighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn) {
@@ -196,9 +209,10 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
     }
 
     @Override
-    protected ConnectorType getConnectorType(IBlockAccess world, BlockPos pos) {
-        Block block = world.getBlockState(pos).getBlock();
-        if (block instanceof GenericCableBlock) {
+    protected ConnectorType getConnectorType(@Nonnull CableColor color, IBlockAccess world, BlockPos pos) {
+        IBlockState state = world.getBlockState(pos);
+        Block block = state.getBlock();
+        if (block instanceof GenericCableBlock && state.getValue(COLOR) == color) {
             return ConnectorType.CABLE;
         } else if (isConnectable(world, pos)) {
             return ConnectorType.BLOCK;

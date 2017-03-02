@@ -1,0 +1,14 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "xnet:connector"
+  },
+  "variants": {
+    "color": {
+      "blue": { "textures": { "txt": "xnet:blocks/cable0/normal_cross_netcable" }},
+      "red": { "textures": { "txt": "xnet:blocks/cable1/normal_cross_netcable" }},
+      "yellow": { "textures": { "txt": "xnet:blocks/cable2/normal_cross_netcable" }},
+      "green": { "textures": { "txt": "xnet:blocks/cable3/normal_cross_netcable" }}
+    }
+  }
+}

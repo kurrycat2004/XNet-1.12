@@ -10,6 +10,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -32,6 +33,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class FacadeBlock extends NetCableBlock implements ITileEntityProvider {
 
@@ -46,6 +48,11 @@ public class FacadeBlock extends NetCableBlock implements ITileEntityProvider {
     @Override
     protected ItemBlock createItemBlock() {
         return new FacadeItemBlock(this);
+    }
+
+    @Override
+    protected void clGetSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+        subItems.add(new ItemStack(itemIn));
     }
 
     protected void initTileEntity() {
@@ -68,6 +75,7 @@ public class FacadeBlock extends NetCableBlock implements ITileEntityProvider {
     public TileEntity createTileEntity(World world, IBlockState metadata) {
         return new FacadeTileEntity();
     }
+
 
     @Override
     public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity te, ItemStack stack) {

@@ -22,6 +22,7 @@ import mcp.mobius.waila.api.IWailaDataAccessor;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -32,6 +33,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -46,6 +48,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Set;
@@ -61,6 +64,7 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
     public static final UnlistedPropertyBlockType DOWN = new UnlistedPropertyBlockType("down");
 
     public static final FacadeProperty FACADEID = new FacadeProperty("facadeid");
+    public static final PropertyEnum<CableColor> COLOR = PropertyEnum.<CableColor>create("color", CableColor.class);
 
 
     public static final ColorId STANDARD_COLOR = new ColorId(1);
@@ -97,15 +101,37 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
         GameRegistry.register(this);
         GameRegistry.register(createItemBlock(), getRegistryName());
         setCreativeTab(XNet.tabXNet);
+        setDefaultState(getDefaultState().withProperty(COLOR, CableColor.BLUE));
     }
 
     protected ItemBlock createItemBlock() {
-        return new ItemBlock(this);
+        ItemBlock itemBlock = new ItemBlock(this) {
+            @Override
+            public int getMetadata(int damage) {
+                return damage;
+            }
+        };
+        itemBlock.setHasSubtypes(true);
+        return itemBlock;
+    }
+
+    @Override
+    public int damageDropped(IBlockState state) {
+        return state.getValue(COLOR).ordinal();
     }
 
     @SideOnly(Side.CLIENT)
     public void initModel() {
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
+        ResourceLocation name = getRegistryName();
+        for (CableColor color : CableColor.VALUES) {
+//            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), color.ordinal(), new ModelResourceLocation(new ResourceLocation(name.getResourceDomain(), name.getResourcePath() + color.ordinal()), "inventory"));
+//            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), color.ordinal(), new ModelResourceLocation(name, "color=" + color.name()));
+            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), color.ordinal(), new ModelResourceLocation(new ResourceLocation(name.getResourceDomain(), name.getResourcePath()+"item"), "color=" + color.name()));
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void initItemModel() {
     }
 
     @Nullable
@@ -137,9 +163,10 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
         if (rc != null) {
             return rc;
         }
+        CableColor color = blockState.getValue(COLOR);
 
         for (EnumFacing facing : EnumFacing.VALUES) {
-            ConnectorType type = getConnectorType(world, pos.offset(facing));
+            ConnectorType type = getConnectorType(color, world, pos.offset(facing));
             if (type != ConnectorType.NONE) {
                 rc = checkIntersect(pos, vec3d, vec3d1, AABBS[facing.ordinal()]);
                 if (rc != null) {
@@ -256,8 +283,18 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
     }
 
     @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return getDefaultState().withProperty(COLOR, CableColor.VALUES[meta]);
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return state.getValue(COLOR).ordinal();
+    }
+
+    @Override
     protected BlockStateContainer createBlockState() {
-        IProperty[] listedProperties = new IProperty[0]; // no listed properties
+        IProperty[] listedProperties = new IProperty[] { COLOR };
         IUnlistedProperty[] unlistedProperties = new IUnlistedProperty[] { NORTH, SOUTH, WEST, EAST, UP, DOWN,
             FACADEID};
         return new ExtendedBlockState(this, listedProperties, unlistedProperties);
@@ -266,13 +303,14 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
     @Override
     public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
+        CableColor color = state.getValue(COLOR);
 
-        ConnectorType north = getConnectorType(world, pos.north());
-        ConnectorType south = getConnectorType(world, pos.south());
-        ConnectorType west = getConnectorType(world, pos.west());
-        ConnectorType east = getConnectorType(world, pos.east());
-        ConnectorType up = getConnectorType(world, pos.up());
-        ConnectorType down = getConnectorType(world, pos.down());
+        ConnectorType north = getConnectorType(color, world, pos.north());
+        ConnectorType south = getConnectorType(color, world, pos.south());
+        ConnectorType west = getConnectorType(color, world, pos.west());
+        ConnectorType east = getConnectorType(color, world, pos.east());
+        ConnectorType up = getConnectorType(color, world, pos.up());
+        ConnectorType down = getConnectorType(color, world, pos.down());
 
         return extendedBlockState
                 .withProperty(NORTH, north)
@@ -283,5 +321,5 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
                 .withProperty(DOWN, down);
     }
 
-    protected abstract ConnectorType getConnectorType(IBlockAccess world, BlockPos pos);
+    protected abstract ConnectorType getConnectorType(@Nonnull CableColor thisColor, IBlockAccess world, BlockPos pos);
 }
