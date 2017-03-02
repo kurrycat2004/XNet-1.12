@@ -2,6 +2,7 @@ package mcjty.xnet.apiimpl.energy;
 
 import cofh.api.energy.IEnergyHandler;
 import mcjty.lib.varia.EnergyTools;
+import mcjty.lib.varia.WorldTools;
 import mcjty.xnet.api.channels.IChannelSettings;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.channels.IControllerContext;
@@ -15,6 +16,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import org.apache.commons.lang3.tuple.Pair;
@@ -63,6 +65,8 @@ public class EnergyChannelSettings implements IChannelSettings {
     public void tick(int channel, IControllerContext context) {
         updateCache(channel, context);
 
+        World world = context.getControllerWorld();
+
         // First find out how much energy we have to distribute in total
         int totalToDistribute = 0;
         List<Pair<ConnectorTileEntity, Integer>> energyProducers = new ArrayList<>();
@@ -72,11 +76,15 @@ public class EnergyChannelSettings implements IChannelSettings {
 
                 EnumFacing side = entry.getKey().getSide();
                 BlockPos pos = consumerPosition.offset(side);
-                TileEntity te = context.getControllerWorld().getTileEntity(pos);
+                if (!WorldTools.chunkLoaded(world, pos)) {
+                    continue;
+                }
+
+                TileEntity te = world.getTileEntity(pos);
                 // @todo report error somewhere?
                 if (isEnergyTE(te, side.getOpposite())) {
                     EnergyConnectorSettings settings = entry.getValue();
-                    ConnectorTileEntity connectorTE = (ConnectorTileEntity) context.getControllerWorld().getTileEntity(consumerPosition);
+                    ConnectorTileEntity connectorTE = (ConnectorTileEntity) world.getTileEntity(consumerPosition);
 
                     RSMode rsMode = settings.getRsMode();
                     if (rsMode != RSMode.IGNORED) {
@@ -138,19 +146,23 @@ public class EnergyChannelSettings implements IChannelSettings {
 
     private int insertEnergy(@Nonnull IControllerContext context, int energy) {
         int total = 0;
+        World world = context.getControllerWorld();
         for (Pair<SidedConsumer, EnergyConnectorSettings> entry : energyConsumers) {
             EnergyConnectorSettings settings = entry.getValue();
             BlockPos extractorPos = context.findConsumerPosition(entry.getKey().getConsumerId());
             if (extractorPos != null) {
                 EnumFacing side = entry.getKey().getSide();
                 BlockPos pos = extractorPos.offset(side);
-                TileEntity te = context.getControllerWorld().getTileEntity(pos);
+                if (!WorldTools.chunkLoaded(world, pos)) {
+                    continue;
+                }
+                TileEntity te = world.getTileEntity(pos);
                 // @todo report error somewhere?
                 if (isEnergyTE(te, settings.getFacing())) {
 
                     RSMode rsMode = settings.getRsMode();
                     if (rsMode != RSMode.IGNORED) {
-                        ConnectorTileEntity connector = (ConnectorTileEntity) context.getControllerWorld().getTileEntity(extractorPos);
+                        ConnectorTileEntity connector = (ConnectorTileEntity) world.getTileEntity(extractorPos);
                         if ((rsMode == RSMode.ON) != (connector.getPowerLevel() > 0)) {
                             continue;
                         }

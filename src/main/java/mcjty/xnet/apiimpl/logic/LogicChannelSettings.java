@@ -1,5 +1,6 @@
 package mcjty.xnet.apiimpl.logic;
 
+import mcjty.lib.varia.WorldTools;
 import mcjty.xnet.api.channels.IChannelSettings;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.channels.IControllerContext;
@@ -11,6 +12,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
@@ -52,6 +54,7 @@ public class LogicChannelSettings implements IChannelSettings {
         }
         int d = delay/10;
         updateCache(channel, context);
+        World world = context.getControllerWorld();
 
         colors = 0;
         for (Pair<SidedConsumer, LogicConnectorSettings> entry : sensors) {
@@ -65,10 +68,14 @@ public class LogicChannelSettings implements IChannelSettings {
             if (extractorPos != null) {
                 EnumFacing side = entry.getKey().getSide();
                 BlockPos pos = extractorPos.offset(side);
-                TileEntity te = context.getControllerWorld().getTileEntity(pos);
+                if (!WorldTools.chunkLoaded(world, pos)) {
+                    continue;
+                }
+
+                TileEntity te = world.getTileEntity(pos);
 
                 for (Sensor sensor : settings.getSensors()) {
-                    if (sensor.test(te, context.getControllerWorld(), pos, settings)) {
+                    if (sensor.test(te, world, pos, settings)) {
                         sensorColors |= 1 << sensor.getOutputColor().ordinal();
                     }
                 }

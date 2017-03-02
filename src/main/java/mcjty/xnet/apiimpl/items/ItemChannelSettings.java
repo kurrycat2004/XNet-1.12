@@ -1,6 +1,7 @@
 package mcjty.xnet.apiimpl.items;
 
 import mcjty.lib.tools.ItemStackTools;
+import mcjty.lib.varia.WorldTools;
 import mcjty.xnet.api.channels.IChannelSettings;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.channels.IControllerContext;
@@ -17,6 +18,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -86,6 +88,7 @@ public class ItemChannelSettings implements IChannelSettings {
 
         updateCache(channel, context);
         // @todo optimize
+        World world = context.getControllerWorld();
         for (Map.Entry<SidedConsumer, ItemConnectorSettings> entry : itemExtractors.entrySet()) {
             ItemConnectorSettings settings = entry.getValue();
             if (d % settings.getSpeed() != 0) {
@@ -96,13 +99,17 @@ public class ItemChannelSettings implements IChannelSettings {
             if (extractorPos != null) {
                 EnumFacing side = entry.getKey().getSide();
                 BlockPos pos = extractorPos.offset(side);
-                TileEntity te = context.getControllerWorld().getTileEntity(pos);
+                if (!WorldTools.chunkLoaded(world, pos)) {
+                    continue;
+                }
+
+                TileEntity te = world.getTileEntity(pos);
                 IItemHandler handler = getItemHandlerAt(te, settings.getFacing());
                 // @todo report error somewhere?
                 if (handler != null) {
                     RSMode rsMode = settings.getRsMode();
                     if (rsMode != RSMode.IGNORED) {
-                        ConnectorTileEntity connector = (ConnectorTileEntity) context.getControllerWorld().getTileEntity(extractorPos);
+                        ConnectorTileEntity connector = (ConnectorTileEntity) world.getTileEntity(extractorPos);
                         if ((rsMode == RSMode.ON) != (connector.getPowerLevel() > 0)) {
                             continue;
                         }
@@ -132,6 +139,7 @@ public class ItemChannelSettings implements IChannelSettings {
     }
 
     private Pair<SidedConsumer, ItemConnectorSettings> insertStackSimulate(@Nonnull IControllerContext context, @Nonnull ItemStack stack) {
+        World world = context.getControllerWorld();
         for (int j = 0 ; j < itemConsumers.size() ; j++) {
             int i = (j + roundRobinOffset)  % itemConsumers.size();
             Pair<SidedConsumer, ItemConnectorSettings> entry = itemConsumers.get(i);
@@ -140,9 +148,13 @@ public class ItemChannelSettings implements IChannelSettings {
             if (settings.getMatcher().test(stack)) {
                 BlockPos consumerPos = context.findConsumerPosition(entry.getKey().getConsumerId());
                 if (consumerPos != null) {
+                    if (!WorldTools.chunkLoaded(world, consumerPos)) {
+                        continue;
+                    }
+
                     RSMode rsMode = settings.getRsMode();
                     if (rsMode != RSMode.IGNORED) {
-                        ConnectorTileEntity connector = (ConnectorTileEntity) context.getControllerWorld().getTileEntity(consumerPos);
+                        ConnectorTileEntity connector = (ConnectorTileEntity) world.getTileEntity(consumerPos);
                         if ((rsMode == RSMode.ON) != (connector.getPowerLevel() > 0)) {
                             continue;
                         }
@@ -153,7 +165,7 @@ public class ItemChannelSettings implements IChannelSettings {
 
                     EnumFacing side = entry.getKey().getSide();
                     BlockPos pos = consumerPos.offset(side);
-                    TileEntity te = context.getControllerWorld().getTileEntity(pos);
+                    TileEntity te = world.getTileEntity(pos);
                     IItemHandler handler = getItemHandlerAt(te, settings.getFacing());
                     // @todo report error somewhere?
                     if (handler != null) {

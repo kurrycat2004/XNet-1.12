@@ -1,5 +1,6 @@
 package mcjty.xnet.apiimpl.fluids;
 
+import mcjty.lib.varia.WorldTools;
 import mcjty.xnet.api.channels.IChannelSettings;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.channels.IControllerContext;
@@ -13,6 +14,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -74,6 +76,7 @@ public class FluidChannelSettings implements IChannelSettings {
 
         updateCache(channel, context);
         // @todo optimize
+        World world = context.getControllerWorld();
         for (Map.Entry<SidedConsumer, FluidConnectorSettings> entry : fluidExtractors.entrySet()) {
             FluidConnectorSettings settings = entry.getValue();
             if (d % settings.getSpeed() != 0) {
@@ -84,14 +87,17 @@ public class FluidChannelSettings implements IChannelSettings {
             if (extractorPos != null) {
                 EnumFacing side = entry.getKey().getSide();
                 BlockPos pos = extractorPos.offset(side);
-                TileEntity te = context.getControllerWorld().getTileEntity(pos);
+                if (!WorldTools.chunkLoaded(world, pos)) {
+                    continue;
+                }
+
+                TileEntity te = world.getTileEntity(pos);
                 IFluidHandler handler = getFluidHandlerAt(te, settings.getFacing());
                 // @todo report error somewhere?
                 if (handler != null) {
-
                     RSMode rsMode = settings.getRsMode();
                     if (rsMode != RSMode.IGNORED) {
-                        ConnectorTileEntity connector = (ConnectorTileEntity) context.getControllerWorld().getTileEntity(extractorPos);
+                        ConnectorTileEntity connector = (ConnectorTileEntity) world.getTileEntity(extractorPos);
                         if ((rsMode == RSMode.ON) != (connector.getPowerLevel() > 0)) {
                             continue;
                         }
@@ -124,10 +130,6 @@ public class FluidChannelSettings implements IChannelSettings {
 
     }
 
-    private static boolean isFluidTE(TileEntity te, @Nonnull EnumFacing side) {
-        return te != null && te.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side);
-    }
-
 
     @Override
     public void cleanCache() {
@@ -141,6 +143,7 @@ public class FluidChannelSettings implements IChannelSettings {
 
     // Returns what could not be filled
     private int insertFluidSimulate(@Nonnull List<Pair<SidedConsumer, FluidConnectorSettings>> inserted, @Nonnull IControllerContext context, @Nonnull FluidStack stack) {
+        World world = context.getControllerWorld();
         int amount = stack.amount;
         for (int j = 0 ; j < fluidConsumers.size() ; j++) {
             int i = (j + roundRobinOffset)  % fluidConsumers.size();
@@ -150,9 +153,13 @@ public class FluidChannelSettings implements IChannelSettings {
             if (settings.getMatcher() == null || settings.getMatcher().equals(stack)) {
                 BlockPos consumerPos = context.findConsumerPosition(entry.getKey().getConsumerId());
                 if (consumerPos != null) {
+                    if (!WorldTools.chunkLoaded(world, consumerPos)) {
+                        continue;
+                    }
+
                     RSMode rsMode = settings.getRsMode();
                     if (rsMode != RSMode.IGNORED) {
-                        ConnectorTileEntity connector = (ConnectorTileEntity) context.getControllerWorld().getTileEntity(consumerPos);
+                        ConnectorTileEntity connector = (ConnectorTileEntity) world.getTileEntity(consumerPos);
                         if ((rsMode == RSMode.ON) != (connector.getPowerLevel() > 0)) {
                             continue;
                         }
@@ -163,7 +170,7 @@ public class FluidChannelSettings implements IChannelSettings {
 
                     EnumFacing side = entry.getKey().getSide();
                     BlockPos pos = consumerPos.offset(side);
-                    TileEntity te = context.getControllerWorld().getTileEntity(pos);
+                    TileEntity te = world.getTileEntity(pos);
                     IFluidHandler handler = getFluidHandlerAt(te, settings.getFacing());
                     // @todo report error somewhere?
                     if (handler != null) {
