@@ -1,0 +1,14 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "xnet:connector"
+  },
+  "variants": {
+    "color": {
+      "blue": { "textures": { "txt": "xnet:blocks/cable0/advanced_connector" }},
+      "red": { "textures": { "txt": "xnet:blocks/cable1/advanced_connector" }},
+      "yellow": { "textures": { "txt": "xnet:blocks/cable2/advanced_connector" }},
+      "green": { "textures": { "txt": "xnet:blocks/cable3/advanced_connector" }}
+    }
+  }
+}
