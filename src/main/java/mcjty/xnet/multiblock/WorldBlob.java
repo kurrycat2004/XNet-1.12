@@ -232,6 +232,8 @@ public class WorldBlob {
             }
             removeCachedNetworksForBlob(blob);
 
+
+            @ todo fix!
             Set<IntPos> borderPositions = blob.getBorderPositions();
             ChunkPos chunkPos = blob.getChunkPos();
             for (IntPos pos : borderPositions) {
