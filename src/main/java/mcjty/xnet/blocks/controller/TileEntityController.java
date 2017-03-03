@@ -17,6 +17,7 @@ import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.blocks.cables.ConnectorTileEntity;
 import mcjty.xnet.blocks.cables.NetCableSetup;
 import mcjty.xnet.blocks.controller.gui.GuiController;
+import mcjty.xnet.config.GeneralConfiguration;
 import mcjty.xnet.logic.*;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
@@ -104,12 +105,18 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     @Override
     public void update() {
         if (!getWorld().isRemote) {
+            if (!checkAndConsumeRF(GeneralConfiguration.controllerRFT)) {
+                return;
+            }
+
             checkNetwork();
             boolean dirty = false;
             int newcolors = 0;
             for (int i = 0; i < MAX_CHANNELS; i++) {
                 if (channels[i] != null && channels[i].isEnabled()) {
-                    channels[i].getChannelSettings().tick(i, this);
+                    if (checkAndConsumeRF(GeneralConfiguration.controllerChannelRFT)) {
+                        channels[i].getChannelSettings().tick(i, this);
+                    }
                     newcolors |= channels[i].getChannelSettings().getColors();
                     dirty = true;
                 }
@@ -122,6 +129,19 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                 markDirtyQuick();
             }
         }
+    }
+
+    @Override
+    public boolean checkAndConsumeRF(int rft) {
+        if (rft > 0) {
+            if (getEnergyStored() < rft) {
+                // Not enough energy
+                return false;
+            }
+            consumeEnergy(rft);
+            markDirtyQuick();
+        }
+        return true;
     }
 
     private void cleanCache(int channel) {

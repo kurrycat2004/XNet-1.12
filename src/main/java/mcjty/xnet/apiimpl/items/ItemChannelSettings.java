@@ -11,6 +11,7 @@ import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.blocks.cables.ConnectorTileEntity;
 import mcjty.xnet.blocks.controller.gui.GuiController;
+import mcjty.xnet.config.GeneralConfiguration;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
@@ -152,7 +153,9 @@ public class ItemChannelSettings implements IChannelSettings {
                         if (ItemStackTools.isValid(stack)) {
                             Pair<SidedConsumer, ItemConnectorSettings> inserted = insertStackSimulate(context, stack);
                             if (inserted != null) {
-                                insertStackReal(context, inserted, fetchItem(handler, false, extractMatcher, settings.getStackMode(), index));
+                                if (context.checkAndConsumeRF(GeneralConfiguration.controllerOperationRFT)) {
+                                    insertStackReal(context, inserted, fetchItem(handler, false, extractMatcher, settings.getStackMode(), index));
+                                }
                                 break;
                             } else {
                                 index.inc();

@@ -23,4 +23,7 @@ public interface IControllerContext {
     Map<SidedConsumer, IConnectorSettings> getConnectors(int channel);
 
     boolean matchColor(int colorMask);
+
+    boolean checkAndConsumeRF(int rft);
+
 }

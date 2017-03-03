@@ -12,6 +12,7 @@ import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.blocks.cables.ConnectorTileEntity;
 import mcjty.xnet.blocks.controller.gui.GuiController;
+import mcjty.xnet.config.GeneralConfiguration;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -121,6 +122,11 @@ public class EnergyChannelSettings implements IChannelSettings {
 
         if (totalToDistribute <= 0) {
             // Nothing to do
+            return;
+        }
+
+        if (!context.checkAndConsumeRF(GeneralConfiguration.controllerOperationRFT)) {
+            // Not enough energy for this operation
             return;
         }
 

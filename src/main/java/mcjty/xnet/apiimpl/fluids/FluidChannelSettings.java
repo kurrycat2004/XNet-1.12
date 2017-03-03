@@ -10,6 +10,7 @@ import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.blocks.cables.ConnectorTileEntity;
 import mcjty.xnet.blocks.controller.gui.GuiController;
+import mcjty.xnet.config.GeneralConfiguration;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -121,7 +122,9 @@ public class FluidChannelSettings implements IChannelSettings {
                         List<Pair<SidedConsumer, FluidConnectorSettings>> inserted = new ArrayList<>();
                         int remaining = insertFluidSimulate(inserted, context, stack);
                         if (!inserted.isEmpty()) {
-                            insertFluidReal(context, inserted, fetchFluid(handler, false, extractMatcher, stack.amount - remaining));
+                            if (context.checkAndConsumeRF(GeneralConfiguration.controllerOperationRFT)) {
+                                insertFluidReal(context, inserted, fetchFluid(handler, false, extractMatcher, stack.amount - remaining));
+                            }
                         }
                     }
                 }
