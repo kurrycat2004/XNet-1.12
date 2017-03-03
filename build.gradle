@@ -43,7 +43,7 @@ repositories {
     }
 }
 
-version = "0.0.2alpha"
+version = "0.1.0beta"
 group= "mcjty.xnet"
 archivesBaseName = "xnet"
 
