@@ -5,7 +5,6 @@ import mcjty.lib.network.Argument;
 import mcjty.lib.varia.BlockPosTools;
 import mcjty.typed.Type;
 import mcjty.xnet.XNet;
-import mcjty.xnet.api.channels.Color;
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.channels.IControllerContext;
@@ -105,11 +104,12 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     @Override
     public void update() {
         if (!getWorld().isRemote) {
+            checkNetwork();
+
             if (!checkAndConsumeRF(GeneralConfiguration.controllerRFT)) {
                 return;
             }
 
-            checkNetwork();
             boolean dirty = false;
             int newcolors = 0;
             for (int i = 0; i < MAX_CHANNELS; i++) {

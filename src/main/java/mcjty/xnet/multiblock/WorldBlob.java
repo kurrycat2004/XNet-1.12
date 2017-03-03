@@ -192,6 +192,7 @@ public class WorldBlob {
      * Recalculate the network starting from the given block
      */
     public void recalculateNetwork(ChunkBlob blob) {
+        removeCachedNetworksForBlob(blob);
         blob.fixNetworkAllocations();
         removeCachedNetworksForBlob(blob);
 

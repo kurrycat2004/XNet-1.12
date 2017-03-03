@@ -122,8 +122,6 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
     public void initModel() {
         ResourceLocation name = getRegistryName();
         for (CableColor color : CableColor.VALUES) {
-//            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), color.ordinal(), new ModelResourceLocation(new ResourceLocation(name.getResourceDomain(), name.getResourcePath() + color.ordinal()), "inventory"));
-//            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), color.ordinal(), new ModelResourceLocation(name, "color=" + color.name()));
             ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), color.ordinal(), new ModelResourceLocation(new ResourceLocation(name.getResourceDomain(), name.getResourcePath()+"item"), "color=" + color.name()));
         }
     }
