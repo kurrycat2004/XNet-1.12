@@ -32,9 +32,12 @@ public class GenericCableBakedModel implements IBakedModel {
     public static final ModelResourceLocation modelCable = new ModelResourceLocation(XNet.MODID + ":" + NetCableBlock.NETCABLE);
 
     private TextureAtlasSprite spriteCable;
-    private TextureAtlasSprite spriteEnergy;
+    private TextureAtlasSprite spriteConnector;
 
     public static class CableTextures {
+        TextureAtlasSprite spriteConnector;
+        TextureAtlasSprite spriteAdvancedConnector;
+
         TextureAtlasSprite spriteNoneCable;
         TextureAtlasSprite spriteNormalCable;
         TextureAtlasSprite spriteEndCable;
@@ -74,6 +77,9 @@ public class GenericCableBakedModel implements IBakedModel {
             for (CableColor color : CableColor.VALUES) {
                 int i = color.ordinal();
                 cableTextures[i] = new CableTextures();
+                cableTextures[i].spriteConnector = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(XNet.MODID + ":blocks/cable" + i + "/connector");
+                cableTextures[i].spriteAdvancedConnector = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(XNet.MODID + ":blocks/cable" + i + "/advanced_connector");
+
                 cableTextures[i].spriteNormalCable = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(XNet.MODID + ":blocks/cable" + i + "/normal_netcable");
                 cableTextures[i].spriteNoneCable = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(XNet.MODID + ":blocks/cable" + i + "/normal_none_netcable");
                 cableTextures[i].spriteEndCable = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(XNet.MODID + ":blocks/cable" + i + "/normal_end_netcable");
@@ -193,9 +199,10 @@ public class GenericCableBakedModel implements IBakedModel {
         initTextures();
         spriteCable = cableTextures[cableColor.ordinal()].spriteNormalCable; // Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(XNet.MODID + ":blocks/netcable");
         GenericCableBlock block = (GenericCableBlock) state.getBlock();
-        String connectorTexture = block.getConnectorTexture();
-        if (connectorTexture != null) {
-            spriteEnergy = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(connectorTexture);
+        if (block.isAdvancedConnector()) {
+            spriteConnector = cableTextures[cableColor.ordinal()].spriteAdvancedConnector;
+        } else {
+            spriteConnector = cableTextures[cableColor.ordinal()].spriteConnector;
         }
         java.util.function.Function<CablePatterns.SpriteIdx, TextureAtlasSprite> getSprite = idx -> getSpriteNormal(idx, cableColor.ordinal());
 
@@ -224,7 +231,7 @@ public class GenericCableBakedModel implements IBakedModel {
             quads.add(createQuad(v(q,     1,     q),     v(1 - q, 1,     q),     v(1 - q, 1 - p, q),     v(q,     1 - p, q), spriteSide));
             quads.add(createQuad(v(q,     1 - p, 1 - q), v(1 - q, 1 - p, 1 - q), v(1 - q, 1,     1 - q), v(q,     1,     1 - q), spriteSide));
 
-            quads.add(createQuad(v(q,     1 - p, q),     v(1 - q, 1 - p, q),     v(1 - q, 1 - p, 1 - q), v(q,     1 - p, 1 - q), spriteEnergy));
+            quads.add(createQuad(v(q,     1 - p, q),     v(1 - q, 1 - p, q),     v(1 - q, 1 - p, 1 - q), v(q,     1 - p, 1 - q), spriteConnector));
         } else {
             CablePatterns.QuadSetting pattern = CablePatterns.findPattern(west, south, east, north);
             quads.add(createQuad(v(o,     1 - o, 1 - o), v(1 - o, 1 - o, 1 - o), v(1 - o, 1 - o, o),     v(o,     1 - o, o), getSprite.apply(pattern.getSprite()), pattern.getRotation()));
@@ -246,7 +253,7 @@ public class GenericCableBakedModel implements IBakedModel {
             quads.add(createQuad(v(q,     p, q),     v(1 - q, p, q),     v(1 - q, 0, q),     v(q,     0, q), spriteSide));
             quads.add(createQuad(v(q,     0, 1 - q), v(1 - q, 0, 1 - q), v(1 - q, p, 1 - q), v(q,     p, 1 - q), spriteSide));
 
-            quads.add(createQuad(v(q,     p, 1 - q), v(1 - q, p, 1 - q), v(1 - q, p, q),     v(q,     p, q), spriteEnergy));
+            quads.add(createQuad(v(q,     p, 1 - q), v(1 - q, p, 1 - q), v(1 - q, p, q),     v(q,     p, q), spriteConnector));
         } else {
             CablePatterns.QuadSetting pattern = CablePatterns.findPattern(west, north, east, south);
             quads.add(createQuad(v(o, o, o), v(1 - o, o, o), v(1 - o, o, 1 - o), v(o, o, 1 - o), getSprite.apply(pattern.getSprite()),pattern.getRotation()));
@@ -268,7 +275,7 @@ public class GenericCableBakedModel implements IBakedModel {
             quads.add(createQuad(v(1 - p, 1 - q, q),     v(1, 1 - q, q),     v(1, q,     q),     v(1 - p, q,     q), spriteSide));
             quads.add(createQuad(v(1 - p, q,     1 - q), v(1, q,     1 - q), v(1, 1 - q, 1 - q), v(1 - p, 1 - q, 1 - q), spriteSide));
 
-            quads.add(createQuad(v(1 - p, q, 1 - q), v(1 - p, 1 - q, 1 - q), v(1 - p, 1 - q, q), v(1 - p, q, q), spriteEnergy));
+            quads.add(createQuad(v(1 - p, q, 1 - q), v(1 - p, 1 - q, 1 - q), v(1 - p, 1 - q, q), v(1 - p, q, q), spriteConnector));
         } else {
             CablePatterns.QuadSetting pattern = CablePatterns.findPattern(down, north, up, south);
             quads.add(createQuad(v(1 - o, o, o), v(1 - o, 1 - o, o), v(1 - o, 1 - o, 1 - o), v(1 - o, o, 1 - o), getSprite.apply(pattern.getSprite()), pattern.getRotation()));
@@ -290,7 +297,7 @@ public class GenericCableBakedModel implements IBakedModel {
             quads.add(createQuad(v(0, 1 - q, q),     v(p, 1 - q, q),     v(p, q,     q),     v(0, q,     q), spriteSide));
             quads.add(createQuad(v(0, q,     1 - q), v(p, q,     1 - q), v(p, 1 - q, 1 - q), v(0, 1 - q, 1 - q), spriteSide));
 
-            quads.add(createQuad(v(p, q, q), v(p, 1 - q, q), v(p, 1 - q, 1 - q), v(p, q, 1 - q), spriteEnergy));
+            quads.add(createQuad(v(p, q, q), v(p, 1 - q, q), v(p, 1 - q, 1 - q), v(p, q, 1 - q), spriteConnector));
         } else {
             CablePatterns.QuadSetting pattern = CablePatterns.findPattern(down, south, up, north);
             quads.add(createQuad(v(o, o, 1 - o), v(o, 1 - o, 1 - o), v(o, 1 - o, o), v(o, o, o), getSprite.apply(pattern.getSprite()), pattern.getRotation()));
@@ -312,7 +319,7 @@ public class GenericCableBakedModel implements IBakedModel {
             quads.add(createQuad(v(1 - q, q,     0), v(1 - q, 1 - q, 0), v(1 - q, 1 - q, p), v(1 - q, q,     p), spriteSide));
             quads.add(createQuad(v(q,     q,     p), v(q,     1 - q, p), v(q,     1 - q, 0), v(q,     q,     0), spriteSide));
 
-            quads.add(createQuad(v(q, q, p), v(1 - q, q, p), v(1 - q, 1 - q, p), v(q, 1 - q, p), spriteEnergy));
+            quads.add(createQuad(v(q, q, p), v(1 - q, q, p), v(1 - q, 1 - q, p), v(q, 1 - q, p), spriteConnector));
         } else {
             CablePatterns.QuadSetting pattern = CablePatterns.findPattern(west, up, east, down);
             quads.add(createQuad(v(o, 1 - o, o), v(1 - o, 1 - o, o), v(1 - o, o, o), v(o, o, o), getSprite.apply(pattern.getSprite()), pattern.getRotation()));
@@ -334,7 +341,7 @@ public class GenericCableBakedModel implements IBakedModel {
             quads.add(createQuad(v(1 - q, q,     1 - p), v(1 - q, 1 - q, 1 - p), v(1 - q, 1 - q, 1),     v(1 - q, q,     1), spriteSide));
             quads.add(createQuad(v(q,     q,     1),     v(q,     1 - q, 1),     v(q,     1 - q, 1 - p), v(q,     q,     1 - p), spriteSide));
 
-            quads.add(createQuad(v(q, 1 - q, 1 - p), v(1 - q, 1 - q, 1 - p), v(1 - q, q, 1 - p), v(q, q, 1 - p), spriteEnergy));
+            quads.add(createQuad(v(q, 1 - q, 1 - p), v(1 - q, 1 - q, 1 - p), v(1 - q, q, 1 - p), v(q, q, 1 - p), spriteConnector));
         } else {
             CablePatterns.QuadSetting pattern = CablePatterns.findPattern(west, down, east, up);
             quads.add(createQuad(v(o, o, 1 - o), v(1 - o, o, 1 - o), v(1 - o, 1 - o, 1 - o), v(o, 1 - o, 1 - o), getSprite.apply(pattern.getSprite()), pattern.getRotation()));

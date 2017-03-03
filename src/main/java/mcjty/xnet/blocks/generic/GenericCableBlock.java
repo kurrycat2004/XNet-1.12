@@ -220,8 +220,8 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
         }
     }
 
-    public String getConnectorTexture() {
-        return null;
+    public boolean isAdvancedConnector() {
+        return false;
     }
 
     @Override

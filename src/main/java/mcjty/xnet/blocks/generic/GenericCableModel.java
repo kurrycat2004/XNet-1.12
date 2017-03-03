@@ -28,33 +28,43 @@ public class GenericCableModel implements IModel {
     @Override
     public Collection<ResourceLocation> getTextures() {
         return ImmutableSet.of(
+                new ResourceLocation(XNet.MODID, "blocks/cable0/connector"),
+                new ResourceLocation(XNet.MODID, "blocks/cable0/advanced_connector"),
                 new ResourceLocation(XNet.MODID, "blocks/cable0/normal_netcable"),
                 new ResourceLocation(XNet.MODID, "blocks/cable0/normal_corner_netcable"),
                 new ResourceLocation(XNet.MODID, "blocks/cable0/normal_cross_netcable"),
                 new ResourceLocation(XNet.MODID, "blocks/cable0/normal_end_netcable"),
                 new ResourceLocation(XNet.MODID, "blocks/cable0/normal_none_netcable"),
                 new ResourceLocation(XNet.MODID, "blocks/cable0/normal_three_netcable"),
+
+                new ResourceLocation(XNet.MODID, "blocks/cable1/connector"),
+                new ResourceLocation(XNet.MODID, "blocks/cable1/advanced_connector"),
                 new ResourceLocation(XNet.MODID, "blocks/cable1/normal_netcable"),
                 new ResourceLocation(XNet.MODID, "blocks/cable1/normal_corner_netcable"),
                 new ResourceLocation(XNet.MODID, "blocks/cable1/normal_cross_netcable"),
                 new ResourceLocation(XNet.MODID, "blocks/cable1/normal_end_netcable"),
                 new ResourceLocation(XNet.MODID, "blocks/cable1/normal_none_netcable"),
                 new ResourceLocation(XNet.MODID, "blocks/cable1/normal_three_netcable"),
+
+                new ResourceLocation(XNet.MODID, "blocks/cable2/connector"),
+                new ResourceLocation(XNet.MODID, "blocks/cable2/advanced_connector"),
                 new ResourceLocation(XNet.MODID, "blocks/cable2/normal_netcable"),
                 new ResourceLocation(XNet.MODID, "blocks/cable2/normal_corner_netcable"),
                 new ResourceLocation(XNet.MODID, "blocks/cable2/normal_cross_netcable"),
                 new ResourceLocation(XNet.MODID, "blocks/cable2/normal_end_netcable"),
                 new ResourceLocation(XNet.MODID, "blocks/cable2/normal_none_netcable"),
                 new ResourceLocation(XNet.MODID, "blocks/cable2/normal_three_netcable"),
+
+                new ResourceLocation(XNet.MODID, "blocks/cable3/connector"),
+                new ResourceLocation(XNet.MODID, "blocks/cable3/advanced_connector"),
                 new ResourceLocation(XNet.MODID, "blocks/cable3/normal_netcable"),
                 new ResourceLocation(XNet.MODID, "blocks/cable3/normal_corner_netcable"),
                 new ResourceLocation(XNet.MODID, "blocks/cable3/normal_cross_netcable"),
                 new ResourceLocation(XNet.MODID, "blocks/cable3/normal_end_netcable"),
                 new ResourceLocation(XNet.MODID, "blocks/cable3/normal_none_netcable"),
                 new ResourceLocation(XNet.MODID, "blocks/cable3/normal_three_netcable"),
-                new ResourceLocation(XNet.MODID, "blocks/connector_side"),
-                new ResourceLocation(XNet.MODID, "blocks/advanced_connector"),
-                new ResourceLocation(XNet.MODID, "blocks/connector")
+
+                new ResourceLocation(XNet.MODID, "blocks/connector_side")
                 );
     }
 

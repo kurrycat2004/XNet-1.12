@@ -311,7 +311,7 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
     }
 
     @Override
-    public String getConnectorTexture() {
-        return XNet.MODID + ":blocks/connector";
+    public boolean isAdvancedConnector() {
+        return false;
     }
 }

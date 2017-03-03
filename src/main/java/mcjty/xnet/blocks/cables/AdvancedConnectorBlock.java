@@ -27,7 +27,7 @@ public class AdvancedConnectorBlock extends ConnectorBlock implements ITileEntit
 
 
     @Override
-    public String getConnectorTexture() {
-        return XNet.MODID + ":blocks/advanced_connector";
+    public boolean isAdvancedConnector() {
+        return true;
     }
 }
