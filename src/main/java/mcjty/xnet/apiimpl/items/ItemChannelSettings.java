@@ -75,6 +75,26 @@ public class ItemChannelSettings implements IChannelSettings {
         tag.setInteger("offset", roundRobinOffset);
     }
 
+    private static class MInteger {
+        private int i;
+
+        public MInteger(int i) {
+            this.i = i;
+        }
+
+        public int get() {
+            return i;
+        }
+
+        public void set(int i) {
+            this.i = i;
+        }
+
+        public void inc() {
+            i++;
+        }
+    }
+
     @Override
     public void tick(int channel, IControllerContext context) {
         delay--;
@@ -126,11 +146,19 @@ public class ItemChannelSettings implements IChannelSettings {
                             continue;
                         }
                     }
-                    ItemStack stack = fetchItem(handler, true, extractMatcher, settings.getStackMode());
-                    if (ItemStackTools.isValid(stack)) {
-                        Pair<SidedConsumer, ItemConnectorSettings> inserted = insertStackSimulate(context, stack);
-                        if (inserted != null) {
-                            insertStackReal(context, inserted, fetchItem(handler, false, extractMatcher, settings.getStackMode()));
+                    MInteger index = new MInteger(0);
+                    while (true) {
+                        ItemStack stack = fetchItem(handler, true, extractMatcher, settings.getStackMode(), index);
+                        if (ItemStackTools.isValid(stack)) {
+                            Pair<SidedConsumer, ItemConnectorSettings> inserted = insertStackSimulate(context, stack);
+                            if (inserted != null) {
+                                insertStackReal(context, inserted, fetchItem(handler, false, extractMatcher, settings.getStackMode(), index));
+                                break;
+                            } else {
+                                index.inc();
+                            }
+                        } else {
+                            break;
                         }
                     }
                 }
@@ -210,12 +238,13 @@ public class ItemChannelSettings implements IChannelSettings {
         return cnt;
     }
 
-    private ItemStack fetchItem(IItemHandler handler, boolean simulate, Predicate<ItemStack> matcher, ItemConnectorSettings.StackMode stackMode) {
-        for (int i = 0 ; i < handler.getSlots() ; i++) {
+    private ItemStack fetchItem(IItemHandler handler, boolean simulate, Predicate<ItemStack> matcher, ItemConnectorSettings.StackMode stackMode, MInteger index) {
+        for (int i = index.get(); i < handler.getSlots() ; i++) {
             ItemStack stack = handler.getStackInSlot(i);
             if (ItemStackTools.isValid(stack)) {
                 stack = handler.extractItem(i, stackMode == ItemConnectorSettings.StackMode.SINGLE ? 1 : stack.getMaxStackSize(), simulate);
                 if (ItemStackTools.isValid(stack) && matcher.test(stack)) {
+                    index.set(i);
                     return stack;
                 }
             }
