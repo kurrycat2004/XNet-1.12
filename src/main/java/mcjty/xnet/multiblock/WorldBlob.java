@@ -233,11 +233,12 @@ public class WorldBlob {
             removeCachedNetworksForBlob(blob);
 
 
-            @ todo fix!
             Set<IntPos> borderPositions = blob.getBorderPositions();
             ChunkPos chunkPos = blob.getChunkPos();
             for (IntPos pos : borderPositions) {
                 Set<NetworkId> networks = blob.getOrCreateNetworksForPosition(pos);
+                ColorId color = blob.getColorIdForPosition(pos);
+
                 for (EnumFacing facing : EnumFacing.HORIZONTALS) {
                     if (pos.isBorder(facing)) {
                         Vec3i vec = facing.getDirectionVec();
@@ -245,7 +246,7 @@ public class WorldBlob {
                                 ChunkPos.asLong(chunkPos.chunkXPos+vec.getX(), chunkPos.chunkZPos+vec.getZ()));
                         if (adjacent != null) {
                             IntPos connectedPos = pos.otherSide(facing);
-                            if (adjacent.getBorderPositions().contains(connectedPos)) {
+                            if (adjacent.getBorderPositions().contains(connectedPos) && adjacent.getColorIdForPosition(connectedPos).equals(color)) {
                                 // We have a connection!
                                 Set<NetworkId> adjacentNetworks = adjacent.getOrCreateNetworksForPosition(connectedPos);
                                 if (networks.addAll(adjacentNetworks)) {
