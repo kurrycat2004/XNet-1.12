@@ -3,6 +3,7 @@ package mcjty.xnet.blocks.facade;
 import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.cables.NetCableBlock;
 import mcjty.xnet.blocks.cables.NetCableSetup;
+import mcjty.xnet.blocks.generic.CableColor;
 import mcjty.xnet.init.ModBlocks;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -93,8 +94,9 @@ public class FacadeBlock extends NetCableBlock implements ITileEntityProvider {
 
     @Override
     public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
+        CableColor color = state.getValue(COLOR);
         this.onBlockHarvested(world, pos, state, player);
-        return world.setBlockState(pos, NetCableSetup.netCableBlock.getDefaultState(), world.isRemote ? 11 : 3);
+        return world.setBlockState(pos, NetCableSetup.netCableBlock.getDefaultState().withProperty(COLOR, color), world.isRemote ? 11 : 3);
     }
 
     @Override

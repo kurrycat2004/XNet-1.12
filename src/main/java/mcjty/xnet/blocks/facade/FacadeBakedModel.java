@@ -46,7 +46,11 @@ public class FacadeBakedModel implements IBakedModel {
         }
 
         IBakedModel model = getModel(facadeId);
-        return model.getQuads(state, side, rand);
+        try {
+            return model.getQuads(state, side, rand);
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
     }
 
     private IBakedModel getModel(@Nonnull FacadeBlockId facadeId) {

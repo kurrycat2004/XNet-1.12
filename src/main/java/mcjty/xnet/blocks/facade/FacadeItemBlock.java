@@ -5,6 +5,7 @@ import mcjty.lib.tools.ChatTools;
 import mcjty.lib.tools.ItemStackTools;
 import mcjty.xnet.blocks.cables.ConnectorTileEntity;
 import mcjty.xnet.blocks.cables.NetCableSetup;
+import mcjty.xnet.blocks.generic.GenericCableBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
@@ -86,7 +87,7 @@ public class FacadeItemBlock extends CompatItemBlock {
             if (block == NetCableSetup.netCableBlock) {
                 int i = this.getMetadata(itemstack.getMetadata());
                 FacadeBlock facadeBlock = (FacadeBlock) this.block;
-                IBlockState placementState = facadeBlock.getPlacementState(world, pos, facing, hitX, hitY, hitZ, i, player);
+                IBlockState placementState = facadeBlock.getPlacementState(world, pos, facing, hitX, hitY, hitZ, i, player).withProperty(FacadeBlock.COLOR, state.getValue(GenericCableBlock.COLOR));
 
                 if (placeBlockAt(itemstack, player, world, pos, facing, hitX, hitY, hitZ, placementState)) {
                     SoundType soundtype = world.getBlockState(pos).getBlock().getSoundType(world.getBlockState(pos), world, pos, player);
