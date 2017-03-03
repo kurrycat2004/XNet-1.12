@@ -1,11 +1,13 @@
 package mcjty.xnet.blocks.cables;
 
+import mcjty.xnet.blocks.generic.CableColor;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.oredict.ShapelessOreRecipe;
 
 public class NetCableSetup {
     public static NetCableBlock netCableBlock;
@@ -37,5 +39,15 @@ public class NetCableSetup {
         GameRegistry.addRecipe(new ItemStack(netCableBlock, 16), "srs", "rgr", "srs", 'r', Items.REDSTONE, 's', Items.STRING, 'g', Items.GOLD_NUGGET);
         GameRegistry.addRecipe(new ItemStack(connectorBlock, 1), "lRl", "rgr", "lrl", 'r', Items.REDSTONE, 'l', lapisStack, 'g', Items.GOLD_INGOT, 'R', Blocks.CHEST);
         GameRegistry.addRecipe(new ItemStack(advancedConnectorBlock, 1), "ce", "dr", 'c', connectorBlock, 'e', Items.ENDER_PEARL, 'd', Items.DIAMOND, 'r', Items.REDSTONE);
+
+        for (CableColor source : CableColor.VALUES) {
+            for (CableColor dest : CableColor.VALUES) {
+                if (dest != source) {
+                    GameRegistry.addRecipe(new ShapelessOreRecipe(new ItemStack(netCableBlock, 1, dest.ordinal()), new ItemStack(netCableBlock, 1, source.ordinal()), dest.getDye()));
+                    GameRegistry.addRecipe(new ShapelessOreRecipe(new ItemStack(connectorBlock, 1, dest.ordinal()), new ItemStack(connectorBlock, 1, source.ordinal()), dest.getDye()));
+                    GameRegistry.addRecipe(new ShapelessOreRecipe(new ItemStack(advancedConnectorBlock, 1, dest.ordinal()), new ItemStack(advancedConnectorBlock, 1, source.ordinal()), dest.getDye()));
+                }
+            }
+        }
     }
 }
