@@ -1,5 +1,6 @@
 package mcjty.xnet.apiimpl.logic;
 
+import com.google.common.collect.ImmutableSet;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.apiimpl.AbstractConnectorSettings;
@@ -12,6 +13,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class LogicConnectorSettings extends AbstractConnectorSettings {
 
@@ -56,6 +58,8 @@ public class LogicConnectorSettings extends AbstractConnectorSettings {
         return null;
     }
 
+    private static Set<String> TAGS = ImmutableSet.of(TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_COLOR+"3");
+
     @Override
     public boolean isEnabled(String tag) {
         if (tag.equals(TAG_FACING)) {
@@ -70,7 +74,7 @@ public class LogicConnectorSettings extends AbstractConnectorSettings {
             }
         }
 
-        return false;
+        return TAGS.contains(tag);
     }
 
     public int getSpeed() {

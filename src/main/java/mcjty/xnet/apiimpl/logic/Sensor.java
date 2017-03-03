@@ -31,7 +31,7 @@ class Sensor {
     public static final String TAG_MODE = "mode";
     public static final String TAG_OPERATOR = "op";
     public static final String TAG_AMOUNT = "amount";
-    public static final String TAG_COLOR = "color";
+    public static final String TAG_COLOR = "scolor";
     public static final String TAG_STACK = "stack";
 
 
@@ -207,7 +207,7 @@ class Sensor {
         sensorMode = SensorMode.values()[tag.getByte("sensorMode" + index)];
         operator = Operator.values()[tag.getByte("operator" + index)];
         amount = tag.getInteger("amount" + index);
-        outputColor = Color.values()[tag.getByte("color" + index)];
+        outputColor = Color.values()[tag.getByte("scolor" + index)];
         if (tag.hasKey("filter" + index)) {
             NBTTagCompound itemTag = tag.getCompoundTag("filter" + index);
             filter = ItemStackTools.loadFromNBT(itemTag);
@@ -220,7 +220,7 @@ class Sensor {
         tag.setByte("sensorMode" + index, (byte) sensorMode.ordinal());
         tag.setByte("operator" + index, (byte) operator.ordinal());
         tag.setInteger("amount" + index, amount);
-        tag.setByte("color" + index, (byte) outputColor.ordinal());
+        tag.setByte("scolor" + index, (byte) outputColor.ordinal());
         if (ItemStackTools.isValid(filter)) {
             NBTTagCompound itemTag = new NBTTagCompound();
             filter.writeToNBT(itemTag);
