@@ -82,6 +82,10 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         markDirtyQuick();
     }
 
+    public ChannelInfo[] getChannels() {
+        return channels;
+    }
+
     private void checkNetwork() {
         WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
         int netversion = worldBlob.getNetworkVersion(networkId);

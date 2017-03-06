@@ -92,6 +92,19 @@ public class WorldBlob {
         return blob.getColorIdForPosition(intPos);
     }
 
+    // Find the position of the controller for a network. This is not very efficient
+    // code. Don't use this at critical places
+    @Nullable
+    public BlockPos findController(@Nonnull NetworkId networkId) {
+        for (ChunkBlob blob : chunkBlobMap.values()) {
+            IntPos pos = blob.getPositionforNetwork(networkId);
+            if (pos != null) {
+                return blob.getPosition(pos);
+            }
+        }
+        return null;
+    }
+
     @Nonnull
     public Set<BlockPos> getConsumers(NetworkId network) {
         if (!consumersOnNetwork.containsKey(network)) {

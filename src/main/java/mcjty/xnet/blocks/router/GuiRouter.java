@@ -99,9 +99,9 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
         channelList.removeChildren();
 
         int sel = channelList.getSelected();
-        BlockPos prevPos = null;
 
         for (ControllerChannelClientInfo channel : fromServer_channels) {
+            String name = channel.getChannelName();
             BlockPos controllerPos = channel.getPos();
             IChannelType type = channel.getChannelType();
             int index = channel.getIndex();
@@ -109,7 +109,7 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
             int color = StyleConfig.colorTextInListNormal;
 
             Panel panel = new Panel(mc, this).setLayout(new HorizontalLayout().setHorizontalMargin(0).setSpacing(0));
-            panel.addChild(new Label<>(mc, this).setText(BlockPosTools.toString(controllerPos) + ": " + index + " (" +
+            panel.addChild(new Label<>(mc, this).setText(name + " (" + BlockPosTools.toString(controllerPos) + "): " + index + " (" +
                 type.getName() + ")"));
             channelList.addChild(panel);
         }

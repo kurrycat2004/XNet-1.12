@@ -10,17 +10,20 @@ import javax.annotation.Nonnull;
 
 public class ControllerChannelClientInfo {
     // Position of the controller
+    @Nonnull private final String channelName;
     @Nonnull private final BlockPos pos;
     @Nonnull private final IChannelType channelType;
     private final int index;        // Index of the channel within that controller (0 through 7)
 
-    public ControllerChannelClientInfo(@Nonnull BlockPos pos, @Nonnull IChannelType channelType, int index) {
+    public ControllerChannelClientInfo(@Nonnull String channelName, @Nonnull BlockPos pos, @Nonnull IChannelType channelType, int index) {
+        this.channelName = channelName;
         this.pos = pos;
         this.channelType = channelType;
         this.index = index;
     }
 
     public ControllerChannelClientInfo(@Nonnull ByteBuf buf) {
+        channelName = NetworkTools.readStringUTF8(buf);
         String id = NetworkTools.readString(buf);
         IChannelType t = XNet.xNetApi.findType(id);
         if (t == null) {
@@ -32,9 +35,15 @@ public class ControllerChannelClientInfo {
     }
 
     public void writeToNBT(@Nonnull ByteBuf buf) {
+        NetworkTools.writeStringUTF8(buf, channelName);
         NetworkTools.writeString(buf, channelType.getID());
         NetworkTools.writePos(buf, pos);
         buf.writeInt(index);
+    }
+
+    @Nonnull
+    public String getChannelName() {
+        return channelName;
     }
 
     @Nonnull

@@ -50,6 +50,9 @@ public class ChunkBlob {
     // Transient datastructure that contains all networks actually used in this chunk
     private Set<NetworkId> cachedNetworks = null;
 
+    // Transient datastructure mapping networks to their network provider position
+    private Map<NetworkId, IntPos> cachedProviders = null;
+
     public ChunkBlob(ChunkPos chunkPos) {
         this.chunkPos = chunkPos;
         this.chunkNum = ChunkPos.asLong(chunkPos.chunkXPos, chunkPos.chunkZPos);
@@ -65,6 +68,17 @@ public class ChunkBlob {
 
     public BlockPos getPosition(IntPos pos) {
         return pos.toBlockPos(chunkPos);
+    }
+
+    @Nullable
+    public IntPos getPositionforNetwork(@Nonnull NetworkId networkId) {
+        if (cachedProviders == null) {
+            cachedProviders = new HashMap<>();
+            for (Map.Entry<IntPos, NetworkId> entry : networkProviders.entrySet()) {
+                cachedProviders.put(entry.getValue(), entry.getKey());
+            }
+        }
+        return cachedProviders.get(networkId);
     }
 
     @Nullable
@@ -179,6 +193,7 @@ public class ChunkBlob {
     public boolean createNetworkProvider(BlockPos pos, ColorId color, NetworkId networkId) {
         IntPos posId = new IntPos(pos);
         networkProviders.put(posId, networkId);
+        cachedProviders = null;
         boolean changed = createCableSegment(pos, color);
         getMappings(blobAllocations.get(posId)).add(networkId);
         return changed;
@@ -288,6 +303,7 @@ public class ChunkBlob {
         networkConsumers.remove(posId);
         cachedConsumers = null;
         networkProviders.remove(posId);
+        cachedProviders = null;
         ColorId oldColor = blobColors.get(blobAllocations.get(posId));
 
         int cnt = 0;
@@ -386,6 +402,7 @@ public class ChunkBlob {
         cachedBorderPositions.clear();
         cachedNetworks = null;
         cachedConsumers = null;
+        cachedProviders = null;
 
         lastBlobId = compound.getInteger("lastBlob");
         Set<BlobId> foundBlobs = new HashSet<>();       // Keep track of blobs we found
