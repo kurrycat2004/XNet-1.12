@@ -195,10 +195,18 @@ class Sensor {
         return false;
     }
 
+    private int safeInt(Object o) {
+        if (o instanceof Integer) {
+            return (Integer) o;
+        } else {
+            return 0;
+        }
+    }
+
     public void update(Map<String, Object> data) {
         sensorMode = SensorMode.valueOf(((String) data.get(TAG_MODE + index)).toUpperCase());
         operator = Operator.valueOfCode(((String) data.get(TAG_OPERATOR + index)).toUpperCase());
-        amount = (Integer) data.get(TAG_AMOUNT + index);
+        amount = safeInt(data.get(TAG_AMOUNT + index));
         outputColor = Color.colorByValue((Integer) data.get(TAG_COLOR + index));
         filter = (ItemStack) data.get(TAG_STACK + index);
     }
