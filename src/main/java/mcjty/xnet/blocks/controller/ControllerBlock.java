@@ -6,6 +6,7 @@ import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.ProbeMode;
 import mcjty.theoneprobe.api.TextStyleClass;
 import mcjty.xnet.api.keys.NetworkId;
+import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.blocks.controller.gui.GuiController;
 import mcjty.xnet.blocks.generic.GenericXNetBlock;
 import mcjty.xnet.gui.GuiProxy;
@@ -76,7 +77,7 @@ public class ControllerBlock extends GenericXNetBlock<TileEntityController, Cont
         ColorId oldColor = worldBlob.getColorAt(pos);
         ColorId newColor = null;
         for (EnumFacing facing : EnumFacing.VALUES) {
-            if (world.getBlockState(pos.offset(facing)).getBlock() instanceof ControllerBlock) {
+            if (world.getBlockState(pos.offset(facing)).getBlock() instanceof ConnectorBlock) {
                 ColorId color = worldBlob.getColorAt(pos.offset(facing));
                 if (color != null) {
                     if (color == oldColor) {
