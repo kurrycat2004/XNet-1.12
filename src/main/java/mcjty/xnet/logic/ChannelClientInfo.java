@@ -21,7 +21,7 @@ public class ChannelClientInfo {
 
     @Nonnull private final IChannelType type;
     @Nonnull private final IChannelSettings channelSettings;
-    @Nonnull private final boolean enabled;
+    private final boolean enabled;
 
     private final Map<SidedConsumer, ConnectorClientInfo> connectors = new HashMap<>();
 
@@ -69,7 +69,6 @@ public class ChannelClientInfo {
         }
     }
 
-    @Nonnull
     public boolean isEnabled() {
         return enabled;
     }
