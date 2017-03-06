@@ -13,11 +13,11 @@ public interface IEditorGui {
 
     IEditorGui label(String txt);
 
-    IEditorGui text(String tag, String tooltip, String value);
+    IEditorGui text(String tag, String tooltip, String value, int width);
 
-    IEditorGui integer(String tag, String tooltip, Integer value);
+    IEditorGui integer(String tag, String tooltip, Integer value, int width);
 
-    IEditorGui real(String tag, String tooltip, Double value);
+    IEditorGui real(String tag, String tooltip, Double value, int width);
 
     IEditorGui toggle(String tag, String tooltip, boolean value);
 

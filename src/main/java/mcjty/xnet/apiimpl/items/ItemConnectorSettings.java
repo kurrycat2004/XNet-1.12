@@ -100,9 +100,9 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
                 .choices(TAG_SPEED, "Number of ticks for each operation", Integer.toString(speed * 10), speeds)
                 .nl()
 
-                .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority).shift(5)
+                .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority, 36).shift(5)
                 .label("#")
-                .integer(TAG_COUNT, itemMode == ItemMode.EXT ? "Amount in destination inventory to keep" : "Max amount in destination inventory", count)
+                .integer(TAG_COUNT, itemMode == ItemMode.EXT ? "Amount in destination inventory to keep" : "Max amount in destination inventory", count, 36)
                 .nl()
 
                 .toggleText(TAG_BLACKLIST, "Enable blacklist mode", "BL", blacklist).shift(2)

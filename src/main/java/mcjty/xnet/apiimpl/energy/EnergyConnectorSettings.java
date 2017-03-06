@@ -66,13 +66,13 @@ public class EnergyConnectorSettings extends AbstractConnectorSettings {
                 .choices(TAG_MODE, "Insert or extract mode", energyMode, EnergyMode.values())
                 .nl()
 
-                .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority).nl()
+                .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority, 30).nl()
 
                 .label("Rate")
-                .integer(TAG_RATE, energyMode == EnergyMode.EXT ? "Max energy extraction rate" : "Max energy insertion rate", rate)
+                .integer(TAG_RATE, energyMode == EnergyMode.EXT ? "Max energy extraction rate" : "Max energy insertion rate", rate, 40)
                 .shift(10)
                 .label(energyMode == EnergyMode.EXT ? "Min" : "Max")
-                .integer(TAG_MINMAX, energyMode == EnergyMode.EXT ? "Disable extraction if energy is too low" : "Disable insertion if energy is too high", minmax);
+                .integer(TAG_MINMAX, energyMode == EnergyMode.EXT ? "Disable extraction if energy is too low" : "Disable insertion if energy is too high", minmax, 50);
     }
 
     private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_COLOR+"3", TAG_RATE, TAG_MINMAX, TAG_PRIORITY);

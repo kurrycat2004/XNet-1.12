@@ -152,7 +152,7 @@ class Sensor {
         gui
                 .choices(TAG_MODE + index, "Sensor mode", sensorMode, SensorMode.values())
                 .choices(TAG_OPERATOR + index, "Operator", operator, Operator.values())
-                .integer(TAG_AMOUNT + index, "Amount to compare with", amount)
+                .integer(TAG_AMOUNT + index, "Amount to compare with", amount, 46)
                 .colors(TAG_COLOR + index, "Output color", outputColor.getColor(), COLORS)
                 .ghostSlot(TAG_STACK + index, filter)
                 .nl();

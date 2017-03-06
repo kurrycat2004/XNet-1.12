@@ -106,8 +106,8 @@ public abstract class AbstractEditorPanel implements IEditorGui {
     }
 
     @Override
-    public IEditorGui text(String tag, String tooltip, String value) {
-        int w = 40;
+    public IEditorGui text(String tag, String tooltip, String value, int width) {
+        int w = width;
         fitWidth(w);
         TextField text = new TextField(mc, gui).setText(value)
                 .setTooltips(tooltip)
@@ -133,8 +133,8 @@ public abstract class AbstractEditorPanel implements IEditorGui {
     }
 
     @Override
-    public IEditorGui integer(String tag, String tooltip, Integer value) {
-        int w = 36;
+    public IEditorGui integer(String tag, String tooltip, Integer value, int width) {
+        int w = width;
         fitWidth(w);
         TextField text = new TextField(mc, gui).setText(value == null ? "" : value.toString())
                 .setTooltips(tooltip)
@@ -160,8 +160,8 @@ public abstract class AbstractEditorPanel implements IEditorGui {
     }
 
     @Override
-    public IEditorGui real(String tag, String tooltip, Double value) {
-        int w = 30;
+    public IEditorGui real(String tag, String tooltip, Double value, int width) {
+        int w = width;
         fitWidth(w);
         TextField text = new TextField(mc, gui).setText(value == null ? "" : value.toString())
                 .setTooltips(tooltip)
