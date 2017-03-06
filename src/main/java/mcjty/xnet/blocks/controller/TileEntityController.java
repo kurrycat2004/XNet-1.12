@@ -277,7 +277,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         List<ChannelClientInfo> chanList = new ArrayList<>();
         for (ChannelInfo channel : channels) {
             if (channel != null) {
-                ChannelClientInfo clientInfo = new ChannelClientInfo(channel.getType(),
+                ChannelClientInfo clientInfo = new ChannelClientInfo(channel.getChannelName(), channel.getType(),
                         channel.getChannelSettings(), channel.isEnabled());
 
                 for (Map.Entry<SidedConsumer, ConnectorInfo> entry : channel.getConnectors().entrySet()) {
@@ -316,7 +316,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         channels[channel].setEnabled(Boolean.TRUE.equals(enabled));
 
         String name = (String) data.get(GuiController.TAG_NAME);
-        // @todo
+        channels[channel].setChannelName(name);
 
         cleanCache(channel);
         markDirtyQuick();

@@ -10,6 +10,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.util.Constants;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +20,7 @@ public class ChannelInfo {
 
     private final IChannelType type;
     private final IChannelSettings channelSettings;
+    private String channelName;
     private boolean enabled = true;
 
     private final Map<SidedConsumer, ConnectorInfo> connectors = new HashMap<>();
@@ -26,6 +28,15 @@ public class ChannelInfo {
     public ChannelInfo(IChannelType type) {
         this.type = type;
         channelSettings = type.createChannel();
+    }
+
+    @Nonnull
+    public String getChannelName() {
+        return channelName == null ? "" : channelName;
+    }
+
+    public void setChannelName(String channelName) {
+        this.channelName = channelName;
     }
 
     public boolean isEnabled() {
@@ -57,6 +68,9 @@ public class ChannelInfo {
     public void writeToNBT(NBTTagCompound tag) {
         channelSettings.writeToNBT(tag);
         tag.setBoolean("enabled", enabled);
+        if (channelName != null && !channelName.isEmpty()) {
+            tag.setString("name", channelName);
+        }
         NBTTagList conlist = new NBTTagList();
         for (Map.Entry<SidedConsumer, ConnectorInfo> entry : connectors.entrySet()) {
             NBTTagCompound tc = new NBTTagCompound();
@@ -74,6 +88,11 @@ public class ChannelInfo {
     public void readFromNBT(NBTTagCompound tag) {
         channelSettings.readFromNBT(tag);
         enabled = tag.getBoolean("enabled");
+        if (tag.hasKey("name")) {
+            channelName = tag.getString("name");
+        } else {
+            channelName = null;
+        }
         NBTTagList conlist = tag.getTagList("connectors", Constants.NBT.TAG_COMPOUND);
         for (int i = 0 ; i < conlist.tagCount() ; i++) {
             NBTTagCompound tc = conlist.getCompoundTagAt(i);

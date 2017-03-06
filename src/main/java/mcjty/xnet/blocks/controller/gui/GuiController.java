@@ -233,9 +233,10 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                 if (info != null) {
                     ChannelEditorPanel editor = new ChannelEditorPanel(channelEditPanel, mc, this, editingChannel);
                     editor.label("Channel " + (editingChannel + 1))
-                            .shift(10)
+                            .shift(5)
                             .toggle(TAG_ENABLED, "Enable processing on this channel", info.isEnabled())
-                            .text(TAG_NAME, "Channel name", "xxxx", 50);
+                            .shift(5)
+                            .text(TAG_NAME, "Channel name", info.getChannelName(), 65);
                     info.getChannelSettings().createGui(editor);
 
                     Button remove = new Button(mc, this).setText("x")
