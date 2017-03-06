@@ -42,6 +42,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -228,6 +229,9 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
             return false;
         }
         if (te instanceof IInventory) {
+            return true;
+        }
+        if (te.hasCapability(CapabilityEnergy.ENERGY, null)) {
             return true;
         }
         if (te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
