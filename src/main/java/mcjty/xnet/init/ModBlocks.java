@@ -3,16 +3,19 @@ package mcjty.xnet.init;
 import mcjty.xnet.blocks.cables.NetCableSetup;
 import mcjty.xnet.blocks.controller.ControllerBlock;
 import mcjty.xnet.blocks.facade.FacadeBlock;
+import mcjty.xnet.blocks.router.RouterBlock;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ModBlocks {
 
     public static ControllerBlock controllerBlock;
+    public static RouterBlock routerBlock;
     public static FacadeBlock facadeBlock;
 
     public static void init() {
         controllerBlock = new ControllerBlock();
+        routerBlock = new RouterBlock();
         facadeBlock = new FacadeBlock();
         NetCableSetup.init();
     }
@@ -20,6 +23,7 @@ public class ModBlocks {
     @SideOnly(Side.CLIENT)
     public static void initModels() {
         controllerBlock.initModel();
+        routerBlock.initModel();
         facadeBlock.initModel();
         NetCableSetup.initClient();
     }

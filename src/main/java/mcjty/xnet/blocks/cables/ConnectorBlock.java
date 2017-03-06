@@ -13,6 +13,7 @@ import mcjty.xnet.blocks.facade.FacadeItemBlock;
 import mcjty.xnet.blocks.generic.CableColor;
 import mcjty.xnet.blocks.generic.GenericCableBakedModel;
 import mcjty.xnet.blocks.generic.GenericCableBlock;
+import mcjty.xnet.blocks.router.TileEntityRouter;
 import mcjty.xnet.config.GeneralConfiguration;
 import mcjty.xnet.gui.GuiProxy;
 import mcjty.xnet.init.ModBlocks;
@@ -73,9 +74,7 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
     @Override
     protected void clGetSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
         for (CableColor value : CableColor.VALUES) {
-            if (value != CableColor.ADVANCED) {
-                subItems.add(new ItemStack(itemIn, 1, value.ordinal()));
-            }
+            subItems.add(new ItemStack(itemIn, 1, value.ordinal()));
         }
     }
 
@@ -216,11 +215,24 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
         Block block = state.getBlock();
         if ((block instanceof NetCableBlock || block instanceof ConnectorBlock) && state.getValue(COLOR) == color) {
             return ConnectorType.CABLE;
-        } else if (isConnectable(world, pos)) {
+        } else if (isConnectable(world, pos) && color != CableColor.ADVANCED) {
+            return ConnectorType.BLOCK;
+        } else if (isConnectableAdvanced(world, pos) && color == CableColor.ADVANCED) {
             return ConnectorType.BLOCK;
         } else {
             return ConnectorType.NONE;
         }
+    }
+
+    public static boolean isConnectableAdvanced(IBlockAccess world, BlockPos pos) {
+        TileEntity te = world.getTileEntity(pos);
+        if (te == null) {
+            return false;
+        }
+        if (te instanceof TileEntityRouter) {
+            return true;
+        }
+        return false;
     }
 
     public static boolean isConnectable(IBlockAccess world, BlockPos pos) {
@@ -241,6 +253,9 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
             return true;
         }
         if (te instanceof TileEntityController) {
+            return true;
+        }
+        if (te instanceof TileEntityRouter) {
             return true;
         }
         return false;

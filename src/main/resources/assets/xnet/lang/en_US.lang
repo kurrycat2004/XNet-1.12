@@ -4,4 +4,5 @@ tile.xnet.advanced_connector.name=Advanced Connector
 tile.xnet.netcable.name=Network Cable
 tile.xnet.advancedcable.name=Advanced Cable
 tile.xnet.controller.name=Controller
+tile.xnet.router.name=Router
 itemGroup.XNet=XNet
