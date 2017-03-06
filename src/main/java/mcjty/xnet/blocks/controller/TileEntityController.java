@@ -315,6 +315,9 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         Boolean enabled = (Boolean) data.get(GuiController.TAG_ENABLED);
         channels[channel].setEnabled(Boolean.TRUE.equals(enabled));
 
+        String name = (String) data.get(GuiController.TAG_NAME);
+        // @todo
+
         cleanCache(channel);
         markDirtyQuick();
     }

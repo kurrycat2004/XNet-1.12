@@ -44,6 +44,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     public static final int HEIGHT = 236;
 
     public static final String TAG_ENABLED = "enabled";
+    public static final String TAG_NAME = "name";
 
     private WidgetList connectorList;
     private int listDirty;
@@ -233,7 +234,8 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                     ChannelEditorPanel editor = new ChannelEditorPanel(channelEditPanel, mc, this, editingChannel);
                     editor.label("Channel " + (editingChannel + 1))
                             .shift(10)
-                            .toggle(TAG_ENABLED, "Enable processing on this channel", info.isEnabled());
+                            .toggle(TAG_ENABLED, "Enable processing on this channel", info.isEnabled())
+                            .text(TAG_NAME, "Channel name", "xxxx", 50);
                     info.getChannelSettings().createGui(editor);
 
                     Button remove = new Button(mc, this).setText("x")
