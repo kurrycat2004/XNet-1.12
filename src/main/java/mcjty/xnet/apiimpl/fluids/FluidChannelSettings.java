@@ -222,7 +222,7 @@ public class FluidChannelSettings implements IChannelSettings {
             FluidConnectorSettings settings = pair.getValue();
             BlockPos pos = consumerPosition.offset(side);
             TileEntity te = context.getControllerWorld().getTileEntity(pos);
-            IFluidHandler handler = getFluidHandlerAt(te, side.getOpposite());
+            IFluidHandler handler = getFluidHandlerAt(te, settings.getFacing());
             // @todo check this check
             FluidStack copy = stack.copy();
             copy.amount = Math.min(settings.getRate(), amount);

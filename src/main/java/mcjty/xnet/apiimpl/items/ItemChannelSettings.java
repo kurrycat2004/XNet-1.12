@@ -220,9 +220,10 @@ public class ItemChannelSettings implements IChannelSettings {
     private void insertStackReal(@Nonnull IControllerContext context, @Nonnull Pair<SidedConsumer, ItemConnectorSettings> entry, @Nonnull ItemStack stack) {
         BlockPos consumerPosition = context.findConsumerPosition(entry.getKey().getConsumerId());
         EnumFacing side = entry.getKey().getSide();
+        ItemConnectorSettings settings = entry.getValue();
         BlockPos pos = consumerPosition.offset(side);
         TileEntity te = context.getControllerWorld().getTileEntity(pos);
-        IItemHandler handler = getItemHandlerAt(te, side.getOpposite());
+        IItemHandler handler = getItemHandlerAt(te, settings.getFacing());
         if (ItemStackTools.isEmpty(ItemHandlerHelper.insertItem(handler, stack, false))) {
             roundRobinOffset = (roundRobinOffset+1) % itemConsumers.size();
         }
