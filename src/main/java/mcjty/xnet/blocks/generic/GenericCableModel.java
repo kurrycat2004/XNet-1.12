@@ -17,7 +17,7 @@ import java.util.Collections;
 public class GenericCableModel implements IModel {
     @Override
     public IBakedModel bake(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
-        return new GenericCableBakedModel(state, format, bakedTextureGetter);
+        return new GenericCableBakedModel(format);
     }
 
     @Override
@@ -63,6 +63,13 @@ public class GenericCableModel implements IModel {
                 new ResourceLocation(XNet.MODID, "blocks/cable3/normal_end_netcable"),
                 new ResourceLocation(XNet.MODID, "blocks/cable3/normal_none_netcable"),
                 new ResourceLocation(XNet.MODID, "blocks/cable3/normal_three_netcable"),
+
+                new ResourceLocation(XNet.MODID, "blocks/cable4/normal_netcable"),
+                new ResourceLocation(XNet.MODID, "blocks/cable4/normal_corner_netcable"),
+                new ResourceLocation(XNet.MODID, "blocks/cable4/normal_cross_netcable"),
+                new ResourceLocation(XNet.MODID, "blocks/cable4/normal_end_netcable"),
+                new ResourceLocation(XNet.MODID, "blocks/cable4/normal_none_netcable"),
+                new ResourceLocation(XNet.MODID, "blocks/cable4/normal_three_netcable"),
 
                 new ResourceLocation(XNet.MODID, "blocks/connector_side")
                 );

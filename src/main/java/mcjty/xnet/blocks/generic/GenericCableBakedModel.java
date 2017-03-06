@@ -16,7 +16,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
-import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
@@ -53,7 +52,6 @@ public class GenericCableBakedModel implements IBakedModel {
 
     private VertexFormat format;
 
-
     static {
         CablePatterns.PATTERNS.put(new CablePatterns.Pattern(false, false, false, false), new CablePatterns.QuadSetting(SPRITE_NONE, 0));
         CablePatterns.PATTERNS.put(new CablePatterns.Pattern(true, false, false, false), new CablePatterns.QuadSetting(SPRITE_END, 3));
@@ -89,31 +87,32 @@ public class GenericCableBakedModel implements IBakedModel {
                 cableTextures[i].spriteThreeCable = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(XNet.MODID + ":blocks/cable" + i + "/normal_three_netcable");
                 cableTextures[i].spriteCrossCable = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(XNet.MODID + ":blocks/cable" + i + "/normal_cross_netcable");
             }
+
             spriteSide = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(XNet.MODID + ":blocks/connector_side");
         }
     }
 
     private static TextureAtlasSprite getSpriteNormal(CablePatterns.SpriteIdx idx, int index) {
         initTextures();
+        CableTextures cableTexture = cableTextures[index];
         switch (idx) {
             case SPRITE_NONE:
-                return cableTextures[index].spriteNoneCable;
+                return cableTexture.spriteNoneCable;
             case SPRITE_END:
-                return cableTextures[index].spriteEndCable;
+                return cableTexture.spriteEndCable;
             case SPRITE_STRAIGHT:
-                return cableTextures[index].spriteNormalCable;
+                return cableTexture.spriteNormalCable;
             case SPRITE_CORNER:
-                return cableTextures[index].spriteCornerCable;
+                return cableTexture.spriteCornerCable;
             case SPRITE_THREE:
-                return cableTextures[index].spriteThreeCable;
+                return cableTexture.spriteThreeCable;
             case SPRITE_CROSS:
-                return cableTextures[index].spriteCrossCable;
+                return cableTexture.spriteCrossCable;
         }
-        return cableTextures[index].spriteNoneCable;
+        return cableTexture.spriteNoneCable;
     }
 
-
-    public GenericCableBakedModel(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
+    public GenericCableBakedModel(VertexFormat format) {
         this.format = format;
     }
 
@@ -198,16 +197,18 @@ public class GenericCableBakedModel implements IBakedModel {
         ConnectorType up = extendedBlockState.getValue(GenericCableBlock.UP);
         ConnectorType down = extendedBlockState.getValue(GenericCableBlock.DOWN);
         CableColor cableColor = extendedBlockState.getValue(GenericCableBlock.COLOR);
+        int index = cableColor.ordinal();
 
         initTextures();
-        spriteCable = cableTextures[cableColor.ordinal()].spriteNormalCable;
+        CableTextures ct = cableTextures[index];
+        spriteCable = ct.spriteNormalCable;
         GenericCableBlock block = (GenericCableBlock) state.getBlock();
         if (block.isAdvancedConnector()) {
-            spriteConnector = cableTextures[cableColor.ordinal()].spriteAdvancedConnector;
+            spriteConnector = ct.spriteAdvancedConnector;
         } else {
-            spriteConnector = cableTextures[cableColor.ordinal()].spriteConnector;
+            spriteConnector = ct.spriteConnector;
         }
-        Function<CablePatterns.SpriteIdx, TextureAtlasSprite> getSprite = idx -> getSpriteNormal(idx, cableColor.ordinal());
+        Function<CablePatterns.SpriteIdx, TextureAtlasSprite> getSprite = idx -> getSpriteNormal(idx, index);
         float hilight = 1.0f;
         if (block instanceof ConnectorBlock) {
             if (north != BLOCK && south != BLOCK && west != BLOCK && east != BLOCK && up != BLOCK && down != BLOCK) {

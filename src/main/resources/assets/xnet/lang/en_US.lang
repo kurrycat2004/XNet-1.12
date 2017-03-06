@@ -2,5 +2,6 @@ tile.xnet.connector.name=Connector
 tile.xnet.facade.name=Facade
 tile.xnet.advanced_connector.name=Advanced Connector
 tile.xnet.netcable.name=Network Cable
+tile.xnet.advancedcable.name=Advanced Cable
 tile.xnet.controller.name=Controller
 itemGroup.XNet=XNet

@@ -23,7 +23,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.creativetab.CreativeTabs;
@@ -44,7 +43,6 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -75,7 +73,9 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
     @Override
     protected void clGetSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
         for (CableColor value : CableColor.VALUES) {
-            subItems.add(new ItemStack(itemIn, 1, value.ordinal()));
+            if (value != CableColor.ADVANCED) {
+                subItems.add(new ItemStack(itemIn, 1, value.ordinal()));
+            }
         }
     }
 
@@ -214,7 +214,7 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
     protected ConnectorType getConnectorType(@Nonnull CableColor color, IBlockAccess world, BlockPos pos) {
         IBlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
-        if (block instanceof GenericCableBlock && state.getValue(COLOR) == color) {
+        if ((block instanceof NetCableBlock || block instanceof ConnectorBlock) && state.getValue(COLOR) == color) {
             return ConnectorType.CABLE;
         } else if (isConnectable(world, pos)) {
             return ConnectorType.BLOCK;

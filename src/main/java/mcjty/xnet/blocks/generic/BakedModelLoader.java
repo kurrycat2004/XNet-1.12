@@ -1,5 +1,6 @@
 package mcjty.xnet.blocks.generic;
 
+import com.google.common.collect.ImmutableSet;
 import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.blocks.cables.NetCableBlock;
@@ -10,20 +11,24 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ICustomModelLoader;
 import net.minecraftforge.client.model.IModel;
 
+import java.util.Set;
+
 public class BakedModelLoader implements ICustomModelLoader {
 
     public static final GenericCableModel GENERIC_MODEL = new GenericCableModel();
     public static final FacadeModel FACADE_MODEL = new FacadeModel();
 
+    private static final Set<String> NAMES = ImmutableSet.of(
+            ConnectorBlock.CONNECTOR,
+            NetCableBlock.NETCABLE,
+            FacadeBlock.FACADE);
 
     @Override
     public boolean accepts(ResourceLocation modelLocation) {
         if (!modelLocation.getResourceDomain().equals(XNet.MODID)) {
             return false;
         }
-        return ConnectorBlock.CONNECTOR.equals(modelLocation.getResourcePath()) ||
-                NetCableBlock.NETCABLE.equals(modelLocation.getResourcePath()) ||
-                FacadeBlock.FACADE.equals(modelLocation.getResourcePath());
+        return NAMES.contains(modelLocation.getResourcePath());
     }
 
     @Override

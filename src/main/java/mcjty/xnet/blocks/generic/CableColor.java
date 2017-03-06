@@ -6,7 +6,8 @@ public enum CableColor implements IStringSerializable {
     BLUE("blue", "dyeBlue"),
     RED("red", "dyeRed"),
     YELLOW("yellow", "dyeYellow"),
-    GREEN("green", "dyeGreen");
+    GREEN("green", "dyeGreen"),
+    ADVANCED("advanced", null);
 
     public static final CableColor[] VALUES = CableColor.values();
 
