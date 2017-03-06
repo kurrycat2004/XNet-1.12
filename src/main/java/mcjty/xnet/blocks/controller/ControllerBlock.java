@@ -76,12 +76,14 @@ public class ControllerBlock extends GenericXNetBlock<TileEntityController, Cont
         ColorId oldColor = worldBlob.getColorAt(pos);
         ColorId newColor = null;
         for (EnumFacing facing : EnumFacing.VALUES) {
-            ColorId color = worldBlob.getColorAt(pos.offset(facing));
-            if (color != null) {
-                if (color == oldColor) {
-                    return; // Nothing to do
+            if (world.getBlockState(pos.offset(facing)).getBlock() instanceof ControllerBlock) {
+                ColorId color = worldBlob.getColorAt(pos.offset(facing));
+                if (color != null) {
+                    if (color == oldColor) {
+                        return; // Nothing to do
+                    }
+                    newColor = color;
                 }
-                newColor = color;
             }
         }
         if (newColor != null) {
