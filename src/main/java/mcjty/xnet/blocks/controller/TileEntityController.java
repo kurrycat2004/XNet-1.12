@@ -3,6 +3,7 @@ package mcjty.xnet.blocks.controller;
 import mcjty.lib.entity.GenericEnergyReceiverTileEntity;
 import mcjty.lib.network.Argument;
 import mcjty.lib.varia.BlockPosTools;
+import mcjty.lib.varia.WorldTools;
 import mcjty.typed.Type;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelType;
@@ -16,6 +17,7 @@ import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.blocks.cables.ConnectorTileEntity;
 import mcjty.xnet.blocks.cables.NetCableSetup;
 import mcjty.xnet.blocks.controller.gui.GuiController;
+import mcjty.xnet.blocks.router.TileEntityRouter;
 import mcjty.xnet.config.GeneralConfiguration;
 import mcjty.xnet.logic.*;
 import mcjty.xnet.multiblock.WorldBlob;
@@ -58,6 +60,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
     // Cached/transient data
     private Map<SidedConsumer, IConnectorSettings> cachedConnectors[] = new Map[MAX_CHANNELS];
+    private Map<SidedConsumer, IConnectorSettings> cachedRoutedConnectors[] = new Map[MAX_CHANNELS];
     private int networkVersion = -1;
 
     public TileEntityController() {
@@ -150,6 +153,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
     private void cleanCache(int channel) {
         cachedConnectors[channel] = null;
+        cachedRoutedConnectors[channel] = null;
         channels[channel].getChannelSettings().cleanCache();
     }
 
@@ -163,6 +167,35 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             }
         }
         return cachedConnectors[channel];
+    }
+
+    @Override
+    @Nonnull
+    public Map<SidedConsumer, IConnectorSettings> getRoutedConnectors(int channel) {
+        if (cachedRoutedConnectors[channel] == null) {
+
+            cachedRoutedConnectors[channel] = new HashMap<>();
+
+            if (!channels[channel].getChannelName().isEmpty()) {
+                WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
+
+                for (Map.Entry<SidedConsumer, ConnectorInfo> entry : channels[channel].getConnectors().entrySet()) {
+                    ConsumerId consumer = entry.getKey().getConsumerId();
+                    BlockPos consumerPos = findConsumerPosition(worldBlob, consumer);
+                    if (consumerPos != null) {
+                        BlockPos routerPos = consumerPos.offset(entry.getKey().getSide());
+                        if (WorldTools.chunkLoaded(getWorld(), routerPos)) {
+                            TileEntity te = getWorld().getTileEntity(routerPos);
+                            if (te instanceof TileEntityRouter) {
+                                TileEntityRouter router = (TileEntityRouter) te;
+                                router.addRoutedConnectors(cachedRoutedConnectors[channel], channels[channel].getChannelName());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return cachedRoutedConnectors[channel];
     }
 
     @Override
@@ -329,6 +362,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     private void removeChannel(int channel) {
         channels[channel] = null;
         cachedConnectors[channel] = null;
+        cachedRoutedConnectors[channel] = null;
         markDirtyQuick();
     }
 
