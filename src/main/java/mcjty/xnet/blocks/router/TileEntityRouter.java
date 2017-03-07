@@ -51,7 +51,6 @@ public final class TileEntityRouter extends GenericTileEntity {
     @Nonnull
     private List<ControllerChannelClientInfo> findChannelInfo() {
         List<ControllerChannelClientInfo> list = new ArrayList<>();
-        WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
         LogicTools.connectors(getWorld(), getPos())
                 .map(connectorPos -> LogicTools.getControllerForConnector(getWorld(), connectorPos))
                 .forEach(controller -> {
@@ -72,7 +71,7 @@ public final class TileEntityRouter extends GenericTileEntity {
         WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
         return LogicTools.advancedConnectors(getWorld(), getPos())
                 .findFirst()
-                .map(connectorPos -> worldBlob.getNetworkAt(connectorPos))
+                .map(worldBlob::getNetworkAt)
                 .orElse(null);
     }
 
@@ -81,21 +80,16 @@ public final class TileEntityRouter extends GenericTileEntity {
         if (networkId != null) {
             LogicTools.consumers(getWorld(), networkId)
                     .filter(consumerPos -> WorldTools.chunkLoaded(getWorld(), consumerPos))
-                    .forEach(consumerPos -> {
-                        LogicTools.routers(getWorld(), consumerPos)
-                                .filter(r -> r != this)
-                                .forEach(router -> {
-                                    router.addConnectorsFromConnectedNetworks(connectors, channelName);
-                                });
-                    });
+                    .forEach(consumerPos -> LogicTools.routers(getWorld(), consumerPos)
+                            .filter(r -> r != this)
+                            .forEach(router -> router.addConnectorsFromConnectedNetworks(connectors, channelName)));
         }
     }
 
     private void addConnectorsFromConnectedNetworks(Map<SidedConsumer, IConnectorSettings> connectors, String channelName) {
-        WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
         LogicTools.connectors(getWorld(), getPos())
-                .filter(blockPos -> WorldTools.chunkLoaded(getWorld(), blockPos))
-                .map(pos -> LogicTools.getControllerForConnector(getWorld(), pos))
+                .filter(connectorPos -> WorldTools.chunkLoaded(getWorld(), connectorPos))
+                .map(connectorPos -> LogicTools.getControllerForConnector(getWorld(), connectorPos))
                 .filter(Objects::nonNull)
                 .forEach(controller -> {
                     for (int i = 0; i < MAX_CHANNELS; i++) {

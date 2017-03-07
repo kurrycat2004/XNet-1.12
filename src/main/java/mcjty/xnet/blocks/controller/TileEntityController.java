@@ -182,7 +182,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             cachedRoutedConnectors[channel] = new HashMap<>();
 
             if (!channels[channel].getChannelName().isEmpty()) {
-                LogicTools.connectedBlocks(getWorld(), networkId, channels[channel].getConnectors().keySet())
+                LogicTools.connectedBlocks(getWorld(), networkId)
                         .filter(pos -> WorldTools.chunkLoaded(getWorld(), pos))
                         .forEach(routerPos -> {
                             TileEntity te = getWorld().getTileEntity(routerPos);
