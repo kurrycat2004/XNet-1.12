@@ -6,7 +6,7 @@ import mcjty.lib.network.PacketListFromServer;
 import mcjty.lib.varia.Logging;
 import mcjty.typed.Type;
 import mcjty.xnet.XNet;
-import mcjty.xnet.logic.ChannelClientInfo;
+import mcjty.xnet.clientinfo.ChannelClientInfo;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;

@@ -29,7 +29,7 @@ public interface IChannelSettings {
     void cleanCache();
 
     /**
-     * If this channel controls logic colors then this returns the latest colors status.
+     * If this channel controls clientinfo colors then this returns the latest colors status.
      */
     int getColors();
 

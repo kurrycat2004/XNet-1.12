@@ -72,6 +72,16 @@ public class WorldBlob {
         return blob.getNetworksForPosition(intPos);
     }
 
+    // @todo, there should be only one network all the time. Check this
+    @Nullable
+    public NetworkId getNetworkAt(@Nonnull BlockPos pos) {
+        Set<NetworkId> networks = getNetworksAt(pos);
+        if (networks == null || networks.isEmpty()) {
+            return null;
+        }
+        return networks.iterator().next();
+    }
+
     @Nullable
     public ConsumerId getConsumerAt(@Nonnull BlockPos pos) {
         ChunkBlob blob = getBlob(pos);

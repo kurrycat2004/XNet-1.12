@@ -1,6 +1,5 @@
 package mcjty.xnet.blocks.router;
 
-import mcjty.lib.base.StyleConfig;
 import mcjty.lib.container.EmptyContainer;
 import mcjty.lib.container.GenericGuiContainer;
 import mcjty.lib.gui.Window;
@@ -14,7 +13,7 @@ import mcjty.lib.varia.BlockPosTools;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.gui.GuiProxy;
-import mcjty.xnet.logic.ControllerChannelClientInfo;
+import mcjty.xnet.clientinfo.ControllerChannelClientInfo;
 import mcjty.xnet.network.PacketGetChannelsRouter;
 import mcjty.xnet.network.XNetMessages;
 import net.minecraft.util.ResourceLocation;

@@ -18,7 +18,7 @@ public class LogicChannelType implements IChannelType {
 
     @Override
     public String getID() {
-        return "xnet.logic";
+        return "xnet.clientinfo";
     }
 
     @Override

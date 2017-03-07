@@ -270,6 +270,13 @@ public class ItemChannelSettings implements IChannelSettings {
                     itemConsumers.add(Pair.of(entry.getKey(), con));
                 }
             }
+            connectors = context.getRoutedConnectors(channel);
+            for (Map.Entry<SidedConsumer, IConnectorSettings> entry : connectors.entrySet()) {
+                ItemConnectorSettings con = (ItemConnectorSettings) entry.getValue();
+                if (con.getItemMode() == ItemConnectorSettings.ItemMode.INS) {
+                    itemConsumers.add(Pair.of(entry.getKey(), con));
+                }
+            }
 
             itemConsumers.sort((o1, o2) -> o2.getRight().getPriority().compareTo(o1.getRight().getPriority()));
         }

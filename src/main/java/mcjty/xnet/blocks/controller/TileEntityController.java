@@ -18,8 +18,13 @@ import mcjty.xnet.blocks.cables.ConnectorTileEntity;
 import mcjty.xnet.blocks.cables.NetCableSetup;
 import mcjty.xnet.blocks.controller.gui.GuiController;
 import mcjty.xnet.blocks.router.TileEntityRouter;
+import mcjty.xnet.clientinfo.ChannelClientInfo;
+import mcjty.xnet.clientinfo.ConnectedBlockClientInfo;
+import mcjty.xnet.clientinfo.ConnectorClientInfo;
+import mcjty.xnet.clientinfo.ConnectorInfo;
 import mcjty.xnet.config.GeneralConfiguration;
-import mcjty.xnet.logic.*;
+import mcjty.xnet.logic.ChannelInfo;
+import mcjty.xnet.logic.LogicTools;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
 import net.minecraft.block.state.IBlockState;
@@ -177,22 +182,15 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             cachedRoutedConnectors[channel] = new HashMap<>();
 
             if (!channels[channel].getChannelName().isEmpty()) {
-                WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
-
-                for (Map.Entry<SidedConsumer, ConnectorInfo> entry : channels[channel].getConnectors().entrySet()) {
-                    ConsumerId consumer = entry.getKey().getConsumerId();
-                    BlockPos consumerPos = findConsumerPosition(worldBlob, consumer);
-                    if (consumerPos != null) {
-                        BlockPos routerPos = consumerPos.offset(entry.getKey().getSide());
-                        if (WorldTools.chunkLoaded(getWorld(), routerPos)) {
+                LogicTools.connectedBlocks(getWorld(), networkId, channels[channel].getConnectors().keySet())
+                        .filter(pos -> WorldTools.chunkLoaded(getWorld(), pos))
+                        .forEach(routerPos -> {
                             TileEntity te = getWorld().getTileEntity(routerPos);
                             if (te instanceof TileEntityRouter) {
                                 TileEntityRouter router = (TileEntityRouter) te;
                                 router.addRoutedConnectors(cachedRoutedConnectors[channel], channels[channel].getChannelName());
                             }
-                        }
-                    }
-                }
+                        });
             }
         }
         return cachedRoutedConnectors[channel];

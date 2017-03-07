@@ -1,4 +1,4 @@
-package mcjty.xnet.logic;
+package mcjty.xnet.clientinfo;
 
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.api.channels.IConnectorSettings;

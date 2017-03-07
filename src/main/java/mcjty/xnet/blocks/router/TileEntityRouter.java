@@ -7,23 +7,12 @@ import mcjty.typed.Type;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.keys.NetworkId;
 import mcjty.xnet.api.keys.SidedConsumer;
-import mcjty.xnet.api.keys.SidedPos;
-import mcjty.xnet.blocks.cables.ConnectorBlock;
-import mcjty.xnet.blocks.controller.TileEntityController;
-import mcjty.xnet.blocks.generic.CableColor;
-import mcjty.xnet.blocks.generic.GenericCableBlock;
+import mcjty.xnet.clientinfo.ControllerChannelClientInfo;
 import mcjty.xnet.logic.ChannelInfo;
-import mcjty.xnet.logic.ConnectedBlockClientInfo;
-import mcjty.xnet.logic.ControllerChannelClientInfo;
+import mcjty.xnet.logic.LogicTools;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -63,74 +52,60 @@ public final class TileEntityRouter extends GenericTileEntity {
     private List<ControllerChannelClientInfo> findChannelInfo() {
         List<ControllerChannelClientInfo> list = new ArrayList<>();
         WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
-        for (EnumFacing facing : EnumFacing.VALUES) {
-            IBlockState state = getWorld().getBlockState(getPos().offset(facing));
-            Block block = state.getBlock();
-            if (block instanceof ConnectorBlock && state.getValue(GenericCableBlock.COLOR) != CableColor.ADVANCED) {
-                Set<NetworkId> networks = worldBlob.getNetworksAt(getPos().offset(facing));
-                // @todo we only support one network!
-                if (!networks.isEmpty()) {
-                    NetworkId networkId = networks.iterator().next();
-                    BlockPos controllerPos = worldBlob.findController(networkId);
-                    if (controllerPos != null) {
-                        TileEntity te = getWorld().getTileEntity(controllerPos);
-                        if (te instanceof TileEntityController) {
-                            TileEntityController controller = (TileEntityController) te;
-                            for (int i = 0 ; i < MAX_CHANNELS ; i++) {
-                                ChannelInfo channelInfo = controller.getChannels()[i];
-                                if (channelInfo != null && !channelInfo.getChannelName().isEmpty()) {
-                                    ControllerChannelClientInfo ci = new ControllerChannelClientInfo(channelInfo.getChannelName(), controllerPos, channelInfo.getType(), i);
-                                    list.add(ci);
-                                }
-                            }
+        LogicTools.connectors(getWorld(), getPos())
+                .map(connectorPos -> LogicTools.getControllerForConnector(getWorld(), connectorPos))
+                .forEach(controller -> {
+                    for (int i = 0; i < MAX_CHANNELS; i++) {
+                        ChannelInfo channelInfo = controller.getChannels()[i];
+                        if (channelInfo != null && !channelInfo.getChannelName().isEmpty()) {
+                            ControllerChannelClientInfo ci = new ControllerChannelClientInfo(channelInfo.getChannelName(), controller.getPos(), channelInfo.getType(), i);
+                            list.add(ci);
                         }
                     }
-                }
-            }
-        }
+                });
 
-
-        // @todo
         return list;
     }
 
     @Nullable
     private NetworkId findAdvancedNetwork() {
-        for (EnumFacing facing : EnumFacing.VALUES) {
-            IBlockState state = getWorld().getBlockState(getPos().offset(facing));
-            Block block = state.getBlock();
-            if (block instanceof ConnectorBlock && state.getValue(GenericCableBlock.COLOR) == CableColor.ADVANCED) {
-                WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
-                Set<NetworkId> networks = worldBlob.getNetworksAt(getPos().offset(facing));
-                // @todo we only support one network!
-                if (!networks.isEmpty()) {
-                    return networks.iterator().next();
-                }
-            }
-        }
-        return null;
+        WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
+        return LogicTools.advancedConnectors(getWorld(), getPos())
+                .findFirst()
+                .map(connectorPos -> worldBlob.getNetworkAt(connectorPos))
+                .orElse(null);
     }
 
     public void addRoutedConnectors(Map<SidedConsumer, IConnectorSettings> connectors, String channelName) {
         NetworkId networkId = findAdvancedNetwork();
-        WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
-        for (BlockPos consumerPos : worldBlob.getConsumers(networkId)) {
-            if (WorldTools.chunkLoaded(getWorld(), consumerPos)) {
-                for (EnumFacing facing : EnumFacing.VALUES) {
-                    BlockPos pos = consumerPos.offset(facing);
-                    TileEntity te = getWorld().getTileEntity(pos);
-                    if (te instanceof TileEntityRouter) {
-                        TileEntityRouter router = (TileEntityRouter) te;
-
-                        // @todo
-
-                    }
-                }
-            }
+        if (networkId != null) {
+            LogicTools.consumers(getWorld(), networkId)
+                    .filter(consumerPos -> WorldTools.chunkLoaded(getWorld(), consumerPos))
+                    .forEach(consumerPos -> {
+                        LogicTools.routers(getWorld(), consumerPos)
+                                .filter(r -> r != this)
+                                .forEach(router -> {
+                                    router.addConnectorsFromConnectedNetworks(connectors, channelName);
+                                });
+                    });
         }
-
     }
 
+    private void addConnectorsFromConnectedNetworks(Map<SidedConsumer, IConnectorSettings> connectors, String channelName) {
+        WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
+        LogicTools.connectors(getWorld(), getPos())
+                .filter(blockPos -> WorldTools.chunkLoaded(getWorld(), blockPos))
+                .map(pos -> LogicTools.getControllerForConnector(getWorld(), pos))
+                .filter(Objects::nonNull)
+                .forEach(controller -> {
+                    for (int i = 0; i < MAX_CHANNELS; i++) {
+                        ChannelInfo info = controller.getChannels()[i];
+                        if (channelName.equals(info.getChannelName())) {
+                            connectors.putAll(controller.getConnectors(i));
+                        }
+                    }
+                });
+    }
 
     @Nonnull
     @Override

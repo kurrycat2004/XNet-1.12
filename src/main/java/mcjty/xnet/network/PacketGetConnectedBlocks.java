@@ -5,7 +5,7 @@ import mcjty.lib.network.PacketRequestListFromServer;
 import mcjty.typed.Type;
 import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.controller.TileEntityController;
-import mcjty.xnet.logic.ConnectedBlockClientInfo;
+import mcjty.xnet.clientinfo.ConnectedBlockClientInfo;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.FMLCommonHandler;

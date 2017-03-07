@@ -1,4 +1,4 @@
-package mcjty.xnet.logic;
+package mcjty.xnet.clientinfo;
 
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.network.NetworkTools;

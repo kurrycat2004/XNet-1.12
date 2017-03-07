@@ -5,6 +5,7 @@ import mcjty.xnet.api.channels.IChannelSettings;
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.api.keys.ConsumerId;
+import mcjty.xnet.clientinfo.ConnectorInfo;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;

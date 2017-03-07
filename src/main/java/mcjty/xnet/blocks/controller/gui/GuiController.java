@@ -22,7 +22,7 @@ import mcjty.xnet.api.keys.SidedPos;
 import mcjty.xnet.blocks.controller.ControllerContainer;
 import mcjty.xnet.blocks.controller.TileEntityController;
 import mcjty.xnet.gui.GuiProxy;
-import mcjty.xnet.logic.*;
+import mcjty.xnet.clientinfo.*;
 import mcjty.xnet.network.PacketGetChannels;
 import mcjty.xnet.network.PacketGetConnectedBlocks;
 import mcjty.xnet.network.XNetMessages;
