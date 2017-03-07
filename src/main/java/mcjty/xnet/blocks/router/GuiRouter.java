@@ -106,8 +106,6 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
             IChannelType type = channel.getChannelType();
             int index = channel.getIndex();
 
-            int color = StyleConfig.colorTextInListNormal;
-
             Panel panel = new Panel(mc, this).setLayout(new HorizontalLayout().setHorizontalMargin(0).setSpacing(0));
             panel.addChild(new Label<>(mc, this).setText(name + " (" + BlockPosTools.toString(controllerPos) + "): " + index + " (" +
                 type.getName() + ")"));

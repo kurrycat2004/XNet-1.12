@@ -30,31 +30,16 @@ import java.util.Map;
 
 public class EnergyChannelSettings implements IChannelSettings {
 
-    public static final String TAG_MODE = "mode";
-
-    enum ChannelMode {
-        PRIORITY,
-        DISTRIBUTE
-    }
-
-    private ChannelMode channelMode = ChannelMode.DISTRIBUTE;
-
     // Cache data
     private List<Pair<SidedConsumer, EnergyConnectorSettings>> energyExtractors = null;
     private List<Pair<SidedConsumer, EnergyConnectorSettings>> energyConsumers = null;
 
-    public ChannelMode getChannelMode() {
-        return channelMode;
-    }
-
     @Override
     public void readFromNBT(NBTTagCompound tag) {
-        channelMode = ChannelMode.values()[tag.getByte("mode")];
     }
 
     @Override
     public void writeToNBT(NBTTagCompound tag) {
-        tag.setByte("mode", (byte) channelMode.ordinal());
     }
 
     @Override
@@ -263,11 +248,9 @@ public class EnergyChannelSettings implements IChannelSettings {
 
     @Override
     public void createGui(IEditorGui gui) {
-        gui.nl().choices(TAG_MODE, "Energy distribution mode", channelMode, ChannelMode.values());
     }
 
     @Override
     public void update(Map<String, Object> data) {
-        channelMode = ChannelMode.valueOf(((String)data.get(TAG_MODE)).toUpperCase());
     }
 }
