@@ -7,7 +7,6 @@ import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.blocks.controller.TileEntityController;
 import mcjty.xnet.blocks.router.TileEntityRouter;
-import mcjty.xnet.multiblock.BlobId;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
 import net.minecraft.tileentity.TileEntity;
@@ -32,7 +31,7 @@ public class LogicTools {
         if (networkId == null) {
             return null;
         }
-        BlockPos controllerPos = worldBlob.findController(networkId);
+        BlockPos controllerPos = worldBlob.getProviderPosition(networkId);
         if (!WorldTools.chunkLoaded(world, connectorPos)) {
             return null;
         }

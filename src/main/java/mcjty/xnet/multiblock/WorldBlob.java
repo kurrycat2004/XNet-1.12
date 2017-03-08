@@ -31,6 +31,11 @@ public class WorldBlob {
     // and do the needed updates
     private final Map<NetworkId, VersionNumber> networkVersions = new HashMap<>();
 
+    // Transient map containing all consumers and their position
+    private final Map<ConsumerId, BlockPos> consumerPositions = new HashMap<>();
+
+    // Transient map containing all providers and their position
+    private final Map<NetworkId, BlockPos> providerPositions = new HashMap<>();
 
     public WorldBlob(int dimId) {
         this.dimId = dimId;
@@ -102,17 +107,21 @@ public class WorldBlob {
         return blob.getColorIdForPosition(intPos);
     }
 
-    // Find the position of the controller for a network. This is not very efficient
-    // code. Don't use this at critical places
+    // Find the position of the network provider
     @Nullable
-    public BlockPos findController(@Nonnull NetworkId networkId) {
-        for (ChunkBlob blob : chunkBlobMap.values()) {
-            IntPos pos = blob.getPositionforNetwork(networkId);
-            if (pos != null) {
-                return blob.getPosition(pos);
+    public BlockPos getProviderPosition(@Nonnull NetworkId networkId) {
+        if (!providerPositions.containsKey(networkId)) {
+            // @todo avoid scanning all blobs?
+            providerPositions.put(networkId, null);
+            for (ChunkBlob blob : chunkBlobMap.values()) {
+                IntPos intPos = blob.getProviderPosition(networkId);
+                if (intPos != null) {
+                    providerPositions.put(networkId, blob.getPosition(intPos));
+                    break;
+                }
             }
         }
-        return null;
+        return providerPositions.get(networkId);
     }
 
     @Nonnull
@@ -155,10 +164,27 @@ public class WorldBlob {
         }
     }
 
+    @Nullable
+    public BlockPos getConsumerPosition(@Nonnull ConsumerId consumer) {
+        if (!consumerPositions.containsKey(consumer)) {
+            // @todo avoid scanning all blobs?
+            consumerPositions.put(consumer, null);
+            for (ChunkBlob blob : chunkBlobMap.values()) {
+                IntPos intPos = blob.getConsumerPosition(consumer);
+                if (intPos != null) {
+                    consumerPositions.put(consumer, blob.getPosition(intPos));
+                    break;
+                }
+            }
+        }
+        return consumerPositions.get(consumer);
+    }
+
     /**
      * Create a cable segment that is also a network provider at this section
      */
     public void createNetworkProvider(BlockPos pos, ColorId color, NetworkId network) {
+        providerPositions.remove(network);
         ChunkBlob blob = getOrCreateBlob(pos);
         blob.createNetworkProvider(pos, color, network);
         recalculateNetwork(blob);
@@ -171,6 +197,7 @@ public class WorldBlob {
         ChunkBlob blob = getOrCreateBlob(pos);
         blob.createNetworkConsumer(pos, color, consumer);
         recalculateNetwork(blob);
+        consumerPositions.remove(consumer);
     }
 
     /**
@@ -206,6 +233,14 @@ public class WorldBlob {
     }
 
     public void removeCableSegment(BlockPos pos) {
+        ConsumerId consumerId = getConsumerAt(pos);
+        if (consumerId != null) {
+            consumerPositions.remove(consumerId);
+        }
+        NetworkId providerId = getNetworkAt(pos);
+        if (providerId != null) {
+            providerPositions.remove(providerId);
+        }
         ChunkBlob blob = getOrCreateBlob(pos);
         blob.removeCableSegment(pos);
         recalculateNetwork();

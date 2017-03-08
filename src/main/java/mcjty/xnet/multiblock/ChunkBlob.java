@@ -37,6 +37,7 @@ public class ChunkBlob {
 
     // These positions represent consumers
     private final Map<IntPos, ConsumerId> networkConsumers = new HashMap<>();
+    private final Map<ConsumerId, IntPos> consumerPositions = new HashMap<>();
 
     // Blob id are mapped to colors
     private final Map<BlobId, ColorId> blobColors = new HashMap<>();
@@ -71,7 +72,7 @@ public class ChunkBlob {
     }
 
     @Nullable
-    public IntPos getPositionforNetwork(@Nonnull NetworkId networkId) {
+    public IntPos getProviderPosition(@Nonnull NetworkId networkId) {
         if (cachedProviders == null) {
             cachedProviders = new HashMap<>();
             for (Map.Entry<IntPos, NetworkId> entry : networkProviders.entrySet()) {
@@ -203,9 +204,14 @@ public class ChunkBlob {
         return networkConsumers;
     }
 
+    public IntPos getConsumerPosition(ConsumerId consumerId) {
+        return consumerPositions.get(consumerId);
+    }
+
     public boolean createNetworkConsumer(BlockPos pos, ColorId color, ConsumerId consumer) {
         IntPos posId = new IntPos(pos);
         networkConsumers.put(posId, consumer);
+        consumerPositions.put(consumer, posId);
         boolean changed = createCableSegment(pos, color);
 //        getMappings(blobAllocations.get(posId)).add(networkId);
         return changed;
@@ -300,7 +306,11 @@ public class ChunkBlob {
             System.out.println("There is no cablesegment at " + BlockPosTools.toString(pos) + "!");
             return getBorderPositions().contains(posId);
         }
-        networkConsumers.remove(posId);
+
+        if (networkConsumers.containsKey(posId)) {
+            consumerPositions.remove(networkConsumers.get(posId));
+            networkConsumers.remove(posId);
+        }
         cachedConsumers = null;
         networkProviders.remove(posId);
         cachedProviders = null;
@@ -454,7 +464,10 @@ public class ChunkBlob {
             int[] consumers = compound.getIntArray("consumers");
             int idx = 0;
             while (idx < consumers.length-1) {
-                networkConsumers.put(new IntPos(consumers[idx]), new ConsumerId(consumers[idx+1]));
+                IntPos intPos = new IntPos(consumers[idx]);
+                ConsumerId consumerId = new ConsumerId(consumers[idx + 1]);
+                networkConsumers.put(intPos, consumerId);
+                consumerPositions.put(consumerId, intPos);
                 idx += 2;
             }
         }
