@@ -24,6 +24,8 @@ public final class TileEntityRouter extends GenericTileEntity {
 
     public static final String CMD_GETCHANNELS = "getChannelInfo";
     public static final String CLIENTCMD_CHANNELSREADY = "channelsReady";
+    public static final String CMD_GETREMOTECHANNELS = "getRemoteChannelInfo";
+    public static final String CLIENTCMD_CHANNELSREMOTEREADY = "channelsRemoteReady";
 
     public TileEntityRouter() {
     }
@@ -63,6 +65,19 @@ public final class TileEntityRouter extends GenericTileEntity {
                     }
                 });
 
+        return list;
+    }
+
+    @Nonnull
+    private List<ControllerChannelClientInfo> findRemoteChannelInfo() {
+        List<ControllerChannelClientInfo> list = new ArrayList<>();
+        NetworkId networkId = findAdvancedNetwork();
+        if (networkId != null) {
+            LogicTools.consumers(getWorld(), networkId)
+                    .forEach(consumerPos -> LogicTools.routers(getWorld(), consumerPos)
+                            .filter(r -> r != this)
+                            .forEach(router -> list.addAll(router.findChannelInfo())));
+        }
         return list;
     }
 
@@ -110,6 +125,8 @@ public final class TileEntityRouter extends GenericTileEntity {
         }
         if (CMD_GETCHANNELS.equals(command)) {
             return type.convert(findChannelInfo());
+        } else if (CMD_GETREMOTECHANNELS.equals(command)) {
+            return type.convert(findRemoteChannelInfo());
         }
         return Collections.emptyList();
     }
@@ -121,7 +138,10 @@ public final class TileEntityRouter extends GenericTileEntity {
             return true;
         }
         if (CLIENTCMD_CHANNELSREADY.equals(command)) {
-            GuiRouter.fromServer_channels = new ArrayList<>(Type.create(ControllerChannelClientInfo.class).convert(list));
+            GuiRouter.fromServer_localChannels = new ArrayList<>(Type.create(ControllerChannelClientInfo.class).convert(list));
+            return true;
+        } else if (CLIENTCMD_CHANNELSREMOTEREADY.equals(command)) {
+            GuiRouter.fromServer_remoteChannels = new ArrayList<>(Type.create(ControllerChannelClientInfo.class).convert(list));
             return true;
         }
         return false;

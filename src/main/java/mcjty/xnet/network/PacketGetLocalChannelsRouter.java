@@ -15,28 +15,28 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import java.util.List;
 
-public class PacketGetChannelsRouter extends PacketRequestListFromServer<ControllerChannelClientInfo, PacketGetChannelsRouter, PacketChannelsRouterReady> {
+public class PacketGetLocalChannelsRouter extends PacketRequestListFromServer<ControllerChannelClientInfo, PacketGetLocalChannelsRouter, PacketLocalChannelsRouterReady> {
 
-    public PacketGetChannelsRouter() {
+    public PacketGetLocalChannelsRouter() {
 
     }
 
-    public PacketGetChannelsRouter(BlockPos pos) {
+    public PacketGetLocalChannelsRouter(BlockPos pos) {
         super(XNet.MODID, pos, TileEntityRouter.CMD_GETCHANNELS);
     }
 
-    public static class Handler implements IMessageHandler<PacketGetChannelsRouter, IMessage> {
+    public static class Handler implements IMessageHandler<PacketGetLocalChannelsRouter, IMessage> {
         @Override
-        public IMessage onMessage(PacketGetChannelsRouter message, MessageContext ctx) {
+        public IMessage onMessage(PacketGetLocalChannelsRouter message, MessageContext ctx) {
             FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
             return null;
         }
 
-        private void handle(PacketGetChannelsRouter message, MessageContext ctx) {
+        private void handle(PacketGetLocalChannelsRouter message, MessageContext ctx) {
             TileEntity te = ctx.getServerHandler().player.getEntityWorld().getTileEntity(message.pos);
             CommandHandler commandHandler = (CommandHandler) te;
             List<ControllerChannelClientInfo> list = commandHandler.executeWithResultList(message.command, message.args, Type.create(ControllerChannelClientInfo.class));
-            XNetMessages.INSTANCE.sendTo(new PacketChannelsRouterReady(message.pos, TileEntityRouter.CLIENTCMD_CHANNELSREADY, list), ctx.getServerHandler().player);
+            XNetMessages.INSTANCE.sendTo(new PacketLocalChannelsRouterReady(message.pos, TileEntityRouter.CLIENTCMD_CHANNELSREADY, list), ctx.getServerHandler().player);
         }
     }
 

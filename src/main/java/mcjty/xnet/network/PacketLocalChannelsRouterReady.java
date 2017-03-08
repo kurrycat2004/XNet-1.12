@@ -15,12 +15,12 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import java.util.List;
 
-public class PacketChannelsRouterReady extends PacketListFromServer<PacketChannelsRouterReady, ControllerChannelClientInfo> {
+public class PacketLocalChannelsRouterReady extends PacketListFromServer<PacketLocalChannelsRouterReady, ControllerChannelClientInfo> {
 
-    public PacketChannelsRouterReady() {
+    public PacketLocalChannelsRouterReady() {
     }
 
-    public PacketChannelsRouterReady(BlockPos pos, String command, List<ControllerChannelClientInfo> list) {
+    public PacketLocalChannelsRouterReady(BlockPos pos, String command, List<ControllerChannelClientInfo> list) {
         super(pos, command, list);
     }
 
@@ -43,14 +43,14 @@ public class PacketChannelsRouterReady extends PacketListFromServer<PacketChanne
         }
     }
 
-    public static class Handler implements IMessageHandler<PacketChannelsRouterReady, IMessage> {
+    public static class Handler implements IMessageHandler<PacketLocalChannelsRouterReady, IMessage> {
         @Override
-        public IMessage onMessage(PacketChannelsRouterReady message, MessageContext ctx) {
+        public IMessage onMessage(PacketLocalChannelsRouterReady message, MessageContext ctx) {
             XNet.proxy.addScheduledTaskClient(() -> handle(message, ctx));
             return null;
         }
 
-        private void handle(PacketChannelsRouterReady message, MessageContext ctx) {
+        private void handle(PacketLocalChannelsRouterReady message, MessageContext ctx) {
             TileEntity te = XNet.proxy.getClientWorld().getTileEntity(message.pos);
             ClientCommandHandler clientCommandHandler = (ClientCommandHandler) te;
             if (!clientCommandHandler.execute(message.command, message.list, Type.create(ControllerChannelClientInfo.class))) {
