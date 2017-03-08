@@ -10,6 +10,7 @@ import mcjty.xnet.api.keys.NetworkId;
 import mcjty.xnet.blocks.generic.CableColor;
 import mcjty.xnet.blocks.generic.GenericXNetBlock;
 import mcjty.xnet.gui.GuiProxy;
+import mcjty.xnet.multiblock.BlobId;
 import mcjty.xnet.multiblock.ColorId;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
@@ -53,6 +54,17 @@ public class RouterBlock extends GenericXNetBlock<TileEntityRouter, EmptyContain
                 probeInfo.text(TextStyleClass.LABEL + "Network: " + TextStyleClass.INFO + networkId.getId());
             }
         }
+
+        if (mode == ProbeMode.EXTENDED) {
+            BlobId blobId = worldBlob.getBlobAt(data.getPos());
+            if (blobId != null) {
+                probeInfo.text(TextStyleClass.LABEL + "Blob: " + TextStyleClass.INFO + blobId.getId());
+            }
+            ColorId colorId = worldBlob.getColorAt(data.getPos());
+            if (colorId != null) {
+                probeInfo.text(TextStyleClass.LABEL + "Color: " + TextStyleClass.INFO + colorId.getId());
+            }
+        }
     }
 
 
@@ -64,7 +76,7 @@ public class RouterBlock extends GenericXNetBlock<TileEntityRouter, EmptyContain
             XNetBlobData blobData = XNetBlobData.getBlobData(world);
             WorldBlob worldBlob = blobData.getWorldBlob(world);
             NetworkId networkId = worldBlob.newNetwork();
-            worldBlob.createNetworkProvider(pos, new ColorId(CableColor.ADVANCED.ordinal()), networkId);
+            worldBlob.createNetworkProvider(pos, new ColorId(CableColor.ADVANCED.ordinal()+1), networkId);
             blobData.save(world);
         }
     }

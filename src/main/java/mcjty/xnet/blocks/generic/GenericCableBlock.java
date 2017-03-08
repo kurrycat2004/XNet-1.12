@@ -203,6 +203,10 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
             if (blobId != null) {
                 probeInfo.text(TextStyleClass.LABEL + "Blob: " + TextStyleClass.INFO + blobId.getId());
             }
+            ColorId colorId = worldBlob.getColorAt(data.getPos());
+            if (colorId != null) {
+                probeInfo.text(TextStyleClass.LABEL + "Color: " + TextStyleClass.INFO + colorId.getId());
+            }
         }
 
         Set<NetworkId> networks = worldBlob.getNetworksAt(data.getPos());

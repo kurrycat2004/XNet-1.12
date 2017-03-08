@@ -259,6 +259,14 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
     @Nullable
     private BlockPos findConsumerPosition(@Nonnull WorldBlob worldBlob, @Nonnull ConsumerId consumerId) {
+
+
+
+        // @todo new method to find consumer without network
+
+
+
+
         Set<BlockPos> consumers = worldBlob.getConsumers(networkId);
         for (BlockPos pos : consumers) {
             ConsumerId c = worldBlob.getConsumerAt(pos);

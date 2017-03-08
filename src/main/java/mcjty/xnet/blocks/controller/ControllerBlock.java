@@ -10,6 +10,7 @@ import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.blocks.controller.gui.GuiController;
 import mcjty.xnet.blocks.generic.GenericXNetBlock;
 import mcjty.xnet.gui.GuiProxy;
+import mcjty.xnet.multiblock.BlobId;
 import mcjty.xnet.multiblock.ColorId;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
@@ -117,12 +118,25 @@ public class ControllerBlock extends GenericXNetBlock<TileEntityController, Cont
     @Override
     public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data) {
         super.addProbeInfo(mode, probeInfo, player, world, blockState, data);
+
         TileEntity te = world.getTileEntity(data.getPos());
         if (te instanceof TileEntityController) {
             TileEntityController controller = (TileEntityController) te;
             NetworkId networkId = controller.getNetworkId();
             if (networkId != null) {
                 probeInfo.text(TextStyleClass.LABEL + "Network: " + TextStyleClass.INFO + networkId.getId());
+            }
+        }
+
+        WorldBlob worldBlob = XNetBlobData.getBlobData(world).getWorldBlob(world);
+        if (mode == ProbeMode.EXTENDED) {
+            BlobId blobId = worldBlob.getBlobAt(data.getPos());
+            if (blobId != null) {
+                probeInfo.text(TextStyleClass.LABEL + "Blob: " + TextStyleClass.INFO + blobId.getId());
+            }
+            ColorId colorId = worldBlob.getColorAt(data.getPos());
+            if (colorId != null) {
+                probeInfo.text(TextStyleClass.LABEL + "Color: " + TextStyleClass.INFO + colorId.getId());
             }
         }
     }

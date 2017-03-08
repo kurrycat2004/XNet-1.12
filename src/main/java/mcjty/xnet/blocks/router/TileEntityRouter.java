@@ -94,7 +94,7 @@ public final class TileEntityRouter extends GenericTileEntity {
                 .forEach(controller -> {
                     for (int i = 0; i < MAX_CHANNELS; i++) {
                         ChannelInfo info = controller.getChannels()[i];
-                        if (channelName.equals(info.getChannelName())) {
+                        if (info != null && channelName.equals(info.getChannelName())) {
                             connectors.putAll(controller.getConnectors(i));
                         }
                     }
