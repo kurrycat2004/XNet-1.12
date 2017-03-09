@@ -2,7 +2,6 @@ package mcjty.xnet.blocks.router;
 
 import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.network.Argument;
-import mcjty.lib.varia.WorldTools;
 import mcjty.typed.Type;
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.api.channels.IConnectorSettings;
@@ -14,8 +13,6 @@ import mcjty.xnet.logic.LogicTools;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ITickable;
-import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -23,7 +20,7 @@ import java.util.*;
 
 import static mcjty.xnet.logic.ChannelInfo.MAX_CHANNELS;
 
-public final class TileEntityRouter extends GenericTileEntity implements ITickable {
+public final class TileEntityRouter extends GenericTileEntity {
 
     public static final String CMD_GETCHANNELS = "getChannelInfo";
     public static final String CLIENTCMD_CHANNELSREADY = "channelsReady";
@@ -31,36 +28,6 @@ public final class TileEntityRouter extends GenericTileEntity implements ITickab
     public static final String CLIENTCMD_CHANNELSREMOTEREADY = "channelsRemoteReady";
 
     public TileEntityRouter() {
-    }
-
-    private final Map<NetworkId, Integer> networkVersions = new HashMap<>();
-
-    @Override
-    public void update() {
-        if (!getWorld().isRemote) {
-            // Here we check if the relevant networks are dirty
-            WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
-            Set<NetworkId> networks = worldBlob.getNetworksAt(getPos());
-            for (NetworkId network : networks) {
-                int version = worldBlob.getNetworkVersion(network);
-                if ((!networkVersions.containsKey(network)) || networkVersions.get(network) != version) {
-                    // Needs an update.
-                    // Update all local networks attached to this
-                    LogicTools.connectors(getWorld(), getPos())
-                            .forEach(connectorPos -> {
-                                BlockPos controllerPos = LogicTools.getControllerPosForConnector(getWorld(), connectorPos);
-                                if (controllerPos != null) {
-                                    NetworkId localNet = worldBlob.getNetworkAt(connectorPos);
-                                    if (localNet != null) {
-                                        worldBlob.incNetworkVersion(localNet);
-                                    }
-                                }
-                            });
-
-                    networkVersions.put(network, version);
-                }
-            }
-        }
     }
 
     @Override

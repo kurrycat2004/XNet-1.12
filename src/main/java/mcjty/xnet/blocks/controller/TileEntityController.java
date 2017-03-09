@@ -3,7 +3,6 @@ package mcjty.xnet.blocks.controller;
 import mcjty.lib.entity.GenericEnergyReceiverTileEntity;
 import mcjty.lib.network.Argument;
 import mcjty.lib.varia.BlockPosTools;
-import mcjty.lib.varia.WorldTools;
 import mcjty.typed.Type;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelType;
@@ -25,6 +24,7 @@ import mcjty.xnet.clientinfo.ConnectorInfo;
 import mcjty.xnet.config.GeneralConfiguration;
 import mcjty.xnet.logic.ChannelInfo;
 import mcjty.xnet.logic.LogicTools;
+import mcjty.xnet.multiblock.NetworkChecker;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
 import net.minecraft.block.state.IBlockState;
@@ -66,13 +66,39 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     // Cached/transient data
     private Map<SidedConsumer, IConnectorSettings> cachedConnectors[] = new Map[MAX_CHANNELS];
     private Map<SidedConsumer, IConnectorSettings> cachedRoutedConnectors[] = new Map[MAX_CHANNELS];
-    private int networkVersion = -1;
+
+    private NetworkChecker networkChecker = null;
+
 
     public TileEntityController() {
         super(100000, 1000); // @todo configurable
         for (int i = 0; i < MAX_CHANNELS; i++) {
             channels[i] = null;
         }
+    }
+
+    @Nonnull
+    private NetworkChecker getNetworkChecker() {
+        if (networkChecker == null) {
+            networkChecker = new NetworkChecker();
+            networkChecker.add(networkId);
+            WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
+            LogicTools.connectedBlocks(getWorld(), networkId)
+                    .forEach(routerPos -> {
+                        TileEntity te = getWorld().getTileEntity(routerPos);
+                        if (te instanceof TileEntityRouter) {
+                            networkChecker.add(worldBlob.getNetworksAt(routerPos));
+                            LogicTools.connectors(getWorld(), routerPos)
+                                    .forEach(connectorPos -> {
+                                        networkChecker.add(worldBlob.getNetworkAt(connectorPos));
+                                    });
+                        }
+                    });
+
+            System.out.println("TileEntityController.getNetworkChecker");
+            networkChecker.dump();
+        }
+        return networkChecker;
     }
 
     @Override
@@ -95,10 +121,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     }
 
     private void checkNetwork() {
-        WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
-        int netversion = worldBlob.getNetworkVersion(networkId);
-        if (netversion != this.networkVersion) {
-            networkVersion = netversion;
+        if (networkId != null && getNetworkChecker().isDirtyAndMarkClean(XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld()))) {
             for (int i = 0 ; i < MAX_CHANNELS ; i++) {
                 if (channels[i] != null) {
                     cleanCache(i);
@@ -153,6 +176,12 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             markDirtyQuick();
         }
         return true;
+    }
+
+    private void networkDirty() {
+        if (networkId != null) {
+            XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld()).incNetworkVersion(networkId);
+        }
     }
 
     private void cleanCache(int channel) {
@@ -344,7 +373,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         String name = (String) data.get(GuiController.TAG_NAME);
         channels[channel].setChannelName(name);
 
-        cleanCache(channel);
+        networkDirty();
         markDirtyQuick();
     }
 
@@ -358,7 +387,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     private void createChannel(int channel, String typeId) {
         IChannelType type = XNet.xNetApi.findType(typeId);
         channels[channel] = new ChannelInfo(type);
-        cleanCache(channel);
+        networkDirty();
         markDirtyQuick();
     }
 
@@ -373,7 +402,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                     data.put(e.getKey(), e.getValue().getValue());
                 }
                 channels[channel].getConnectors().get(key).getConnectorSettings().update(data);
-                cleanCache(channel);
+                networkDirty();
                 markDirtyQuick();
                 return;
             }
@@ -393,7 +422,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         }
         if (toremove != null) {
             channels[channel].getConnectors().remove(toremove);
-            cleanCache(channel);
+            networkDirty();
             markDirtyQuick();
         }
     }
@@ -408,7 +437,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         SidedConsumer id = new SidedConsumer(consumerId, pos.getSide().getOpposite());
         boolean advanced = getWorld().getBlockState(consumerPos).getBlock() == NetCableSetup.advancedConnectorBlock;
         channels[channel].createConnector(id, advanced);
-        cleanCache(channel);
+        networkDirty();
         markDirtyQuick();
     }
 
