@@ -9,14 +9,15 @@ import net.minecraft.util.math.BlockPos;
 import javax.annotation.Nonnull;
 
 public class ControllerChannelClientInfo {
-    // Position of the controller
     @Nonnull private final String channelName;
+    @Nonnull private final String publishedName;
     @Nonnull private final BlockPos pos;
     @Nonnull private final IChannelType channelType;
     private final int index;        // Index of the channel within that controller (0 through 7)
 
-    public ControllerChannelClientInfo(@Nonnull String channelName, @Nonnull BlockPos pos, @Nonnull IChannelType channelType, int index) {
+    public ControllerChannelClientInfo(@Nonnull String channelName, @Nonnull String publishedName, @Nonnull BlockPos pos, @Nonnull IChannelType channelType, int index) {
         this.channelName = channelName;
+        this.publishedName = publishedName;
         this.pos = pos;
         this.channelType = channelType;
         this.index = index;
@@ -24,6 +25,7 @@ public class ControllerChannelClientInfo {
 
     public ControllerChannelClientInfo(@Nonnull ByteBuf buf) {
         channelName = NetworkTools.readStringUTF8(buf);
+        publishedName = NetworkTools.readStringUTF8(buf);
         String id = NetworkTools.readString(buf);
         IChannelType t = XNet.xNetApi.findType(id);
         if (t == null) {
@@ -36,6 +38,7 @@ public class ControllerChannelClientInfo {
 
     public void writeToNBT(@Nonnull ByteBuf buf) {
         NetworkTools.writeStringUTF8(buf, channelName);
+        NetworkTools.writeStringUTF8(buf, publishedName);
         NetworkTools.writeString(buf, channelType.getID());
         NetworkTools.writePos(buf, pos);
         buf.writeInt(index);
@@ -44,6 +47,11 @@ public class ControllerChannelClientInfo {
     @Nonnull
     public String getChannelName() {
         return channelName;
+    }
+
+    @Nonnull
+    public String getPublishedName() {
+        return publishedName;
     }
 
     @Nonnull

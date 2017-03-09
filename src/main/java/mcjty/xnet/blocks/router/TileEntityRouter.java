@@ -12,6 +12,7 @@ import mcjty.xnet.logic.ChannelInfo;
 import mcjty.xnet.logic.LogicTools;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nonnull;
@@ -22,10 +23,12 @@ import static mcjty.xnet.logic.ChannelInfo.MAX_CHANNELS;
 
 public final class TileEntityRouter extends GenericTileEntity {
 
+    public static final String CMD_UPDATENAME = "updateName";
     public static final String CMD_GETCHANNELS = "getChannelInfo";
     public static final String CLIENTCMD_CHANNELSREADY = "channelsReady";
     public static final String CMD_GETREMOTECHANNELS = "getRemoteChannelInfo";
     public static final String CLIENTCMD_CHANNELSREMOTEREADY = "channelsRemoteReady";
+
 
     public TileEntityRouter() {
     }
@@ -59,7 +62,7 @@ public final class TileEntityRouter extends GenericTileEntity {
                     for (int i = 0; i < MAX_CHANNELS; i++) {
                         ChannelInfo channelInfo = controller.getChannels()[i];
                         if (channelInfo != null && !channelInfo.getChannelName().isEmpty()) {
-                            ControllerChannelClientInfo ci = new ControllerChannelClientInfo(channelInfo.getChannelName(), controller.getPos(), channelInfo.getType(), i);
+                            ControllerChannelClientInfo ci = new ControllerChannelClientInfo(channelInfo.getChannelName(), channelInfo.getChannelName(), controller.getPos(), channelInfo.getType(), i);
                             list.add(ci);
                         }
                     }
@@ -112,6 +115,26 @@ public final class TileEntityRouter extends GenericTileEntity {
                         }
                     }
                 });
+    }
+
+    private void updatePublishName(int index, String name) {
+        // @todo
+    }
+
+    @Override
+    public boolean execute(EntityPlayerMP playerMP, String command, Map<String, Argument> args) {
+        boolean rc = super.execute(playerMP, command, args);
+        if (rc) {
+            return true;
+        }
+        if (CMD_UPDATENAME.equals(command)) {
+            int index = args.get("index").getInteger();
+            String name = args.get("name").getString();
+            updatePublishName(index, name);
+            return true;
+        }
+
+        return false;
     }
 
     @Nonnull
