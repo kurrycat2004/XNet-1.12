@@ -2,6 +2,7 @@ package mcjty.xnet.multiblock;
 
 import mcjty.xnet.api.keys.NetworkId;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,8 +16,10 @@ public class NetworkChecker {
     private final Set<NetworkId> networks = new HashSet<>();
     private long lastHash = -1;
 
-    public void add(NetworkId networkId) {
-        networks.add(networkId);
+    public void add(@Nullable NetworkId networkId) {
+        if (networkId != null) {
+            networks.add(networkId);
+        }
     }
 
     public void add(Collection<NetworkId> networks) {

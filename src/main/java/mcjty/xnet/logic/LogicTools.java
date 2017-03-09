@@ -87,6 +87,20 @@ public class LogicTools {
                 .filter(Objects::nonNull);
     }
 
+    // Return all controllers connected to a network
+    public static Stream<TileEntityController> controllers(@Nonnull World world, @Nonnull NetworkId networkId) {
+        return connectedBlocks(world, networkId)
+                .filter(pos -> world.getTileEntity(pos) instanceof TileEntityController)
+                .map(pos -> (TileEntityController) world.getTileEntity(pos));
+    }
+
+    // Return all routers connected to a network
+    public static Stream<TileEntityRouter> routers(@Nonnull World world, @Nonnull NetworkId networkId) {
+        return connectedBlocks(world, networkId)
+                .filter(pos -> world.getTileEntity(pos) instanceof TileEntityRouter)
+                .map(pos -> (TileEntityRouter) world.getTileEntity(pos));
+    }
+
     // Return all potential connected blocks (with or an actual connector defined in the channel)
     public static Stream<BlockPos> connectedBlocks(@Nonnull World world, @Nonnull NetworkId networkId) {
         return consumers(world, networkId)

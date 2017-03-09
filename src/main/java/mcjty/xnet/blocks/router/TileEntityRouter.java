@@ -95,7 +95,7 @@ public final class TileEntityRouter extends GenericTileEntity {
         if (networkId != null) {
             LogicTools.consumers(getWorld(), networkId)
                     .forEach(consumerPos -> LogicTools.routers(getWorld(), consumerPos)
-                            .filter(r -> r != this)
+//                            .filter(r -> r != this)
                             .forEach(router -> router.addConnectorsFromConnectedNetworks(connectors, channelName, type)));
         }
     }

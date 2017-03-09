@@ -127,10 +127,19 @@ public class ControllerBlock extends GenericXNetBlock<TileEntityController, Cont
                 probeInfo.text(TextStyleClass.LABEL + "Network: " + TextStyleClass.INFO + networkId.getId());
             }
 
-            for (NetworkId id : controller.getNetworkChecker().getAffectedNetworks()) {
-                probeInfo.text(TextStyleClass.LABEL + "Influence Net: " + TextStyleClass.INFO + id.getId());
+            if (mode == ProbeMode.DEBUG) {
+                String s = "";
+                for (NetworkId id : controller.getNetworkChecker().getAffectedNetworks()) {
+                    s += id.getId() + " ";
+                    if (s.length() > 15) {
+                        probeInfo.text(TextStyleClass.LABEL + "InfNet: " + TextStyleClass.INFO + s);
+                        s = "";
+                    }
+                }
+                if (!s.isEmpty()) {
+                    probeInfo.text(TextStyleClass.LABEL + "InfNet: " + TextStyleClass.INFO + s);
+                }
             }
-
         }
 
         WorldBlob worldBlob = XNetBlobData.getBlobData(world).getWorldBlob(world);

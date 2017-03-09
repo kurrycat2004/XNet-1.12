@@ -82,16 +82,17 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             networkChecker = new NetworkChecker();
             networkChecker.add(networkId);
             WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
-            LogicTools.connectedBlocks(getWorld(), networkId)
-                    .forEach(routerPos -> {
-                        TileEntity te = getWorld().getTileEntity(routerPos);
-                        if (te instanceof TileEntityRouter) {
-                            networkChecker.add(worldBlob.getNetworksAt(routerPos));
-                            LogicTools.connectors(getWorld(), routerPos)
-                                    .forEach(connectorPos -> {
-                                        networkChecker.add(worldBlob.getNetworkAt(connectorPos));
-                                    });
-                        }
+            LogicTools.routers(getWorld(), networkId)
+                    .forEach(router -> {
+                            networkChecker.add(worldBlob.getNetworksAt(router.getPos()));
+                            // We're only interested in one network. The other router networks are all same topology
+                            NetworkId routerNetwork = worldBlob.getNetworkAt(router.getPos());
+                            if (routerNetwork != null) {
+                                LogicTools.routers(getWorld(), routerNetwork)
+                                        .filter(r -> router != r)
+                                        .forEach(r -> LogicTools.connectors(getWorld(), r.getPos())
+                                                .forEach(connectorPos -> networkChecker.add(worldBlob.getNetworkAt(connectorPos))));
+                            }
                     });
 
             System.out.println("TileEntityController.getNetworkChecker");
@@ -209,14 +210,8 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             cachedRoutedConnectors[channel] = new HashMap<>();
 
             if (!channels[channel].getChannelName().isEmpty()) {
-                LogicTools.connectedBlocks(getWorld(), networkId)
-                        .forEach(routerPos -> {
-                            TileEntity te = getWorld().getTileEntity(routerPos);
-                            if (te instanceof TileEntityRouter) {
-                                TileEntityRouter router = (TileEntityRouter) te;
-                                router.addRoutedConnectors(cachedRoutedConnectors[channel], channels[channel].getChannelName(), channels[channel].getType());
-                            }
-                        });
+                LogicTools.routers(getWorld(), networkId)
+                        .forEach(router -> router.addRoutedConnectors(cachedRoutedConnectors[channel], channels[channel].getChannelName(), channels[channel].getType()));
             }
         }
         return cachedRoutedConnectors[channel];
