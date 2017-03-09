@@ -8,6 +8,7 @@ import mcjty.xnet.api.channels.RSMode;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.keys.SidedConsumer;
+import mcjty.xnet.apiimpl.items.ItemConnectorSettings;
 import mcjty.xnet.blocks.cables.ConnectorTileEntity;
 import mcjty.xnet.blocks.controller.gui.GuiController;
 import mcjty.xnet.config.GeneralConfiguration;
@@ -252,6 +253,15 @@ public class FluidChannelSettings implements IChannelSettings {
                     fluidConsumers.add(Pair.of(entry.getKey(), con));
                 }
             }
+
+            connectors = context.getRoutedConnectors(channel);
+            for (Map.Entry<SidedConsumer, IConnectorSettings> entry : connectors.entrySet()) {
+                FluidConnectorSettings con = (FluidConnectorSettings) entry.getValue();
+                if (con.getFluidMode() == FluidConnectorSettings.FluidMode.INS) {
+                    fluidConsumers.add(Pair.of(entry.getKey(), con));
+                }
+            }
+
             fluidConsumers.sort((o1, o2) -> o2.getRight().getPriority().compareTo(o1.getRight().getPriority()));
         }
     }

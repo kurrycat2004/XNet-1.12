@@ -49,10 +49,8 @@ public class RouterBlock extends GenericXNetBlock<TileEntityRouter, EmptyContain
         XNetBlobData blobData = XNetBlobData.getBlobData(world);
         WorldBlob worldBlob = blobData.getWorldBlob(world);
         Set<NetworkId> networks = worldBlob.getNetworksAt(data.getPos());
-        if (networks != null) {
-            for (NetworkId networkId : networks) {
-                probeInfo.text(TextStyleClass.LABEL + "Network: " + TextStyleClass.INFO + networkId.getId());
-            }
+        for (NetworkId networkId : networks) {
+            probeInfo.text(TextStyleClass.LABEL + "Network: " + TextStyleClass.INFO + networkId.getId());
         }
 
         if (mode == ProbeMode.EXTENDED) {

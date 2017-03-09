@@ -10,6 +10,7 @@ import mcjty.xnet.api.channels.RSMode;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.keys.SidedConsumer;
+import mcjty.xnet.apiimpl.fluids.FluidConnectorSettings;
 import mcjty.xnet.blocks.cables.ConnectorTileEntity;
 import mcjty.xnet.blocks.controller.gui.GuiController;
 import mcjty.xnet.config.GeneralConfiguration;
@@ -224,6 +225,15 @@ public class EnergyChannelSettings implements IChannelSettings {
                     energyConsumers.add(Pair.of(entry.getKey(), con));
                 }
             }
+
+            connectors = context.getRoutedConnectors(channel);
+            for (Map.Entry<SidedConsumer, IConnectorSettings> entry : connectors.entrySet()) {
+                EnergyConnectorSettings con = (EnergyConnectorSettings) entry.getValue();
+                if (con.getEnergyMode() == EnergyConnectorSettings.EnergyMode.INS) {
+                    energyConsumers.add(Pair.of(entry.getKey(), con));
+                }
+            }
+
             energyExtractors.sort((o1, o2) -> o2.getRight().getPriority().compareTo(o1.getRight().getPriority()));
             energyConsumers.sort((o1, o2) -> o2.getRight().getPriority().compareTo(o1.getRight().getPriority()));
         }

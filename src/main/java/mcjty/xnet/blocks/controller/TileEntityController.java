@@ -99,7 +99,6 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         int netversion = worldBlob.getNetworkVersion(networkId);
         if (netversion != this.networkVersion) {
             networkVersion = netversion;
-            System.out.println("netversion = " + netversion);
             for (int i = 0 ; i < MAX_CHANNELS ; i++) {
                 if (channels[i] != null) {
                     cleanCache(i);
@@ -183,12 +182,11 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
             if (!channels[channel].getChannelName().isEmpty()) {
                 LogicTools.connectedBlocks(getWorld(), networkId)
-                        .filter(pos -> WorldTools.chunkLoaded(getWorld(), pos))
                         .forEach(routerPos -> {
                             TileEntity te = getWorld().getTileEntity(routerPos);
                             if (te instanceof TileEntityRouter) {
                                 TileEntityRouter router = (TileEntityRouter) te;
-                                router.addRoutedConnectors(cachedRoutedConnectors[channel], channels[channel].getChannelName());
+                                router.addRoutedConnectors(cachedRoutedConnectors[channel], channels[channel].getChannelName(), channels[channel].getType());
                             }
                         });
             }

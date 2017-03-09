@@ -67,11 +67,11 @@ public class WorldBlob {
         return blob.getBlobIdForPosition(intPos);
     }
 
-    @Nullable
+    @Nonnull
     public Set<NetworkId> getNetworksAt(@Nonnull BlockPos pos) {
         ChunkBlob blob = getBlob(pos);
         if (blob == null) {
-            return null;
+            return Collections.emptySet();
         }
         IntPos intPos = new IntPos(pos);
         return blob.getNetworksForPosition(intPos);
@@ -81,7 +81,7 @@ public class WorldBlob {
     @Nullable
     public NetworkId getNetworkAt(@Nonnull BlockPos pos) {
         Set<NetworkId> networks = getNetworksAt(pos);
-        if (networks == null || networks.isEmpty()) {
+        if (networks.isEmpty()) {
             return null;
         }
         return networks.iterator().next();
@@ -149,7 +149,7 @@ public class WorldBlob {
         }
     }
 
-    private void incNetworkVersion(NetworkId id) {
+    public void incNetworkVersion(NetworkId id) {
         if (!networkVersions.containsKey(id)) {
             networkVersions.put(id, new VersionNumber(1));
         }

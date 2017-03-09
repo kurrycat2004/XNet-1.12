@@ -24,18 +24,15 @@ import java.util.stream.Stream;
 public class LogicTools {
 
     // Find the controller attached to this connector.
-    // @todo Note: WorldBlock.findController() is not optimal yet!
+    @Nullable
     public static TileEntityController getControllerForConnector(@Nonnull World world, @Nonnull BlockPos connectorPos) {
-        WorldBlob worldBlob = XNetBlobData.getBlobData(world).getWorldBlob(world);
-        NetworkId networkId = worldBlob.getNetworkAt(connectorPos);
-        if (networkId == null) {
+        BlockPos controllerPos = getControllerPosForConnector(world, connectorPos);
+        if (controllerPos == null) {
             return null;
         }
-        BlockPos controllerPos = worldBlob.getProviderPosition(networkId);
-        if (!WorldTools.chunkLoaded(world, connectorPos)) {
+        if (!WorldTools.chunkLoaded(world, controllerPos)) {
             return null;
         }
-        assert controllerPos != null;
         TileEntity te = world.getTileEntity(controllerPos);
         if (te instanceof TileEntityController) {
             return (TileEntityController) te;
@@ -44,19 +41,33 @@ public class LogicTools {
         }
     }
 
+    @Nullable
+    public static BlockPos getControllerPosForConnector(@Nonnull World world, @Nonnull BlockPos connectorPos) {
+        WorldBlob worldBlob = XNetBlobData.getBlobData(world).getWorldBlob(world);
+        NetworkId networkId = worldBlob.getNetworkAt(connectorPos);
+        if (networkId == null) {
+            return null;
+        }
+        return worldBlob.getProviderPosition(networkId);
+    }
+
+    // All consumers for a given network
     public static Stream<BlockPos> consumers(@Nonnull World world, @Nonnull NetworkId networkId) {
         WorldBlob worldBlob = XNetBlobData.getBlobData(world).getWorldBlob(world);
         return worldBlob.getConsumers(networkId).stream();
     }
 
+    // All normal connectors for a given position
     public static Stream<BlockPos> connectors(@Nonnull World world, @Nonnull BlockPos pos) {
         return new ConnectorIterator(world, pos, false).stream();
     }
 
+    // All advanced connectors for a given position
     public static Stream<BlockPos> advancedConnectors(@Nonnull World world, @Nonnull BlockPos pos) {
         return new ConnectorIterator(world, pos, true).stream();
     }
 
+    // All routers from a given position
     public static Stream<TileEntityRouter> routers(@Nonnull World world, @Nonnull BlockPos pos) {
         return new RouterIterator(world, pos).stream();
     }

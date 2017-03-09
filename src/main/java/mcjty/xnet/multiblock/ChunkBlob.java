@@ -82,9 +82,14 @@ public class ChunkBlob {
         return cachedProviders.get(networkId);
     }
 
-    @Nullable
+    @Nonnull
     public Set<NetworkId> getNetworksForPosition(IntPos pos) {
-        return networkMappings.get(blobAllocations.get(pos));
+        BlobId blobId = blobAllocations.get(pos);
+        if (networkMappings.containsKey(blobId)) {
+            return networkMappings.get(blobId);
+        } else {
+            return Collections.emptySet();
+        }
     }
 
     @Nonnull
