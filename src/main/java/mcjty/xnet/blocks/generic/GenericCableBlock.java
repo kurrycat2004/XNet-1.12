@@ -198,7 +198,7 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
     public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data) {
         WorldBlob worldBlob = XNetBlobData.getBlobData(world).getWorldBlob(world);
 
-        if (mode == ProbeMode.EXTENDED) {
+        if (mode == ProbeMode.DEBUG) {
             BlobId blobId = worldBlob.getBlobAt(data.getPos());
             if (blobId != null) {
                 probeInfo.text(TextStyleClass.LABEL + "Blob: " + TextStyleClass.INFO + blobId.getId());

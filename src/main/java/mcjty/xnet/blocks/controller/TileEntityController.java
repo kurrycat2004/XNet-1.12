@@ -69,7 +69,6 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
     private NetworkChecker networkChecker = null;
 
-
     public TileEntityController() {
         super(100000, 1000); // @todo configurable
         for (int i = 0; i < MAX_CHANNELS; i++) {
@@ -78,7 +77,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     }
 
     @Nonnull
-    private NetworkChecker getNetworkChecker() {
+    public NetworkChecker getNetworkChecker() {
         if (networkChecker == null) {
             networkChecker = new NetworkChecker();
             networkChecker.add(networkId);

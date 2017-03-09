@@ -53,7 +53,7 @@ public class RouterBlock extends GenericXNetBlock<TileEntityRouter, EmptyContain
             probeInfo.text(TextStyleClass.LABEL + "Network: " + TextStyleClass.INFO + networkId.getId());
         }
 
-        if (mode == ProbeMode.EXTENDED) {
+        if (mode == ProbeMode.DEBUG) {
             BlobId blobId = worldBlob.getBlobAt(data.getPos());
             if (blobId != null) {
                 probeInfo.text(TextStyleClass.LABEL + "Blob: " + TextStyleClass.INFO + blobId.getId());

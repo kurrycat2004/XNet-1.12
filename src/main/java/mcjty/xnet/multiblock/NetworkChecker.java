@@ -60,4 +60,8 @@ public class NetworkChecker {
             System.out.println("network = " + network);
         }
     }
+
+    public Collection<NetworkId> getAffectedNetworks() {
+        return networks;
+    }
 }
