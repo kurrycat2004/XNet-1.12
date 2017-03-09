@@ -16,7 +16,6 @@ import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.blocks.cables.ConnectorTileEntity;
 import mcjty.xnet.blocks.cables.NetCableSetup;
 import mcjty.xnet.blocks.controller.gui.GuiController;
-import mcjty.xnet.blocks.router.TileEntityRouter;
 import mcjty.xnet.clientinfo.ChannelClientInfo;
 import mcjty.xnet.clientinfo.ConnectedBlockClientInfo;
 import mcjty.xnet.clientinfo.ConnectorClientInfo;
@@ -31,6 +30,8 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
@@ -63,6 +64,9 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     private final ChannelInfo[] channels = new ChannelInfo[MAX_CHANNELS];
     private int colors = 0;
 
+    // Client side only
+    private boolean error = false;
+
     // Cached/transient data
     private Map<SidedConsumer, IConnectorSettings> cachedConnectors[] = new Map[MAX_CHANNELS];
     private Map<SidedConsumer, IConnectorSettings> cachedRoutedConnectors[] = new Map[MAX_CHANNELS];
@@ -75,6 +79,21 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             channels[i] = null;
         }
     }
+
+    @Override
+    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet) {
+        boolean oldError = error;
+
+        super.onDataPacket(net, packet);
+
+        if (getWorld().isRemote) {
+            // If needed send a render update.
+            if (oldError != error) {
+                getWorld().markBlockRangeForRenderUpdate(getPos(), getPos());
+            }
+        }
+    }
+
 
     @Nonnull
     public NetworkChecker getNetworkChecker() {
@@ -120,8 +139,8 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         return channels;
     }
 
-    private void checkNetwork() {
-        if (networkId != null && getNetworkChecker().isDirtyAndMarkClean(XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld()))) {
+    private void checkNetwork(WorldBlob worldBlob) {
+        if (networkId != null && getNetworkChecker().isDirtyAndMarkClean(worldBlob)) {
             for (int i = 0 ; i < MAX_CHANNELS ; i++) {
                 if (channels[i] != null) {
                     cleanCache(i);
@@ -135,10 +154,27 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         return (colors & colorMask) == colorMask;
     }
 
+    public boolean inError() {
+        if (getWorld().isRemote) {
+            return error;
+        } else {
+            WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
+            return worldBlob.getNetworksAt(getPos()).size() > 1;
+        }
+    }
+
     @Override
     public void update() {
         if (!getWorld().isRemote) {
-            checkNetwork();
+            WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
+
+            if (worldBlob.getNetworksAt(getPos()).size() > 1) {
+                // Error situation!
+                markDirtyClient();
+                return;
+            }
+
+            checkNetwork(worldBlob);
 
             if (!checkAndConsumeRF(GeneralConfiguration.controllerRFT)) {
                 return;
@@ -225,6 +261,20 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     @Override
     public void readFromNBT(NBTTagCompound tagCompound) {
         super.readFromNBT(tagCompound);
+    }
+
+    @Override
+    public void writeClientDataToNBT(NBTTagCompound tagCompound) {
+        super.writeClientDataToNBT(tagCompound);
+        if (!getWorld().isRemote) {
+            tagCompound.setBoolean("error", inError());
+        }
+    }
+
+    @Override
+    public void readClientDataFromNBT(NBTTagCompound tagCompound) {
+        super.readClientDataFromNBT(tagCompound);
+        error = tagCompound.getBoolean("error");
     }
 
     @Override

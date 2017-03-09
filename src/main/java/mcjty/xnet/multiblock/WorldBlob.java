@@ -77,7 +77,6 @@ public class WorldBlob {
         return blob.getNetworksForPosition(intPos);
     }
 
-    // @todo, there should be only one network all the time. Check this
     @Nullable
     public NetworkId getNetworkAt(@Nonnull BlockPos pos) {
         Set<NetworkId> networks = getNetworksAt(pos);

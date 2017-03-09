@@ -16,6 +16,8 @@ import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -23,11 +25,16 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.ChunkCache;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ControllerBlock extends GenericXNetBlock<TileEntityController, ControllerContainer> {
+
+    public static final PropertyBool ERROR = PropertyBool.create("error");
 
     public ControllerBlock() {
         super(Material.IRON, TileEntityController.class, ControllerContainer.class, "controller", false);
@@ -140,6 +147,9 @@ public class ControllerBlock extends GenericXNetBlock<TileEntityController, Cont
                     probeInfo.text(TextStyleClass.LABEL + "InfNet: " + TextStyleClass.INFO + s);
                 }
             }
+            if (controller.inError()) {
+                probeInfo.text(TextStyleClass.ERROR + "Too many controllers on network!");
+            }
         }
 
         WorldBlob worldBlob = XNetBlobData.getBlobData(world).getWorldBlob(world);
@@ -156,4 +166,20 @@ public class ControllerBlock extends GenericXNetBlock<TileEntityController, Cont
 
         }
     }
+
+    @Override
+    public IBlockState getActualState(IBlockState state, IBlockAccess world, BlockPos pos) {
+        TileEntity te = world instanceof ChunkCache ? ((ChunkCache)world).getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK) : world.getTileEntity(pos);
+        boolean error = false;
+        if (te instanceof TileEntityController) {
+            error = ((TileEntityController)te).inError();
+        }
+        return state.withProperty(ERROR, error);
+    }
+
+    @Override
+    protected BlockStateContainer createBlockState() {
+        return new BlockStateContainer(this, FACING, ERROR);
+    }
+
 }

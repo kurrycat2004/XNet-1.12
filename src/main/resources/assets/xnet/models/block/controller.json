@@ -1,6 +1,6 @@
 {
   "parent": "xnet:block/xnetblock",
   "textures": {
-    "front": "xnet:blocks/machine_controller"
+    "front": "#txt"
   }
 }
