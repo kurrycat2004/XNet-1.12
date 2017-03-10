@@ -50,18 +50,6 @@ public class NetCableBlock extends GenericCableBlock {
         ModelLoader.setCustomStateMapper(this, ignoreState);
     }
 
-//    @Override
-//    @SideOnly(Side.CLIENT)
-//    public void initItemModel() {
-//        // For our item model we want to use a normal json model. This has to be called in
-//        // ClientProxy.init (not preInit) so that's why it is a separate method.
-//        Item itemBlock = ForgeRegistries.ITEMS.getValue(new ResourceLocation(XNet.MODID, NETCABLE));
-//        ModelResourceLocation itemModelResourceLocation = new ModelResourceLocation(getRegistryName(), "inventory");
-//        for (CableColor color : CableColor.VALUES) {
-//            Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(itemBlock, color.ordinal(), itemModelResourceLocation);
-//        }
-//    }
-
     @Override
     protected void clGetSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
         for (CableColor value : CableColor.VALUES) {
@@ -76,7 +64,7 @@ public class NetCableBlock extends GenericCableBlock {
     }
 
     public IBlockState getPlacementState(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-        // When our block is placed down we force a re-render of adjacent blocks to make sure their ISBM model is updated
+        // When our block is placed down we force a re-render of adjacent blocks to make sure their baked model is updated
         world.markBlockRangeForRenderUpdate(pos.add(-1, -1, -1), pos.add(1, 1, 1));
         return super.clGetStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, placer);
     }

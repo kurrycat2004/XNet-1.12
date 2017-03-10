@@ -62,8 +62,8 @@ public class LogicTools {
         return new ConnectorIterator(world, pos, false).stream();
     }
 
-    // All advanced connectors for a given position
-    public static Stream<BlockPos> advancedConnectors(@Nonnull World world, @Nonnull BlockPos pos) {
+    // All routing connectors for a given position
+    public static Stream<BlockPos> routingConnectors(@Nonnull World world, @Nonnull BlockPos pos) {
         return new ConnectorIterator(world, pos, true).stream();
     }
 

@@ -36,15 +36,15 @@ public class NetCableSetup {
 
     public static void initCrafting() {
         ItemStack lapisStack = new ItemStack(Items.DYE, 1, 4);
-        GameRegistry.addRecipe(new ItemStack(netCableBlock, 16, CableColor.ADVANCED.ordinal()), "srs", "rgr", "srs", 'r', Blocks.REDSTONE_BLOCK, 's', Items.STRING, 'g', Items.DIAMOND);
+        GameRegistry.addRecipe(new ItemStack(netCableBlock, 16, CableColor.ROUTING.ordinal()), "srs", "rgr", "srs", 'r', Blocks.REDSTONE_BLOCK, 's', Items.STRING, 'g', Items.DIAMOND);
         GameRegistry.addRecipe(new ItemStack(netCableBlock, 16), "srs", "rgr", "srs", 'r', Items.REDSTONE, 's', Items.STRING, 'g', Items.GOLD_NUGGET);
         GameRegistry.addRecipe(new ItemStack(connectorBlock, 1), "lRl", "rgr", "lrl", 'r', Items.REDSTONE, 'l', lapisStack, 'g', Items.GOLD_INGOT, 'R', Blocks.CHEST);
         GameRegistry.addRecipe(new ItemStack(advancedConnectorBlock, 1), "ce", "dr", 'c', connectorBlock, 'e', Items.ENDER_PEARL, 'd', Items.DIAMOND, 'r', Items.REDSTONE);
 
         for (CableColor source : CableColor.VALUES) {
-            if (source != CableColor.ADVANCED) {
+            if (source != CableColor.ROUTING) {
                 for (CableColor dest : CableColor.VALUES) {
-                    if (dest != source && dest != CableColor.ADVANCED) {
+                    if (dest != source && dest != CableColor.ROUTING) {
                         GameRegistry.addRecipe(new ShapelessOreRecipe(new ItemStack(netCableBlock, 1, dest.ordinal()), new ItemStack(netCableBlock, 1, source.ordinal()), dest.getDye()));
                         GameRegistry.addRecipe(new ShapelessOreRecipe(new ItemStack(connectorBlock, 1, dest.ordinal()), new ItemStack(connectorBlock, 1, source.ordinal()), dest.getDye()));
                         GameRegistry.addRecipe(new ShapelessOreRecipe(new ItemStack(advancedConnectorBlock, 1, dest.ordinal()), new ItemStack(advancedConnectorBlock, 1, source.ordinal()), dest.getDye()));

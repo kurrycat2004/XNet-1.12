@@ -19,7 +19,7 @@ public class ConnectorIterator implements Iterator<BlockPos> {
 
     @Nonnull private final World world;
     @Nonnull private final BlockPos pos;
-    private final boolean advanced;
+    private final boolean routing;
 
     private int facingIdx = 0;
     private BlockPos foundPos = null;
@@ -28,10 +28,10 @@ public class ConnectorIterator implements Iterator<BlockPos> {
         return StreamSupport.stream(Spliterators.spliterator(this, EnumFacing.VALUES.length, Spliterator.ORDERED), false);
     }
 
-    ConnectorIterator(@Nonnull World world, @Nonnull BlockPos pos, boolean advanced) {
+    ConnectorIterator(@Nonnull World world, @Nonnull BlockPos pos, boolean routing) {
         this.world = world;
         this.pos = pos;
-        this.advanced = advanced;
+        this.routing = routing;
         findNext();
     }
 
@@ -46,7 +46,7 @@ public class ConnectorIterator implements Iterator<BlockPos> {
             IBlockState state = world.getBlockState(connectorPos);
             if (state.getBlock() instanceof ConnectorBlock) {
                 CableColor color = state.getValue(GenericCableBlock.COLOR);
-                if ((color == CableColor.ADVANCED) == advanced) {
+                if ((color == CableColor.ROUTING) == routing) {
                     foundPos = connectorPos;
                     return;
                 }

@@ -9,6 +9,7 @@ import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.keys.NetworkId;
 import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.clientinfo.ControllerChannelClientInfo;
+import mcjty.xnet.config.GeneralConfiguration;
 import mcjty.xnet.logic.ChannelInfo;
 import mcjty.xnet.logic.LogicTools;
 import mcjty.xnet.multiblock.WorldBlob;
@@ -16,6 +17,8 @@ import mcjty.xnet.multiblock.XNetBlobData;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants;
 
@@ -33,11 +36,56 @@ public final class TileEntityRouter extends GenericTileEntity {
     public static final String CMD_GETREMOTECHANNELS = "getRemoteChannelInfo";
     public static final String CLIENTCMD_CHANNELSREMOTEREADY = "channelsRemoteReady";
 
-
     private Map<LocalChannelId, String> publishedChannels = new HashMap<>();
+    private int channelCount = 0;
 
     public TileEntityRouter() {
     }
+
+    public void addPublishedChannels(Set<String> channels) {
+        channels.addAll(publishedChannels.values());
+    }
+
+    public int countPublishedChannelsOnNet() {
+        Set<String> channels = new HashSet<>();
+        NetworkId networkId = findRoutingNetwork();
+        if (networkId != null) {
+            LogicTools.routers(getWorld(), networkId)
+                    .forEach(router -> router.addPublishedChannels(channels));
+        }
+        return channels.size();
+    }
+
+    public boolean inError() {
+        return channelCount > GeneralConfiguration.maxPublishedChannels;
+    }
+
+    public int getChannelCount() {
+        return channelCount;
+    }
+
+    public void setChannelCount(int cnt) {
+        if (channelCount == cnt) {
+            return;
+        }
+        channelCount = cnt;
+        markDirtyClient();
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet) {
+        boolean oldError = inError();
+
+        super.onDataPacket(net, packet);
+
+        if (getWorld().isRemote) {
+            // If needed send a render update.
+            if (oldError != inError()) {
+                getWorld().markBlockRangeForRenderUpdate(getPos(), getPos());
+            }
+        }
+    }
+
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound tagCompound) {
@@ -52,6 +100,7 @@ public final class TileEntityRouter extends GenericTileEntity {
     @Override
     public void writeRestorableToNBT(NBTTagCompound tagCompound) {
         super.writeRestorableToNBT(tagCompound);
+        tagCompound.setInteger("chancnt", channelCount);
         NBTTagList published = new NBTTagList();
         for (Map.Entry<LocalChannelId, String> entry : publishedChannels.entrySet()) {
             NBTTagCompound tc = new NBTTagCompound();
@@ -66,6 +115,7 @@ public final class TileEntityRouter extends GenericTileEntity {
     @Override
     public void readRestorableFromNBT(NBTTagCompound tagCompound) {
         super.readRestorableFromNBT(tagCompound);
+        channelCount = tagCompound.getInteger("chancnt");
         NBTTagList published = tagCompound.getTagList("published", Constants.NBT.TAG_COMPOUND);
         for (int i = 0 ; i < published.tagCount() ; i++) {
             NBTTagCompound tc = published.getCompoundTagAt(i);
@@ -103,7 +153,7 @@ public final class TileEntityRouter extends GenericTileEntity {
     @Nonnull
     private List<ControllerChannelClientInfo> findRemoteChannelInfo() {
         List<ControllerChannelClientInfo> list = new ArrayList<>();
-        NetworkId networkId = findAdvancedNetwork();
+        NetworkId networkId = findRoutingNetwork();
         if (networkId != null) {
             LogicTools.consumers(getWorld(), networkId)
                     .forEach(consumerPos -> LogicTools.routers(getWorld(), consumerPos)
@@ -114,16 +164,20 @@ public final class TileEntityRouter extends GenericTileEntity {
     }
 
     @Nullable
-    private NetworkId findAdvancedNetwork() {
+    private NetworkId findRoutingNetwork() {
         WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
-        return LogicTools.advancedConnectors(getWorld(), getPos())
+        return LogicTools.routingConnectors(getWorld(), getPos())
                 .findFirst()
                 .map(worldBlob::getNetworkAt)
                 .orElse(null);
     }
 
     public void addRoutedConnectors(Map<SidedConsumer, IConnectorSettings> connectors, @Nonnull BlockPos controllerPos, int channel, IChannelType type) {
-        NetworkId networkId = findAdvancedNetwork();
+        if (inError()) {
+            // We are in error. Don't do anything
+            return;
+        }
+        NetworkId networkId = findRoutingNetwork();
         if (networkId != null) {
             LocalChannelId id = new LocalChannelId(controllerPos, channel);
             String publishedName = publishedChannels.get(id);
@@ -151,7 +205,19 @@ public final class TileEntityRouter extends GenericTileEntity {
 
     private void updatePublishName(@Nonnull BlockPos controllerPos, int channel, String name) {
         LocalChannelId id = new LocalChannelId(controllerPos, channel);
-        publishedChannels.put(id, name);
+        if (name == null || name.isEmpty()) {
+            publishedChannels.remove(id);
+        } else {
+            publishedChannels.put(id, name);
+        }
+        int number = countPublishedChannelsOnNet();
+        if (number != channelCount) {
+            NetworkId networkId = findRoutingNetwork();
+            if (networkId != null) {
+                LogicTools.routers(getWorld(), networkId)
+                        .forEach(router -> router.setChannelCount(number));
+            }
+        }
         markDirtyQuick();
     }
 

@@ -12,12 +12,17 @@ public class GeneralConfiguration {
     public static int controllerChannelRFT = 1;   // RF Per tick per enabled channel
     public static int controllerOperationRFT = 2; // RF Per tick per operation
 
+    public static int maxPublishedChannels = 32;    // Maximum number of published channels on a routing network
+
     public static void init(Configuration cfg) {
 
         maxRfConnector = cfg.getInt(CATEGORY_GENERAL, "maxRfConnector", maxRfConnector, 1, 1000000000,
                 "Maximum RF the normal connector can store");
         maxRfAdvancedConnector = cfg.getInt(CATEGORY_GENERAL, "maxRfAdvancedConnector", maxRfAdvancedConnector, 1, 1000000000,
                 "Maximum RF the advanced connector can store");
+
+        maxPublishedChannels = cfg.getInt(CATEGORY_GENERAL, "maxPublishedChannels", maxPublishedChannels, 1, 1000000000,
+                "Maximum number of published channels that a routing channel can support");
 
         controllerRFT = cfg.getInt(CATEGORY_GENERAL, "controllerRFPerTick", controllerRFT, 0, 1000000000,
                 "Power usage for the controller regardless of what it is doing");

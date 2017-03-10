@@ -9,7 +9,7 @@
       "red": { "textures": { "txt": "xnet:blocks/cable1/connector" }},
       "yellow": { "textures": { "txt": "xnet:blocks/cable2/connector" }},
       "green": { "textures": { "txt": "xnet:blocks/cable3/connector" }},
-      "advanced": { "textures": { "txt": "xnet:blocks/cable4/connector" }}
+      "routing": { "textures": { "txt": "xnet:blocks/cable4/connector" }}
     }
   }
 }

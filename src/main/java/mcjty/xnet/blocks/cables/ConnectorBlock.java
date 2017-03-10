@@ -215,9 +215,9 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
         Block block = state.getBlock();
         if ((block instanceof NetCableBlock || block instanceof ConnectorBlock) && state.getValue(COLOR) == color) {
             return ConnectorType.CABLE;
-        } else if (isConnectable(world, pos) && color != CableColor.ADVANCED) {
+        } else if (isConnectable(world, pos) && color != CableColor.ROUTING) {
             return ConnectorType.BLOCK;
-        } else if (isConnectableAdvanced(world, pos) && color == CableColor.ADVANCED) {
+        } else if (isConnectableAdvanced(world, pos) && color == CableColor.ROUTING) {
             return ConnectorType.BLOCK;
         } else {
             return ConnectorType.NONE;
