@@ -6,6 +6,7 @@ import mcjty.lib.tools.ItemStackTools;
 import mcjty.xnet.blocks.cables.ConnectorTileEntity;
 import mcjty.xnet.blocks.cables.NetCableSetup;
 import mcjty.xnet.blocks.generic.GenericCableBlock;
+import mcjty.xnet.init.ModBlocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
@@ -111,6 +112,8 @@ public class FacadeItemBlock extends CompatItemBlock {
                         return EnumActionResult.FAIL;
                     }
                 }
+            } else if (block == ModBlocks.facadeBlock) {
+                return EnumActionResult.FAIL;
             } else {
                 setMimicBlock(itemstack, state);
                 if (world.isRemote) {
