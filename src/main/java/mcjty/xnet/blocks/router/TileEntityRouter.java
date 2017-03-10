@@ -196,8 +196,13 @@ public final class TileEntityRouter extends GenericTileEntity {
                 .forEach(controller -> {
                     for (int i = 0; i < MAX_CHANNELS; i++) {
                         ChannelInfo info = controller.getChannels()[i];
-                        if (info != null && channelName.equals(info.getChannelName()) && type.equals(info.getType())) {
-                            connectors.putAll(controller.getConnectors(i));
+                        if (info != null) {
+                            String publishedName = publishedChannels.get(new LocalChannelId(controller.getPos(), i));
+                            if (publishedName != null && !publishedName.isEmpty()) {
+                                if (channelName.equals(publishedName) && type.equals(info.getType())) {
+                                    connectors.putAll(controller.getConnectors(i));
+                                }
+                            }
                         }
                     }
                 });
@@ -211,12 +216,14 @@ public final class TileEntityRouter extends GenericTileEntity {
             publishedChannels.put(id, name);
         }
         int number = countPublishedChannelsOnNet();
-        if (number != channelCount) {
-            NetworkId networkId = findRoutingNetwork();
-            if (networkId != null) {
+        NetworkId networkId = findRoutingNetwork();
+        if (networkId != null) {
+            if (number != channelCount) {
                 LogicTools.routers(getWorld(), networkId)
                         .forEach(router -> router.setChannelCount(number));
             }
+            WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
+            worldBlob.incNetworkVersion(networkId); // Force a recalc of affected networks
         }
         markDirtyQuick();
     }

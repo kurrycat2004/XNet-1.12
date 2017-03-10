@@ -245,7 +245,6 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
             cachedRoutedConnectors[channel] = new HashMap<>();
 
-            // @todo, send pos + channel index instead of name here
             if (!channels[channel].getChannelName().isEmpty()) {
                 LogicTools.routers(getWorld(), networkId)
                         .forEach(router -> router.addRoutedConnectors(cachedRoutedConnectors[channel], getPos(), channel, channels[channel].getType()));
