@@ -2,6 +2,7 @@ package mcjty.xnet.blocks.router;
 
 import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.network.Argument;
+import mcjty.lib.varia.BlockPosTools;
 import mcjty.typed.Type;
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.api.channels.IConnectorSettings;
@@ -14,6 +15,9 @@ import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,6 +33,9 @@ public final class TileEntityRouter extends GenericTileEntity {
     public static final String CMD_GETREMOTECHANNELS = "getRemoteChannelInfo";
     public static final String CLIENTCMD_CHANNELSREMOTEREADY = "channelsRemoteReady";
 
+
+    private Map<LocalChannelId, String> publishedChannels = new HashMap<>();
+    private Map<String, LocalChannelId> nameToChannel = new HashMap<>();
 
     public TileEntityRouter() {
     }
@@ -46,15 +53,32 @@ public final class TileEntityRouter extends GenericTileEntity {
     @Override
     public void writeRestorableToNBT(NBTTagCompound tagCompound) {
         super.writeRestorableToNBT(tagCompound);
+        NBTTagList published = new NBTTagList();
+        for (Map.Entry<LocalChannelId, String> entry : publishedChannels.entrySet()) {
+            NBTTagCompound tc = new NBTTagCompound();
+            BlockPosTools.writeToNBT(tc, "pos", entry.getKey().getControllerPos());
+            tc.setInteger("index", entry.getKey().getIndex());
+            tc.setString("name", entry.getValue());
+            published.appendTag(tc);
+        }
+        tagCompound.setTag("published", published);
     }
 
     @Override
     public void readRestorableFromNBT(NBTTagCompound tagCompound) {
         super.readRestorableFromNBT(tagCompound);
+        NBTTagList published = tagCompound.getTagList("published", Constants.NBT.TAG_COMPOUND);
+        for (int i = 0 ; i < published.tagCount() ; i++) {
+            NBTTagCompound tc = published.getCompoundTagAt(i);
+            LocalChannelId id = new LocalChannelId(BlockPosTools.readFromNBT(tc, "pos"), tc.getInteger("index"));
+            String name = tc.getString("name");
+            publishedChannels.put(id, name);
+            nameToChannel.put(name, id);
+        }
     }
 
     @Nonnull
-    private List<ControllerChannelClientInfo> findChannelInfo() {
+    private List<ControllerChannelClientInfo> findLocalChannelInfo() {
         List<ControllerChannelClientInfo> list = new ArrayList<>();
         LogicTools.connectors(getWorld(), getPos())
                 .map(connectorPos -> LogicTools.getControllerForConnector(getWorld(), connectorPos))
@@ -62,7 +86,12 @@ public final class TileEntityRouter extends GenericTileEntity {
                     for (int i = 0; i < MAX_CHANNELS; i++) {
                         ChannelInfo channelInfo = controller.getChannels()[i];
                         if (channelInfo != null && !channelInfo.getChannelName().isEmpty()) {
-                            ControllerChannelClientInfo ci = new ControllerChannelClientInfo(channelInfo.getChannelName(), channelInfo.getChannelName(), controller.getPos(), channelInfo.getType(), i);
+                            LocalChannelId id = new LocalChannelId(controller.getPos(), i);
+                            String publishedName = publishedChannels.get(id);
+                            if (publishedName == null) {
+                                publishedName = "";
+                            }
+                            ControllerChannelClientInfo ci = new ControllerChannelClientInfo(channelInfo.getChannelName(), publishedName, controller.getPos(), channelInfo.getType(), i);
                             list.add(ci);
                         }
                     }
@@ -79,7 +108,7 @@ public final class TileEntityRouter extends GenericTileEntity {
             LogicTools.consumers(getWorld(), networkId)
                     .forEach(consumerPos -> LogicTools.routers(getWorld(), consumerPos)
                             .filter(r -> r != this)
-                            .forEach(router -> list.addAll(router.findChannelInfo())));
+                            .forEach(router -> list.addAll(router.findLocalChannelInfo())));
         }
         return list;
     }
@@ -117,8 +146,11 @@ public final class TileEntityRouter extends GenericTileEntity {
                 });
     }
 
-    private void updatePublishName(int index, String name) {
-        // @todo
+    private void updatePublishName(@Nonnull BlockPos controllerPos, int channel, String name) {
+        LocalChannelId id = new LocalChannelId(controllerPos, channel);
+        publishedChannels.put(id, name);
+        nameToChannel.put(name, id);
+        markDirtyQuick();
     }
 
     @Override
@@ -128,9 +160,10 @@ public final class TileEntityRouter extends GenericTileEntity {
             return true;
         }
         if (CMD_UPDATENAME.equals(command)) {
-            int index = args.get("index").getInteger();
+            BlockPos controllerPos = args.get("pos").getCoordinate();
+            int channel = args.get("channel").getInteger();
             String name = args.get("name").getString();
-            updatePublishName(index, name);
+            updatePublishName(controllerPos, channel, name);
             return true;
         }
 
@@ -145,7 +178,7 @@ public final class TileEntityRouter extends GenericTileEntity {
             return rc;
         }
         if (CMD_GETCHANNELS.equals(command)) {
-            return type.convert(findChannelInfo());
+            return type.convert(findLocalChannelInfo());
         } else if (CMD_GETREMOTECHANNELS.equals(command)) {
             return type.convert(findRemoteChannelInfo());
         }

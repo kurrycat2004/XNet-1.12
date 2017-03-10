@@ -42,8 +42,6 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
     private boolean needsRefresh = true;
     private int listDirty;
 
-    TextField publishAs;
-
     public GuiRouter(TileEntityRouter router, EmptyContainer container) {
         super(XNet.instance, XNetMessages.INSTANCE, router, container, GuiProxy.GUI_MANUAL_MAIN, "router");
 
@@ -62,15 +60,8 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
 
         toplevel.addChild(initLocalChannelListPanel());
         toplevel.addChild(initRemoteChannelListPanel());
-        toplevel.addChild(new Label<>(mc, this).setHorizontalAlignment(HorizontalAlignment.ALIGH_LEFT).setText("Local Channels").setColor(0xff2244aa).setLayoutHint(new PositionalLayout.PositionalHint(6, 2, 166, 13)));
-        toplevel.addChild(new Label<>(mc, this).setHorizontalAlignment(HorizontalAlignment.ALIGH_LEFT).setText("Remote Channels").setColor(0xff2244aa).setLayoutHint(new PositionalLayout.PositionalHint(172, 2, 164, 13)));
-        toplevel.addChild(new Label<>(mc, this).setText("Publish as:").setHorizontalAlignment(HorizontalAlignment.ALIGH_LEFT).setLayoutHint(new PositionalLayout.PositionalHint(6, 14, 60, 14)));
-        publishAs = new TextField(mc, this).setLayoutHint(new PositionalLayout.PositionalHint(66, 14, 100, 14))
-                .setTooltips("Name under which this channel", "will be known on the routed", "network")
-                .addTextEnterEvent((parent, newText) -> {
-                    updatePublish();
-                });
-        toplevel.addChild(publishAs);
+        toplevel.addChild(new Label<>(mc, this).setHorizontalAlignment(HorizontalAlignment.ALIGH_LEFT).setText("Local Channels").setColor(0xff2244aa).setLayoutHint(new PositionalLayout.PositionalHint(6, 8, 166, 13)));
+        toplevel.addChild(new Label<>(mc, this).setHorizontalAlignment(HorizontalAlignment.ALIGH_LEFT).setText("Remote Channels").setColor(0xff2244aa).setLayoutHint(new PositionalLayout.PositionalHint(172, 8, 164, 13)));
 
         window = new Window(this, toplevel);
 
@@ -78,8 +69,11 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
         listDirty = 0;
     }
 
-    private void updatePublish() {
-        sendServerCommand(XNetMessages.INSTANCE, TileEntityRouter.CMD_UPDATENAME, new Argument("index", localChannelList.getSelected()), new Argument("name", publishAs.getText()));
+    private void updatePublish(BlockPos pos, int index, String name) {
+        sendServerCommand(XNetMessages.INSTANCE, TileEntityRouter.CMD_UPDATENAME,
+                new Argument("pos", pos),
+                new Argument("channel", index),
+                new Argument("name", name));
     }
 
     private void refresh() {
@@ -98,7 +92,7 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
 //                setSelectedBlock(index);
             }
         });
-//        localChannelList.setPropagateEventsToChildren(true);
+        localChannelList.setPropagateEventsToChildren(true);
         Slider listSlider = new Slider(mc, this).setDesiredWidth(10).setVertical().setScrollable(localChannelList);
         return new Panel(mc, this)
                 .setLayout(new HorizontalLayout().setHorizontalMargin(3).setSpacing(1))
@@ -141,7 +135,7 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
         int sel = localChannelList.getSelected();
 
         for (ControllerChannelClientInfo channel : fromServer_localChannels) {
-            localChannelList.addChild(makeChannelLine(channel));
+            localChannelList.addChild(makeChannelLine(channel, true));
         }
 
         localChannelList.setSelected(sel);
@@ -151,13 +145,13 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
         sel = remoteChannelList.getSelected();
 
         for (ControllerChannelClientInfo channel : fromServer_remoteChannels) {
-            remoteChannelList.addChild(makeChannelLine(channel));
+            remoteChannelList.addChild(makeChannelLine(channel, false));
         }
 
         remoteChannelList.setSelected(sel);
     }
 
-    private Panel makeChannelLine(ControllerChannelClientInfo channel) {
+    private Panel makeChannelLine(ControllerChannelClientInfo channel, boolean local) {
         String name = channel.getChannelName();
         String publishedName = channel.getPublishedName();
         BlockPos controllerPos = channel.getPos();
@@ -169,7 +163,13 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
         panel1.addChild(new Label<>(mc, this).setText("Chan").setColor(0xff2244aa));
         panel1.addChild(new Label<>(mc, this).setText(name));
         panel1.addChild(new Label<>(mc, this).setText("->").setColor(0xff2244aa));
-        panel1.addChild(new Label<>(mc, this).setText(publishedName).setColor(0xffee3311));
+        if (local) {
+            TextField pubName = new TextField(mc, this).setText(publishedName).setDesiredWidth(50).setDesiredHeight(13)
+                    .addTextEvent((parent, newText) -> updatePublish(controllerPos, index, newText));
+            panel1.addChild(pubName);
+        } else {
+            panel1.addChild(new Label<>(mc, this).setText(publishedName).setColor(0xffee3311));
+        }
 
         Panel panel2 = new Panel(mc, this).setLayout(new HorizontalLayout().setHorizontalMargin(0).setSpacing(0)).setLayoutHint(new PositionalLayout.PositionalHint(0, 13, 160, 13));
         panel2.addChild(new Label<>(mc, this).setText("Pos").setColor(0xff2244aa));
@@ -200,11 +200,6 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
     protected void drawGuiContainerBackgroundLayer(float v, int x1, int x2) {
         requestListsIfNeeded();
         populateList();
-        if (localChannelList.getSelected() == -1) {
-            publishAs.setVisible(false);
-        } else {
-            publishAs.setVisible(true);
-        }
         drawWindow();
     }
 }
