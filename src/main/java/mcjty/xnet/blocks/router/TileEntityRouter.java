@@ -35,7 +35,6 @@ public final class TileEntityRouter extends GenericTileEntity {
 
 
     private Map<LocalChannelId, String> publishedChannels = new HashMap<>();
-    private Map<String, LocalChannelId> nameToChannel = new HashMap<>();
 
     public TileEntityRouter() {
     }
@@ -73,7 +72,6 @@ public final class TileEntityRouter extends GenericTileEntity {
             LocalChannelId id = new LocalChannelId(BlockPosTools.readFromNBT(tc, "pos"), tc.getInteger("index"));
             String name = tc.getString("name");
             publishedChannels.put(id, name);
-            nameToChannel.put(name, id);
         }
     }
 
@@ -122,13 +120,16 @@ public final class TileEntityRouter extends GenericTileEntity {
                 .orElse(null);
     }
 
-    public void addRoutedConnectors(Map<SidedConsumer, IConnectorSettings> connectors, String channelName, IChannelType type) {
+    public void addRoutedConnectors(Map<SidedConsumer, IConnectorSettings> connectors, @Nonnull BlockPos controllerPos, int channel, IChannelType type) {
         NetworkId networkId = findAdvancedNetwork();
         if (networkId != null) {
-            LogicTools.consumers(getWorld(), networkId)
-                    .forEach(consumerPos -> LogicTools.routers(getWorld(), consumerPos)
-//                            .filter(r -> r != this)
-                            .forEach(router -> router.addConnectorsFromConnectedNetworks(connectors, channelName, type)));
+            LocalChannelId id = new LocalChannelId(controllerPos, channel);
+            String publishedName = publishedChannels.get(id);
+            if (publishedName != null && !publishedName.isEmpty()) {
+                LogicTools.consumers(getWorld(), networkId)
+                        .forEach(consumerPos -> LogicTools.routers(getWorld(), consumerPos)
+                                .forEach(router -> router.addConnectorsFromConnectedNetworks(connectors, publishedName, type)));
+            }
         }
     }
 
@@ -149,7 +150,6 @@ public final class TileEntityRouter extends GenericTileEntity {
     private void updatePublishName(@Nonnull BlockPos controllerPos, int channel, String name) {
         LocalChannelId id = new LocalChannelId(controllerPos, channel);
         publishedChannels.put(id, name);
-        nameToChannel.put(name, id);
         markDirtyQuick();
     }
 
