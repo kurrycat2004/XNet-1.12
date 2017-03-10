@@ -76,7 +76,7 @@ public final class TileEntityRouter extends GenericTileEntity {
     }
 
     @Nonnull
-    private List<ControllerChannelClientInfo> findLocalChannelInfo() {
+    private List<ControllerChannelClientInfo> findLocalChannelInfo(boolean onlyPublished) {
         List<ControllerChannelClientInfo> list = new ArrayList<>();
         LogicTools.connectors(getWorld(), getPos())
                 .map(connectorPos -> LogicTools.getControllerForConnector(getWorld(), connectorPos))
@@ -89,8 +89,10 @@ public final class TileEntityRouter extends GenericTileEntity {
                             if (publishedName == null) {
                                 publishedName = "";
                             }
-                            ControllerChannelClientInfo ci = new ControllerChannelClientInfo(channelInfo.getChannelName(), publishedName, controller.getPos(), channelInfo.getType(), i);
-                            list.add(ci);
+                            if ((!onlyPublished) || !publishedName.isEmpty()) {
+                                ControllerChannelClientInfo ci = new ControllerChannelClientInfo(channelInfo.getChannelName(), publishedName, controller.getPos(), channelInfo.getType(), i);
+                                list.add(ci);
+                            }
                         }
                     }
                 });
@@ -106,7 +108,7 @@ public final class TileEntityRouter extends GenericTileEntity {
             LogicTools.consumers(getWorld(), networkId)
                     .forEach(consumerPos -> LogicTools.routers(getWorld(), consumerPos)
                             .filter(r -> r != this)
-                            .forEach(router -> list.addAll(router.findLocalChannelInfo())));
+                            .forEach(router -> list.addAll(router.findLocalChannelInfo(true))));
         }
         return list;
     }
@@ -178,7 +180,7 @@ public final class TileEntityRouter extends GenericTileEntity {
             return rc;
         }
         if (CMD_GETCHANNELS.equals(command)) {
-            return type.convert(findLocalChannelInfo());
+            return type.convert(findLocalChannelInfo(false));
         } else if (CMD_GETREMOTECHANNELS.equals(command)) {
             return type.convert(findRemoteChannelInfo());
         }
