@@ -74,7 +74,9 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
     @Override
     protected void clGetSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
         for (CableColor value : CableColor.VALUES) {
-            subItems.add(new ItemStack(itemIn, 1, value.ordinal()));
+            if (value != CableColor.ROUTING || this != NetCableSetup.advancedConnectorBlock) {
+                subItems.add(updateColorInStack(new ItemStack(itemIn, 1, value.ordinal()), value));
+            }
         }
     }
 

@@ -31,6 +31,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -101,6 +102,25 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
         setCreativeTab(XNet.tabXNet);
         setDefaultState(getDefaultState().withProperty(COLOR, CableColor.BLUE));
     }
+
+    @Override
+    public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state) {
+        ItemStack item = super.getItem(worldIn, pos, state);
+        return updateColorInStack(item, state.getValue(COLOR));
+    }
+
+    protected ItemStack updateColorInStack(ItemStack item, CableColor color) {
+        if (color != null) {
+            if (item.getTagCompound() == null) {
+                item.setTagCompound(new NBTTagCompound());
+            }
+            NBTTagCompound display = new NBTTagCompound();
+            display.setString("LocName", getUnlocalizedName() + "_" + color.getName() + ".name");
+            item.getTagCompound().setTag("display", display);
+        }
+        return item;
+    }
+
 
     protected ItemBlock createItemBlock() {
         ItemBlock itemBlock = new ItemBlock(this) {

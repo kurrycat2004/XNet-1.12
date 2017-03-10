@@ -53,7 +53,7 @@ public class NetCableBlock extends GenericCableBlock {
     @Override
     protected void clGetSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
         for (CableColor value : CableColor.VALUES) {
-            subItems.add(new ItemStack(itemIn, 1, value.ordinal()));
+            subItems.add(updateColorInStack(new ItemStack(itemIn, 1, value.ordinal()), value));
         }
     }
 
