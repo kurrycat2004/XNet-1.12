@@ -43,7 +43,7 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
     private int listDirty;
 
     public GuiRouter(TileEntityRouter router, EmptyContainer container) {
-        super(XNet.instance, XNetMessages.INSTANCE, router, container, GuiProxy.GUI_MANUAL_MAIN, "router");
+        super(XNet.instance, XNetMessages.INSTANCE, router, container, GuiProxy.GUI_MANUAL_XNET, "router");
 
         xSize = WIDTH;
         ySize = HEIGHT;

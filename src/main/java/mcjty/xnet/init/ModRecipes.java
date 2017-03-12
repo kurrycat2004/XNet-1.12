@@ -32,6 +32,9 @@ public class ModRecipes {
 
         GameRegistry.addRecipe(new ItemStack(ModBlocks.facadeBlock, 16), "pwp", "wXw", "pwp",
                 'p', Items.PAPER, 'w', Blocks.WOOL, 'X', Blocks.GLASS);
+
+        GameRegistry.addRecipe(new ItemStack(ModItems.xNetManualItem), "rsr", " b ", "r r", 'r', Items.REDSTONE, 'b', Items.BOOK, 's', Items.STRING);
+
     }
 
 }

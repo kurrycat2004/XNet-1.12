@@ -1,0 +1,48 @@
+{b}XNet Manual
+
+Table of Contents:
+{l:intro}Introduction
+{l:basic}Basic Concepts
+{l:advanced}Advanced Concepts
+{-------------------------------------------------------------}
+{b}Introduction
+{n:intro}
+XNet is all about networking and transporting items, liquids,
+energy and information through the world. Using cables you connect
+various machines and blocks and in the controller you configure
+how things move through the created network. A cable can send
+all kinds of information. You don't need different cables for
+items, energy, or liquids.
+
+XNet is also very efficient and scalable. Cables are not tile
+entities and you can create huge cable networks without
+performance differences.
+{-------------------------------------------------------------}
+{b}Basic Concepts
+{n:basic}
+A network (or local network) is represented by a number of machines
+and blocks connected using cables and connectors and one controller.
+Every network needs one controller (and not more) and it is the
+block that does the actual work.
+
+On a single network you can have up to eight channels for items,
+liquids, energy, and information. You can configure these channels
+in the UI of the controller.
+
+Every channel can be connected to as many blocks and machines as
+you want using connectors.
+{-------------------------------------------------------------}
+{b}Advanced Concepts
+{n:advanced}
+Using routers one can connect multiple networks. A single router
+can connect up to 6 networks (one for each side). To do that simply
+connect the network to the router using a normal connector.
+
+Channels are only visible to the router if they are named. This can
+be done in the UI of the controller. These channels are called
+'named channels'.
+
+A named channel can then be published in the router by giving it
+a 'published name'. Only then can this channel be used by other
+networks (either local or remote).
+{-------------------------------------------------------------}

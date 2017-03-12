@@ -5,6 +5,7 @@ import mcjty.lib.container.GenericBlock;
 import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.blocks.cables.ConnectorTileEntity;
 import mcjty.xnet.blocks.cables.GuiConnector;
+import mcjty.xnet.items.manual.GuiXNetManual;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -14,13 +15,16 @@ import net.minecraftforge.fml.common.network.IGuiHandler;
 
 public class GuiProxy implements IGuiHandler {
 
-    public static final int GUI_MANUAL_MAIN = 0;
+    public static final int GUI_MANUAL_XNET = 0;
     public static final int GUI_CONTROLLER = 1;
     public static final int GUI_CONNECTOR = 2;
     public static final int GUI_ROUTER = 3;
 
     @Override
     public Object getServerGuiElement(int guiid, EntityPlayer entityPlayer, World world, int x, int y, int z) {
+        if (guiid == GUI_MANUAL_XNET) {
+            return null;
+        }
         BlockPos pos = new BlockPos(x, y, z);
         Block block = world.getBlockState(pos).getBlock();
         if (block instanceof GenericBlock) {
@@ -35,6 +39,9 @@ public class GuiProxy implements IGuiHandler {
 
     @Override
     public Object getClientGuiElement(int guiid, EntityPlayer entityPlayer, World world, int x, int y, int z) {
+        if (guiid == GUI_MANUAL_XNET) {
+            return new GuiXNetManual(GuiXNetManual.MANUAL_XNET);
+        }
         BlockPos pos = new BlockPos(x, y, z);
         Block block = world.getBlockState(pos).getBlock();
         if (block instanceof GenericBlock) {

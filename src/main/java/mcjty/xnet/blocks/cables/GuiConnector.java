@@ -27,7 +27,7 @@ public class GuiConnector extends GenericGuiContainer<ConnectorTileEntity> {
     }
 
     public GuiConnector(ConnectorTileEntity tileEntity, EmptyContainer container) {
-        super(XNet.instance, XNetMessages.INSTANCE, tileEntity, container, GuiProxy.GUI_MANUAL_MAIN, "connector");
+        super(XNet.instance, XNetMessages.INSTANCE, tileEntity, container, GuiProxy.GUI_MANUAL_XNET, "connector");
 
         xSize = WIDTH;
         ySize = HEIGHT;

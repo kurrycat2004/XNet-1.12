@@ -73,7 +73,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     private boolean needsRefresh = true;
 
     public GuiController(TileEntityController controller, ControllerContainer container) {
-        super(XNet.instance, XNetMessages.INSTANCE, controller, container, GuiProxy.GUI_MANUAL_MAIN, "controller");
+        super(XNet.instance, XNetMessages.INSTANCE, controller, container, GuiProxy.GUI_MANUAL_XNET, "controller");
 
         xSize = WIDTH;
         ySize = HEIGHT;
