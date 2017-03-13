@@ -1,7 +1,13 @@
 {
   "forge_marker": 1,
   "defaults": {
-    "model": "xnet:netcable"
+    "model": "xnet:netcable",
+    "transform": {
+      "gui": {
+        "scale": 0.30,
+        "rotation": [{"x": 35},{"y": 45}]
+      }
+    }
   },
   "variants": {
     "color": {
