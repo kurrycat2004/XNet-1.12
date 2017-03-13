@@ -114,12 +114,6 @@ public class LogicChannelSettings implements IChannelSettings {
                 LogicConnectorSettings con = (LogicConnectorSettings) entry.getValue();
                 sensors.add(Pair.of(entry.getKey(), con));
             }
-
-            connectors = context.getRoutedConnectors(channel);
-            for (Map.Entry<SidedConsumer, IConnectorSettings> entry : connectors.entrySet()) {
-                LogicConnectorSettings con = (LogicConnectorSettings) entry.getValue();
-                sensors.add(Pair.of(entry.getKey(), con));
-            }
         }
     }
 
