@@ -61,6 +61,9 @@ There are currently four different channel types:
 The logic channel is special. It allows you to create sensors to
 measure various things in other blocks (like number of items,
 amount of energy, ...) and then set a 'color' on the controller.
+
+Note that the logic channel doesn't do anything through a router
+right now.
 {-------------------------------------------------------------}
 {b}Network Color
 {n:netcolors}
