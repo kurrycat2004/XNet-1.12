@@ -242,6 +242,7 @@ public class GenericCableBakedModel implements IBakedModel {
             quads.add(createQuad(v(q,     1 - p, 1 - q), v(1 - q, 1 - p, 1 - q), v(1 - q, 1,     1 - q), v(q,     1,     1 - q), spriteSide, hilight));
 
             quads.add(createQuad(v(q,     1 - p, q),     v(1 - q, 1 - p, q),     v(1 - q, 1 - p, 1 - q), v(q,     1 - p, 1 - q), spriteConnector, hilight));
+            quads.add(createQuad(v(q,     1, q),         v(q,     1, 1 - q),     v(1 - q, 1, 1 - q),     v(1 - q, 1, q), spriteSide, hilight));
         } else {
             CablePatterns.QuadSetting pattern = CablePatterns.findPattern(west, south, east, north);
             quads.add(createQuad(v(o,     1 - o, 1 - o), v(1 - o, 1 - o, 1 - o), v(1 - o, 1 - o, o),     v(o,     1 - o, o), getSprite.apply(pattern.getSprite()), pattern.getRotation(), hilight));
@@ -264,6 +265,7 @@ public class GenericCableBakedModel implements IBakedModel {
             quads.add(createQuad(v(q,     0, 1 - q), v(1 - q, 0, 1 - q), v(1 - q, p, 1 - q), v(q,     p, 1 - q), spriteSide, hilight));
 
             quads.add(createQuad(v(q,     p, 1 - q), v(1 - q, p, 1 - q), v(1 - q, p, q),     v(q,     p, q), spriteConnector, hilight));
+            quads.add(createQuad(v(q,     0, 1 - q), v(q,     0, q),     v(1 - q, 0, q),     v(1 - q, 0, 1 - q), spriteSide, hilight));
         } else {
             CablePatterns.QuadSetting pattern = CablePatterns.findPattern(west, north, east, south);
             quads.add(createQuad(v(o, o, o), v(1 - o, o, o), v(1 - o, o, 1 - o), v(o, o, 1 - o), getSprite.apply(pattern.getSprite()),pattern.getRotation(), hilight));
@@ -286,6 +288,7 @@ public class GenericCableBakedModel implements IBakedModel {
             quads.add(createQuad(v(1 - p, q,     1 - q), v(1, q,     1 - q), v(1, 1 - q, 1 - q), v(1 - p, 1 - q, 1 - q), spriteSide, hilight));
 
             quads.add(createQuad(v(1 - p, q, 1 - q), v(1 - p, 1 - q, 1 - q), v(1 - p, 1 - q, q), v(1 - p, q, q), spriteConnector, hilight));
+            quads.add(createQuad(v(1, q, 1 - q),     v(1, q, q),             v(1, 1 - q, q),     v(1, 1 - q, 1 - q), spriteSide, hilight));
         } else {
             CablePatterns.QuadSetting pattern = CablePatterns.findPattern(down, north, up, south);
             quads.add(createQuad(v(1 - o, o, o), v(1 - o, 1 - o, o), v(1 - o, 1 - o, 1 - o), v(1 - o, o, 1 - o), getSprite.apply(pattern.getSprite()), pattern.getRotation(), hilight));
@@ -308,6 +311,7 @@ public class GenericCableBakedModel implements IBakedModel {
             quads.add(createQuad(v(0, q,     1 - q), v(p, q,     1 - q), v(p, 1 - q, 1 - q), v(0, 1 - q, 1 - q), spriteSide, hilight));
 
             quads.add(createQuad(v(p, q, q), v(p, 1 - q, q), v(p, 1 - q, 1 - q), v(p, q, 1 - q), spriteConnector, hilight));
+            quads.add(createQuad(v(0, q, q), v(0, q, 1 - q), v(0, 1 - q, 1 - q), v(0, 1 - q, q), spriteSide, hilight));
         } else {
             CablePatterns.QuadSetting pattern = CablePatterns.findPattern(down, south, up, north);
             quads.add(createQuad(v(o, o, 1 - o), v(o, 1 - o, 1 - o), v(o, 1 - o, o), v(o, o, o), getSprite.apply(pattern.getSprite()), pattern.getRotation(), hilight));
@@ -330,6 +334,7 @@ public class GenericCableBakedModel implements IBakedModel {
             quads.add(createQuad(v(q,     q,     p), v(q,     1 - q, p), v(q,     1 - q, 0), v(q,     q,     0), spriteSide, hilight));
 
             quads.add(createQuad(v(q, q, p), v(1 - q, q, p), v(1 - q, 1 - q, p), v(q, 1 - q, p), spriteConnector, hilight));
+            quads.add(createQuad(v(q, q, 0), v(q, 1 - q, 0), v(1 - q, 1 - q, 0), v(1 - q, q, 0), spriteSide, hilight));
         } else {
             CablePatterns.QuadSetting pattern = CablePatterns.findPattern(west, up, east, down);
             quads.add(createQuad(v(o, 1 - o, o), v(1 - o, 1 - o, o), v(1 - o, o, o), v(o, o, o), getSprite.apply(pattern.getSprite()), pattern.getRotation(), hilight));
@@ -352,6 +357,7 @@ public class GenericCableBakedModel implements IBakedModel {
             quads.add(createQuad(v(q,     q,     1),     v(q,     1 - q, 1),     v(q,     1 - q, 1 - p), v(q,     q,     1 - p), spriteSide, hilight));
 
             quads.add(createQuad(v(q, 1 - q, 1 - p), v(1 - q, 1 - q, 1 - p), v(1 - q, q, 1 - p), v(q, q, 1 - p), spriteConnector, hilight));
+            quads.add(createQuad(v(q, 1 - q, 1),     v(q, q, 1),             v(1 - q, q, 1),     v(1 - q, 1 - q, 1), spriteSide, hilight));
         } else {
             CablePatterns.QuadSetting pattern = CablePatterns.findPattern(west, down, east, up);
             quads.add(createQuad(v(o, o, 1 - o), v(1 - o, o, 1 - o), v(1 - o, 1 - o, 1 - o), v(o, 1 - o, 1 - o), getSprite.apply(pattern.getSprite()), pattern.getRotation(), hilight));
