@@ -11,6 +11,7 @@ import mcjty.xnet.commands.CommandCheck;
 import mcjty.xnet.commands.CommandDump;
 import mcjty.xnet.commands.CommandGen;
 import mcjty.xnet.commands.CommandRebuild;
+import mcjty.xnet.items.manual.GuiXNetManual;
 import mcjty.xnet.multiblock.XNetBlobData;
 import mcjty.xnet.proxy.CommonProxy;
 import net.minecraft.creativetab.CreativeTabs;
@@ -93,8 +94,9 @@ public class XNet implements ModBase {
     }
 
     @Override
-    public void openManual(EntityPlayer entityPlayer, int i, String s) {
-        // @todo
+    public void openManual(EntityPlayer player, int bookIndex, String page) {
+        GuiXNetManual.locatePage = page;
+        player.openGui(XNet.instance, bookIndex, player.getEntityWorld(), (int) player.posX, (int) player.posY, (int) player.posZ);
     }
 
     @Mod.EventHandler
