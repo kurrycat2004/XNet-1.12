@@ -102,7 +102,7 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
 
                 .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority, 36).shift(5)
                 .label("#")
-                .integer(TAG_COUNT, itemMode == ItemMode.EXT ? "Amount in destination inventory to keep" : "Max amount in destination inventory", count, 36)
+                .integer(TAG_COUNT, itemMode == ItemMode.EXT ? "Amount in destination inventory|to keep" : "Max amount in destination|inventory", count, 36)
                 .nl()
 
                 .toggleText(TAG_BLACKLIST, "Enable blacklist mode", "BL", blacklist).shift(2)

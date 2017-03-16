@@ -94,6 +94,10 @@ public abstract class AbstractEditorPanel implements IEditorGui {
         }
     }
 
+    private String[] parseTooltips(String tooltip) {
+        return StringUtils.split(tooltip, '|');
+    }
+
     @Override
     public IEditorGui label(String txt) {
         int w = mc.fontRenderer.getStringWidth(txt)+5;
@@ -110,7 +114,7 @@ public abstract class AbstractEditorPanel implements IEditorGui {
         int w = width;
         fitWidth(w);
         TextField text = new TextField(mc, gui).setText(value)
-                .setTooltips(tooltip)
+                .setTooltips(parseTooltips(tooltip))
                 .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
         data.put(tag, value);
         text.addTextEnterEvent((parent, newText) -> update(tag, newText));
@@ -137,7 +141,7 @@ public abstract class AbstractEditorPanel implements IEditorGui {
         int w = width;
         fitWidth(w);
         TextField text = new TextField(mc, gui).setText(value == null ? "" : value.toString())
-                .setTooltips(tooltip)
+                .setTooltips(parseTooltips(tooltip))
                 .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
         data.put(tag, value);
         text.addTextEnterEvent((parent, newText) -> update(tag, parseInt(newText)));
@@ -164,7 +168,7 @@ public abstract class AbstractEditorPanel implements IEditorGui {
         int w = width;
         fitWidth(w);
         TextField text = new TextField(mc, gui).setText(value == null ? "" : value.toString())
-                .setTooltips(tooltip)
+                .setTooltips(parseTooltips(tooltip))
                 .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
         data.put(tag, value);
         text.addTextEnterEvent((parent, newText) -> update(tag, parseDouble(newText)));
@@ -180,7 +184,7 @@ public abstract class AbstractEditorPanel implements IEditorGui {
         int w = 12;
         fitWidth(w);
         ToggleButton toggle = new ToggleButton(mc, gui).setCheckMarker(true).setPressed(value)
-                .setTooltips(tooltip)
+                .setTooltips(parseTooltips(tooltip))
                 .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
         data.put(tag, value);
         toggle.addButtonEvent(parent -> update(tag, toggle.isPressed()));
@@ -196,7 +200,7 @@ public abstract class AbstractEditorPanel implements IEditorGui {
         fitWidth(w);
         ToggleButton toggle = new ToggleButton(mc, gui).setCheckMarker(false).setPressed(value)
                 .setText(text)
-                .setTooltips(tooltip)
+                .setTooltips(parseTooltips(tooltip))
                 .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
         data.put(tag, value);
         toggle.addButtonEvent(parent -> update(tag, toggle.isPressed()));
@@ -211,7 +215,7 @@ public abstract class AbstractEditorPanel implements IEditorGui {
         int w = 14;
         fitWidth(w);
         ColorChoiceLabel choice = new ColorChoiceLabel(mc, gui).addColors(colors).setCurrentColor(current)
-                .setTooltips(tooltip)
+                .setTooltips(parseTooltips(tooltip))
                 .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
         data.put(tag, current);
         choice.addChoiceEvent((parent, newChoice) -> update(tag, newChoice));
@@ -230,7 +234,7 @@ public abstract class AbstractEditorPanel implements IEditorGui {
 
         fitWidth(w);
         ChoiceLabel choice = new ChoiceLabel(mc, gui).addChoices(values).setChoice(current)
-                .setTooltips(tooltip)
+                .setTooltips(parseTooltips(tooltip))
                 .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
         data.put(tag, current);
         choice.addChoiceEvent((parent, newChoice) -> update(tag, newChoice));

@@ -111,10 +111,10 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
                 .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority, 36).nl()
 
                 .label("Rate")
-                .integer(TAG_RATE, fluidMode == FluidMode.EXT ? "Fluid extraction rate (max " + maxrate + "mb)" : "Fluid insertion rate (max " + maxrate + "mb)", rate, 36)
+                .integer(TAG_RATE, fluidMode == FluidMode.EXT ? "Fluid extraction rate|(max " + maxrate + "mb)" : "Fluid insertion rate|(max " + maxrate + "mb)", rate, 36)
                 .shift(10)
                 .label(fluidMode == FluidMode.EXT ? "Min" : "Max")
-                .integer(TAG_MINMAX, fluidMode == FluidMode.EXT ? "Disable extraction if fluid is too low" : "Disable insertion if fluid is too high", minmax, 36)
+                .integer(TAG_MINMAX, fluidMode == FluidMode.EXT ? "Disable extraction if|fluid level is too low" : "Disable insertion if|fluid level is too high", minmax, 36)
                 .nl()
                 .label("Filter")
                 .ghostSlot(TAG_FILTER, filter);
