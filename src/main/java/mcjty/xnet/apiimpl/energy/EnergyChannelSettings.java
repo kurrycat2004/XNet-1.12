@@ -93,7 +93,7 @@ public class EnergyChannelSettings implements IChannelSettings {
 
                     Integer rate = settings.getRate();
                     if (rate == null) {
-                        rate = 1000000000;
+                        rate = settings.isAdvanced() ? GeneralConfiguration.maxRfRateAdvanced : GeneralConfiguration.maxRfRateNormal;
                     }
                     connectorTE.setEnergyInputFrom(side, rate);
 
@@ -173,7 +173,7 @@ public class EnergyChannelSettings implements IChannelSettings {
 
                     Integer rate = settings.getRate();
                     if (rate == null) {
-                        rate = 1000000000;
+                        rate = settings.isAdvanced() ? GeneralConfiguration.maxRfRateAdvanced : GeneralConfiguration.maxRfRateNormal;
                     }
                     int totransfer = Math.min(rate, energy);
                     int e = EnergyTools.receiveEnergy(te, settings.getFacing(), totransfer);

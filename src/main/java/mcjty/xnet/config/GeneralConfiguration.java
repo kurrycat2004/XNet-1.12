@@ -8,6 +8,9 @@ public class GeneralConfiguration {
     public static int maxRfConnector = 50000;
     public static int maxRfAdvancedConnector = 500000;
 
+    public static int maxRfRateNormal = 10000;
+    public static int maxRfRateAdvanced = 100000;
+
     public static int controllerRFT = 0;          // RF per tick that the controller uses all the time
     public static int controllerChannelRFT = 1;   // RF Per tick per enabled channel
     public static int controllerOperationRFT = 2; // RF Per tick per operation
@@ -20,6 +23,10 @@ public class GeneralConfiguration {
                 "Maximum RF the normal connector can store");
         maxRfAdvancedConnector = cfg.getInt(CATEGORY_GENERAL, "maxRfAdvancedConnector", maxRfAdvancedConnector, 1, 1000000000,
                 "Maximum RF the advanced connector can store");
+        maxRfRateNormal = cfg.getInt(CATEGORY_GENERAL, "maxRfRateNormal", maxRfRateNormal, 1, 1000000000,
+                "Maximum RF/rate that a normal connector can input or output");
+        maxRfRateAdvanced = cfg.getInt(CATEGORY_GENERAL, "maxRfRateAdvanced", maxRfRateAdvanced, 1, 1000000000,
+                "Maximum RF/rate that an advanced connector can input or output");
 
         maxPublishedChannels = cfg.getInt(CATEGORY_GENERAL, "maxPublishedChannels", maxPublishedChannels, 1, 1000000000,
                 "Maximum number of published channels that a routing channel can support");
