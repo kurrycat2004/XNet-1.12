@@ -171,8 +171,11 @@ public class ItemChannelSettings implements IChannelSettings {
 
     private Pair<SidedConsumer, ItemConnectorSettings> insertStackSimulate(@Nonnull IControllerContext context, @Nonnull ItemStack stack) {
         World world = context.getControllerWorld();
+        if (channelMode == ChannelMode.PRIORITY) {
+            roundRobinOffset = 0;       // Always start at 0
+        }
         for (int j = 0 ; j < itemConsumers.size() ; j++) {
-            int i = (j + roundRobinOffset)  % itemConsumers.size();
+            int i = (j + roundRobinOffset) % itemConsumers.size();
             Pair<SidedConsumer, ItemConnectorSettings> entry = itemConsumers.get(i);
             ItemConnectorSettings settings = entry.getValue();
 

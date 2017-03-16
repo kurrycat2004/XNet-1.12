@@ -8,7 +8,6 @@ import mcjty.xnet.api.channels.RSMode;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.keys.SidedConsumer;
-import mcjty.xnet.apiimpl.items.ItemConnectorSettings;
 import mcjty.xnet.blocks.cables.ConnectorTileEntity;
 import mcjty.xnet.blocks.controller.gui.GuiController;
 import mcjty.xnet.config.GeneralConfiguration;
@@ -148,6 +147,9 @@ public class FluidChannelSettings implements IChannelSettings {
     // Returns what could not be filled
     private int insertFluidSimulate(@Nonnull List<Pair<SidedConsumer, FluidConnectorSettings>> inserted, @Nonnull IControllerContext context, @Nonnull FluidStack stack) {
         World world = context.getControllerWorld();
+        if (channelMode == ChannelMode.PRIORITY) {
+            roundRobinOffset = 0;       // Always start at 0
+        }
         int amount = stack.amount;
         for (int j = 0 ; j < fluidConsumers.size() ; j++) {
             int i = (j + roundRobinOffset)  % fluidConsumers.size();
