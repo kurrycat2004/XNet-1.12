@@ -35,7 +35,7 @@ public class XNet implements ModBase {
 
     public static final String MODID = "xnet";
     public static final String MODNAME = "XNet";
-    public static final String MODVERSION = "1.0.0";
+    public static final String MODVERSION = "1.0.1";
 
     public static final String MIN_FORGE10_VER = "12.18.2.2116";
     public static final String MIN_FORGE11_VER = "13.19.0.2176";
