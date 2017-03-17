@@ -109,15 +109,19 @@ public class FluidChannelSettings implements IChannelSettings {
 
                     FluidStack extractMatcher = settings.getMatcher();
 
+                    int toextract = settings.getRate();
+
                     Integer count = settings.getMinmax();
                     if (count != null) {
                         int amount = countFluid(handler, extractMatcher);
-                        if (amount < count) {
+                        int canextract = amount-count;
+                        if (canextract <= 0) {
                             continue;
                         }
+                        toextract = Math.min(toextract, canextract);
                     }
 
-                    FluidStack stack = fetchFluid(handler, true, extractMatcher, settings.getRate());
+                    FluidStack stack = fetchFluid(handler, true, extractMatcher, toextract);
                     if (stack != null) {
                         List<Pair<SidedConsumer, FluidConnectorSettings>> inserted = new ArrayList<>();
                         int remaining = insertFluidSimulate(inserted, context, stack);
@@ -180,16 +184,20 @@ public class FluidChannelSettings implements IChannelSettings {
                     IFluidHandler handler = getFluidHandlerAt(te, settings.getFacing());
                     // @todo report error somewhere?
                     if (handler != null) {
+                        int toinsert = Math.min(settings.getRate(), amount);
+
                         Integer count = settings.getMinmax();
                         if (count != null) {
                             int a = countFluid(handler, settings.getMatcher());
-                            if (a >= count) {
+                            int caninsert = count-a;
+                            if (caninsert <= 0) {
                                 continue;
                             }
+                            toinsert = Math.min(toinsert, caninsert);
                         }
 
                         FluidStack copy = stack.copy();
-                        copy.amount = Math.min(settings.getRate(), amount);
+                        copy.amount = toinsert;
 
                         int filled = handler.fill(copy, false);
                         if (filled > 0) {
@@ -226,9 +234,22 @@ public class FluidChannelSettings implements IChannelSettings {
             BlockPos pos = consumerPosition.offset(side);
             TileEntity te = context.getControllerWorld().getTileEntity(pos);
             IFluidHandler handler = getFluidHandlerAt(te, settings.getFacing());
-            // @todo check this check
+
+            int toinsert = Math.min(settings.getRate(), amount);
+
+            Integer count = settings.getMinmax();
+            if (count != null) {
+                int a = countFluid(handler, settings.getMatcher());
+                int caninsert = count-a;
+                if (caninsert <= 0) {
+                    continue;
+                }
+                toinsert = Math.min(toinsert, caninsert);
+            }
+
             FluidStack copy = stack.copy();
-            copy.amount = Math.min(settings.getRate(), amount);
+            copy.amount = toinsert;
+
             int filled = handler.fill(copy, true);
             if (filled > 0) {
                 roundRobinOffset = (roundRobinOffset+1) % fluidConsumers.size();
