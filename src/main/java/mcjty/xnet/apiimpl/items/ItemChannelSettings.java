@@ -276,6 +276,9 @@ public class ItemChannelSettings implements IChannelSettings {
             if (actuallyinserted > 0) {
                 roundRobinOffset = (roundRobinOffset+1) % itemConsumers.size();
                 total -= actuallyinserted;
+                if (total <= 0) {
+                    return;
+                }
             }
         }
     }
@@ -297,7 +300,7 @@ public class ItemChannelSettings implements IChannelSettings {
         for (int i = index.get(); i < handler.getSlots() ; i++) {
             ItemStack stack = handler.getStackInSlot(i);
             if (ItemStackTools.isValid(stack)) {
-                int s = stackMode == ItemConnectorSettings.StackMode.SINGLE ? 1 : stack.getMaxStackSize();
+                int s = (stackMode == ItemConnectorSettings.StackMode.SINGLE) ? 1 : stack.getMaxStackSize();
                 s = Math.min(s, maxamount);
                 stack = handler.extractItem(i, s, simulate);
                 if (ItemStackTools.isValid(stack) && matcher.test(stack)) {
