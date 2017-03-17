@@ -425,6 +425,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         channels[channel] = null;
         cachedConnectors[channel] = null;
         cachedRoutedConnectors[channel] = null;
+        networkDirty();
         markDirtyQuick();
     }
 

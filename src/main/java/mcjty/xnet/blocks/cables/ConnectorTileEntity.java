@@ -7,16 +7,21 @@ import mcjty.lib.network.Argument;
 import mcjty.xnet.blocks.facade.IFacadeSupport;
 import mcjty.xnet.blocks.facade.MimicBlockSupport;
 import mcjty.xnet.config.GeneralConfiguration;
+import mcjty.xnet.multiblock.WorldBlob;
+import mcjty.xnet.multiblock.XNetBlobData;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
+import javax.annotation.Nonnull;
 import java.util.Map;
 
 public class ConnectorTileEntity extends GenericTileEntity implements IEnergyProvider, IEnergyReceiver,
@@ -29,6 +34,8 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
     private int energy = 0;
     private int inputFromSide[] = new int[] { 0, 0, 0, 0, 0, 0 };
     private String name = "";
+
+    private Block[] cachedNeighbours = new Block[EnumFacing.VALUES.length];
 
     @Override
     public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet) {
@@ -55,6 +62,20 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         markDirtyClient();
     }
 
+    // Optimization to only increase the network if there is an actual block change
+    public void possiblyMarkNetworkDirty(@Nonnull BlockPos neighbor) {
+        for (EnumFacing facing : EnumFacing.VALUES) {
+            if (getPos().offset(facing).equals(neighbor)) {
+                Block newblock = getWorld().getBlockState(neighbor).getBlock();
+                if (newblock != cachedNeighbours[facing.ordinal()]) {
+                    cachedNeighbours[facing.ordinal()] = newblock;
+                    WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
+                    worldBlob.incNetworkVersion(worldBlob.getNetworkAt(getPos()));
+                }
+                return;
+            }
+        }
+    }
 
     @Override
     public void readFromNBT(NBTTagCompound tagCompound) {

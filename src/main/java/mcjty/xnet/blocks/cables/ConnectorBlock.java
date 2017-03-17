@@ -191,6 +191,20 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
     }
 
     @Override
+    public void onNeighborChange(IBlockAccess blockAccess, BlockPos pos, BlockPos neighbor) {
+        if (blockAccess instanceof World) {
+            World world = (World) blockAccess;
+            if (!world.isRemote) {
+                TileEntity te = world.getTileEntity(pos);
+                if (te instanceof ConnectorTileEntity) {
+                    ConnectorTileEntity connector = (ConnectorTileEntity) te;
+                    connector.possiblyMarkNetworkDirty(neighbor);
+                }
+            }
+        }
+    }
+
+    @Override
     public boolean shouldCheckWeakPower(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
         return false;
     }
