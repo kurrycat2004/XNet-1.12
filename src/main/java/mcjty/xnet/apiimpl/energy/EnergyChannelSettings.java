@@ -6,11 +6,10 @@ import mcjty.lib.varia.WorldTools;
 import mcjty.xnet.api.channels.IChannelSettings;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.channels.IControllerContext;
-import mcjty.xnet.api.channels.RSMode;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.keys.SidedConsumer;
-import mcjty.xnet.apiimpl.fluids.FluidConnectorSettings;
+import mcjty.xnet.apiimpl.DefaultChannelSettings;
 import mcjty.xnet.blocks.cables.ConnectorTileEntity;
 import mcjty.xnet.blocks.controller.gui.GuiController;
 import mcjty.xnet.config.GeneralConfiguration;
@@ -29,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class EnergyChannelSettings implements IChannelSettings {
+public class EnergyChannelSettings extends DefaultChannelSettings implements IChannelSettings {
 
     // Cache data
     private List<Pair<SidedConsumer, EnergyConnectorSettings>> energyExtractors = null;
@@ -73,11 +72,8 @@ public class EnergyChannelSettings implements IChannelSettings {
                     EnergyConnectorSettings settings = entry.getValue();
                     ConnectorTileEntity connectorTE = (ConnectorTileEntity) world.getTileEntity(consumerPosition);
 
-                    RSMode rsMode = settings.getRsMode();
-                    if (rsMode != RSMode.IGNORED) {
-                        if ((rsMode == RSMode.ON) != (connectorTE.getPowerLevel() > 0)) {
-                            continue;
-                        }
+                    if (checkRedstone(world, settings, consumerPosition)) {
+                        continue;
                     }
                     if (!context.matchColor(settings.getColorsMask())) {
                         continue;
@@ -152,12 +148,8 @@ public class EnergyChannelSettings implements IChannelSettings {
                 // @todo report error somewhere?
                 if (isEnergyTE(te, settings.getFacing())) {
 
-                    RSMode rsMode = settings.getRsMode();
-                    if (rsMode != RSMode.IGNORED) {
-                        ConnectorTileEntity connector = (ConnectorTileEntity) world.getTileEntity(extractorPos);
-                        if ((rsMode == RSMode.ON) != (connector.getPowerLevel() > 0)) {
-                            continue;
-                        }
+                    if (checkRedstone(world, settings, extractorPos)) {
+                        continue;
                     }
                     if (!context.matchColor(settings.getColorsMask())) {
                         continue;
@@ -187,6 +179,7 @@ public class EnergyChannelSettings implements IChannelSettings {
         }
         return total;
     }
+
 
     public static boolean isEnergyTE(TileEntity te, @Nonnull EnumFacing side) {
         return te instanceof IEnergyHandler || (te != null && te.hasCapability(CapabilityEnergy.ENERGY, side));

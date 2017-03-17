@@ -4,11 +4,10 @@ import mcjty.lib.varia.WorldTools;
 import mcjty.xnet.api.channels.IChannelSettings;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.channels.IControllerContext;
-import mcjty.xnet.api.channels.RSMode;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.keys.SidedConsumer;
-import mcjty.xnet.blocks.cables.ConnectorTileEntity;
+import mcjty.xnet.apiimpl.DefaultChannelSettings;
 import mcjty.xnet.blocks.controller.gui.GuiController;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -22,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class LogicChannelSettings implements IChannelSettings {
+public class LogicChannelSettings extends DefaultChannelSettings implements IChannelSettings {
 
     private int delay = 0;
     private int colors = 0;     // Colors for this channel
@@ -78,13 +77,8 @@ public class LogicChannelSettings implements IChannelSettings {
                 }
 
                 boolean sense = true;
-                RSMode rsMode = settings.getRsMode();
-                if (rsMode != RSMode.IGNORED) {
-                    ConnectorTileEntity connector = (ConnectorTileEntity) world.getTileEntity(extractorPos);
-                    if ((rsMode == RSMode.ON) != (connector.getPowerLevel() > 0)) {
-                        sense = false;
-                    }
-                }
+
+                sense = !checkRedstone(world, settings, extractorPos);
                 if (sense && !context.matchColor(settings.getColorsMask())) {
                     sense = false;
                 }

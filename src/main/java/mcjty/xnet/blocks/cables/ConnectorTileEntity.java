@@ -35,6 +35,9 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
     private int inputFromSide[] = new int[] { 0, 0, 0, 0, 0, 0 };
     private String name = "";
 
+    // Count the number of redstone pulses we got
+    private int pulseCounter;
+
     private Block[] cachedNeighbours = new Block[EnumFacing.VALUES.length];
 
     @Override
@@ -62,6 +65,18 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         markDirtyClient();
     }
 
+    @Override
+    public void setPowerInput(int powered) {
+        if (powerLevel == 0 && powered > 0) {
+            pulseCounter++;
+        }
+        super.setPowerInput(powered);
+    }
+
+    public int getPulseCounter() {
+        return pulseCounter;
+    }
+
     // Optimization to only increase the network if there is an actual block change
     public void possiblyMarkNetworkDirty(@Nonnull BlockPos neighbor) {
         for (EnumFacing facing : EnumFacing.VALUES) {
@@ -85,8 +100,14 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         if (inputFromSide.length != 6) {
             inputFromSide = new int[] { 0, 0, 0, 0, 0, 0 };
         }
-        name = tagCompound.getString("name");
         mimicBlockSupport.readFromNBT(tagCompound);
+        pulseCounter = tagCompound.getInteger("pulse");
+    }
+
+    @Override
+    public void readRestorableFromNBT(NBTTagCompound tagCompound) {
+        super.readRestorableFromNBT(tagCompound);
+        name = tagCompound.getString("name");
     }
 
     @Override
@@ -94,9 +115,15 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         super.writeToNBT(tagCompound);
         tagCompound.setInteger("energy", energy);
         tagCompound.setIntArray("inputs", inputFromSide);
-        tagCompound.setString("name", name);
         mimicBlockSupport.writeToNBT(tagCompound);
+        tagCompound.setInteger("pulse", pulseCounter);
         return tagCompound;
+    }
+
+    @Override
+    public void writeRestorableToNBT(NBTTagCompound tagCompound) {
+        super.writeRestorableToNBT(tagCompound);
+        tagCompound.setString("name", name);
     }
 
     public int getPowerLevel() {

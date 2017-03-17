@@ -18,6 +18,7 @@ public abstract class AbstractConnectorSettings implements IConnectorSettings {
     public static final String TAG_FACING = "facing";
 
     private RSMode rsMode = RSMode.IGNORED;
+    private int prevPulse = 0;
     private Color[] colors = new Color[]{Color.OFF, Color.OFF, Color.OFF, Color.OFF};
     private int colorsMask = 0;
 
@@ -44,6 +45,14 @@ public abstract class AbstractConnectorSettings implements IConnectorSettings {
 
     public RSMode getRsMode() {
         return rsMode;
+    }
+
+    public int getPrevPulse() {
+        return prevPulse;
+    }
+
+    public void setPrevPulse(int prevPulse) {
+        this.prevPulse = prevPulse;
     }
 
     public Color[] getColors() {
@@ -78,6 +87,7 @@ public abstract class AbstractConnectorSettings implements IConnectorSettings {
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         rsMode = RSMode.values()[tag.getByte("rsMode")];
+        prevPulse = tag.getInteger("prevPulse");
         colors[0] = Color.values()[tag.getByte("color0")];
         colors[1] = Color.values()[tag.getByte("color1")];
         colors[2] = Color.values()[tag.getByte("color2")];
@@ -91,6 +101,7 @@ public abstract class AbstractConnectorSettings implements IConnectorSettings {
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         tag.setByte("rsMode", (byte) rsMode.ordinal());
+        tag.setInteger("prevPulse", prevPulse);
         tag.setByte("color0", (byte) colors[0].ordinal());
         tag.setByte("color1", (byte) colors[1].ordinal());
         tag.setByte("color2", (byte) colors[2].ordinal());

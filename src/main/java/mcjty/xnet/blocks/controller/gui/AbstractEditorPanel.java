@@ -7,7 +7,6 @@ import mcjty.lib.network.Argument;
 import mcjty.lib.network.ArgumentType;
 import mcjty.lib.tools.ItemStackTools;
 import mcjty.lib.tools.MinecraftTools;
-import mcjty.lib.varia.RedstoneMode;
 import mcjty.xnet.api.channels.RSMode;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.network.XNetMessages;
@@ -259,18 +258,22 @@ public abstract class AbstractEditorPanel implements IEditorGui {
         int w = 14;
         fitWidth(w);
         ImageChoiceLabel redstoneMode = new ImageChoiceLabel(mc, gui)
-                .addChoice(RedstoneMode.REDSTONE_IGNORED.getDescription(), "Redstone mode:\nIgnored", GuiController.iconGuiElements, 1, 1)
-                .addChoice(RedstoneMode.REDSTONE_OFFREQUIRED.getDescription(), "Redstone mode:\nOff to activate", GuiController.iconGuiElements, 17, 1)
-                .addChoice(RedstoneMode.REDSTONE_ONREQUIRED.getDescription(), "Redstone mode:\nOn to activate", GuiController.iconGuiElements, 33, 1);
+                .addChoice("Ignored", "Redstone mode:\nIgnored", GuiController.iconGuiElements, 1, 1)
+                .addChoice("Off", "Redstone mode:\nOff to activate", GuiController.iconGuiElements, 17, 1)
+                .addChoice("On", "Redstone mode:\nOn to activate", GuiController.iconGuiElements, 33, 1)
+                .addChoice("Pulse", "Do one operation\non a pulse", GuiController.iconGuiElements, 49, 1);
         switch (current) {
             case IGNORED:
-                redstoneMode.setCurrentChoice(RedstoneMode.REDSTONE_IGNORED.getDescription());
+                redstoneMode.setCurrentChoice("Ignored");
                 break;
             case OFF:
-                redstoneMode.setCurrentChoice(RedstoneMode.REDSTONE_OFFREQUIRED.getDescription());
+                redstoneMode.setCurrentChoice("Off");
                 break;
             case ON:
-                redstoneMode.setCurrentChoice(RedstoneMode.REDSTONE_ONREQUIRED.getDescription());
+                redstoneMode.setCurrentChoice("On");
+                break;
+            case PULSE:
+                redstoneMode.setCurrentChoice("Pulse");
                 break;
         }
         redstoneMode.setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));

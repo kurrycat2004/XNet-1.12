@@ -5,11 +5,10 @@ import mcjty.lib.varia.WorldTools;
 import mcjty.xnet.api.channels.IChannelSettings;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.channels.IControllerContext;
-import mcjty.xnet.api.channels.RSMode;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.keys.SidedConsumer;
-import mcjty.xnet.blocks.cables.ConnectorTileEntity;
+import mcjty.xnet.apiimpl.DefaultChannelSettings;
 import mcjty.xnet.blocks.controller.gui.GuiController;
 import mcjty.xnet.config.GeneralConfiguration;
 import net.minecraft.inventory.IInventory;
@@ -35,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-public class ItemChannelSettings implements IChannelSettings {
+public class ItemChannelSettings extends DefaultChannelSettings implements IChannelSettings {
 
     public static final String TAG_MODE = "mode";
 
@@ -128,12 +127,8 @@ public class ItemChannelSettings implements IChannelSettings {
                 IItemHandler handler = getItemHandlerAt(te, settings.getFacing());
                 // @todo report error somewhere?
                 if (handler != null) {
-                    RSMode rsMode = settings.getRsMode();
-                    if (rsMode != RSMode.IGNORED) {
-                        ConnectorTileEntity connector = (ConnectorTileEntity) world.getTileEntity(extractorPos);
-                        if ((rsMode == RSMode.ON) != (connector.getPowerLevel() > 0)) {
-                            continue;
-                        }
+                    if (checkRedstone(world, settings, extractorPos)) {
+                        continue;
                     }
                     if (!context.matchColor(settings.getColorsMask())) {
                         continue;
@@ -205,12 +200,8 @@ public class ItemChannelSettings implements IChannelSettings {
                         continue;
                     }
 
-                    RSMode rsMode = settings.getRsMode();
-                    if (rsMode != RSMode.IGNORED) {
-                        ConnectorTileEntity connector = (ConnectorTileEntity) world.getTileEntity(consumerPos);
-                        if ((rsMode == RSMode.ON) != (connector.getPowerLevel() > 0)) {
-                            continue;
-                        }
+                    if (checkRedstone(world, settings, consumerPos)) {
+                        continue;
                     }
                     if (!context.matchColor(settings.getColorsMask())) {
                         continue;
