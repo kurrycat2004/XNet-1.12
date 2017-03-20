@@ -21,12 +21,17 @@ public class ItemFilterCache {
     private ItemStackList stacks;
     private Set<Integer> oredictMatches = new HashSet<>();
 
-    public ItemFilterCache(boolean matchDamage, boolean oredictMode, boolean blacklistMode, boolean nbtMode, ItemStackList stacks) {
+    public ItemFilterCache(boolean matchDamage, boolean oredictMode, boolean blacklistMode, boolean nbtMode, @Nonnull ItemStackList stacks) {
         this.matchDamage = matchDamage;
         this.oredictMode = oredictMode;
         this.blacklistMode = blacklistMode;
         this.nbtMode = nbtMode;
         this.stacks = stacks;
+        for (ItemStack s : stacks) {
+            for (int id : OreDictionary.getOreIDs(s)) {
+                oredictMatches.add(id);
+            }
+        }
     }
 
     public boolean match(ItemStack stack) {
