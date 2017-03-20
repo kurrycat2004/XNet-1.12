@@ -24,9 +24,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class EnergyChannelSettings extends DefaultChannelSettings implements IChannelSettings {
 
@@ -55,24 +53,28 @@ public class EnergyChannelSettings extends DefaultChannelSettings implements ICh
 
         // First find out how much energy we have to distribute in total
         int totalToDistribute = 0;
+        // Keep track of the connectors we already got energy from and how much energy we
+        // got from it
+        Map<BlockPos, Integer> alreadyHandled = new HashMap<>();
+
         List<Pair<ConnectorTileEntity, Integer>> energyProducers = new ArrayList<>();
         for (Pair<SidedConsumer, EnergyConnectorSettings> entry : energyExtractors) {
-            BlockPos consumerPosition = context.findConsumerPosition(entry.getKey().getConsumerId());
-            if (consumerPosition != null) {
+            BlockPos connectorPos = context.findConsumerPosition(entry.getKey().getConsumerId());
+            if (connectorPos != null) {
 
                 EnumFacing side = entry.getKey().getSide();
-                BlockPos pos = consumerPosition.offset(side);
-                if (!WorldTools.chunkLoaded(world, pos)) {
+                BlockPos energyPos = connectorPos.offset(side);
+                if (!WorldTools.chunkLoaded(world, energyPos)) {
                     continue;
                 }
 
-                TileEntity te = world.getTileEntity(pos);
+                TileEntity te = world.getTileEntity(energyPos);
                 // @todo report error somewhere?
                 if (isEnergyTE(te, side.getOpposite())) {
                     EnergyConnectorSettings settings = entry.getValue();
-                    ConnectorTileEntity connectorTE = (ConnectorTileEntity) world.getTileEntity(consumerPosition);
+                    ConnectorTileEntity connectorTE = (ConnectorTileEntity) world.getTileEntity(connectorPos);
 
-                    if (checkRedstone(world, settings, consumerPosition)) {
+                    if (checkRedstone(world, settings, connectorPos)) {
                         continue;
                     }
                     if (!context.matchColor(settings.getColorsMask())) {
@@ -93,8 +95,17 @@ public class EnergyChannelSettings extends DefaultChannelSettings implements ICh
                     }
                     connectorTE.setEnergyInputFrom(side, rate);
 
-                    int tosend = Math.min(rate, connectorTE.getEnergy());
+                    if (!alreadyHandled.containsKey(connectorPos)) {
+                        // We did not handle this connector yet. Remember the amount of energy in it
+                        alreadyHandled.put(connectorPos, connectorTE.getEnergy());
+                    }
+
+                    // Check how much energy we can still send from that connector
+                    int connectorEnergy = alreadyHandled.get(connectorPos);
+                    int tosend = Math.min(rate, connectorEnergy);
                     if (tosend > 0) {
+                        // Decrease the energy from our temporary datastructure
+                        alreadyHandled.put(connectorPos, connectorEnergy - tosend);
                         totalToDistribute += tosend;
                         energyProducers.add(Pair.of(connectorTE, tosend));
                     }
