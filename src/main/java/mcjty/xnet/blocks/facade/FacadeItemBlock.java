@@ -59,8 +59,8 @@ public class FacadeItemBlock extends CompatItemBlock {
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-        super.addInformation(stack, playerIn, tooltip, advanced);
+    public void clAddInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+        super.clAddInformation(stack, playerIn, tooltip, advanced);
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null || !tagCompound.hasKey("regName")) {
             tooltip.add(TextFormatting.BLUE + "Right or sneak-right click on block to mimic");

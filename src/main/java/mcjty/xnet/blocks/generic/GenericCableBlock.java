@@ -1,5 +1,6 @@
 package mcjty.xnet.blocks.generic;
 
+import mcjty.lib.CompatLayer;
 import mcjty.lib.compat.CompatBlock;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
 import mcjty.lib.compat.waila.WailaInfoProvider;
@@ -39,6 +40,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
@@ -115,7 +117,12 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
                 item.setTagCompound(new NBTTagCompound());
             }
             NBTTagCompound display = new NBTTagCompound();
-            display.setString("LocName", getUnlocalizedName() + "_" + color.getName() + ".name");
+            String unlocname = getUnlocalizedName() + "_" + color.getName() + ".name";
+            if (CompatLayer.isV10()) {
+                display.setString("Name", I18n.translateToLocal(unlocname));
+            } else {
+                display.setString("LocName", unlocname);
+            }
             item.getTagCompound().setTag("display", display);
         }
         return item;

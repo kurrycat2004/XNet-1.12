@@ -310,8 +310,8 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List<String> tooltip, boolean adv) {
-        super.addInformation(stack, player, tooltip, adv);
+    public void clAddInformation(ItemStack stack, EntityPlayer player, List<String> tooltip, boolean adv) {
+        super.clAddInformation(stack, player, tooltip, adv);
 
         if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
             tooltip.add(TextFormatting.BLUE + "Place connector next to block or");
