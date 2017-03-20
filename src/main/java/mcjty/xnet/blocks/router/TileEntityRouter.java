@@ -177,14 +177,17 @@ public final class TileEntityRouter extends GenericTileEntity {
             // We are in error. Don't do anything
             return;
         }
-        NetworkId networkId = findRoutingNetwork();
-        if (networkId != null) {
-            LocalChannelId id = new LocalChannelId(controllerPos, channel);
-            String publishedName = publishedChannels.get(id);
-            if (publishedName != null && !publishedName.isEmpty()) {
+        LocalChannelId id = new LocalChannelId(controllerPos, channel);
+        String publishedName = publishedChannels.get(id);
+        if (publishedName != null && !publishedName.isEmpty()) {
+            NetworkId networkId = findRoutingNetwork();
+            if (networkId != null) {
                 LogicTools.consumers(getWorld(), networkId)
                         .forEach(consumerPos -> LogicTools.routers(getWorld(), consumerPos)
                                 .forEach(router -> router.addConnectorsFromConnectedNetworks(connectors, publishedName, type)));
+            } else {
+                // If there is no routing network that means we have a local network only
+                addConnectorsFromConnectedNetworks(connectors, publishedName, type);
             }
         }
     }
