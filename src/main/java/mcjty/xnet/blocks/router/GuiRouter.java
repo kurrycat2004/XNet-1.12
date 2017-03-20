@@ -168,7 +168,7 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
                     .addTextEvent((parent, newText) -> updatePublish(controllerPos, index, newText));
             panel1.addChild(pubName);
         } else {
-            panel1.addChild(new Label<>(mc, this).setText(publishedName).setColor(0xffee3311));
+            panel1.addChild(new Label<>(mc, this).setText(publishedName).setColor(0xff33ff00));
         }
 
         Panel panel2 = new Panel(mc, this).setLayout(new HorizontalLayout().setHorizontalMargin(0).setSpacing(0)).setLayoutHint(new PositionalLayout.PositionalHint(0, 13, 160, 13));
