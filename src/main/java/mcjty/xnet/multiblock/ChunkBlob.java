@@ -229,7 +229,7 @@ public class ChunkBlob {
         IntPos posId = new IntPos(pos);
         if (blobAllocations.containsKey(posId)) {
             // @todo
-            System.out.println("There is already a cablesegment at " + BlockPosTools.toString(pos) + "!");
+//            System.out.println("There is already a cablesegment at " + BlockPosTools.toString(pos) + "!");
             return getBorderPositions().contains(posId);
         }
 
@@ -308,7 +308,7 @@ public class ChunkBlob {
         IntPos posId = new IntPos(pos);
         if (!blobAllocations.containsKey(posId)) {
             // @todo
-            System.out.println("There is no cablesegment at " + BlockPosTools.toString(pos) + "!");
+//            System.out.println("There is no cablesegment at " + BlockPosTools.toString(pos) + "!");
             return getBorderPositions().contains(posId);
         }
 
