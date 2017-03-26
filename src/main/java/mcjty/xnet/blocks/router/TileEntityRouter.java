@@ -130,6 +130,7 @@ public final class TileEntityRouter extends GenericTileEntity {
         List<ControllerChannelClientInfo> list = new ArrayList<>();
         LogicTools.connectors(getWorld(), getPos())
                 .map(connectorPos -> LogicTools.getControllerForConnector(getWorld(), connectorPos))
+                .filter(Objects::nonNull)
                 .forEach(controller -> {
                     for (int i = 0; i < MAX_CHANNELS; i++) {
                         ChannelInfo channelInfo = controller.getChannels()[i];
