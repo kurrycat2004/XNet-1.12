@@ -114,7 +114,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                             }
                     });
 
-            networkChecker.dump();
+//            networkChecker.dump();
         }
         return networkChecker;
     }
