@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
 public class NetCableSetup {
@@ -35,10 +36,9 @@ public class NetCableSetup {
     }
 
     public static void initCrafting() {
-        ItemStack lapisStack = new ItemStack(Items.DYE, 1, 4);
         GameRegistry.addRecipe(new ItemStack(netCableBlock, 16, CableColor.ROUTING.ordinal()), "srs", "rgr", "srs", 'r', Blocks.REDSTONE_BLOCK, 's', Items.STRING, 'g', Items.DIAMOND);
         GameRegistry.addRecipe(new ItemStack(netCableBlock, 16), "srs", "rgr", "srs", 'r', Items.REDSTONE, 's', Items.STRING, 'g', Items.GOLD_NUGGET);
-        GameRegistry.addRecipe(new ItemStack(connectorBlock, 1), "lRl", "rgr", "lrl", 'r', Items.REDSTONE, 'l', lapisStack, 'g', Items.GOLD_INGOT, 'R', Blocks.CHEST);
+        GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(connectorBlock, 1), "lRl", "rgr", "lrl", 'r', Items.REDSTONE, 'l', "dyeBlue", 'g', Items.GOLD_INGOT, 'R', "chest"));
         GameRegistry.addRecipe(new ItemStack(connectorBlock, 1, CableColor.ROUTING.ordinal()), "rrr", "xMx", "rrr", 'M', new ItemStack(connectorBlock, 1), 'r', Items.REDSTONE, 'x', Items.GOLD_NUGGET);
         GameRegistry.addRecipe(new ItemStack(advancedConnectorBlock, 1), "ce", "dr", 'c', connectorBlock, 'e', Items.ENDER_PEARL, 'd', Items.DIAMOND, 'r', Items.REDSTONE);
 
