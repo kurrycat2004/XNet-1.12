@@ -10,6 +10,8 @@ Table of Contents:
 {l:connector}Connectors
 {l:controller}Controller
 {l:router}Router
+{l:proxy}Redstone Proxy
+
 {-------------------------------------------------------------}
 {b}Introduction
 {n:intro}
@@ -151,4 +153,13 @@ same published name.
 
 Also note that there is a limit of 32 published channels on a
 routing network.
+{-------------------------------------------------------------}
+{b}Redstone Proxy
+{n:orixt}
+{rb:redstone_proxy}
+The Redstone Proxy block is a very simple block that has no
+functionality on its own. It is special because connectors can
+also connect to it which allows you to access the redstone
+properties of it in a sensor. Using a sensor in a logic channel
+you can read out the amount of redstone going into the proxy block.
 {-------------------------------------------------------------}

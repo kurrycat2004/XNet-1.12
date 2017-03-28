@@ -66,10 +66,10 @@ public class LogicChannelSettings extends DefaultChannelSettings implements ICha
                 continue;
             }
             int sensorColors = 0;
-            BlockPos extractorPos = context.findConsumerPosition(entry.getKey().getConsumerId());
-            if (extractorPos != null) {
+            BlockPos connectorPos = context.findConsumerPosition(entry.getKey().getConsumerId());
+            if (connectorPos != null) {
                 EnumFacing side = entry.getKey().getSide();
-                BlockPos pos = extractorPos.offset(side);
+                BlockPos pos = connectorPos.offset(side);
                 if (!WorldTools.chunkLoaded(world, pos)) {
                     // If it is not chunkloaded we just use the color settings as we last remembered it
                     colors |= settings.getColorMask();
@@ -78,7 +78,7 @@ public class LogicChannelSettings extends DefaultChannelSettings implements ICha
 
                 boolean sense = true;
 
-                sense = !checkRedstone(world, settings, extractorPos);
+                sense = !checkRedstone(world, settings, connectorPos);
                 if (sense && !context.matchColor(settings.getColorsMask())) {
                     sense = false;
                 }

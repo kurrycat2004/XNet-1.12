@@ -233,14 +233,14 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
             return ConnectorType.CABLE;
         } else if (isConnectable(world, pos) && color != CableColor.ROUTING) {
             return ConnectorType.BLOCK;
-        } else if (isConnectableAdvanced(world, pos) && color == CableColor.ROUTING) {
+        } else if (isConnectableRouting(world, pos) && color == CableColor.ROUTING) {
             return ConnectorType.BLOCK;
         } else {
             return ConnectorType.NONE;
         }
     }
 
-    public static boolean isConnectableAdvanced(IBlockAccess world, BlockPos pos) {
+    public static boolean isConnectableRouting(IBlockAccess world, BlockPos pos) {
         TileEntity te = world.getTileEntity(pos);
         if (te == null) {
             return false;
@@ -253,6 +253,9 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
 
     public static boolean isConnectable(IBlockAccess world, BlockPos pos) {
         TileEntity te = world.getTileEntity(pos);
+        if (world.getBlockState(pos).getBlock() == ModBlocks.redstoneProxyBlock) {
+            return true;
+        }
         if (te == null) {
             return false;
         }
