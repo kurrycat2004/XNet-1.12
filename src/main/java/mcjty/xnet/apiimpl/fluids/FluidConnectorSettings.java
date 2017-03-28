@@ -7,6 +7,7 @@ import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.apiimpl.AbstractConnectorSettings;
 import mcjty.xnet.blocks.controller.gui.GuiController;
+import mcjty.xnet.config.GeneralConfiguration;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -26,8 +27,6 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
     public static final String TAG_FILTER = "flt";
     public static final String TAG_SPEED = "speed";
 
-    public static final int MAXRATE_ADVANCED = 5000;
-    public static final int MAXRATE_NORMAL = 1000;
 
     enum FluidMode {
         INS,
@@ -62,7 +61,7 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
 
     @Nonnull
     public Integer getRate() {
-        return rate == null ? MAXRATE_NORMAL : rate;
+        return rate == null ? GeneralConfiguration.maxFluidRateNormal : rate;
     }
 
     @Nullable
@@ -94,10 +93,10 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
         int maxrate;
         if (isAdvanced()) {
             speeds = new String[] { "10", "20", "60", "100", "200" };
-            maxrate = MAXRATE_ADVANCED;
+            maxrate = GeneralConfiguration.maxFluidRateAdvanced;
         } else {
             speeds = new String[] { "20", "60", "100", "200" };
-            maxrate = MAXRATE_NORMAL;
+            maxrate = GeneralConfiguration.maxFluidRateNormal;
         }
 
         sideGui(gui);
@@ -156,9 +155,9 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
         rate = (Integer) data.get(TAG_RATE);
         int maxrate;
         if (isAdvanced()) {
-            maxrate = MAXRATE_ADVANCED;
+            maxrate = GeneralConfiguration.maxFluidRateAdvanced;
         } else {
-            maxrate = MAXRATE_NORMAL;
+            maxrate = GeneralConfiguration.maxFluidRateNormal;
         }
         if (rate != null && rate > maxrate) {
             rate = maxrate;
