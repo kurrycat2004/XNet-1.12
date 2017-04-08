@@ -270,8 +270,17 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                 toinsert = Math.min(toinsert, caninsert);
                 ItemStackTools.setStackSize(stack, toinsert);
             }
-            stack = ItemHandlerHelper.insertItem(handler, stack, false);
-            int actuallyinserted = toinsert - ItemStackTools.getStackSize(stack);
+            ItemStack remaining = ItemHandlerHelper.insertItem(handler, stack, false);
+            int actuallyinserted = toinsert - ItemStackTools.getStackSize(remaining);
+            if (count == null) {
+                // If we are not using a count then we restore 'stack' here as that is what
+                // we actually have to keep inserting until it is empty. If we are using a count
+                // then we don't do this as we don't want to risk stack getting null (on 1.10.2)
+                // from the insertItem() and then not being able to set stacksize a few lines
+                // above this
+                stack = remaining;
+            }
+
             if (actuallyinserted > 0) {
                 roundRobinOffset = (roundRobinOffset+1) % itemConsumers.size();
                 total -= actuallyinserted;
