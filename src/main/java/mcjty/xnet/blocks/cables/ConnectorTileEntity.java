@@ -189,12 +189,12 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
 
     @Override
     public int getEnergyStored(EnumFacing from) {
-        return 0;
+        return energy;
     }
 
     @Override
     public int getMaxEnergyStored(EnumFacing from) {
-        return 0;
+        return getMaxEnergy();
     }
 
     @Override
