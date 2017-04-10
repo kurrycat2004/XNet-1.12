@@ -99,7 +99,7 @@ public class FacadeItemBlock extends CompatItemBlock {
                     }
                     ItemStackTools.incStackSize(itemstack, -1);
                 }
-            } else if (block == NetCableSetup.connectorBlock) {
+            } else if (block == NetCableSetup.connectorBlock || block == NetCableSetup.advancedConnectorBlock) {
                 TileEntity te = world.getTileEntity(pos);
                 if (te instanceof ConnectorTileEntity) {
                     ConnectorTileEntity connectorTileEntity = (ConnectorTileEntity) te;
