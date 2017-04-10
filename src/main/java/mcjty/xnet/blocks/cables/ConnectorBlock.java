@@ -1,6 +1,7 @@
 package mcjty.xnet.blocks.cables;
 
 import mcjty.lib.tools.ItemStackTools;
+import mcjty.lib.varia.EnergyTools;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.ProbeMode;
@@ -42,7 +43,6 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.property.IExtendedBlockState;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -262,7 +262,7 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
         if (te instanceof IInventory) {
             return true;
         }
-        if (te.hasCapability(CapabilityEnergy.ENERGY, null)) {
+        if (EnergyTools.isEnergyTE(te)) {
             return true;
         }
         if (te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
