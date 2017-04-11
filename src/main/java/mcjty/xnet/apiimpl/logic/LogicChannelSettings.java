@@ -52,10 +52,10 @@ public class LogicChannelSettings extends DefaultChannelSettings implements ICha
         if (delay <= 0) {
             delay = 200 * 6;      // Multiply of the different speeds we have
         }
-        if (delay % 10 != 0) {
+        if (delay % 5 != 0) {
             return;
         }
-        int d = delay / 10;
+        int d = delay / 5;
         updateCache(channel, context);
         World world = context.getControllerWorld();
 
@@ -116,7 +116,7 @@ public class LogicChannelSettings extends DefaultChannelSettings implements ICha
                 TileEntity te = world.getTileEntity(connectorPos);
                 if (te instanceof ConnectorTileEntity) {
                     ConnectorTileEntity connectorTE = (ConnectorTileEntity) te;
-                    int powerOut = connectorTE.getPowerOut(side);
+                    int powerOut;
                     if (checkRedstone(world, settings, connectorPos)) {
                         powerOut = 0;
                     } else if (!context.matchColor(settings.getColorsMask())) {

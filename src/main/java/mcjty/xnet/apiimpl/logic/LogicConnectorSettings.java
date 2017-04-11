@@ -112,9 +112,9 @@ public class LogicConnectorSettings extends AbstractConnectorSettings {
     public void createGui(IEditorGui gui) {
         String[] speeds;
         if (isAdvanced()) {
-            speeds = new String[] { "10", "20", "60", "100", "200" };
+            speeds = new String[] { "5", "10", "20", "60", "100", "200" };
         } else {
-            speeds = new String[] { "20", "60", "100", "200" };
+            speeds = new String[] { "10", "20", "60", "100", "200" };
         }
         sideGui(gui);
         colorsGui(gui);
