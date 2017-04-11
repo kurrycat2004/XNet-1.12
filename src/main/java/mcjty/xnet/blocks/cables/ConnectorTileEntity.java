@@ -4,6 +4,7 @@ import cofh.api.energy.IEnergyProvider;
 import cofh.api.energy.IEnergyReceiver;
 import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.network.Argument;
+import mcjty.lib.tools.WorldTools;
 import mcjty.xnet.blocks.facade.IFacadeSupport;
 import mcjty.xnet.blocks.facade.MimicBlockSupport;
 import mcjty.xnet.config.GeneralConfiguration;
@@ -37,6 +38,7 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
 
     // Count the number of redstone pulses we got
     private int pulseCounter;
+    private int powerOut[] = new int[] { 0, 0, 0, 0, 0, 0 };
 
     private Block[] cachedNeighbours = new Block[EnumFacing.VALUES.length];
 
@@ -54,6 +56,21 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         }
     }
 
+    public int getPowerOut(EnumFacing side) {
+        return powerOut[side.ordinal()];
+    }
+
+    public void setPowerOut(EnumFacing side, int powerOut) {
+        if (powerOut > 15) {
+            powerOut = 15;
+        }
+        if (this.powerOut[side.ordinal()] == powerOut) {
+            return;
+        }
+        this.powerOut[side.ordinal()] = powerOut;
+        markDirty();
+        WorldTools.notifyBlockOfStateChange(getWorld(), this.pos.offset(side), this.getBlockType(), this.pos);
+    }
 
     @Override
     public IBlockState getMimicBlock() {
@@ -102,6 +119,9 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         }
         mimicBlockSupport.readFromNBT(tagCompound);
         pulseCounter = tagCompound.getInteger("pulse");
+        for (int i = 0 ; i < 6 ; i++) {
+            powerOut[i] = tagCompound.getByte("p" + i);
+        }
     }
 
     @Override
@@ -117,6 +137,9 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         tagCompound.setIntArray("inputs", inputFromSide);
         mimicBlockSupport.writeToNBT(tagCompound);
         tagCompound.setInteger("pulse", pulseCounter);
+        for (int i = 0 ; i < 6 ; i++) {
+            tagCompound.setByte("p" + i, (byte) powerOut[i]);
+        }
         return tagCompound;
     }
 

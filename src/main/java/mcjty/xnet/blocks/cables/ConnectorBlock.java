@@ -30,6 +30,7 @@ import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -219,6 +220,30 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
     }
 
     @Override
+    public boolean canProvidePower(IBlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getWeakPower(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+        return getRedstoneOutput(state, world, pos, side);
+    }
+
+    @Override
+    public int getStrongPower(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+        return getRedstoneOutput(state, world, pos, side);
+    }
+
+    protected int getRedstoneOutput(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+        TileEntity te = world.getTileEntity(pos);
+        if (state.getBlock() instanceof ConnectorBlock && te instanceof ConnectorTileEntity) {
+            ConnectorTileEntity connector = (ConnectorTileEntity) te;
+            return connector.getPowerOut(side.getOpposite());
+        }
+        return 0;
+    }
+
+    @Override
     protected IBlockState clGetStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
         // When our block is placed down we force a re-render of adjacent blocks to make sure their ISBM model is updated
         world.markBlockRangeForRenderUpdate(pos.add(-1, -1, -1), pos.add(1, 1, 1));
@@ -253,7 +278,15 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
 
     public static boolean isConnectable(IBlockAccess world, BlockPos pos) {
         TileEntity te = world.getTileEntity(pos);
-        if (world.getBlockState(pos).getBlock() == ModBlocks.redstoneProxyBlock) {
+        IBlockState state = world.getBlockState(pos);
+        Block block = state.getBlock();
+        if (block instanceof ConnectorBlock) {
+            return false;
+        }
+        if (block == ModBlocks.redstoneProxyBlock || block == Blocks.REDSTONE_LAMP || block == Blocks.LIT_REDSTONE_LAMP) {
+            return true;
+        }
+        if (block.canConnectRedstone(state, world, pos, null) || state.canProvidePower()) {
             return true;
         }
         if (te == null) {

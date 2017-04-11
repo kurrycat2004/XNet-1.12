@@ -8,6 +8,7 @@ import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.apiimpl.DefaultChannelSettings;
+import mcjty.xnet.blocks.cables.ConnectorTileEntity;
 import mcjty.xnet.blocks.controller.gui.GuiController;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -26,6 +27,7 @@ public class LogicChannelSettings extends DefaultChannelSettings implements ICha
     private int delay = 0;
     private int colors = 0;     // Colors for this channel
     private List<Pair<SidedConsumer, LogicConnectorSettings>> sensors = null;
+    private List<Pair<SidedConsumer, LogicConnectorSettings>> outputs = null;
 
     @Override
     public void readFromNBT(NBTTagCompound tag) {
@@ -48,12 +50,12 @@ public class LogicChannelSettings extends DefaultChannelSettings implements ICha
     public void tick(int channel, IControllerContext context) {
         delay--;
         if (delay <= 0) {
-            delay = 200*6;      // Multiply of the different speeds we have
+            delay = 200 * 6;      // Multiply of the different speeds we have
         }
         if (delay % 10 != 0) {
             return;
         }
-        int d = delay/10;
+        int d = delay / 10;
         updateCache(channel, context);
         World world = context.getControllerWorld();
 
@@ -98,15 +100,56 @@ public class LogicChannelSettings extends DefaultChannelSettings implements ICha
             colors |= sensorColors;
         }
 
+        for (Pair<SidedConsumer, LogicConnectorSettings> entry : outputs) {
+            LogicConnectorSettings settings = entry.getValue();
+            if (d % settings.getSpeed() != 0) {
+                continue;
+            }
+
+            BlockPos connectorPos = context.findConsumerPosition(entry.getKey().getConsumerId());
+            if (connectorPos != null) {
+                EnumFacing side = entry.getKey().getSide();
+                if (!WorldTools.chunkLoaded(world, connectorPos)) {
+                    continue;
+                }
+
+                TileEntity te = world.getTileEntity(connectorPos);
+                if (te instanceof ConnectorTileEntity) {
+                    ConnectorTileEntity connectorTE = (ConnectorTileEntity) te;
+                    int powerOut = connectorTE.getPowerOut(side);
+                    if (checkRedstone(world, settings, connectorPos)) {
+                        powerOut = 0;
+                    } else if (!context.matchColor(settings.getColorsMask())) {
+                        powerOut = 0;
+                    } else {
+                        powerOut = settings.getRedstoneOut() == null ? 0 : settings.getRedstoneOut();
+                    }
+                    connectorTE.setPowerOut(side, powerOut);
+                }
+            }
+        }
     }
 
     private void updateCache(int channel, IControllerContext context) {
         if (sensors == null) {
             sensors = new ArrayList<>();
+            outputs = new ArrayList<>();
             Map<SidedConsumer, IConnectorSettings> connectors = context.getConnectors(channel);
             for (Map.Entry<SidedConsumer, IConnectorSettings> entry : connectors.entrySet()) {
                 LogicConnectorSettings con = (LogicConnectorSettings) entry.getValue();
-                sensors.add(Pair.of(entry.getKey(), con));
+                if (con.getLogicMode() == LogicConnectorSettings.LogicMode.SENSOR) {
+                    sensors.add(Pair.of(entry.getKey(), con));
+                } else {
+                    outputs.add(Pair.of(entry.getKey(), con));
+                }
+            }
+
+            connectors = context.getRoutedConnectors(channel);
+            for (Map.Entry<SidedConsumer, IConnectorSettings> entry : connectors.entrySet()) {
+                LogicConnectorSettings con = (LogicConnectorSettings) entry.getValue();
+                if (con.getLogicMode() == LogicConnectorSettings.LogicMode.OUTPUT) {
+                    outputs.add(Pair.of(entry.getKey(), con));
+                }
             }
         }
     }
