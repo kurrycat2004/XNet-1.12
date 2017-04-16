@@ -71,7 +71,9 @@ public class FacadeItemBlock extends CompatItemBlock {
             Block value = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(regName));
             if (value != null) {
                 ItemStack s = new ItemStack(value, 1, meta);
-                tooltip.add(TextFormatting.BLUE + "Mimicing " + s.getDisplayName());
+                if (s.getItem() != null) {
+                    tooltip.add(TextFormatting.BLUE + "Mimicing " + s.getDisplayName());
+                }
             }
         }
     }
