@@ -182,7 +182,11 @@ public class GenericCableBakedModel implements IBakedModel {
         if (facadeId != null) {
             Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(facadeId.getRegistryName()));
             IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(block.getStateFromMeta(facadeId.getMeta()));
-            return model.getQuads(state, side, rand);
+            try {
+                return model.getQuads(state, side, rand);
+            } catch (Exception e) {
+                return Collections.emptyList();
+            }
         }
 
         if (side != null) {
