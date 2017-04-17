@@ -32,12 +32,12 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
 
     public static final int FILTER_SIZE = 18;
 
-    enum ItemMode {
+    public enum ItemMode {
         INS,
         EXT
     }
 
-    enum StackMode {
+    public enum StackMode {
         SINGLE,
         STACK
     }

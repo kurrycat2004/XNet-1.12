@@ -18,6 +18,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
@@ -51,6 +52,7 @@ public class XNet implements ModBase {
     public static XNet instance;
     public static Logger logger;
 
+    public static boolean rftools = false;
     public static XNetApi xNetApi = new XNetApi();
 
     public static CreativeTabs tabXNet = new CompatCreativeTabs("XNet") {
@@ -63,6 +65,7 @@ public class XNet implements ModBase {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event){
         logger = event.getModLog();
+        rftools = Loader.isModLoaded("rftools");
         proxy.preInit(event);
     }
 
