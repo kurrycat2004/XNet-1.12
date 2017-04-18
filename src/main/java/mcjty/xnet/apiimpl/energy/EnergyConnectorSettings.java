@@ -3,7 +3,7 @@ package mcjty.xnet.apiimpl.energy;
 import com.google.common.collect.ImmutableSet;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
-import mcjty.xnet.apiimpl.AbstractConnectorSettings;
+import mcjty.xnet.api.helper.AbstractConnectorSettings;
 import mcjty.xnet.blocks.controller.gui.GuiController;
 import mcjty.xnet.config.GeneralConfiguration;
 import net.minecraft.nbt.NBTTagCompound;

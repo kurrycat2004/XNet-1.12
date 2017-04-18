@@ -9,7 +9,7 @@ import mcjty.xnet.api.channels.IControllerContext;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.keys.SidedConsumer;
-import mcjty.xnet.apiimpl.DefaultChannelSettings;
+import mcjty.xnet.api.helper.DefaultChannelSettings;
 import mcjty.xnet.blocks.controller.gui.GuiController;
 import mcjty.xnet.compat.RFToolsSupport;
 import mcjty.xnet.config.GeneralConfiguration;

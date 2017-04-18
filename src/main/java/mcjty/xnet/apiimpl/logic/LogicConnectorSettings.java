@@ -3,7 +3,7 @@ package mcjty.xnet.apiimpl.logic;
 import com.google.common.collect.ImmutableSet;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
-import mcjty.xnet.apiimpl.AbstractConnectorSettings;
+import mcjty.xnet.api.helper.AbstractConnectorSettings;
 import mcjty.xnet.blocks.controller.gui.GuiController;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;

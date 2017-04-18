@@ -5,6 +5,7 @@ import cofh.api.energy.IEnergyReceiver;
 import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.network.Argument;
 import mcjty.lib.tools.WorldTools;
+import mcjty.xnet.api.tiles.IConnectorTile;
 import mcjty.xnet.blocks.facade.IFacadeSupport;
 import mcjty.xnet.blocks.facade.MimicBlockSupport;
 import mcjty.xnet.config.GeneralConfiguration;
@@ -26,7 +27,7 @@ import javax.annotation.Nonnull;
 import java.util.Map;
 
 public class ConnectorTileEntity extends GenericTileEntity implements IEnergyProvider, IEnergyReceiver,
-        IFacadeSupport {
+        IFacadeSupport, IConnectorTile {
 
     public static final String CMD_SETNAME = "setName";
 
@@ -90,6 +91,7 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         super.setPowerInput(powered);
     }
 
+    @Override
     public int getPulseCounter() {
         return pulseCounter;
     }
@@ -149,6 +151,7 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         tagCompound.setString("name", name);
     }
 
+    @Override
     public int getPowerLevel() {
         return powerLevel;
     }

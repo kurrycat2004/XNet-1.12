@@ -1,4 +1,4 @@
-package mcjty.xnet.apiimpl;
+package mcjty.xnet.api.helper;
 
 import mcjty.xnet.api.channels.Color;
 import mcjty.xnet.api.channels.IConnectorSettings;

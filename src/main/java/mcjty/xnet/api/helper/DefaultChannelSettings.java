@@ -1,7 +1,7 @@
-package mcjty.xnet.apiimpl;
+package mcjty.xnet.api.helper;
 
 import mcjty.xnet.api.channels.RSMode;
-import mcjty.xnet.blocks.cables.ConnectorTileEntity;
+import mcjty.xnet.api.tiles.IConnectorTile;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -10,7 +10,7 @@ public class DefaultChannelSettings {
     protected boolean checkRedstone(World world, AbstractConnectorSettings settings, BlockPos extractorPos) {
         RSMode rsMode = settings.getRsMode();
         if (rsMode != RSMode.IGNORED) {
-            ConnectorTileEntity connector = (ConnectorTileEntity) world.getTileEntity(extractorPos);
+            IConnectorTile connector = (IConnectorTile) world.getTileEntity(extractorPos);
             if (rsMode == RSMode.PULSE) {
                 int prevPulse = settings.getPrevPulse();
                 settings.setPrevPulse(connector.getPulseCounter());
