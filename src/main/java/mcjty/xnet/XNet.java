@@ -28,6 +28,7 @@ import org.apache.logging.log4j.Logger;
         dependencies =
                         "required-after:mcjtylib_ng@[" + XNet.MIN_MCJTYLIB_VER + ",);" +
                         "required-after:compatlayer@[" + XNet.COMPATLAYER_VER + ",);" +
+                        "after:rftools@[" + XNet.MIN_RFTOOLS_VER + ",);" +
                         "after:Forge@[" + XNet.MIN_FORGE10_VER + ",);" +
                         "after:forge@[" + XNet.MIN_FORGE11_VER + ",)",
         version = XNet.MODVERSION,
@@ -41,6 +42,7 @@ public class XNet implements ModBase {
     public static final String MIN_FORGE10_VER = "12.18.2.2116";
     public static final String MIN_FORGE11_VER = "13.19.0.2176";
     public static final String MIN_MCJTYLIB_VER = "2.3.11";
+    public static final String MIN_RFTOOLS_VER = "5.92";
     public static final String COMPATLAYER_VER = "0.2.5";
 
     public static final String SHIFT_MESSAGE = "<Press Shift>";

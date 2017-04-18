@@ -74,11 +74,31 @@ public abstract class AbstractConnectorSettings implements IConnectorSettings {
 
     @Override
     public void update(Map<String, Object> data) {
-        rsMode = RSMode.valueOf(((String) data.get(TAG_RS)).toUpperCase());
-        colors[0] = Color.colorByValue((Integer) data.get(TAG_COLOR + "0"));
-        colors[1] = Color.colorByValue((Integer) data.get(TAG_COLOR + "1"));
-        colors[2] = Color.colorByValue((Integer) data.get(TAG_COLOR + "2"));
-        colors[3] = Color.colorByValue((Integer) data.get(TAG_COLOR + "3"));
+        if (data.containsKey(TAG_RS)) {
+            rsMode = RSMode.valueOf(((String) data.get(TAG_RS)).toUpperCase());
+        } else {
+            rsMode = RSMode.IGNORED;
+        }
+        if (data.containsKey(TAG_COLOR + "0")) {
+            colors[0] = Color.colorByValue((Integer) data.get(TAG_COLOR + "0"));
+        } else {
+            colors[0] = Color.OFF;
+        }
+        if (data.containsKey(TAG_COLOR + "1")) {
+            colors[1] = Color.colorByValue((Integer) data.get(TAG_COLOR + "1"));
+        } else {
+            colors[1] = Color.OFF;
+        }
+        if (data.containsKey(TAG_COLOR + "2")) {
+            colors[2] = Color.colorByValue((Integer) data.get(TAG_COLOR + "2"));
+        } else {
+            colors[2] = Color.OFF;
+        }
+        if (data.containsKey(TAG_COLOR + "3")) {
+            colors[3] = Color.colorByValue((Integer) data.get(TAG_COLOR + "3"));
+        } else {
+            colors[3] = Color.OFF;
+        }
         calculateColorsMask();
         String facing = (String) data.get(TAG_FACING);
         facingOverride = facing == null ? null : EnumFacing.byName(facing);
