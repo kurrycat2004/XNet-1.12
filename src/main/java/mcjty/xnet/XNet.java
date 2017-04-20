@@ -50,6 +50,8 @@ public class XNet implements ModBase {
     @SidedProxy(clientSide = "mcjty.xnet.proxy.ClientProxy", serverSide = "mcjty.xnet.proxy.ServerProxy")
     public static CommonProxy proxy;
 
+    public ClientInfo clientInfo = new ClientInfo();
+
     @Mod.Instance(MODID)
     public static XNet instance;
     public static Logger logger;

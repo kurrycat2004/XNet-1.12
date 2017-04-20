@@ -13,7 +13,9 @@ import mcjty.lib.gui.widgets.Button;
 import mcjty.lib.gui.widgets.Label;
 import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.network.Argument;
+import mcjty.lib.tools.MinecraftTools;
 import mcjty.lib.varia.BlockPosTools;
+import mcjty.lib.varia.Logging;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.api.gui.IndicatorIcon;
@@ -21,8 +23,10 @@ import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.api.keys.SidedPos;
 import mcjty.xnet.blocks.controller.ControllerContainer;
 import mcjty.xnet.blocks.controller.TileEntityController;
+import mcjty.xnet.clientinfo.ChannelClientInfo;
+import mcjty.xnet.clientinfo.ConnectedBlockClientInfo;
+import mcjty.xnet.clientinfo.ConnectorClientInfo;
 import mcjty.xnet.gui.GuiProxy;
-import mcjty.xnet.clientinfo.*;
 import mcjty.xnet.network.PacketGetChannels;
 import mcjty.xnet.network.PacketGetConnectedBlocks;
 import mcjty.xnet.network.XNetMessages;
@@ -134,7 +138,11 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         connectorList = new WidgetList(mc, this).addSelectionEvent(new DefaultSelectionEvent() {
             @Override
             public void select(Widget parent, int index) {
-//                setSelectedBlock(index);
+            }
+
+            @Override
+            public void doubleClick(Widget parent, int index) {
+                hilightSelectedContainer(index);
             }
         });
         connectorList.setPropagateEventsToChildren(true);
@@ -144,6 +152,22 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                 .addChild(connectorList)
                 .addChild(listSlider)
                 .setLayoutHint(new PositionalLayout.PositionalHint(2, 20, 169, 214));
+    }
+
+    private void hilightSelectedContainer(int index) {
+        if (index == -1) {
+            return;
+        }
+        if (index == 0) {
+            // Starred
+            return;
+        }
+        ConnectedBlockClientInfo c = fromServer_connectedBlocks.get(index - 1);
+        if (c != null) {
+            XNet.instance.clientInfo.hilightBlock(c.getPos().getPos(), System.currentTimeMillis() + 1000 * 5);
+            Logging.message(MinecraftTools.getPlayer(mc), "The block is now highlighted");
+            MinecraftTools.getPlayer(mc).closeScreen();
+        }
     }
 
     private Panel initChannelSelectionPanel() {
@@ -374,10 +398,12 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
             if (!name.isEmpty()) {
                 br.setTooltips(TextFormatting.GREEN + "Connector: " + TextFormatting.WHITE + name,
                         TextFormatting.GREEN + "Block: " + TextFormatting.WHITE + blockName,
-                        TextFormatting.GREEN + "Position: " + TextFormatting.WHITE + BlockPosTools.toString(coordinate));
+                        TextFormatting.GREEN + "Position: " + TextFormatting.WHITE + BlockPosTools.toString(coordinate),
+                        TextFormatting.WHITE + "(doubleclick to highlight)");
             } else {
                 br.setTooltips(TextFormatting.GREEN + "Block: " + TextFormatting.WHITE + blockName,
-                        TextFormatting.GREEN + "Position: " + TextFormatting.WHITE + BlockPosTools.toString(coordinate));
+                        TextFormatting.GREEN + "Position: " + TextFormatting.WHITE + BlockPosTools.toString(coordinate),
+                        TextFormatting.WHITE + "(doubleclick to highlight)");
             }
 
             panel.addChild(new Label(mc, this).setText(sidedPos.getSide().getName().substring(0, 1).toUpperCase()).setColor(color).setDesiredWidth(18));

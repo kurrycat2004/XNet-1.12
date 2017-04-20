@@ -2,11 +2,7 @@ package mcjty.xnet.apiimpl.items;
 
 import mcjty.lib.tools.ItemStackList;
 import mcjty.lib.tools.ItemStackTools;
-import mcjty.rftools.blocks.storage.sorters.ModItemSorter;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.oredict.OreDictionary;
 
 import javax.annotation.Nonnull;
