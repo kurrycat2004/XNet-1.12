@@ -155,11 +155,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     }
 
     private void hilightSelectedContainer(int index) {
-        if (index == -1) {
-            return;
-        }
-        if (index == 0) {
-            // Starred
+        if (index < 0) {
             return;
         }
         ConnectedBlockClientInfo c = fromServer_connectedBlocks.get(index);
