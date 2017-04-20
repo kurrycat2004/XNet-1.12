@@ -127,11 +127,18 @@ public class ControllerBlock extends GenericXNetBlock<TileEntityController, Cont
         super.addProbeInfo(mode, probeInfo, player, world, blockState, data);
 
         TileEntity te = world.getTileEntity(data.getPos());
+        WorldBlob worldBlob = XNetBlobData.getBlobData(world).getWorldBlob(world);
+
         if (te instanceof TileEntityController) {
             TileEntityController controller = (TileEntityController) te;
             NetworkId networkId = controller.getNetworkId();
             if (networkId != null) {
-                probeInfo.text(TextStyleClass.LABEL + "Network: " + TextStyleClass.INFO + networkId.getId());
+                if (mode == ProbeMode.DEBUG) {
+                    probeInfo.text(TextStyleClass.LABEL + "Network: " + TextStyleClass.INFO + networkId.getId() + ", V: " +
+                            worldBlob.getNetworkVersion(networkId));
+                } else {
+                    probeInfo.text(TextStyleClass.LABEL + "Network: " + TextStyleClass.INFO + networkId.getId());
+                }
             }
 
             if (mode == ProbeMode.DEBUG) {
@@ -152,7 +159,6 @@ public class ControllerBlock extends GenericXNetBlock<TileEntityController, Cont
             }
         }
 
-        WorldBlob worldBlob = XNetBlobData.getBlobData(world).getWorldBlob(world);
         if (mode == ProbeMode.DEBUG) {
             BlobId blobId = worldBlob.getBlobAt(data.getPos());
             if (blobId != null) {

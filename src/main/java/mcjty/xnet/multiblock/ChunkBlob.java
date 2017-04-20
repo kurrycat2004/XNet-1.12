@@ -192,17 +192,20 @@ public class ChunkBlob {
         }
     }
 
+    public void clearNetworkCache() {
+        cachedNetworks = null;
+    }
+
     public Map<IntPos, NetworkId> getNetworkProviders() {
         return networkProviders;
     }
 
-    public boolean createNetworkProvider(BlockPos pos, ColorId color, NetworkId networkId) {
+    public void createNetworkProvider(BlockPos pos, ColorId color, NetworkId networkId) {
         IntPos posId = new IntPos(pos);
         networkProviders.put(posId, networkId);
         cachedProviders = null;
-        boolean changed = createCableSegment(pos, color);
+        createCableSegment(pos, color);
         getMappings(blobAllocations.get(posId)).add(networkId);
-        return changed;
     }
 
     public Map<IntPos, ConsumerId> getNetworkConsumers() {
@@ -213,24 +216,21 @@ public class ChunkBlob {
         return consumerPositions.get(consumerId);
     }
 
-    public boolean createNetworkConsumer(BlockPos pos, ColorId color, ConsumerId consumer) {
+    public void createNetworkConsumer(BlockPos pos, ColorId color, ConsumerId consumer) {
         IntPos posId = new IntPos(pos);
         networkConsumers.put(posId, consumer);
         consumerPositions.put(consumer, posId);
-        boolean changed = createCableSegment(pos, color);
-//        getMappings(blobAllocations.get(posId)).add(networkId);
-        return changed;
+        createCableSegment(pos, color);
     }
 
-    // Create a cable segment and return all positions on the border of this
-    // chunk where something changed. Network ids are merged if needed.
+    // Create a cable segment. Network ids are merged if needed.
     // This method returns true if a block on the border of this chunk changed
-    public boolean createCableSegment(BlockPos pos, ColorId color) {
+    public void createCableSegment(BlockPos pos, ColorId color) {
         IntPos posId = new IntPos(pos);
         if (blobAllocations.containsKey(posId)) {
             // @todo
 //            System.out.println("There is already a cablesegment at " + BlockPosTools.toString(pos) + "!");
-            return getBorderPositions().contains(posId);
+            return;
         }
 
         Set<BlobId> ids = new HashSet<>();
@@ -246,44 +246,28 @@ public class ChunkBlob {
             }
         }
 
+        if (posId.isBorder()) {
+            cachedBorderPositions.add(posId);
+        }
+
         if (ids.isEmpty()) {
             // New id
             lastBlobId++;
             BlobId blobId = new BlobId(lastBlobId);
             blobAllocations.put(posId, blobId);
             blobColors.put(blobId, color);
-            if (posId.isBorder()) {
-                cachedBorderPositions.add(posId);
-                return true;
-            } else {
-                return false;
-            }
         } else if (ids.size() == 1) {
             // Merge with existing
             BlobId id = ids.iterator().next();
             blobAllocations.put(posId, id);
-            if (posId.isBorder()) {
-                cachedBorderPositions.add(posId);
-                return true;
-            } else {
-                return false;
-            }
         } else {
             // Merge several blobs
-            boolean changed = false;
             BlobId id = ids.iterator().next();
             blobAllocations.put(posId, id);
-            if (posId.isBorder()) {
-                cachedBorderPositions.add(posId);
-                changed = true;
-            }
             for (Map.Entry<IntPos, BlobId> entry : blobAllocations.entrySet()) {
                 if (ids.contains(entry.getValue())) {
                     IntPos p = entry.getKey();
                     blobAllocations.put(p, id);
-                    if (p.isBorder()) {
-                        changed = true;
-                    }
                 }
             }
             Set<NetworkId> networkIds = new HashSet<>();
@@ -295,7 +279,6 @@ public class ChunkBlob {
             networkMappings.put(id, networkIds);
             cachedConsumers = null;
             cachedNetworks = null;
-            return changed;
         }
     }
 

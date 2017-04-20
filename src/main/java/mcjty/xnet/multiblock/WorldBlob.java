@@ -204,14 +204,8 @@ public class WorldBlob {
      */
     public void createCableSegment(BlockPos pos, ColorId color) {
         ChunkBlob blob = getOrCreateBlob(pos);
-        if (blob.createCableSegment(pos, color)) {
-            recalculateNetwork(blob);
-        } else {
-            recalculateNetwork(blob);
-            // @todo optimize this case?
-//            blob.fixNetworkAllocations();
-//            removeCachedNetworksForBlob(blob);
-        }
+        blob.createCableSegment(pos, color);
+        recalculateNetwork(blob);
     }
 
     @Nonnull
@@ -288,6 +282,7 @@ public class WorldBlob {
                     recalculated.add(blob);
                 }
             }
+            blob.clearNetworkCache();
             removeCachedNetworksForBlob(blob);
 
 
