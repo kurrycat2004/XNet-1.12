@@ -368,14 +368,20 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
 
     @Override
     public void createCableSegment(World world, BlockPos pos, ItemStack stack) {
-        XNetBlobData blobData = XNetBlobData.getBlobData(world);
-        WorldBlob worldBlob = blobData.getWorldBlob(world);
         ConsumerId consumer;
         if (ItemStackTools.isValid(stack) && stack.hasTagCompound() && stack.getTagCompound().hasKey("consumerId")) {
             consumer = new ConsumerId(stack.getTagCompound().getInteger("consumerId"));
         } else {
+            XNetBlobData blobData = XNetBlobData.getBlobData(world);
+            WorldBlob worldBlob = blobData.getWorldBlob(world);
             consumer = worldBlob.newConsumer();
         }
+        createCableSegment(world, pos, consumer);
+    }
+
+    public void createCableSegment(World world, BlockPos pos, ConsumerId consumer) {
+        XNetBlobData blobData = XNetBlobData.getBlobData(world);
+        WorldBlob worldBlob = blobData.getWorldBlob(world);
         CableColor color = world.getBlockState(pos).getValue(COLOR);
         worldBlob.createNetworkConsumer(pos, new ColorId(color.ordinal()+1), consumer);
         blobData.save(world);

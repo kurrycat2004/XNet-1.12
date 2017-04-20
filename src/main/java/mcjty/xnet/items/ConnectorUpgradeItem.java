@@ -4,11 +4,14 @@ import mcjty.lib.compat.CompatItem;
 import mcjty.lib.tools.ChatTools;
 import mcjty.lib.tools.ItemStackTools;
 import mcjty.xnet.XNet;
+import mcjty.xnet.api.keys.ConsumerId;
 import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.blocks.cables.ConnectorTileEntity;
 import mcjty.xnet.blocks.cables.NetCableSetup;
 import mcjty.xnet.blocks.generic.CableColor;
 import mcjty.xnet.blocks.generic.GenericCableBlock;
+import mcjty.xnet.multiblock.WorldBlob;
+import mcjty.xnet.multiblock.XNetBlobData;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -64,10 +67,15 @@ public class ConnectorUpgradeItem extends CompatItem {
                     NBTTagCompound tag = new NBTTagCompound();
                     te.writeToNBT(tag);
                     CableColor color = world.getBlockState(pos).getValue(GenericCableBlock.COLOR);
+
+                    XNetBlobData blobData = XNetBlobData.getBlobData(world);
+                    WorldBlob worldBlob = blobData.getWorldBlob(world);
+                    ConsumerId consumer = worldBlob.getConsumerAt(pos);
                     ((ConnectorBlock)block).unlinkBlock(world, pos);
                     world.setBlockState(pos, NetCableSetup.advancedConnectorBlock.getDefaultState().withProperty(GenericCableBlock.COLOR, color));
                     IBlockState blockState = world.getBlockState(pos);
-                    ((ConnectorBlock)blockState.getBlock()).createCableSegment(world, pos, ItemStackTools.getEmptyStack());
+                    ((ConnectorBlock)blockState.getBlock()).createCableSegment(world, pos, consumer);
+
                     te = TileEntity.create(world, tag);
                     if (te != null) {
                         world.getChunkFromBlockCoords(pos).addTileEntity(te);
