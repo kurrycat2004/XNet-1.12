@@ -278,14 +278,17 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
 
     @Override
     public void breakBlock(World world, BlockPos pos, IBlockState state) {
+        unlinkBlock(world, pos);
+        originalBreakBlock(world, pos, state);
+    }
+
+    public void unlinkBlock(World world, BlockPos pos) {
         if (!world.isRemote) {
             XNetBlobData blobData = XNetBlobData.getBlobData(world);
             WorldBlob worldBlob = blobData.getWorldBlob(world);
             worldBlob.removeCableSegment(pos);
             blobData.save(world);
         }
-
-        originalBreakBlock(world, pos, state);
     }
 
     protected void originalBreakBlock(World world, BlockPos pos, IBlockState state) {

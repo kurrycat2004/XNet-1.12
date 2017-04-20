@@ -1,6 +1,7 @@
 package mcjty.xnet.blocks.cables;
 
 import mcjty.xnet.blocks.generic.CableColor;
+import mcjty.xnet.init.ModItems;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -41,6 +42,7 @@ public class NetCableSetup {
         GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(connectorBlock, 1), "lRl", "rgr", "lrl", 'r', Items.REDSTONE, 'l', "dyeBlue", 'g', Items.GOLD_INGOT, 'R', "chest"));
         GameRegistry.addRecipe(new ItemStack(connectorBlock, 1, CableColor.ROUTING.ordinal()), "rrr", "xMx", "rrr", 'M', new ItemStack(connectorBlock, 1), 'r', Items.REDSTONE, 'x', Items.GOLD_NUGGET);
         GameRegistry.addRecipe(new ItemStack(advancedConnectorBlock, 1), "ce", "dr", 'c', connectorBlock, 'e', Items.ENDER_PEARL, 'd', Items.DIAMOND, 'r', Items.REDSTONE);
+        GameRegistry.addRecipe(new ItemStack(ModItems.upgradeItem, 1), "ce", "dr", 'c', Items.PAPER, 'e', Items.ENDER_PEARL, 'd', Items.DIAMOND, 'r', Items.REDSTONE);
 
         for (CableColor source : CableColor.VALUES) {
             if (source != CableColor.ROUTING) {
