@@ -162,7 +162,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
             // Starred
             return;
         }
-        ConnectedBlockClientInfo c = fromServer_connectedBlocks.get(index - 1);
+        ConnectedBlockClientInfo c = fromServer_connectedBlocks.get(index);
         if (c != null) {
             XNet.instance.clientInfo.hilightBlock(c.getPos().getPos(), System.currentTimeMillis() + 1000 * 5);
             Logging.message(MinecraftTools.getPlayer(mc), "The block is now highlighted");
