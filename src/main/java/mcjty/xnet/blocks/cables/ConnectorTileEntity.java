@@ -70,7 +70,7 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         }
         this.powerOut[side.ordinal()] = powerOut;
         markDirty();
-        WorldTools.notifyBlockOfStateChange(getWorld(), this.pos.offset(side), this.getBlockType(), this.pos);
+        WorldTools.neighborChanged(getWorld(), side, this.getBlockType(), this.pos);
     }
 
     @Override

@@ -220,15 +220,19 @@ public final class TileEntityRouter extends GenericTileEntity {
             publishedChannels.put(id, name);
         }
         int number = countPublishedChannelsOnNet();
+        WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
         NetworkId networkId = findRoutingNetwork();
         if (networkId != null) {
             if (number != channelCount) {
                 LogicTools.routers(getWorld(), networkId)
                         .forEach(router -> router.setChannelCount(number));
             }
-            WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
             worldBlob.incNetworkVersion(networkId); // Force a recalc of affected networks
         }
+        for (NetworkId net : worldBlob.getNetworksAt(pos)) {
+            worldBlob.incNetworkVersion(net);
+        }
+
         markDirtyQuick();
     }
 
