@@ -11,7 +11,15 @@ public enum Color {
     BLUE(0x0000ff),
     YELLOW(0xffff00),
     CYAN(0x00ffff),
-    PURPLE(0xff00ff);
+    PURPLE(0xff00ff),
+    ORANGE(0xff8800),
+    GRAY(0x888888),
+    DARK_RED(0x880000),
+    DARK_GREEN(0x008800),
+    DARK_BLUE(0x000088),
+    DARK_YELLOW(0x888800),
+    DARK_CYAN(0x008888),
+    DARK_PURPLE(0x880088);
 
     private final int color;
 
