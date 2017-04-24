@@ -254,12 +254,20 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound tagCompound) {
+        if (networkId != null) {
+            tagCompound.setInteger("networkId", networkId.getId());
+        }
         return super.writeToNBT(tagCompound);
     }
 
     @Override
     public void readFromNBT(NBTTagCompound tagCompound) {
         super.readFromNBT(tagCompound);
+        if (tagCompound.hasKey("networkId")) {
+            networkId = new NetworkId(tagCompound.getInteger("networkId"));
+        } else {
+            networkId = null;
+        }
     }
 
     @Override
@@ -279,9 +287,6 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     @Override
     public void writeRestorableToNBT(NBTTagCompound tagCompound) {
         super.writeRestorableToNBT(tagCompound);
-        if (networkId != null) {
-            tagCompound.setInteger("networkId", networkId.getId());
-        }
         tagCompound.setInteger("colors", colors);
 
         for (int i = 0; i < MAX_CHANNELS; i++) {
@@ -297,11 +302,6 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     @Override
     public void readRestorableFromNBT(NBTTagCompound tagCompound) {
         super.readRestorableFromNBT(tagCompound);
-        if (tagCompound.hasKey("networkId")) {
-            networkId = new NetworkId(tagCompound.getInteger("networkId"));
-        } else {
-            networkId = null;
-        }
         colors = tagCompound.getInteger("colors");
         for (int i = 0; i < MAX_CHANNELS; i++) {
             if (tagCompound.hasKey("channel" + i)) {
