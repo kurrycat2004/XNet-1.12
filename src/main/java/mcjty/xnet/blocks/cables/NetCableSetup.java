@@ -37,7 +37,7 @@ public class NetCableSetup {
     }
 
     public static void initCrafting() {
-        GameRegistry.addRecipe(new ItemStack(netCableBlock, 16, CableColor.ROUTING.ordinal()), "srs", "rgr", "srs", 'r', Blocks.REDSTONE_BLOCK, 's', Items.STRING, 'g', Items.DIAMOND);
+        GameRegistry.addRecipe(new ItemStack(netCableBlock, 32, CableColor.ROUTING.ordinal()), "srs", "rgr", "srs", 'r', Blocks.REDSTONE_BLOCK, 's', Items.STRING, 'g', Items.GOLD_INGOT);
         GameRegistry.addRecipe(new ItemStack(netCableBlock, 16), "srs", "rgr", "srs", 'r', Items.REDSTONE, 's', Items.STRING, 'g', Items.GOLD_NUGGET);
         GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(connectorBlock, 1), "lRl", "rgr", "lrl", 'r', Items.REDSTONE, 'l', "dyeBlue", 'g', Items.GOLD_INGOT, 'R', "chest"));
         GameRegistry.addRecipe(new ItemStack(connectorBlock, 1, CableColor.ROUTING.ordinal()), "rrr", "xMx", "rrr", 'M', new ItemStack(connectorBlock, 1), 'r', Items.REDSTONE, 'x', Items.GOLD_NUGGET);
