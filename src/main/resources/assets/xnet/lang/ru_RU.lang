@@ -1,5 +1,5 @@
 item.xnet.xnet_manual.name=Описание XNet
-
+item.xnet.connector_upgrade.name=Комплект улучшения разъёма
 
 tile.xnet.facade.name=Фасад
 tile.xnet.facade_blue.name=Синий фасад
@@ -28,6 +28,8 @@ tile.xnet.netcable_red.name=Красный сетевой кабель
 tile.xnet.netcable_yellow.name=Жёлтый сетевой кабель
 tile.xnet.netcable_green.name=Зелёный сетевой кабель
 tile.xnet.netcable_routing.name=Распределяющий сетевой кабель
+
+tile.xnet.redstone_proxy.name=Редстоуновый прокси
 
 tile.xnet.controller.name=Контроллер
 tile.xnet.router.name=Распределитель
