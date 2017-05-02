@@ -211,11 +211,29 @@ class Sensor {
     }
 
     public void update(Map<String, Object> data) {
-        sensorMode = SensorMode.valueOf(((String) data.get(TAG_MODE + index)).toUpperCase());
-        operator = Operator.valueOfCode(((String) data.get(TAG_OPERATOR + index)).toUpperCase());
+        Object sm = data.get(TAG_MODE + index);
+        if (sm != null) {
+            sensorMode = SensorMode.valueOf(((String) sm).toUpperCase());
+        } else {
+            sensorMode = SensorMode.OFF;
+        }
+        Object op = data.get(TAG_OPERATOR + index);
+        if (op != null) {
+            operator = Operator.valueOfCode(((String) op).toUpperCase());
+        } else {
+            operator = Operator.EQUAL;
+        }
         amount = safeInt(data.get(TAG_AMOUNT + index));
-        outputColor = Color.colorByValue((Integer) data.get(TAG_COLOR + index));
+        Object co = data.get(TAG_COLOR + index);
+        if (co != null) {
+            outputColor = Color.colorByValue((Integer) co);
+        } else {
+            outputColor = OFF;
+        }
         filter = (ItemStack) data.get(TAG_STACK + index);
+        if (filter == null) {
+            filter = ItemStackTools.getEmptyStack();
+        }
     }
 
     public void readFromNBT(NBTTagCompound tag) {
