@@ -70,12 +70,12 @@ right now.
 {b}Network Color
 {n:netcolors}
 Using a logic channel and sensors you can enable or disable
-seven different colors in a controller. Basically a color is
+fifteen different colors in a controller. Basically a color is
 a boolean value that can be either on or off. You can use these
 colors in connections from all channel types to disable or
 enable a connection. Every connection can listen to four
-different colors and will only work if any set (non-black)
-color is enabled.
+different colors and will only work if all set (non-black)
+colors are enabled.
 {-------------------------------------------------------------}
 {b}Colored Cables
 {n:colors}
