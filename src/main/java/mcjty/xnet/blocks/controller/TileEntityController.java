@@ -229,9 +229,14 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     @Nonnull
     public Map<SidedConsumer, IConnectorSettings> getConnectors(int channel) {
         if (cachedConnectors[channel] == null) {
+            WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
             cachedConnectors[channel] = new HashMap<>();
             for (Map.Entry<SidedConsumer, ConnectorInfo> entry : channels[channel].getConnectors().entrySet()) {
-                cachedConnectors[channel].put(entry.getKey(), entry.getValue().getConnectorSettings());
+                SidedConsumer sidedConsumer = entry.getKey();
+                BlockPos pos = findConsumerPosition(sidedConsumer.getConsumerId());
+                if (pos != null && worldBlob.getNetworksAt(pos).contains(getNetworkId())) {
+                    cachedConnectors[channel].put(sidedConsumer, entry.getValue().getConnectorSettings());
+                }
             }
         }
         return cachedConnectors[channel];
