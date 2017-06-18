@@ -5,8 +5,6 @@ import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.gui.widgets.*;
 import mcjty.lib.network.Argument;
 import mcjty.lib.network.ArgumentType;
-import mcjty.lib.tools.ItemStackTools;
-import mcjty.lib.tools.MinecraftTools;
 import mcjty.xnet.api.channels.RSMode;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.network.XNetMessages;
@@ -296,13 +294,17 @@ public abstract class AbstractEditorPanel implements IEditorGui {
         blockRender.addSelectionEvent(new BlockRenderEvent() {
             @Override
             public void select(Widget widget) {
-                ItemStack holding = MinecraftTools.getPlayer(Minecraft.getMinecraft()).inventory.getItemStack();
-                if (ItemStackTools.isEmpty(holding)) {
+                ItemStack holding = Minecraft.getMinecraft().player.inventory.getItemStack();
+                if (holding.isEmpty()) {
                     update(tag, holding);
                     blockRender.setRenderItem(null);
                 } else {
                     ItemStack copy = holding.copy();
-                    ItemStackTools.setStackSize(copy, 1);
+                    if (1 <= 0) {
+                        copy.setCount(0);
+                    } else {
+                        copy.setCount(1);
+                    }
                     blockRender.setRenderItem(copy);
                     update(tag, copy);
                 }

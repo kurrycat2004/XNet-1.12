@@ -13,7 +13,6 @@ import mcjty.lib.gui.widgets.Button;
 import mcjty.lib.gui.widgets.Label;
 import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.network.Argument;
-import mcjty.lib.tools.MinecraftTools;
 import mcjty.lib.varia.BlockPosTools;
 import mcjty.lib.varia.Logging;
 import mcjty.xnet.XNet;
@@ -161,8 +160,8 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         ConnectedBlockClientInfo c = fromServer_connectedBlocks.get(index);
         if (c != null) {
             XNet.instance.clientInfo.hilightBlock(c.getPos().getPos(), System.currentTimeMillis() + 1000 * 5);
-            Logging.message(MinecraftTools.getPlayer(mc), "The block is now highlighted");
-            MinecraftTools.getPlayer(mc).closeScreen();
+            Logging.message(mc.player, "The block is now highlighted");
+            mc.player.closeScreen();
         }
     }
 

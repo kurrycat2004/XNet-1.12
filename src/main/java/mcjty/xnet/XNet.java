@@ -4,7 +4,6 @@ package mcjty.xnet;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import mcjty.lib.base.ModBase;
-import mcjty.lib.compat.CompatCreativeTabs;
 import mcjty.xnet.api.IXNet;
 import mcjty.xnet.apiimpl.XNetApi;
 import mcjty.xnet.commands.CommandCheck;
@@ -18,6 +17,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -54,10 +54,10 @@ public class XNet implements ModBase {
     public static boolean rftools = false;
     public static XNetApi xNetApi = new XNetApi();
 
-    public static CreativeTabs tabXNet = new CompatCreativeTabs("XNet") {
+    public static CreativeTabs tabXNet = new CreativeTabs("XNet") {
         @Override
-        protected Item getItem() {
-            return Item.getItemFromBlock(Blocks.ANVIL);
+        public ItemStack getTabIconItem() {
+            return new ItemStack(Item.getItemFromBlock(Blocks.ANVIL));
         }
     };
 

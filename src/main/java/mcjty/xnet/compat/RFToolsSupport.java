@@ -1,6 +1,5 @@
 package mcjty.xnet.compat;
 
-import mcjty.lib.tools.ItemStackTools;
 import mcjty.rftools.api.storage.IStorageScanner;
 import mcjty.xnet.api.channels.IControllerContext;
 import mcjty.xnet.api.keys.SidedConsumer;
@@ -34,10 +33,10 @@ public class RFToolsSupport {
             }
         }
         ItemStack stack = scanner.requestItem(extractMatcher, true, settings.getStackMode() == ItemConnectorSettings.StackMode.STACK ? 64 : 1, true);
-        if (ItemStackTools.isValid(stack)) {
+        if (!stack.isEmpty()) {
             // Now that we have a stack we first reduce the amount of the stack if we want to keep a certain
             // number of items
-            int toextract = ItemStackTools.getStackSize(stack);
+            int toextract = stack.getCount();
             if (count != null) {
                 int canextract = amount-count;
                 if (canextract <= 0) {
@@ -45,7 +44,11 @@ public class RFToolsSupport {
                 }
                 if (canextract < toextract) {
                     toextract = canextract;
-                    ItemStackTools.setStackSize(stack, toextract);
+                    if (toextract <= 0) {
+                        stack.setCount(0);
+                    } else {
+                        stack.setCount(toextract);
+                    }
                 }
             }
 

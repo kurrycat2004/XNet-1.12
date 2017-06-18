@@ -1,14 +1,12 @@
 package mcjty.xnet.commands;
 
-import mcjty.lib.compat.CompatCommand;
-import mcjty.lib.compat.CompatCommandBase;
-import mcjty.lib.tools.ItemStackTools;
 import mcjty.xnet.blocks.cables.NetCableSetup;
 import mcjty.xnet.multiblock.XNetBlobData;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -22,7 +20,7 @@ import java.util.List;
 //import mcjty.rftools.blocks.teleporter.TeleportDestination;
 //import mcjty.rftools.blocks.teleporter.TeleportationTools;
 
-public class CommandGen implements CompatCommand {
+public class CommandGen implements ICommand {
 
     @Override
     public String getName() {
@@ -55,7 +53,7 @@ public class CommandGen implements CompatCommand {
             System.out.println("i = " + i);
             world.setBlockState(pos, NetCableSetup.netCableBlock.getDefaultState());
             world.markBlockRangeForRenderUpdate(pos.add(-1, -1, -1), pos.add(1, 1, 1));
-            NetCableSetup.netCableBlock.createCableSegment(world, pos, ItemStackTools.getEmptyStack());
+            NetCableSetup.netCableBlock.createCableSegment(world, pos, ItemStack.EMPTY);
             pos = pos.offset(facing);
         }
 
@@ -85,6 +83,6 @@ public class CommandGen implements CompatCommand {
 
     @Override
     public int compareTo(ICommand o) {
-        return getName().compareTo(CompatCommandBase.getCommandName(o));
+        return getName().compareTo(o.getName());
     }
 }

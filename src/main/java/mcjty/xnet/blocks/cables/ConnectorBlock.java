@@ -1,6 +1,5 @@
 package mcjty.xnet.blocks.cables;
 
-import mcjty.lib.tools.ItemStackTools;
 import mcjty.lib.varia.EnergyTools;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
@@ -369,7 +368,7 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
     @Override
     public void createCableSegment(World world, BlockPos pos, ItemStack stack) {
         ConsumerId consumer;
-        if (ItemStackTools.isValid(stack) && stack.hasTagCompound() && stack.getTagCompound().hasKey("consumerId")) {
+        if (!stack.isEmpty() && stack.hasTagCompound() && stack.getTagCompound().hasKey("consumerId")) {
             consumer = new ConsumerId(stack.getTagCompound().getInteger("consumerId"));
         } else {
             XNetBlobData blobData = XNetBlobData.getBlobData(world);

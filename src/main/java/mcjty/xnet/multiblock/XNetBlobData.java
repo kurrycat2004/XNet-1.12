@@ -1,6 +1,5 @@
 package mcjty.xnet.multiblock;
 
-import mcjty.lib.tools.WorldTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.World;
@@ -22,7 +21,7 @@ public class XNetBlobData extends WorldSavedData {
     }
 
     public void save(World world) {
-        WorldTools.saveData(world, NAME, this);
+        world.setData(NAME, this);
         markDirty();
     }
 
@@ -41,7 +40,7 @@ public class XNetBlobData extends WorldSavedData {
         if (instance != null) {
             return instance;
         }
-        instance = mcjty.lib.tools.WorldTools.loadData(world, XNetBlobData.class, NAME);
+        instance = (XNetBlobData) world.loadData(XNetBlobData.class, NAME);
         if (instance == null) {
             instance = new XNetBlobData(NAME);
         }

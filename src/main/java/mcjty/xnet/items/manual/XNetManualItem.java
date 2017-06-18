@@ -1,21 +1,23 @@
 package mcjty.xnet.items.manual;
 
-import mcjty.lib.compat.CompatItem;
 import mcjty.xnet.XNet;
 import mcjty.xnet.gui.GuiProxy;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class XNetManualItem extends CompatItem {
+public class XNetManualItem extends Item {
 
     public XNetManualItem() {
         setUnlocalizedName(XNet.MODID + ".xnet_manual");
@@ -31,7 +33,7 @@ public class XNetManualItem extends CompatItem {
     }
 
     @Override
-    protected ActionResult<ItemStack> clOnItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         if (world.isRemote) {
             player.openGui(XNet.instance, GuiProxy.GUI_MANUAL_XNET, player.getEntityWorld(), (int) player.posX, (int) player.posY, (int) player.posZ);
@@ -43,6 +45,12 @@ public class XNetManualItem extends CompatItem {
     @SideOnly(Side.CLIENT)
     public void initModel() {
         ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+        super.getSubItems(tab, (NonNullList<ItemStack>) subItems);
     }
 }
 

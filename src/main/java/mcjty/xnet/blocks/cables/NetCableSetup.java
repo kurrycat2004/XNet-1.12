@@ -1,16 +1,7 @@
 package mcjty.xnet.blocks.cables;
 
-import mcjty.lib.MyGameReg;
-import mcjty.xnet.blocks.generic.CableColor;
-import mcjty.xnet.init.ModItems;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.oredict.ShapedOreRecipe;
-import net.minecraftforge.oredict.ShapelessOreRecipe;
 
 public class NetCableSetup {
     public static NetCableBlock netCableBlock;
@@ -38,12 +29,6 @@ public class NetCableSetup {
     }
 
     public static void initCrafting() {
-        MyGameReg.addRecipe(new ItemStack(netCableBlock, 32, CableColor.ROUTING.ordinal()), "srs", "rgr", "srs", 'r', Blocks.REDSTONE_BLOCK, 's', Items.STRING, 'g', Items.GOLD_INGOT);
-        MyGameReg.addRecipe(new ItemStack(netCableBlock, 16), "srs", "rgr", "srs", 'r', Items.REDSTONE, 's', Items.STRING, 'g', Items.GOLD_NUGGET);
-        MyGameReg.addRecipe(new ItemStack(connectorBlock, 1), "lRl", "rgr", "lrl", 'r', Items.REDSTONE, 'l', "dyeBlue", 'g', Items.GOLD_INGOT, 'R', "chest");
-        MyGameReg.addRecipe(new ItemStack(connectorBlock, 1, CableColor.ROUTING.ordinal()), "rrr", "xMx", "rrr", 'M', new ItemStack(connectorBlock, 1), 'r', Items.REDSTONE, 'x', Items.GOLD_NUGGET);
-        MyGameReg.addRecipe(new ItemStack(advancedConnectorBlock, 1), "ce", "dr", 'c', connectorBlock, 'e', Items.ENDER_PEARL, 'd', Items.DIAMOND, 'r', Items.REDSTONE);
-        MyGameReg.addRecipe(new ItemStack(ModItems.upgradeItem, 1), "ce", "dr", 'c', Items.PAPER, 'e', Items.ENDER_PEARL, 'd', Items.DIAMOND, 'r', Items.REDSTONE);
 
         // @todo recipes
 //        for (CableColor source : CableColor.VALUES) {

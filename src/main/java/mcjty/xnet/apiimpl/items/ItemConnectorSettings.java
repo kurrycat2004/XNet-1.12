@@ -1,8 +1,7 @@
 package mcjty.xnet.apiimpl.items;
 
 import com.google.common.collect.ImmutableSet;
-import mcjty.lib.tools.ItemStackList;
-import mcjty.lib.tools.ItemStackTools;
+import mcjty.lib.varia.ItemStackList;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.helper.AbstractConnectorSettings;
@@ -119,7 +118,7 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
         if (matcher == null) {
             ItemStackList filterList = ItemStackList.create();
             for (ItemStack stack : filters) {
-                if (ItemStackTools.isValid(stack)) {
+                if (!stack.isEmpty()) {
                     filterList.add(stack);
                 }
             }
@@ -217,9 +216,9 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
         for (int i = 0 ; i < FILTER_SIZE ; i++) {
             if (tag.hasKey("filter" + i)) {
                 NBTTagCompound itemTag = tag.getCompoundTag("filter" + i);
-                filters.set(i, ItemStackTools.loadFromNBT(itemTag));
+                filters.set(i, new ItemStack(itemTag));
             } else {
-                filters.set(i, ItemStackTools.getEmptyStack());
+                filters.set(i, ItemStack.EMPTY);
             }
         }
         matcher = null;
@@ -242,7 +241,7 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
             tag.setInteger("count", count);
         }
         for (int i = 0 ; i < FILTER_SIZE ; i++) {
-            if (ItemStackTools.isValid(filters.get(i))) {
+            if (!filters.get(i).isEmpty()) {
                 NBTTagCompound itemTag = new NBTTagCompound();
                 filters.get(i).writeToNBT(itemTag);
                 tag.setTag("filter" + i, itemTag);

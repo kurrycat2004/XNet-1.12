@@ -3,7 +3,6 @@ package mcjty.xnet.proxy;
 import com.google.common.util.concurrent.ListenableFuture;
 import mcjty.lib.McJtyLibClient;
 import mcjty.lib.font.TrueTypeFont;
-import mcjty.lib.tools.MinecraftTools;
 import mcjty.xnet.RenderWorldLastEventHandler;
 import mcjty.xnet.blocks.generic.BakedModelLoader;
 import mcjty.xnet.init.ModBlocks;
@@ -54,12 +53,12 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public World getClientWorld() {
-        return MinecraftTools.getWorld(Minecraft.getMinecraft());
+        return Minecraft.getMinecraft().world;
     }
 
     @Override
     public EntityPlayer getClientPlayer() {
-        return MinecraftTools.getPlayer(Minecraft.getMinecraft());
+        return Minecraft.getMinecraft().player;
     }
 
     @Override

@@ -25,9 +25,10 @@ public class MyGameReg {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final File RECIPE_DIR = new File("changeme");
 
-    public static void addRecipe(ItemStack result, Object... components) {
-        addShapedRecipe(result, components);
-    }
+
+//    public static void addRecipe(ItemStack result, Object... components) {
+//        addShapedRecipe(result, components);
+//    }
 
     public static void addShapedRecipe(ItemStack result, Object... components) {
         if (!RECIPE_DIR.exists()) {

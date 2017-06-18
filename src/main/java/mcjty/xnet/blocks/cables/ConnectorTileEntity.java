@@ -4,7 +4,6 @@ import cofh.api.energy.IEnergyProvider;
 import cofh.api.energy.IEnergyReceiver;
 import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.network.Argument;
-import mcjty.lib.tools.WorldTools;
 import mcjty.xnet.api.tiles.IConnectorTile;
 import mcjty.xnet.blocks.facade.IFacadeSupport;
 import mcjty.xnet.blocks.facade.MimicBlockSupport;
@@ -70,7 +69,7 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         }
         this.powerOut[side.ordinal()] = powerOut;
         markDirty();
-        WorldTools.neighborChanged(getWorld(), side, this.getBlockType(), this.pos);
+        getWorld().neighborChanged(pos.offset(side), this.getBlockType(), this.pos);
     }
 
     @Override

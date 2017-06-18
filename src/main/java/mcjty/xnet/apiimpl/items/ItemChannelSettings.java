@@ -1,6 +1,5 @@
 package mcjty.xnet.apiimpl.items;
 
-import mcjty.lib.tools.ItemStackTools;
 import mcjty.lib.varia.WorldTools;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelSettings;
@@ -160,10 +159,10 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
         MInteger index = new MInteger(0);
         while (true) {
             ItemStack stack = fetchItem(handler, true, extractMatcher, settings.getStackMode(), 64, index);
-            if (ItemStackTools.isValid(stack)) {
+            if (!stack.isEmpty()) {
                 // Now that we have a stack we first reduce the amount of the stack if we want to keep a certain
                 // number of items
-                int toextract = ItemStackTools.getStackSize(stack);
+                int toextract = stack.getCount();
                 if (count != null) {
                     int canextract = amount-count;
                     if (canextract <= 0) {
@@ -172,7 +171,11 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                     }
                     if (canextract < toextract) {
                         toextract = canextract;
-                        ItemStackTools.setStackSize(stack, toextract);
+                        if (toextract <= 0) {
+                            stack.setCount(0);
+                        } else {
+                            stack.setCount(toextract);
+                        }
                     }
                 }
 
@@ -198,7 +201,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
         if (channelMode == ChannelMode.PRIORITY) {
             roundRobinOffset = 0;       // Always start at 0
         }
-        int total = ItemStackTools.getStackSize(stack);
+        int total = stack.getCount();
         for (int j = 0 ; j < itemConsumers.size() ; j++) {
             int i = (j + roundRobinOffset) % itemConsumers.size();
             Pair<SidedConsumer, ItemConnectorSettings> entry = itemConsumers.get(i);
@@ -234,7 +237,11 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                                 continue;
                             }
                             toinsert = Math.min(toinsert, caninsert);
-                            ItemStackTools.setStackSize(stack, toinsert);
+                            if (toinsert <= 0) {
+                                stack.setCount(0);
+                            } else {
+                                stack.setCount(toinsert);
+                            }
                         }
                         remaining = RFToolsSupport.insertItem(te, stack, true);
                     } else {
@@ -247,7 +254,11 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                                     continue;
                                 }
                                 toinsert = Math.min(toinsert, caninsert);
-                                ItemStackTools.setStackSize(stack, toinsert);
+                                if (toinsert <= 0) {
+                                    stack.setCount(0);
+                                } else {
+                                    stack.setCount(toinsert);
+                                }
                             }
                             remaining = ItemHandlerHelper.insertItem(handler, stack, true);
                         } else {
@@ -255,7 +266,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                         }
                     }
 
-                    actuallyinserted = toinsert - ItemStackTools.getStackSize(remaining);
+                    actuallyinserted = toinsert - remaining.getCount();
                     if (count == null) {
                         // If we are not using a count then we restore 'stack' here as that is what
                         // we actually have to keep inserting until it is empty. If we are using a count
@@ -278,7 +289,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
     }
 
     public void insertStackReal(@Nonnull IControllerContext context, @Nonnull List<Pair<SidedConsumer, ItemConnectorSettings>> inserted, @Nonnull ItemStack stack) {
-        int total = ItemStackTools.getStackSize(stack);
+        int total = stack.getCount();
         for (Pair<SidedConsumer, ItemConnectorSettings> entry : inserted) {
             BlockPos consumerPosition = context.findConsumerPosition(entry.getKey().getConsumerId());
             EnumFacing side = entry.getKey().getSide();
@@ -295,10 +306,14 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                         continue;
                     }
                     toinsert = Math.min(toinsert, caninsert);
-                    ItemStackTools.setStackSize(stack, toinsert);
+                    if (toinsert <= 0) {
+                        stack.setCount(0);
+                    } else {
+                        stack.setCount(toinsert);
+                    }
                 }
                 ItemStack remaining = RFToolsSupport.insertItem(te, stack, false);
-                int actuallyinserted = toinsert - ItemStackTools.getStackSize(remaining);
+                int actuallyinserted = toinsert - remaining.getCount();
                 if (count == null) {
                     // If we are not using a count then we restore 'stack' here as that is what
                     // we actually have to keep inserting until it is empty. If we are using a count
@@ -328,10 +343,14 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                         continue;
                     }
                     toinsert = Math.min(toinsert, caninsert);
-                    ItemStackTools.setStackSize(stack, toinsert);
+                    if (toinsert <= 0) {
+                        stack.setCount(0);
+                    } else {
+                        stack.setCount(toinsert);
+                    }
                 }
                 ItemStack remaining = ItemHandlerHelper.insertItem(handler, stack, false);
-                int actuallyinserted = toinsert - ItemStackTools.getStackSize(remaining);
+                int actuallyinserted = toinsert - remaining.getCount();
                 if (count == null) {
                     // If we are not using a count then we restore 'stack' here as that is what
                     // we actually have to keep inserting until it is empty. If we are using a count
@@ -356,9 +375,9 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
         int cnt = 0;
         for (int i = 0 ; i < handler.getSlots() ; i++) {
             ItemStack s = handler.getStackInSlot(i);
-            if (ItemStackTools.isValid(s)) {
+            if (!s.isEmpty()) {
                 if (matcher.test(s)) {
-                    cnt += ItemStackTools.getStackSize(s);
+                    cnt += s.getCount();
                 }
             }
         }
@@ -368,17 +387,17 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
     private ItemStack fetchItem(IItemHandler handler, boolean simulate, Predicate<ItemStack> matcher, ItemConnectorSettings.StackMode stackMode, int maxamount, MInteger index) {
         for (int i = index.get(); i < handler.getSlots() ; i++) {
             ItemStack stack = handler.getStackInSlot(i);
-            if (ItemStackTools.isValid(stack)) {
+            if (!stack.isEmpty()) {
                 int s = (stackMode == ItemConnectorSettings.StackMode.SINGLE) ? 1 : stack.getMaxStackSize();
                 s = Math.min(s, maxamount);
                 stack = handler.extractItem(i, s, simulate);
-                if (ItemStackTools.isValid(stack) && matcher.test(stack)) {
+                if (!stack.isEmpty() && matcher.test(stack)) {
                     index.set(i);
                     return stack;
                 }
             }
         }
-        return ItemStackTools.getEmptyStack();
+        return ItemStack.EMPTY;
     }
 
 

@@ -1,7 +1,5 @@
 package mcjty.xnet.apiimpl.logic;
 
-import mcjty.lib.tools.FluidTools;
-import mcjty.lib.tools.ItemStackTools;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.Color;
 import mcjty.xnet.api.gui.IEditorGui;
@@ -9,6 +7,7 @@ import mcjty.xnet.apiimpl.energy.EnergyChannelSettings;
 import mcjty.xnet.apiimpl.fluids.FluidChannelSettings;
 import mcjty.xnet.apiimpl.items.ItemChannelSettings;
 import mcjty.xnet.compat.RFToolsSupport;
+import mcjty.xnet.varia.FluidTools;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -93,7 +92,7 @@ class Sensor {
     private Operator operator = Operator.EQUAL;
     private int amount = 0;
     private Color outputColor = OFF;
-    private ItemStack filter = ItemStackTools.getEmptyStack();
+    private ItemStack filter = ItemStack.EMPTY;
 
     public Sensor(int index) {
         this.index = index;
@@ -232,7 +231,7 @@ class Sensor {
         }
         filter = (ItemStack) data.get(TAG_STACK + index);
         if (filter == null) {
-            filter = ItemStackTools.getEmptyStack();
+            filter = ItemStack.EMPTY;
         }
     }
 
@@ -243,9 +242,9 @@ class Sensor {
         outputColor = Color.values()[tag.getByte("scolor" + index)];
         if (tag.hasKey("filter" + index)) {
             NBTTagCompound itemTag = tag.getCompoundTag("filter" + index);
-            filter = ItemStackTools.loadFromNBT(itemTag);
+            filter = new ItemStack(itemTag);
         } else {
-            filter = ItemStackTools.getEmptyStack();
+            filter = ItemStack.EMPTY;
         }
     }
 
@@ -254,7 +253,7 @@ class Sensor {
         tag.setByte("operator" + index, (byte) operator.ordinal());
         tag.setInteger("amount" + index, amount);
         tag.setByte("scolor" + index, (byte) outputColor.ordinal());
-        if (ItemStackTools.isValid(filter)) {
+        if (!filter.isEmpty()) {
             NBTTagCompound itemTag = new NBTTagCompound();
             filter.writeToNBT(itemTag);
             tag.setTag("filter" + index, itemTag);
@@ -266,17 +265,17 @@ class Sensor {
         int cnt = 0;
         for (int i = 0; i < handler.getSlots(); i++) {
             ItemStack stack = handler.getStackInSlot(i);
-            if (ItemStackTools.isValid(stack)) {
-                if (ItemStackTools.isValid(matcher)) {
+            if (!stack.isEmpty()) {
+                if (!matcher.isEmpty()) {
                     // @todo oredict?
                     if (matcher.isItemEqual(stack)) {
-                        cnt += ItemStackTools.getStackSize(stack);
+                        cnt += stack.getCount();
                         if (cnt >= maxNeeded) {
                             return cnt;
                         }
                     }
                 } else {
-                    cnt += ItemStackTools.getStackSize(stack);
+                    cnt += stack.getCount();
                     if (cnt >= maxNeeded) {
                         return cnt;
                     }
@@ -288,7 +287,7 @@ class Sensor {
 
     private int countFluid(@Nonnull IFluidHandler handler, ItemStack matcher, int maxNeeded) {
         FluidStack fluidStack;
-        if (ItemStackTools.isValid(matcher)) {
+        if (!matcher.isEmpty()) {
             fluidStack = FluidTools.convertBucketToFluid(matcher);
         } else {
             fluidStack = null;

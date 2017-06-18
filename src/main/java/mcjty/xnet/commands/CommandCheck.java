@@ -1,7 +1,5 @@
 package mcjty.xnet.commands;
 
-import mcjty.lib.compat.CompatCommand;
-import mcjty.lib.compat.CompatCommandBase;
 import mcjty.xnet.multiblock.XNetBlobData;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
@@ -14,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CommandCheck implements CompatCommand {
+public class CommandCheck implements ICommand {
 
     @Override
     public String getName() {
@@ -61,6 +59,6 @@ public class CommandCheck implements CompatCommand {
 
     @Override
     public int compareTo(ICommand o) {
-        return getName().compareTo(CompatCommandBase.getCommandName(o));
+        return getName().compareTo(o.getName());
     }
 }

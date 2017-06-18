@@ -1,6 +1,5 @@
 package mcjty.xnet;
 
-import mcjty.lib.tools.MinecraftTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -40,7 +39,7 @@ public class RenderWorldLastEventHandler {
             return;
         }
 
-        EntityPlayerSP p = MinecraftTools.getPlayer(mc);
+        EntityPlayerSP p = mc.player;
         double doubleX = p.lastTickPosX + (p.posX - p.lastTickPosX) * evt.getPartialTicks();
         double doubleY = p.lastTickPosY + (p.posY - p.lastTickPosY) * evt.getPartialTicks();
         double doubleZ = p.lastTickPosZ + (p.posZ - p.lastTickPosZ) * evt.getPartialTicks();

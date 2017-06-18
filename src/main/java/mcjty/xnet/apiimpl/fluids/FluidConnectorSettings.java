@@ -1,13 +1,12 @@
 package mcjty.xnet.apiimpl.fluids;
 
 import com.google.common.collect.ImmutableSet;
-import mcjty.lib.tools.FluidTools;
-import mcjty.lib.tools.ItemStackTools;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.helper.AbstractConnectorSettings;
 import mcjty.xnet.blocks.controller.gui.GuiController;
 import mcjty.xnet.config.GeneralConfiguration;
+import mcjty.xnet.varia.FluidTools;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -40,7 +39,7 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
     @Nullable private Integer minmax = null;
     private int speed = 2;
 
-    private ItemStack filter = ItemStackTools.getEmptyStack();
+    private ItemStack filter = ItemStack.EMPTY;
 
     public FluidConnectorSettings(boolean advanced, @Nonnull EnumFacing side) {
         super(advanced, side);
@@ -140,7 +139,7 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
     @Nullable
     public FluidStack getMatcher() {
         // @todo optimize/cache this?
-        if (ItemStackTools.isValid(filter)) {
+        if (!filter.isEmpty()) {
             return FluidTools.convertBucketToFluid(filter);
         } else {
             return null;
@@ -170,7 +169,7 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
         }
         filter = (ItemStack) data.get(TAG_FILTER);
         if (filter == null) {
-            filter = ItemStackTools.getEmptyStack();
+            filter = ItemStack.EMPTY;
         }
     }
 
@@ -199,9 +198,9 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
         }
         if (tag.hasKey("filter")) {
             NBTTagCompound itemTag = tag.getCompoundTag("filter");
-            filter = ItemStackTools.loadFromNBT(itemTag);
+            filter = new ItemStack(itemTag);
         } else {
-            filter = ItemStackTools.getEmptyStack();
+            filter = ItemStack.EMPTY;
         }
     }
 
@@ -219,7 +218,7 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
             tag.setInteger("minmax", minmax);
         }
         tag.setInteger("speed", speed);
-        if (ItemStackTools.isValid(filter)) {
+        if (!filter.isEmpty()) {
             NBTTagCompound itemTag = new NBTTagCompound();
             filter.writeToNBT(itemTag);
             tag.setTag("filter", itemTag);
