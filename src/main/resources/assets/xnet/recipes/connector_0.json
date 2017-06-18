@@ -1,0 +1,26 @@
+{
+  "result": {
+    "item": "xnet:connector",
+    "data": 0
+  },
+  "pattern": [
+    "lRl",
+    "rgr",
+    "lrl"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "r": {
+      "item": "minecraft:redstone"
+    },
+    "R": {
+      "item": "#chest"
+    },
+    "g": {
+      "item": "minecraft:gold_ingot"
+    },
+    "l": {
+      "item": "#dyeBlue"
+    }
+  }
+}

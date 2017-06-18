@@ -1,0 +1,19 @@
+{
+  "result": {
+    "item": "xnet:redstone_proxy"
+  },
+  "pattern": [
+    "rrr",
+    "rmr",
+    "rrr"
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "r": {
+      "item": "minecraft:redstone"
+    },
+    "m": {
+      "item": "rftools:machine_frame"
+    }
+  }
+}

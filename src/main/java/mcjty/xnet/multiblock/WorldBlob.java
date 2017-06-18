@@ -211,7 +211,7 @@ public class WorldBlob {
     @Nonnull
     private ChunkBlob getOrCreateBlob(BlockPos pos) {
         ChunkPos cpos = new ChunkPos(pos);
-        long chunkId = ChunkPos.asLong(cpos.chunkXPos, cpos.chunkZPos);
+        long chunkId = ChunkPos.asLong(cpos.x, cpos.z);
         if (!chunkBlobMap.containsKey(chunkId)) {
             chunkBlobMap.put(chunkId, new ChunkBlob(cpos));
         }
@@ -221,7 +221,7 @@ public class WorldBlob {
     @Nullable
     private ChunkBlob getBlob(BlockPos pos) {
         ChunkPos cpos = new ChunkPos(pos);
-        long chunkId = ChunkPos.asLong(cpos.chunkXPos, cpos.chunkZPos);
+        long chunkId = ChunkPos.asLong(cpos.x, cpos.z);
         return chunkBlobMap.get(chunkId);
     }
 
@@ -296,7 +296,7 @@ public class WorldBlob {
                     if (pos.isBorder(facing)) {
                         Vec3i vec = facing.getDirectionVec();
                         ChunkBlob adjacent = chunkBlobMap.get(
-                                ChunkPos.asLong(chunkPos.chunkXPos+vec.getX(), chunkPos.chunkZPos+vec.getZ()));
+                                ChunkPos.asLong(chunkPos.x+vec.getX(), chunkPos.z+vec.getZ()));
                         if (adjacent != null) {
                             IntPos connectedPos = pos.otherSide(facing);
                             if (adjacent.getBorderPositions().contains(connectedPos) && adjacent.getColorIdForPosition(connectedPos).equals(color)) {
@@ -363,8 +363,8 @@ public class WorldBlob {
         for (Map.Entry<Long, ChunkBlob> entry : chunkBlobMap.entrySet()) {
             ChunkBlob blob = entry.getValue();
             NBTTagCompound tc = new NBTTagCompound();
-            tc.setInteger("chunkX", blob.getChunkPos().chunkXPos);
-            tc.setInteger("chunkZ", blob.getChunkPos().chunkZPos);
+            tc.setInteger("chunkX", blob.getChunkPos().x);
+            tc.setInteger("chunkZ", blob.getChunkPos().z);
             blob.writeToNBT(tc);
             list.appendTag(tc);
         }

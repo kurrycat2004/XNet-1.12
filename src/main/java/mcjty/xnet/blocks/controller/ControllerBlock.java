@@ -70,10 +70,10 @@ public class ControllerBlock extends GenericXNetBlock<TileEntityController, Cont
     }
 
     @Override
-    protected void clOnNeighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn) {
-        super.clOnNeighborChanged(state, world, pos, blockIn);
-        if (!world.isRemote) {
-            findNeighbourConnector(world, pos);
+    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
+        super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
+        if (!worldIn.isRemote) {
+            findNeighbourConnector(worldIn, pos);
         }
     }
 

@@ -56,7 +56,7 @@ public class ChunkBlob {
 
     public ChunkBlob(ChunkPos chunkPos) {
         this.chunkPos = chunkPos;
-        this.chunkNum = ChunkPos.asLong(chunkPos.chunkXPos, chunkPos.chunkZPos);
+        this.chunkNum = ChunkPos.asLong(chunkPos.x, chunkPos.z);
     }
 
     public long getChunkNum() {
@@ -365,7 +365,7 @@ public class ChunkBlob {
     }
 
     public void dump() {
-        System.out.println("################# Chunk (" + chunkPos.chunkXPos + "," + chunkPos.chunkZPos + ") #################");
+        System.out.println("################# Chunk (" + chunkPos.x + "," + chunkPos.z + ") #################");
         System.out.println("Network providers:");
         for (Map.Entry<IntPos, NetworkId> entry : networkProviders.entrySet()) {
             System.out.println("    " + toString(entry.getKey()) + ", network = " + entry.getValue().getId());
