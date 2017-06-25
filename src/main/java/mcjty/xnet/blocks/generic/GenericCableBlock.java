@@ -1,5 +1,6 @@
 package mcjty.xnet.blocks.generic;
 
+import mcjty.lib.McJtyRegister;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
 import mcjty.lib.compat.waila.WailaInfoProvider;
 import mcjty.theoneprobe.api.IProbeHitData;
@@ -103,8 +104,8 @@ public abstract class GenericCableBlock extends Block implements WailaInfoProvid
         setHarvestLevel("pickaxe", 0);
         setUnlocalizedName(XNet.MODID + "." + name);
         setRegistryName(name);
-        GameRegistry.register(this);
-        GameRegistry.register(createItemBlock(), getRegistryName());
+        McJtyRegister.registerLater(this, XNet.instance, null, null);
+        McJtyRegister.registerLater(createItemBlock().setRegistryName(name));
         setCreativeTab(XNet.tabXNet);
         setDefaultState(getDefaultState().withProperty(COLOR, CableColor.BLUE));
     }

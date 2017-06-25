@@ -1,5 +1,6 @@
 package mcjty.xnet.blocks.redstoneproxy;
 
+import mcjty.lib.McJtyRegister;
 import mcjty.xnet.XNet;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -35,8 +36,8 @@ public class RedstoneProxyBlock extends Block {
         super(Material.IRON);
         setUnlocalizedName(XNet.MODID + ".redstone_proxy");
         setRegistryName("redstone_proxy");
-        GameRegistry.register(this);
-        GameRegistry.register(new ItemBlock(this), getRegistryName());
+        McJtyRegister.registerLater(this, XNet.instance, null, null);
+        McJtyRegister.registerLater(new ItemBlock(this).setRegistryName(getRegistryName()));
         setCreativeTab(XNet.tabXNet);
     }
 

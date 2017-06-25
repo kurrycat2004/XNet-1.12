@@ -1,5 +1,6 @@
 package mcjty.xnet.items.manual;
 
+import mcjty.lib.McJtyRegister;
 import mcjty.xnet.XNet;
 import mcjty.xnet.gui.GuiProxy;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -23,7 +24,7 @@ public class XNetManualItem extends Item {
         setUnlocalizedName(XNet.MODID + ".xnet_manual");
         setRegistryName("xnet_manual");
         setCreativeTab(XNet.tabXNet);
-        GameRegistry.register(this);
+        McJtyRegister.registerLater(this);
         setMaxStackSize(1);
     }
 

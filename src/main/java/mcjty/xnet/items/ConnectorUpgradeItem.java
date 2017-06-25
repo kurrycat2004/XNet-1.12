@@ -1,5 +1,6 @@
 package mcjty.xnet.items;
 
+import mcjty.lib.McJtyRegister;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.keys.ConsumerId;
 import mcjty.xnet.blocks.cables.ConnectorBlock;
@@ -26,7 +27,6 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -39,7 +39,7 @@ public class ConnectorUpgradeItem extends Item {
         setUnlocalizedName(XNet.MODID + ".connector_upgrade");
         setRegistryName("connector_upgrade");
         setCreativeTab(XNet.tabXNet);
-        GameRegistry.register(this);
+        McJtyRegister.registerLater(this);
     }
 
     @SideOnly(Side.CLIENT)
