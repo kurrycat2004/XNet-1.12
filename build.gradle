@@ -43,7 +43,7 @@ repositories {
     }
 }
 
-version = "1.12-1.3.2"
+version = "1.12-1.3.3"
 group= "com.github.mcjty"
 archivesBaseName = "xnet"
 
@@ -62,8 +62,8 @@ dependencies {
     deobfCompile "mcp.mobius.waila:Hwyla:1.8.18-B32_1.12:api"
     deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.9-3"
     deobfCompile "com.github.mcjty:intwheel:1.12-1.2.6"
-    deobfCompile "com.github.mcjty:mcjtylib:1.12-2.3.12-SNAPSHOT"
-    deobfCompile "com.github.mcjty:rftools:1.12-6.02"
+    deobfCompile "com.github.mcjty:mcjtylib:1.12-2.3.13-SNAPSHOT"
+    deobfCompile "com.github.mcjty:rftools:1.12-6.03"
 }
 
 processResources

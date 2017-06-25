@@ -10,6 +10,7 @@ import mcjty.xnet.init.ModItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
@@ -27,17 +28,21 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void preInit(FMLPreInitializationEvent e) {
         super.preInit(e);
+        MinecraftForge.EVENT_BUS.register(this);
 //        OBJLoader.INSTANCE.addDomain(RFTools.MODID);
         ModelLoaderRegistry.registerLoader(new BakedModelLoader());
+        McJtyLibClient.preInit(e);
+    }
+
+    @SubscribeEvent
+    public void registerModels(ModelRegistryEvent event) {
         ModItems.initModels();
         ModBlocks.initModels();
-        McJtyLibClient.preInit(e);
     }
 
     @Override
     public void init(FMLInitializationEvent e) {
         super.init(e);
-        MinecraftForge.EVENT_BUS.register(this);
     }
 
     @Override

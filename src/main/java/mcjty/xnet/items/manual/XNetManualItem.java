@@ -24,7 +24,7 @@ public class XNetManualItem extends Item {
         setUnlocalizedName(XNet.MODID + ".xnet_manual");
         setRegistryName("xnet_manual");
         setCreativeTab(XNet.tabXNet);
-        McJtyRegister.registerLater(this);
+        McJtyRegister.registerLater(this, XNet.instance);
         setMaxStackSize(1);
     }
 

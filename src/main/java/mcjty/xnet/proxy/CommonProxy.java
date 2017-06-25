@@ -5,6 +5,7 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.network.PacketHandler;
 import mcjty.lib.varia.WrenchChecker;
+import mcjty.xnet.ForgeEventHandlers;
 import mcjty.xnet.XNet;
 import mcjty.xnet.apiimpl.energy.EnergyChannelType;
 import mcjty.xnet.apiimpl.fluids.FluidChannelType;
@@ -18,6 +19,7 @@ import mcjty.xnet.init.ModRecipes;
 import mcjty.xnet.network.XNetMessages;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -36,6 +38,7 @@ public abstract class CommonProxy {
     private Configuration mainConfig;
 
     public void preInit(FMLPreInitializationEvent e) {
+        MinecraftForge.EVENT_BUS.register(new ForgeEventHandlers());
         McJtyLib.preInit(e);
 
         GeneralConfig.preInit(e);
@@ -75,7 +78,6 @@ public abstract class CommonProxy {
 
     public void init(FMLInitializationEvent e) {
         NetworkRegistry.INSTANCE.registerGuiHandler(XNet.instance, new GuiProxy());
-//        MinecraftForge.EVENT_BUS.register(new ForgeEventHandlers());
         ModRecipes.init();
     }
 
