@@ -1,6 +1,5 @@
 package mcjty.xnet.blocks.facade;
 
-import com.google.common.base.Function;
 import mcjty.xnet.XNet;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -17,6 +16,7 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
 public class FacadeBakedModel implements IBakedModel {
 

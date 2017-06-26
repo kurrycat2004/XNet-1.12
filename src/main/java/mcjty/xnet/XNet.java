@@ -1,8 +1,6 @@
 package mcjty.xnet;
 
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import mcjty.lib.base.ModBase;
 import mcjty.xnet.api.IXNet;
 import mcjty.xnet.apiimpl.XNetApi;
@@ -23,6 +21,9 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
 import org.apache.logging.log4j.Logger;
+
+import java.util.Optional;
+import java.util.function.Function;
 
 @Mod(modid = XNet.MODID, name = XNet.MODNAME,
         dependencies =
