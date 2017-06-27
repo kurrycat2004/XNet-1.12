@@ -1,15 +1,16 @@
 package mcjty.xnet.apiimpl.energy;
 
-import cofh.api.energy.IEnergyHandler;
+import mcjty.lib.compat.RedstoneFluxCompatibility;
 import mcjty.lib.varia.EnergyTools;
 import mcjty.lib.varia.WorldTools;
+import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelSettings;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.channels.IControllerContext;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
-import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.api.helper.DefaultChannelSettings;
+import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.blocks.cables.ConnectorTileEntity;
 import mcjty.xnet.blocks.controller.gui.GuiController;
 import mcjty.xnet.config.GeneralConfiguration;
@@ -24,7 +25,10 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class EnergyChannelSettings extends DefaultChannelSettings implements IChannelSettings {
 
@@ -193,13 +197,15 @@ public class EnergyChannelSettings extends DefaultChannelSettings implements ICh
 
 
     public static boolean isEnergyTE(TileEntity te, @Nonnull EnumFacing side) {
-        return te instanceof IEnergyHandler || (te != null && te.hasCapability(CapabilityEnergy.ENERGY, side));
+        if (te == null) {
+            return false;
+        }
+        return (XNet.redstoneflux && RedstoneFluxCompatibility.isEnergyHandler(te)) || te.hasCapability(CapabilityEnergy.ENERGY, side);
     }
 
     public static int getEnergyLevel(TileEntity tileEntity, @Nonnull EnumFacing side) {
-        if (tileEntity instanceof IEnergyHandler) {
-            IEnergyHandler handler = (IEnergyHandler) tileEntity;
-            return handler.getEnergyStored(EnumFacing.DOWN);
+        if (XNet.redstoneflux && RedstoneFluxCompatibility.isEnergyHandler(tileEntity)) {
+            return RedstoneFluxCompatibility.getEnergy(tileEntity);
         } else if (tileEntity != null && tileEntity.hasCapability(CapabilityEnergy.ENERGY, side)) {
             IEnergyStorage energy = tileEntity.getCapability(CapabilityEnergy.ENERGY, side);
             return energy.getEnergyStored();

@@ -35,7 +35,7 @@ public class XNet implements ModBase {
 
     public static final String MODID = "xnet";
     public static final String MODNAME = "XNet";
-    public static final String MODVERSION = "1.3.3";
+    public static final String MODVERSION = "1.3.4";
 
     public static final String MIN_FORGE11_VER = "13.19.0.2176";
     public static final String MIN_MCJTYLIB_VER = "2.3.13";
@@ -53,6 +53,7 @@ public class XNet implements ModBase {
     public static Logger logger;
 
     public static boolean rftools = false;
+    public static boolean redstoneflux = false;
     public static XNetApi xNetApi = new XNetApi();
 
     public static CreativeTabs tabXNet = new CreativeTabs("XNet") {
@@ -66,6 +67,7 @@ public class XNet implements ModBase {
     public void preInit(FMLPreInitializationEvent event){
         logger = event.getModLog();
         rftools = Loader.isModLoaded("rftools");
+        redstoneflux = Loader.isModLoaded("redstoneflux");
         proxy.preInit(event);
     }
 

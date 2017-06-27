@@ -5,8 +5,8 @@ import mcjty.lib.network.NetworkTools;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.api.channels.IConnectorSettings;
-import mcjty.xnet.api.keys.SidedPos;
 import mcjty.xnet.api.keys.ConsumerId;
+import mcjty.xnet.api.keys.SidedPos;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 

@@ -1,7 +1,7 @@
 package mcjty.xnet.blocks.cables;
 
-import cofh.api.energy.IEnergyProvider;
-import cofh.api.energy.IEnergyReceiver;
+import cofh.redstoneflux.api.IEnergyProvider;
+import cofh.redstoneflux.api.IEnergyReceiver;
 import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.network.Argument;
 import mcjty.xnet.api.tiles.IConnectorTile;
@@ -21,10 +21,15 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.fml.common.Optional;
 
 import javax.annotation.Nonnull;
 import java.util.Map;
 
+@Optional.InterfaceList({
+        @Optional.Interface(iface = "cofh.redstoneflux.api.IEnergyProvider", modid = "redstoneflux"),
+        @Optional.Interface(iface = "cofh.redstoneflux.api.IEnergyReceiver", modid = "redstoneflux")
+})
 public class ConnectorTileEntity extends GenericTileEntity implements IEnergyProvider, IEnergyReceiver,
         IFacadeSupport, IConnectorTile {
 
@@ -184,11 +189,13 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         return GeneralConfiguration.maxRfConnector;
     }
 
+    @Optional.Method(modid = "redstoneflux")
     @Override
     public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate) {
         return 0;
     }
 
+    @Optional.Method(modid = "redstoneflux")
     @Override
     public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
         if (from == null) {
@@ -212,16 +219,19 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         return 0;
     }
 
+    @Optional.Method(modid = "redstoneflux")
     @Override
     public int getEnergyStored(EnumFacing from) {
         return energy;
     }
 
+    @Optional.Method(modid = "redstoneflux")
     @Override
     public int getMaxEnergyStored(EnumFacing from) {
         return getMaxEnergy();
     }
 
+    @Optional.Method(modid = "redstoneflux")
     @Override
     public boolean canConnectEnergy(EnumFacing from) {
         if (from == null) {
