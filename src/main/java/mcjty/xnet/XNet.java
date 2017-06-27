@@ -38,8 +38,8 @@ public class XNet implements ModBase {
     public static final String MODVERSION = "1.3.4";
 
     public static final String MIN_FORGE11_VER = "13.19.0.2176";
-    public static final String MIN_MCJTYLIB_VER = "2.3.13";
-    public static final String MIN_RFTOOLS_VER = "6.03";
+    public static final String MIN_MCJTYLIB_VER = "2.4.0";
+    public static final String MIN_RFTOOLS_VER = "6.04";
 
     public static final String SHIFT_MESSAGE = "<Press Shift>";
 
