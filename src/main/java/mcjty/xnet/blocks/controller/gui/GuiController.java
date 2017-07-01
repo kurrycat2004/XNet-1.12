@@ -113,7 +113,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     }
 
     private void initEnergyBar() {
-        int maxEnergyStored = tileEntity.getMaxEnergyStored(EnumFacing.DOWN);
+        int maxEnergyStored = tileEntity.getMaxEnergyStored();
         energyBar = new EnergyBar(mc, this)
                 .setHorizontal()
                 .setMaxValue(maxEnergyStored)
