@@ -198,6 +198,10 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
     @Optional.Method(modid = "redstoneflux")
     @Override
     public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
+        return receiveEnergyInternal(from, maxReceive, simulate);
+    }
+
+    private int receiveEnergyInternal(EnumFacing from, int maxReceive, boolean simulate) {
         if (from == null) {
             return 0;
         }
@@ -225,9 +229,18 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         return energy;
     }
 
+    private int getEnergyStoredInternal() {
+        return energy;
+    }
+
+
     @Optional.Method(modid = "redstoneflux")
     @Override
     public int getMaxEnergyStored(EnumFacing from) {
+        return getMaxEnergy();
+    }
+
+    private int getMaxEnergyStoredInternal() {
         return getMaxEnergy();
     }
 
@@ -283,7 +296,7 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         sidedHandlers[facing.ordinal()] = new IEnergyStorage() {
             @Override
             public int receiveEnergy(int maxReceive, boolean simulate) {
-                return ConnectorTileEntity.this.receiveEnergy(facing, maxReceive, simulate);
+                return ConnectorTileEntity.this.receiveEnergyInternal(facing, maxReceive, simulate);
             }
 
             @Override
@@ -293,12 +306,12 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
 
             @Override
             public int getEnergyStored() {
-                return ConnectorTileEntity.this.getEnergyStored(facing);
+                return ConnectorTileEntity.this.getEnergyStoredInternal();
             }
 
             @Override
             public int getMaxEnergyStored() {
-                return ConnectorTileEntity.this.getMaxEnergyStored(facing);
+                return ConnectorTileEntity.this.getMaxEnergyStoredInternal();
             }
 
             @Override
