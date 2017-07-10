@@ -30,6 +30,7 @@ public class NetCableSetup {
 
     public static void initCrafting() {
 
+
         // @todo recipes
 //        for (CableColor source : CableColor.VALUES) {
 //            if (source != CableColor.ROUTING) {

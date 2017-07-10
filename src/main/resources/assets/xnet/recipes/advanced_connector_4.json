@@ -1,12 +1,12 @@
 {
   "result": {
-    "item": "xnet:netcable",
+    "item": "xnet:advanced_connector",
     "data": 0
   },
-  "type": "minecraft:crafting_shapeless",
+  "type": "forge:ore_shapeless",
   "ingredients": [
     {
-      "type": "xnet:basic_cable"
+      "type": "xnet:advanced_connector"
     },
     {
       "type": "forge:ore_dict",

@@ -1,7 +1,7 @@
 {
   "result": {
     "item": "xnet:connector",
-    "data": 0
+    "data": 2
   },
   "type": "forge:ore_shapeless",
   "ingredients": [
@@ -10,7 +10,7 @@
     },
     {
       "type": "forge:ore_dict",
-      "ore": "dyeBlue"
+      "ore": "dyeYellow"
     }
   ]
 }

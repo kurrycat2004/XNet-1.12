@@ -1,16 +1,16 @@
 {
   "result": {
-    "item": "xnet:connector",
-    "data": 0
+    "item": "xnet:advanced_connector",
+    "data": 3
   },
   "type": "forge:ore_shapeless",
   "ingredients": [
     {
-      "type": "xnet:basic_connector"
+      "type": "xnet:advanced_connector"
     },
     {
       "type": "forge:ore_dict",
-      "ore": "dyeBlue"
+      "ore": "dyeGreen"
     }
   ]
 }

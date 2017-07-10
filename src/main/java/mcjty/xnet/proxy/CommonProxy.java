@@ -15,7 +15,6 @@ import mcjty.xnet.config.GeneralConfiguration;
 import mcjty.xnet.gui.GuiProxy;
 import mcjty.xnet.init.ModBlocks;
 import mcjty.xnet.init.ModItems;
-import mcjty.xnet.init.ModRecipes;
 import mcjty.xnet.network.XNetMessages;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
@@ -78,7 +77,6 @@ public abstract class CommonProxy {
 
     public void init(FMLInitializationEvent e) {
         NetworkRegistry.INSTANCE.registerGuiHandler(XNet.instance, new GuiProxy());
-        ModRecipes.init();
     }
 
     public void postInit(FMLPostInitializationEvent e) {
