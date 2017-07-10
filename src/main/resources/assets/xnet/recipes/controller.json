@@ -1,4 +1,13 @@
 {
+  "conditions": [
+    {
+      "type": "forge:not",
+      "value": {
+        "type": "forge:mod_loaded",
+        "modid": "rftools"
+      }
+    }
+  ],
   "result": {
     "item": "xnet:controller"
   },
@@ -25,7 +34,7 @@
       "item": "minecraft:iron_ingot"
     },
     "M": {
-      "item": "rftools:machine_frame"
+      "item": "minecraft:iron_block"
     }
   }
 }
