@@ -55,12 +55,25 @@ public class ItemFilterCache {
 
     private boolean itemMatches(ItemStack stack) {
         if (stacks != null) {
+            int forestryFlags = ForestrySupport.Tag.GEN.getFlag() | ForestrySupport.Tag.IS_ANALYZED.getFlag();
+            ItemStack cleanedStack = null;
+            if(nbtMode && ForestrySupport.isLoaded() && ForestrySupport.isBreedable(stack)) {
+                cleanedStack = ForestrySupport.sanitize(stack, forestryFlags);
+            }
             for (ItemStack itemStack : stacks) {
                 if (matchDamage && itemStack.getMetadata() != stack.getMetadata()) {
                     continue;
                 }
-                if (nbtMode && !ItemStack.areItemStackTagsEqual(itemStack, stack)) {
-                    continue;
+                if (nbtMode) {
+                    if((cleanedStack != null) && ForestrySupport.isBreedable(itemStack)) {
+                        ItemStack cleanedItemStack = ForestrySupport.sanitize(itemStack, forestryFlags);
+                        if(ItemStack.areItemStackTagsEqual(cleanedItemStack, cleanedStack)) {
+                    		return true;
+                    	}
+                    }
+                    if(!ItemStack.areItemStackTagsEqual(itemStack, stack)) {
+                        continue;
+                    }
                 }
                 if (itemStack.getItem().equals(stack.getItem())) {
                     return true;
