@@ -1,6 +1,7 @@
 package mcjty.xnet.apiimpl.items;
 
 import mcjty.lib.varia.ItemStackList;
+import mcjty.xnet.compat.ForestrySupport;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -67,11 +68,11 @@ public class ItemFilterCache {
                 if (nbtMode) {
                     if((cleanedStack != null) && ForestrySupport.isBreedable(itemStack)) {
                         ItemStack cleanedItemStack = ForestrySupport.sanitize(itemStack, forestryFlags);
-                        if(ItemStack.areItemStackTagsEqual(cleanedItemStack, cleanedStack)) {
-                    		return true;
+                        if(!ItemStack.areItemStackTagsEqual(cleanedItemStack, cleanedStack)) {
+                    		continue;
                     	}
                     }
-                    if(!ItemStack.areItemStackTagsEqual(itemStack, stack)) {
+                    else if(!ItemStack.areItemStackTagsEqual(itemStack, stack)) {
                         continue;
                     }
                 }
