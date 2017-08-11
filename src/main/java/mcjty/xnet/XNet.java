@@ -30,6 +30,7 @@ import java.util.function.Function;
                         "required-after:mcjtylib_ng@[" + XNet.MIN_MCJTYLIB_VER + ",);" +
                         "after:rftools@[" + XNet.MIN_RFTOOLS_VER + ",);" +
                         "after:forge@[" + XNet.MIN_FORGE11_VER + ",)",
+        acceptedMinecraftVersions = "[1.12,1.13)",
         version = XNet.MODVERSION)
 public class XNet implements ModBase {
 
