@@ -91,7 +91,7 @@ public class XNet implements ModBase {
     @Mod.EventHandler
     public void serverLoad(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandDump());
-        event.registerServerCommand(new CommandGen());
+//        event.registerServerCommand(new CommandGen());
         event.registerServerCommand(new CommandRebuild());
         event.registerServerCommand(new CommandCheck());
     }
