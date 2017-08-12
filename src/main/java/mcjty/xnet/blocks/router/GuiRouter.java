@@ -160,9 +160,9 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
 
         Panel panel = new Panel(mc, this).setLayout(new PositionalLayout()).setDesiredHeight(30);
         Panel panel1 = new Panel(mc, this).setLayout(new HorizontalLayout().setHorizontalMargin(0).setSpacing(0)).setLayoutHint(new PositionalLayout.PositionalHint(0, 0, 160, 13));
-        panel1.addChild(new Label<>(mc, this).setText("Chan").setColor(0xff2244aa));
+        panel1.addChild(new Label<>(mc, this).setText("Ch").setColor(0xff2244aa));
         panel1.addChild(new Label<>(mc, this).setText(name));
-        panel1.addChild(new Label<>(mc, this).setText("->").setColor(0xff2244aa));
+        panel1.addChild(new Label<>(mc, this).setText(">").setColor(0xff2244aa));
         if (local) {
             TextField pubName = new TextField(mc, this).setText(publishedName).setDesiredWidth(50).setDesiredHeight(13)
                     .addTextEvent((parent, newText) -> updatePublish(controllerPos, index, newText));
