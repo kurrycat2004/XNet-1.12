@@ -12,6 +12,7 @@ import mcjty.lib.gui.widgets.*;
 import mcjty.lib.gui.widgets.Button;
 import mcjty.lib.gui.widgets.Label;
 import mcjty.lib.gui.widgets.Panel;
+import mcjty.lib.gui.widgets.TextField;
 import mcjty.lib.network.Argument;
 import mcjty.lib.varia.BlockPosTools;
 import mcjty.lib.varia.Logging;
@@ -51,6 +52,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
 
     private WidgetList connectorList;
     private int listDirty;
+    private TextField searchBar;
 
     private Panel channelEditPanel;
     private Panel connectorEditPanel;
@@ -92,12 +94,15 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         toplevel.setBounds(new Rectangle(guiLeft-SIDEWIDTH, guiTop, xSize+SIDEWIDTH, ySize));
 
         initEnergyBar();
+        searchBar = new TextField(mc, this).setLayoutHint(new PositionalLayout.PositionalHint(5, 21, 163, 14));
+        searchBar.addTextEvent((parent, newText) -> needsRefresh = true );
         Panel listPanel = initConnectorListPanel();
         Panel channelSelectionPanel = initChannelSelectionPanel();
         initEditPanels();
 
         toplevel.addChild(channelSelectionPanel).addChild(listPanel).addChild(channelEditPanel).addChild(connectorEditPanel)
-            .addChild(energyBar);
+                .addChild(searchBar)
+                .addChild(energyBar);
 
         window = new Window(this, toplevel);
 
@@ -150,7 +155,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                 .setLayout(new HorizontalLayout().setHorizontalMargin(3).setSpacing(1))
                 .addChild(connectorList)
                 .addChild(listSlider)
-                .setLayoutHint(new PositionalLayout.PositionalHint(2, 20, 169, 214));
+                .setLayoutHint(new PositionalLayout.PositionalHint(2, 36, 169, 198));
     }
 
     private void hilightSelectedContainer(int index) {
@@ -372,6 +377,8 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         int sel = connectorList.getSelected();
         BlockPos prevPos = null;
 
+        String selectedText = searchBar.getText().trim().toLowerCase();
+
         for (ConnectedBlockClientInfo connectedBlock : fromServer_connectedBlocks) {
             SidedPos sidedPos = connectedBlock.getPos();
             BlockPos coordinate = sidedPos.getPos();
@@ -382,6 +389,11 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
             int color = StyleConfig.colorTextInListNormal;
 
             Panel panel = new Panel(mc, this).setLayout(new HorizontalLayout().setHorizontalMargin(0).setSpacing(0));
+            if (!selectedText.isEmpty()) {
+                if (blockName.toLowerCase().contains(selectedText)) {
+                    panel.setFilledBackground(0xffddeeaa);
+                }
+            }
             BlockRender br;
             if (coordinate.equals(prevPos)) {
                 br = new BlockRender(mc, this);
