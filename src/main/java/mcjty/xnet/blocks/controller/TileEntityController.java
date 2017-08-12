@@ -464,9 +464,11 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         SidedConsumer toremove = null;
         for (Map.Entry<SidedConsumer, ConnectorInfo> entry : channels[channel].getConnectors().entrySet()) {
             SidedConsumer key = entry.getKey();
-            if (key.getConsumerId().equals(consumerId)) {
-                toremove = key;
-                break;
+            if (key.getSide().getOpposite().equals(pos.getSide())) {
+                if (key.getConsumerId().equals(consumerId)) {
+                    toremove = key;
+                    break;
+                }
             }
         }
         if (toremove != null) {
