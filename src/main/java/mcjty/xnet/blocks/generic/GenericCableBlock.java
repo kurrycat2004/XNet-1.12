@@ -336,6 +336,10 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
 
     @Override
     public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
+        return getStateInternal(state, world, pos);
+    }
+
+    public IBlockState getStateInternal(IBlockState state, IBlockAccess world, BlockPos pos) {
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
         CableColor color = state.getValue(COLOR);
 
