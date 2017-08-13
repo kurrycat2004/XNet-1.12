@@ -2,8 +2,11 @@ package mcjty.xnet;
 
 import mcjty.lib.tools.ItemStackTools;
 import mcjty.lib.tools.MinecraftTools;
+import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.blocks.cables.ConnectorType;
 import mcjty.xnet.blocks.facade.FacadeBlock;
+import mcjty.xnet.blocks.facade.FacadeBlockId;
+import mcjty.xnet.blocks.generic.CableColor;
 import mcjty.xnet.blocks.generic.GenericCableBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -19,7 +22,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.fml.relauncher.Side;
@@ -66,7 +68,7 @@ public class RenderWorldLastEventHandler {
 
         GlStateManager.pushMatrix();
         GlStateManager.color(1.0f, 0, 0);
-        GlStateManager.glLineWidth(3);
+        GlStateManager.glLineWidth(2);
         GlStateManager.translate(-doubleX, -doubleY, -doubleZ);
 
         GlStateManager.disableDepth();
@@ -82,10 +84,51 @@ public class RenderWorldLastEventHandler {
                     BlockPos c = p.getPosition().add(dx, dy, dz);
                     IBlockState state = world.getBlockState(c);
                     Block block = state.getBlock();
-                    if (block instanceof GenericCableBlock) {
-                        List<Rect> quads = getQuads(state, world, c);
+                    if (block instanceof FacadeBlock || block instanceof ConnectorBlock) {
+                        IExtendedBlockState extendedBlockState;
+                        if (state.getBlock() instanceof FacadeBlock) {
+                            extendedBlockState = (IExtendedBlockState) ((FacadeBlock) state.getBlock()).getStateInternal(state, world, c);
+                        } else {
+                            extendedBlockState = (IExtendedBlockState) state.getBlock().getExtendedState(state, world, c);
+                        }
+                        FacadeBlockId facadeId = extendedBlockState.getValue(GenericCableBlock.FACADEID);
+                        if (facadeId == null && !(block instanceof FacadeBlock)) {
+                            continue;
+                        }
+                        CableColor color = extendedBlockState.getValue(GenericCableBlock.COLOR);
+                        float r = 0;
+                        float g = 0;
+                        float b = 0;
+                        switch (color) {
+                            case BLUE:
+                                r = .4f;
+                                g = .4f;
+                                b = 1f;
+                                break;
+                            case RED:
+                                r = 1f;
+                                g = .4f;
+                                b = .4f;
+                                break;
+                            case YELLOW:
+                                r = 1f;
+                                g = 1f;
+                                b = .4f;
+                                break;
+                            case GREEN:
+                                r = .4f;
+                                g = 1f;
+                                b = .4f;
+                                break;
+                            case ROUTING:
+                                r = .7f;
+                                g = .7f;
+                                b = .7f;
+                                break;
+                        }
+                        List<Rect> quads = getQuads(extendedBlockState);
                         for (Rect quad : quads) {
-                            renderRect(buffer, quad, c, 0.6f, 0.6f, 1.0f, 0.5f);
+                            renderRect(buffer, quad, c, r, g, b, 0.5f);
                         }
                     }
                 }
@@ -117,16 +160,7 @@ public class RenderWorldLastEventHandler {
         }
     }
 
-    private static List<Rect> getQuads(IBlockState state, World world, BlockPos pos) {
-
-        // Called with the blockstate from our block. Here we get the values of the six properties and pass that to
-        // our baked model implementation.
-        IExtendedBlockState extendedBlockState;
-        if (state.getBlock() instanceof FacadeBlock) {
-            extendedBlockState = (IExtendedBlockState) ((FacadeBlock) state.getBlock()).getStateInternal(state, world, pos);
-        } else {
-            extendedBlockState = (IExtendedBlockState) state.getBlock().getExtendedState(state, world, pos);
-        }
+    private static List<Rect> getQuads(IExtendedBlockState extendedBlockState) {
         ConnectorType north = extendedBlockState.getValue(GenericCableBlock.NORTH);
         ConnectorType south = extendedBlockState.getValue(GenericCableBlock.SOUTH);
         ConnectorType west = extendedBlockState.getValue(GenericCableBlock.WEST);
