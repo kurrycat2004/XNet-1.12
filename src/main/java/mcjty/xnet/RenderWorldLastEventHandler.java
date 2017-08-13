@@ -1,7 +1,16 @@
 package mcjty.xnet;
 
+import mcjty.xnet.blocks.cables.ConnectorBlock;
+import mcjty.xnet.blocks.cables.ConnectorType;
+import mcjty.xnet.blocks.facade.FacadeBlock;
+import mcjty.xnet.blocks.facade.FacadeBlockId;
+import mcjty.xnet.blocks.generic.CableColor;
+import mcjty.xnet.blocks.generic.GenericCableBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -36,10 +45,10 @@ public class RenderWorldLastEventHandler {
     private static void renderCables(RenderWorldLastEvent evt) {
         Minecraft mc = Minecraft.getMinecraft();
 
-        EntityPlayerSP p = MinecraftTools.getPlayer(mc);
+        EntityPlayerSP p = mc.player;
 
         ItemStack heldItem = p.getHeldItem(EnumHand.MAIN_HAND);
-        if (ItemStackTools.isValid(heldItem)) {
+        if (!heldItem.isEmpty()) {
             if (heldItem.getItem() instanceof ItemBlock) {
                 if (((ItemBlock) heldItem.getItem()).getBlock() instanceof GenericCableBlock) {
                     renderCablesInt(evt, mc);
@@ -49,8 +58,8 @@ public class RenderWorldLastEventHandler {
     }
 
     private static void renderCablesInt(RenderWorldLastEvent evt, Minecraft mc) {
-        EntityPlayerSP p = MinecraftTools.getPlayer(mc);
-        WorldClient world = MinecraftTools.getWorld(mc);
+        EntityPlayerSP p = mc.player;
+        WorldClient world = mc.world;
         double doubleX = p.lastTickPosX + (p.posX - p.lastTickPosX) * evt.getPartialTicks();
         double doubleY = p.lastTickPosY + (p.posY - p.lastTickPosY) * evt.getPartialTicks();
         double doubleZ = p.lastTickPosZ + (p.posZ - p.lastTickPosZ) * evt.getPartialTicks();
@@ -64,7 +73,7 @@ public class RenderWorldLastEventHandler {
         GlStateManager.disableTexture2D();
 
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer buffer = tessellator.getBuffer();
+        BufferBuilder buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
 
         for (int dx = -20 ; dx <= 20 ; dx++) {
@@ -300,15 +309,15 @@ public class RenderWorldLastEventHandler {
         return quads;
     }
 
-    public static void renderRect(VertexBuffer buffer, Rect rect, BlockPos p, float r, float g, float b, float a) {
-        buffer.pos(p.getX() + rect.v1.xCoord, p.getY() + rect.v1.yCoord, p.getZ() + rect.v1.zCoord).color(r, g, b, a).endVertex();
-        buffer.pos(p.getX() + rect.v2.xCoord, p.getY() + rect.v2.yCoord, p.getZ() + rect.v2.zCoord).color(r, g, b, a).endVertex();
-        buffer.pos(p.getX() + rect.v2.xCoord, p.getY() + rect.v2.yCoord, p.getZ() + rect.v2.zCoord).color(r, g, b, a).endVertex();
-        buffer.pos(p.getX() + rect.v3.xCoord, p.getY() + rect.v3.yCoord, p.getZ() + rect.v3.zCoord).color(r, g, b, a).endVertex();
-        buffer.pos(p.getX() + rect.v3.xCoord, p.getY() + rect.v3.yCoord, p.getZ() + rect.v3.zCoord).color(r, g, b, a).endVertex();
-        buffer.pos(p.getX() + rect.v4.xCoord, p.getY() + rect.v4.yCoord, p.getZ() + rect.v4.zCoord).color(r, g, b, a).endVertex();
-        buffer.pos(p.getX() + rect.v4.xCoord, p.getY() + rect.v4.yCoord, p.getZ() + rect.v4.zCoord).color(r, g, b, a).endVertex();
-        buffer.pos(p.getX() + rect.v1.xCoord, p.getY() + rect.v1.yCoord, p.getZ() + rect.v1.zCoord).color(r, g, b, a).endVertex();
+    public static void renderRect(BufferBuilder buffer, Rect rect, BlockPos p, float r, float g, float b, float a) {
+        buffer.pos(p.getX() + rect.v1.x, p.getY() + rect.v1.y, p.getZ() + rect.v1.z).color(r, g, b, a).endVertex();
+        buffer.pos(p.getX() + rect.v2.x, p.getY() + rect.v2.y, p.getZ() + rect.v2.z).color(r, g, b, a).endVertex();
+        buffer.pos(p.getX() + rect.v2.x, p.getY() + rect.v2.y, p.getZ() + rect.v2.z).color(r, g, b, a).endVertex();
+        buffer.pos(p.getX() + rect.v3.x, p.getY() + rect.v3.y, p.getZ() + rect.v3.z).color(r, g, b, a).endVertex();
+        buffer.pos(p.getX() + rect.v3.x, p.getY() + rect.v3.y, p.getZ() + rect.v3.z).color(r, g, b, a).endVertex();
+        buffer.pos(p.getX() + rect.v4.x, p.getY() + rect.v4.y, p.getZ() + rect.v4.z).color(r, g, b, a).endVertex();
+        buffer.pos(p.getX() + rect.v4.x, p.getY() + rect.v4.y, p.getZ() + rect.v4.z).color(r, g, b, a).endVertex();
+        buffer.pos(p.getX() + rect.v1.x, p.getY() + rect.v1.y, p.getZ() + rect.v1.z).color(r, g, b, a).endVertex();
     }
 
 

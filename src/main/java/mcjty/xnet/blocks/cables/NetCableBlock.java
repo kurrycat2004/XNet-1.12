@@ -13,6 +13,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -51,14 +52,14 @@ public class NetCableBlock extends GenericCableBlock {
     }
 
     @Override
-    protected void clGetSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+    public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> items) {
         for (CableColor value : CableColor.VALUES) {
-            subItems.add(updateColorInStack(new ItemStack(itemIn, 1, value.ordinal()), value));
+            items.add(updateColorInStack(new ItemStack(this, 1, value.ordinal()), value));
         }
     }
 
     @Override
-    protected IBlockState clGetStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
         return getPlacementState(world, pos, facing, hitX, hitY, hitZ, meta, placer);
 
     }
@@ -66,7 +67,7 @@ public class NetCableBlock extends GenericCableBlock {
     public IBlockState getPlacementState(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
         // When our block is placed down we force a re-render of adjacent blocks to make sure their baked model is updated
         world.markBlockRangeForRenderUpdate(pos.add(-1, -1, -1), pos.add(1, 1, 1));
-        return super.clGetStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, placer);
+        return super.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, placer);
     }
 
     @Override
