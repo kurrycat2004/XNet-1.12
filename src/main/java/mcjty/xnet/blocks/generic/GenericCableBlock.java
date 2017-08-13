@@ -189,7 +189,7 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
         CableColor color = blockState.getValue(COLOR);
 
         for (EnumFacing facing : EnumFacing.VALUES) {
-            ConnectorType type = getConnectorType(color, world, pos.offset(facing));
+            ConnectorType type = getConnectorType(color, world, pos, facing);
             if (type != ConnectorType.NONE) {
                 rc = checkIntersect(pos, vec3d, vec3d1, AABBS[facing.ordinal()]);
                 if (rc != null) {
@@ -343,12 +343,12 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
         CableColor color = state.getValue(COLOR);
 
-        ConnectorType north = getConnectorType(color, world, pos.north());
-        ConnectorType south = getConnectorType(color, world, pos.south());
-        ConnectorType west = getConnectorType(color, world, pos.west());
-        ConnectorType east = getConnectorType(color, world, pos.east());
-        ConnectorType up = getConnectorType(color, world, pos.up());
-        ConnectorType down = getConnectorType(color, world, pos.down());
+        ConnectorType north = getConnectorType(color, world, pos, EnumFacing.NORTH);
+        ConnectorType south = getConnectorType(color, world, pos, EnumFacing.SOUTH);
+        ConnectorType west = getConnectorType(color, world, pos, EnumFacing.WEST);
+        ConnectorType east = getConnectorType(color, world, pos, EnumFacing.EAST);
+        ConnectorType up = getConnectorType(color, world, pos, EnumFacing.UP);
+        ConnectorType down = getConnectorType(color, world, pos, EnumFacing.DOWN);
 
         return extendedBlockState
                 .withProperty(NORTH, north)
@@ -359,5 +359,5 @@ public abstract class GenericCableBlock extends CompatBlock implements WailaInfo
                 .withProperty(DOWN, down);
     }
 
-    protected abstract ConnectorType getConnectorType(@Nonnull CableColor thisColor, IBlockAccess world, BlockPos pos);
+    protected abstract ConnectorType getConnectorType(@Nonnull CableColor thisColor, IBlockAccess world, BlockPos pos, EnumFacing facing);
 }

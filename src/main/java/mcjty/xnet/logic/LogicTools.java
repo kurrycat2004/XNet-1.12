@@ -105,8 +105,8 @@ public class LogicTools {
     public static Stream<BlockPos> connectedBlocks(@Nonnull World world, @Nonnull NetworkId networkId) {
         return consumers(world, networkId)
                 .map(blockPos -> Arrays.stream(EnumFacing.VALUES)
-                        .map(blockPos::offset)
-                        .filter(pos -> ConnectorBlock.isConnectable(world, pos)))
+                        .filter(facing -> ConnectorBlock.isConnectable(world, blockPos, facing))
+                        .map(blockPos::offset))
                 .flatMap(s -> s);
     }
 

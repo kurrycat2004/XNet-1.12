@@ -29,6 +29,7 @@ import java.util.Map;
 public class ConnectorTileEntity extends GenericTileEntity implements IEnergyProvider, IEnergyReceiver,
         IFacadeSupport, IConnectorTile {
 
+    public static final String CMD_ENABLE = "enable";
     public static final String CMD_SETNAME = "setName";
 
     private MimicBlockSupport mimicBlockSupport = new MimicBlockSupport();
@@ -41,17 +42,20 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
     private int pulseCounter;
     private int powerOut[] = new int[] { 0, 0, 0, 0, 0, 0 };
 
+    private byte enabled = 0x3f;
+
     private Block[] cachedNeighbours = new Block[EnumFacing.VALUES.length];
 
     @Override
     public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet) {
         IBlockState oldMimicBlock = mimicBlockSupport.getMimicBlock();
+        byte oldEnabled = enabled;
 
         super.onDataPacket(net, packet);
 
         if (getWorld().isRemote) {
             // If needed send a render update.
-            if (mimicBlockSupport.getMimicBlock() != oldMimicBlock) {
+            if (enabled != oldEnabled || mimicBlockSupport.getMimicBlock() != oldMimicBlock) {
                 getWorld().markBlockRangeForRenderUpdate(getPos(), getPos());
             }
         }
@@ -71,6 +75,19 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         this.powerOut[side.ordinal()] = powerOut;
         markDirty();
         WorldTools.neighborChanged(getWorld(), side, this.getBlockType(), this.pos);
+    }
+
+    public void setEnabled(EnumFacing direction, boolean e) {
+        if (e) {
+            enabled |= 1 << direction.ordinal();
+        } else {
+            enabled &= ~(1 << direction.ordinal());
+        }
+        markDirtyClient();
+    }
+
+    public boolean isEnabled(EnumFacing direction) {
+        return (enabled & (1 << direction.ordinal())) != 0;
     }
 
     @Override
@@ -130,6 +147,11 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
     public void readRestorableFromNBT(NBTTagCompound tagCompound) {
         super.readRestorableFromNBT(tagCompound);
         name = tagCompound.getString("name");
+        if (tagCompound.hasKey("enabled")) {
+            enabled = tagCompound.getByte("enabled");
+        } else {
+            enabled = 0x3f;
+        }
     }
 
     @Override
@@ -149,6 +171,7 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
     public void writeRestorableToNBT(NBTTagCompound tagCompound) {
         super.writeRestorableToNBT(tagCompound);
         tagCompound.setString("name", name);
+        tagCompound.setByte("enabled", enabled);
     }
 
     @Override
@@ -242,6 +265,11 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         if (CMD_SETNAME.equals(command)) {
             this.name = args.get("name").getString();
             markDirtyClient();
+            return true;
+        } else if (CMD_ENABLE.equals(command)) {
+            int f = args.get("facing").getInteger();
+            boolean e = args.get("enabled").getBoolean();
+            setEnabled(EnumFacing.VALUES[f], e);
             return true;
         }
         return false;
