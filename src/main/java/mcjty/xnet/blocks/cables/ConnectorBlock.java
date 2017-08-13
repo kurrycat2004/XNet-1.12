@@ -250,12 +250,13 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
     }
 
     @Override
-    protected ConnectorType getConnectorType(@Nonnull CableColor color, IBlockAccess world, BlockPos pos) {
+    protected ConnectorType getConnectorType(@Nonnull CableColor color, IBlockAccess world, BlockPos connectorPos, EnumFacing facing) {
+        BlockPos pos = connectorPos.offset(facing);
         IBlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
         if ((block instanceof NetCableBlock || block instanceof ConnectorBlock) && state.getValue(COLOR) == color) {
             return ConnectorType.CABLE;
-        } else if (isConnectable(world, pos) && color != CableColor.ROUTING) {
+        } else if (isConnectable(world, connectorPos, facing) && color != CableColor.ROUTING) {
             return ConnectorType.BLOCK;
         } else if (isConnectableRouting(world, pos) && color == CableColor.ROUTING) {
             return ConnectorType.BLOCK;
@@ -275,7 +276,13 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
         return false;
     }
 
-    public static boolean isConnectable(IBlockAccess world, BlockPos pos) {
+    public static boolean isConnectable(IBlockAccess world, BlockPos connectorPos, EnumFacing facing) {
+        ConnectorTileEntity connectorTE = (ConnectorTileEntity) world.getTileEntity(connectorPos);
+        if (!connectorTE.isEnabled(facing)) {
+            return false;
+        }
+
+        BlockPos pos = connectorPos.offset(facing);
         TileEntity te = world.getTileEntity(pos);
         IBlockState state = world.getBlockState(pos);
         Block block = state.getBlock();

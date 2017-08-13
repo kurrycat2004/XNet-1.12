@@ -70,7 +70,8 @@ public class NetCableBlock extends GenericCableBlock {
     }
 
     @Override
-    protected ConnectorType getConnectorType(@Nonnull CableColor color, IBlockAccess world, BlockPos pos) {
+    protected ConnectorType getConnectorType(@Nonnull CableColor color, IBlockAccess world, BlockPos connectorPos, EnumFacing facing) {
+        BlockPos pos = connectorPos.offset(facing);
         IBlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
         if ((block instanceof NetCableBlock || block instanceof ConnectorBlock) && state.getValue(COLOR) == color) {

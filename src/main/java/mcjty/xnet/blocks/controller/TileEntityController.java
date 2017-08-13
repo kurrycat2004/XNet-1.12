@@ -352,8 +352,8 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                 XNet.logger.warn("What? The connector at " + BlockPosTools.toString(consumerPos) + " is not a connector?");
             }
             for (EnumFacing facing : EnumFacing.VALUES) {
-                BlockPos pos = consumerPos.offset(facing);
-                if (ConnectorBlock.isConnectable(getWorld(), pos)) {
+                if (ConnectorBlock.isConnectable(getWorld(), consumerPos, facing)) {
+                    BlockPos pos = consumerPos.offset(facing);
                     SidedPos sidedPos = new SidedPos(pos, facing.getOpposite());
                     IBlockState state = getWorld().getBlockState(pos);
                     ItemStack item = state.getBlock().getItem(getWorld(), pos, state);
