@@ -280,6 +280,10 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
 
     public static boolean isConnectable(IBlockAccess world, BlockPos connectorPos, EnumFacing facing) {
         ConnectorTileEntity connectorTE = (ConnectorTileEntity) world.getTileEntity(connectorPos);
+        if (connectorTE == null) {
+            return false;
+        }
+
         if (!connectorTE.isEnabled(facing)) {
             return false;
         }
