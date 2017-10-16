@@ -337,6 +337,33 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         return worldBlob.getConsumerPosition(consumerId);
     }
 
+    @Override
+    public List<SidedPos> getConnectedBlockPositions() {
+        WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
+
+        List<SidedPos> result = new ArrayList<>();
+        Set<ConnectedBlockClientInfo> set = new HashSet<>();
+        for (BlockPos consumerPos : worldBlob.getConsumers(networkId)) {
+            String name = "";
+            TileEntity te = getWorld().getTileEntity(consumerPos);
+            if (te instanceof ConnectorTileEntity) {
+                // Should always be the case. @todo error?
+                name = ((ConnectorTileEntity) te).getConnectorName();
+            } else {
+                XNet.logger.warn("What? The connector at " + BlockPosTools.toString(consumerPos) + " is not a connector?");
+            }
+            for (EnumFacing facing : EnumFacing.VALUES) {
+                if (ConnectorBlock.isConnectable(getWorld(), consumerPos, facing)) {
+                    BlockPos pos = consumerPos.offset(facing);
+                    SidedPos sidedPos = new SidedPos(pos, facing.getOpposite());
+                    result.add(sidedPos);
+                }
+            }
+        }
+
+        return result;
+    }
+
     @Nonnull
     private List<ConnectedBlockClientInfo> findConnectedBlocks() {
         WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());

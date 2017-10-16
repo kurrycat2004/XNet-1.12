@@ -3,11 +3,13 @@ package mcjty.xnet.api.channels;
 import mcjty.xnet.api.keys.ConsumerId;
 import mcjty.xnet.api.keys.NetworkId;
 import mcjty.xnet.api.keys.SidedConsumer;
+import mcjty.xnet.api.keys.SidedPos;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Map;
 
 public interface IControllerContext {
@@ -28,5 +30,7 @@ public interface IControllerContext {
     boolean matchColor(int colorMask);
 
     boolean checkAndConsumeRF(int rft);
+
+    List<SidedPos> getConnectedBlockPositions();
 
 }
