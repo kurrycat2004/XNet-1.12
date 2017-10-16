@@ -294,7 +294,8 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
         if (block instanceof ConnectorBlock) {
             return false;
         }
-        if (block == ModBlocks.redstoneProxyBlock || block == Blocks.REDSTONE_LAMP || block == Blocks.LIT_REDSTONE_LAMP) {
+        if (block == ModBlocks.redstoneProxyBlock || block == Blocks.REDSTONE_LAMP || block == Blocks.LIT_REDSTONE_LAMP ||
+                block == Blocks.PISTON || block == Blocks.STICKY_PISTON) {
             return true;
         }
         if (block.canConnectRedstone(state, world, pos, null) || state.canProvidePower()) {
