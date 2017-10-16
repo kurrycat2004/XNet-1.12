@@ -20,6 +20,8 @@ public class GeneralConfiguration {
 
     public static int maxPublishedChannels = 32;    // Maximum number of published channels on a routing network
 
+    public static boolean showNonFacadedCablesWhileSneaking = true;
+
     public static void init(Configuration cfg) {
 
         maxRfConnector = cfg.getInt(CATEGORY_GENERAL, "maxRfConnector", maxRfConnector, 1, 1000000000,
@@ -44,6 +46,8 @@ public class GeneralConfiguration {
                 "Power usage for the controller per active channel");
         controllerOperationRFT = cfg.getInt(CATEGORY_GENERAL, "controllerOperationRFT", controllerOperationRFT, 0, 1000000000,
                 "Power usage for the controller per operation performed by one of the channels");
+        showNonFacadedCablesWhileSneaking = cfg.getBoolean(CATEGORY_GENERAL, "showNonFacadedCablesWhileSneaking", showNonFacadedCablesWhileSneaking,
+                "If true then cables are also shown when sneaking even if they are not in a facade");
 
     }
 }

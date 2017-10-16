@@ -33,4 +33,11 @@ public interface IControllerContext {
 
     List<SidedPos> getConnectedBlockPositions();
 
+    /*
+     * This allows other mods to iterate over all blocks the controller is
+     * connected to without worrying about configured channels. With this
+     * they can basically piggy-back onto the existing XNet network.
+     */
+    List<SidedPos> getConnectedBlockPositions();
+
 }

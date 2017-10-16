@@ -103,15 +103,15 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
             LogicTools.routers(getWorld(), networkId)
                     .forEach(router -> {
-                            networkChecker.add(worldBlob.getNetworksAt(router.getPos()));
-                            // We're only interested in one network. The other router networks are all same topology
-                            NetworkId routerNetwork = worldBlob.getNetworkAt(router.getPos());
-                            if (routerNetwork != null) {
-                                LogicTools.routers(getWorld(), routerNetwork)
-                                        .filter(r -> router != r)
-                                        .forEach(r -> LogicTools.connectors(getWorld(), r.getPos())
-                                                .forEach(connectorPos -> networkChecker.add(worldBlob.getNetworkAt(connectorPos))));
-                            }
+                        networkChecker.add(worldBlob.getNetworksAt(router.getPos()));
+                        // We're only interested in one network. The other router networks are all same topology
+                        NetworkId routerNetwork = worldBlob.getNetworkAt(router.getPos());
+                        if (routerNetwork != null) {
+                            LogicTools.routers(getWorld(), routerNetwork)
+                                    .filter(r -> router != r)
+                                    .forEach(r -> LogicTools.connectors(getWorld(), r.getPos())
+                                            .forEach(connectorPos -> networkChecker.add(worldBlob.getNetworkAt(connectorPos))));
+                        }
                     });
 
 //            networkChecker.dump();
@@ -140,7 +140,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
     private void checkNetwork(WorldBlob worldBlob) {
         if (networkId != null && getNetworkChecker().isDirtyAndMarkClean(worldBlob)) {
-            for (int i = 0 ; i < MAX_CHANNELS ; i++) {
+            for (int i = 0; i < MAX_CHANNELS; i++) {
                 if (channels[i] != null) {
                     cleanCache(i);
                 }

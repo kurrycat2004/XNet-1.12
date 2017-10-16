@@ -145,7 +145,8 @@ public class FacadeBlock extends NetCableBlock implements ITileEntityProvider {
     @Override
     @SideOnly(Side.CLIENT)
     public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
-        return getMimicBlock(blockAccess, pos).shouldSideBeRendered(blockAccess, pos, side);
+        IBlockState mimicBlock = getMimicBlock(blockAccess, pos);
+        return mimicBlock == null ? true : mimicBlock.shouldSideBeRendered(blockAccess, pos, side);
     }
 
     @Override
