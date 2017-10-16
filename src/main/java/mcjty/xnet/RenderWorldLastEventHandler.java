@@ -8,6 +8,7 @@ import mcjty.xnet.blocks.facade.FacadeBlock;
 import mcjty.xnet.blocks.facade.FacadeBlockId;
 import mcjty.xnet.blocks.generic.CableColor;
 import mcjty.xnet.blocks.generic.GenericCableBlock;
+import mcjty.xnet.config.GeneralConfiguration;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -84,7 +85,7 @@ public class RenderWorldLastEventHandler {
                     BlockPos c = p.getPosition().add(dx, dy, dz);
                     IBlockState state = world.getBlockState(c);
                     Block block = state.getBlock();
-                    if (block instanceof FacadeBlock || block instanceof ConnectorBlock) {
+                    if (block instanceof FacadeBlock || block instanceof ConnectorBlock || block instanceof GenericCableBlock) {
                         IExtendedBlockState extendedBlockState;
                         if (state.getBlock() instanceof FacadeBlock) {
                             extendedBlockState = (IExtendedBlockState) ((FacadeBlock) state.getBlock()).getStateInternal(state, world, c);
@@ -92,7 +93,7 @@ public class RenderWorldLastEventHandler {
                             extendedBlockState = (IExtendedBlockState) state.getBlock().getExtendedState(state, world, c);
                         }
                         FacadeBlockId facadeId = extendedBlockState.getValue(GenericCableBlock.FACADEID);
-                        if (facadeId == null && !(block instanceof FacadeBlock)) {
+                        if (((!GeneralConfiguration.showNonFacadedCablesWhileSneaking) || (!p.isSneaking())) && facadeId == null && !(block instanceof FacadeBlock)) {
                             continue;
                         }
                         CableColor color = extendedBlockState.getValue(GenericCableBlock.COLOR);
