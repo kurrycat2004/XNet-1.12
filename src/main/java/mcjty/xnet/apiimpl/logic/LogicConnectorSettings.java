@@ -121,7 +121,7 @@ public class LogicConnectorSettings extends AbstractConnectorSettings {
         redstoneGui(gui);
         gui.nl()
                 .choices(TAG_MODE, "Sensor or Output mode", logicMode, LogicMode.values())
-                .choices(TAG_SPEED, (logicMode == LogicMode.SENSOR ? "Number of ticks for each check" : "Number of ticks for each operation"), Integer.toString(speed * 10), speeds)
+                .choices(TAG_SPEED, (logicMode == LogicMode.SENSOR ? "Number of ticks for each check" : "Number of ticks for each operation"), Integer.toString(speed * 5), speeds)
                 .nl();
         if (logicMode == LogicMode.SENSOR) {
             for (Sensor sensor : sensors) {
@@ -139,7 +139,9 @@ public class LogicConnectorSettings extends AbstractConnectorSettings {
         super.update(data);
         logicMode = LogicMode.valueOf(((String)data.get(TAG_MODE)).toUpperCase());
         String facing = (String) data.get(TAG_FACING);
-        speed = Integer.parseInt((String) data.get(TAG_SPEED)) / 10;
+        // @todo suspicious
+
+        speed = Integer.parseInt((String) data.get(TAG_SPEED)) / 5;
         if (speed == 0) {
             speed = 2;
         }
