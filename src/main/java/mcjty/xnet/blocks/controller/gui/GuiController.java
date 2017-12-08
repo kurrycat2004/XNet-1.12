@@ -320,7 +320,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                             .setLayoutHint(new PositionalLayout.PositionalHint(151, 1, 9, 10))
                             .addButtonEvent(parent -> removeConnector(editingConnector));
 
-                    ControllerEditorPanel editor = new ControllerEditorPanel(connectorEditPanel, mc, this, editingChannel, editingConnector);
+                    ConnectorEditorPanel editor = new ConnectorEditorPanel(connectorEditPanel, mc, this, editingChannel, editingConnector);
 
                     connectorInfo.getConnectorSettings().createGui(editor);
                     connectorEditPanel.addChild(remove);

@@ -18,8 +18,11 @@ public interface IChannelType {
      */
     boolean supportsBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nullable EnumFacing side);
 
+    /**
+     * The 'advanced' parameter is no longer used and will always be 'false'. Don't depend on this
+     */
     @Nonnull
-    IConnectorSettings createConnector(boolean advanced, @Nonnull EnumFacing side);
+    IConnectorSettings createConnector(@Nonnull EnumFacing side);
 
     @Nonnull
     IChannelSettings createChannel();

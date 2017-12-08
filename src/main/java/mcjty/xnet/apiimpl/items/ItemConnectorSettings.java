@@ -60,8 +60,8 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
         return itemMode;
     }
 
-    public ItemConnectorSettings(boolean advanced, @Nonnull EnumFacing side) {
-        super(advanced, side);
+    public ItemConnectorSettings(@Nonnull EnumFacing side) {
+        super(side);
     }
 
     @Nullable
@@ -84,8 +84,9 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
 
     @Override
     public void createGui(IEditorGui gui) {
+        advanced = gui.isAdvanced();
         String[] speeds;
-        if (isAdvanced()) {
+        if (advanced) {
             speeds = new String[] { "10", "20", "60", "100", "200" };
         } else {
             speeds = new String[] { "20", "60", "100", "200" };
@@ -160,7 +161,7 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
             return true;
         }
         if (tag.equals(TAG_FACING)) {
-            return isAdvanced();
+            return advanced;
         }
         if (itemMode == ItemMode.INS) {
             return INSERT_TAGS.contains(tag);

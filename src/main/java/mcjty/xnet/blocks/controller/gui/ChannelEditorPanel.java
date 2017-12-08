@@ -14,6 +14,11 @@ public class ChannelEditorPanel extends AbstractEditorPanel {
     private final int channel;
 
     @Override
+    public boolean isAdvanced() {
+        return false;
+    }
+
+    @Override
     protected void update(String tag, Object value) {
         data.put(tag, value);
         Argument[] args = new Argument[data.size() + 1];

@@ -32,8 +32,8 @@ public class EnergyConnectorSettings extends AbstractConnectorSettings {
     @Nullable private Integer rate = null;
     @Nullable private Integer minmax = null;
 
-    public EnergyConnectorSettings(boolean advanced, @Nonnull EnumFacing side) {
-        super(advanced, side);
+    public EnergyConnectorSettings(@Nonnull EnumFacing side) {
+        super(side);
     }
 
     public EnergyMode getEnergyMode() {
@@ -60,6 +60,7 @@ public class EnergyConnectorSettings extends AbstractConnectorSettings {
 
     @Override
     public void createGui(IEditorGui gui) {
+        advanced = gui.isAdvanced();
         sideGui(gui);
         colorsGui(gui);
         redstoneGui(gui);
@@ -72,7 +73,7 @@ public class EnergyConnectorSettings extends AbstractConnectorSettings {
                 .label("Rate")
                 .integer(TAG_RATE,
                         (energyMode == EnergyMode.EXT ? "Max energy extraction rate" : "Max energy insertion rate") +
-                        "|(limited to " + (isAdvanced() ? GeneralConfiguration.maxRfRateAdvanced : GeneralConfiguration.maxRfRateNormal) + " per tick)", rate, 40)
+                        "|(limited to " + (gui.isAdvanced() ? GeneralConfiguration.maxRfRateAdvanced : GeneralConfiguration.maxRfRateNormal) + " per tick)", rate, 40)
                 .shift(10)
                 .label(energyMode == EnergyMode.EXT ? "Min" : "Max")
                 .integer(TAG_MINMAX, energyMode == EnergyMode.EXT ? "Disable extraction if energy|is too low" : "Disable insertion if energy|is too high", minmax, 50);
@@ -85,7 +86,7 @@ public class EnergyConnectorSettings extends AbstractConnectorSettings {
     public boolean isEnabled(String tag) {
         if (energyMode == EnergyMode.INS) {
             if (tag.equals(TAG_FACING)) {
-                return isAdvanced();
+                return advanced;
             }
             return INSERT_TAGS.contains(tag);
         } else {

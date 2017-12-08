@@ -36,8 +36,8 @@ public class LogicConnectorSettings extends AbstractConnectorSettings {
     private int speed = 2;
     private Integer redstoneOut;    // Redstone output value
 
-    public LogicConnectorSettings(boolean advanced, @Nonnull EnumFacing side) {
-        super(advanced, side);
+    public LogicConnectorSettings(@Nonnull EnumFacing side) {
+        super(side);
         sensors = new ArrayList<>(SENSORS);
         for (int i = 0 ; i < SENSORS ; i++) {
             sensors.add(new Sensor(i));
@@ -85,7 +85,7 @@ public class LogicConnectorSettings extends AbstractConnectorSettings {
     @Override
     public boolean isEnabled(String tag) {
         if (tag.equals(TAG_FACING)) {
-            return isAdvanced();
+            return advanced;
         }
         if (tag.equals(TAG_SPEED)) {
             return true;
@@ -110,8 +110,9 @@ public class LogicConnectorSettings extends AbstractConnectorSettings {
 
     @Override
     public void createGui(IEditorGui gui) {
+        advanced = gui.isAdvanced();
         String[] speeds;
-        if (isAdvanced()) {
+        if (advanced) {
             speeds = new String[] { "5", "10", "20", "60", "100", "200" };
         } else {
             speeds = new String[] { "10", "20", "60", "100", "200" };

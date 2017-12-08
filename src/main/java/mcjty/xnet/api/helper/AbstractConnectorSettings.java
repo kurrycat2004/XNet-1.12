@@ -22,25 +22,21 @@ public abstract class AbstractConnectorSettings implements IConnectorSettings {
     private Color[] colors = new Color[]{Color.OFF, Color.OFF, Color.OFF, Color.OFF};
     private int colorsMask = 0;
 
-    private final boolean advanced;
+    // Cache for advanced mode
+    protected boolean advanced = false;
 
     @Nonnull
     private final EnumFacing side;
     @Nullable
     private EnumFacing facingOverride = null; // Only available on advanced connectors
 
-    public AbstractConnectorSettings(boolean advanced, @Nonnull EnumFacing side) {
+    public AbstractConnectorSettings(@Nonnull EnumFacing side) {
         this.side = side;
-        this.advanced = advanced;
     }
 
     @Nonnull
     public EnumFacing getFacing() {
         return facingOverride == null ? side : facingOverride;
-    }
-
-    public boolean isAdvanced() {
-        return advanced;
     }
 
     public RSMode getRsMode() {

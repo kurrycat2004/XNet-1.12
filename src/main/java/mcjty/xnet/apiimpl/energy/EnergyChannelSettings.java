@@ -10,6 +10,7 @@ import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.api.helper.DefaultChannelSettings;
+import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.blocks.cables.ConnectorTileEntity;
 import mcjty.xnet.blocks.controller.gui.GuiController;
 import mcjty.xnet.config.GeneralConfiguration;
@@ -91,7 +92,8 @@ public class EnergyChannelSettings extends DefaultChannelSettings implements ICh
 
                     Integer rate = settings.getRate();
                     if (rate == null) {
-                        rate = settings.isAdvanced() ? GeneralConfiguration.maxRfRateAdvanced : GeneralConfiguration.maxRfRateNormal;
+                        boolean advanced = ConnectorBlock.isAdvancedConnector(world, connectorPos);
+                        rate = advanced ? GeneralConfiguration.maxRfRateAdvanced : GeneralConfiguration.maxRfRateNormal;
                     }
                     connectorTE.setEnergyInputFrom(side, rate);
 
@@ -176,7 +178,8 @@ public class EnergyChannelSettings extends DefaultChannelSettings implements ICh
 
                     Integer rate = settings.getRate();
                     if (rate == null) {
-                        rate = settings.isAdvanced() ? GeneralConfiguration.maxRfRateAdvanced : GeneralConfiguration.maxRfRateNormal;
+                        boolean advanced = ConnectorBlock.isAdvancedConnector(world, extractorPos);
+                        rate = advanced ? GeneralConfiguration.maxRfRateAdvanced : GeneralConfiguration.maxRfRateNormal;
                     }
                     int totransfer = Math.min(rate, energy);
                     int e = EnergyTools.receiveEnergy(te, settings.getFacing(), totransfer);

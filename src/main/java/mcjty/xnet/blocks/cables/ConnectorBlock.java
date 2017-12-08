@@ -399,6 +399,14 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
         blobData.save(world);
     }
 
+    public static boolean isAdvancedConnector(World world, BlockPos pos) {
+        Block block = world.getBlockState(pos).getBlock();
+        if (block instanceof GenericCableBlock) {
+            return ((GenericCableBlock) block).isAdvancedConnector();
+        }
+        return false;
+    }
+
     @Override
     public boolean isAdvancedConnector() {
         return false;

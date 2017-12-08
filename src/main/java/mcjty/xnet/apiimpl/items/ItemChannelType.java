@@ -42,8 +42,8 @@ public class ItemChannelType implements IChannelType {
 
     @Override
     @Nonnull
-    public IConnectorSettings createConnector(boolean advanced, @Nonnull EnumFacing side) {
-        return new ItemConnectorSettings(advanced, side);
+    public IConnectorSettings createConnector(@Nonnull EnumFacing side) {
+        return new ItemConnectorSettings(side);
     }
 
     @Nonnull
