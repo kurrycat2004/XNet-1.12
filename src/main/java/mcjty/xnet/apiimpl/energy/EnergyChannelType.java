@@ -41,8 +41,8 @@ public class EnergyChannelType implements IChannelType {
 
     @Override
     @Nonnull
-    public IConnectorSettings createConnector(boolean advanced, @Nonnull EnumFacing side) {
-        return new EnergyConnectorSettings(advanced, side);
+    public IConnectorSettings createConnector(@Nonnull EnumFacing side) {
+        return new EnergyConnectorSettings(side);
     }
 
     @Nonnull

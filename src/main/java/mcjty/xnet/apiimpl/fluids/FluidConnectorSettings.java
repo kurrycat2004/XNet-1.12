@@ -41,8 +41,8 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
 
     private ItemStack filter = ItemStack.EMPTY;
 
-    public FluidConnectorSettings(boolean advanced, @Nonnull EnumFacing side) {
-        super(advanced, side);
+    public FluidConnectorSettings(@Nonnull EnumFacing side) {
+        super(side);
     }
 
     public FluidMode getFluidMode() {
@@ -88,9 +88,10 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
 
     @Override
     public void createGui(IEditorGui gui) {
+        advanced = gui.isAdvanced();
         String[] speeds;
         int maxrate;
-        if (isAdvanced()) {
+        if (gui.isAdvanced()) {
             speeds = new String[] { "10", "20", "60", "100", "200" };
             maxrate = GeneralConfiguration.maxFluidRateAdvanced;
         } else {
@@ -125,7 +126,7 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
     public boolean isEnabled(String tag) {
         if (fluidMode == FluidMode.INS) {
             if (tag.equals(TAG_FACING)) {
-                return isAdvanced();
+                return advanced;
             }
             return INSERT_TAGS.contains(tag);
         } else {
@@ -153,7 +154,7 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
         fluidMode = FluidMode.valueOf(((String)data.get(TAG_MODE)).toUpperCase());
         rate = (Integer) data.get(TAG_RATE);
         int maxrate;
-        if (isAdvanced()) {
+        if (advanced) {
             maxrate = GeneralConfiguration.maxFluidRateAdvanced;
         } else {
             maxrate = GeneralConfiguration.maxFluidRateNormal;

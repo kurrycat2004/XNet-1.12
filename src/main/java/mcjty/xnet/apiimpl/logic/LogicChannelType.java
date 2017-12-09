@@ -29,8 +29,8 @@ public class LogicChannelType implements IChannelType {
 
     @Override
     @Nonnull
-    public IConnectorSettings createConnector(boolean advanced, @Nonnull EnumFacing side) {
-        return new LogicConnectorSettings(advanced, side);
+    public IConnectorSettings createConnector(@Nonnull EnumFacing side) {
+        return new LogicConnectorSettings(side);
     }
 
     @Nonnull

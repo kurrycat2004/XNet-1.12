@@ -5,6 +5,9 @@ import net.minecraft.item.ItemStack;
 
 public interface IEditorGui {
 
+    /// This returns true if we are editing an advanced connector
+    boolean isAdvanced();
+
     IEditorGui move(int x, int y);
 
     IEditorGui move(int x);

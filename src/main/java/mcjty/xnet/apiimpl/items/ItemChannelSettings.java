@@ -171,6 +171,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                     }
                     if (canextract < toextract) {
                         toextract = canextract;
+                        stack = stack.copy();
                         if (toextract <= 0) {
                             stack.setCount(0);
                         } else {
@@ -237,6 +238,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                                 continue;
                             }
                             toinsert = Math.min(toinsert, caninsert);
+                            stack = stack.copy();
                             if (toinsert <= 0) {
                                 stack.setCount(0);
                             } else {
@@ -254,6 +256,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                                     continue;
                                 }
                                 toinsert = Math.min(toinsert, caninsert);
+                                stack = stack.copy();
                                 if (toinsert <= 0) {
                                     stack.setCount(0);
                                 } else {
@@ -306,6 +309,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                         continue;
                     }
                     toinsert = Math.min(toinsert, caninsert);
+                    stack = stack.copy();
                     if (toinsert <= 0) {
                         stack.setCount(0);
                     } else {
@@ -343,6 +347,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                         continue;
                     }
                     toinsert = Math.min(toinsert, caninsert);
+                    stack = stack.copy();
                     if (toinsert <= 0) {
                         stack.setCount(0);
                     } else {
