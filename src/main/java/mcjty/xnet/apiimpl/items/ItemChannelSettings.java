@@ -172,6 +172,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                     }
                     if (canextract < toextract) {
                         toextract = canextract;
+                        stack = stack.copy();
                         ItemStackTools.setStackSize(stack, toextract);
                     }
                 }
@@ -234,6 +235,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                                 continue;
                             }
                             toinsert = Math.min(toinsert, caninsert);
+                            stack = stack.copy();
                             ItemStackTools.setStackSize(stack, toinsert);
                         }
                         remaining = RFToolsSupport.insertItem(te, stack, true);
@@ -247,6 +249,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                                     continue;
                                 }
                                 toinsert = Math.min(toinsert, caninsert);
+                                stack = stack.copy();
                                 ItemStackTools.setStackSize(stack, toinsert);
                             }
                             remaining = ItemHandlerHelper.insertItem(handler, stack, true);
@@ -295,6 +298,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                         continue;
                     }
                     toinsert = Math.min(toinsert, caninsert);
+                    stack = stack.copy();
                     ItemStackTools.setStackSize(stack, toinsert);
                 }
                 ItemStack remaining = RFToolsSupport.insertItem(te, stack, false);
@@ -328,6 +332,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                         continue;
                     }
                     toinsert = Math.min(toinsert, caninsert);
+                    stack = stack.copy();
                     ItemStackTools.setStackSize(stack, toinsert);
                 }
                 ItemStack remaining = ItemHandlerHelper.insertItem(handler, stack, false);
