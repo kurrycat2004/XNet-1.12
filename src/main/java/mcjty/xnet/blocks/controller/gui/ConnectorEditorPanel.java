@@ -3,7 +3,6 @@ package mcjty.xnet.blocks.controller.gui;
 import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.network.Argument;
-import mcjty.lib.tools.MinecraftTools;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.keys.SidedPos;
 import mcjty.xnet.blocks.cables.ConnectorBlock;
@@ -33,7 +32,7 @@ public class ConnectorEditorPanel extends AbstractEditorPanel {
         super(panel, mc, gui);
         this.channel = channel;
         this.sidedPos = sidedPos;
-        advanced = ConnectorBlock.isAdvancedConnector(MinecraftTools.getWorld(mc), sidedPos.getPos().offset(sidedPos.getSide()));
+        advanced = ConnectorBlock.isAdvancedConnector(mc.world, sidedPos.getPos().offset(sidedPos.getSide()));
     }
 
     @Override
