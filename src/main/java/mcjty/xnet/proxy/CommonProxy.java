@@ -5,6 +5,7 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.network.PacketHandler;
 import mcjty.lib.varia.WrenchChecker;
+import mcjty.xnet.CommandHandler;
 import mcjty.xnet.ForgeEventHandlers;
 import mcjty.xnet.XNet;
 import mcjty.xnet.apiimpl.energy.EnergyChannelType;
@@ -39,6 +40,7 @@ public abstract class CommonProxy {
     public void preInit(FMLPreInitializationEvent e) {
         MinecraftForge.EVENT_BUS.register(new ForgeEventHandlers());
         McJtyLib.preInit(e);
+        CommandHandler.registerCommands();
 
         GeneralConfig.preInit(e);
 
