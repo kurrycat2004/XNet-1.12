@@ -91,6 +91,16 @@ processResources
     }
 }
 
+task deobfJar(type: Jar) {
+    from sourceSets.main.output
+    classifier = 'dev'
+}
+
+artifacts {
+    archives sourceJar
+    archives deobfJar
+}
+
 task("uploadJars", dependsOn: "reobf") {
     description = "uploads JARs"
     if (System.getenv("local_maven") != null) {
