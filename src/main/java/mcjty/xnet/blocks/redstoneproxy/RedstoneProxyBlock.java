@@ -35,7 +35,7 @@ public class RedstoneProxyBlock extends Block {
         super(Material.IRON);
         setUnlocalizedName(XNet.MODID + ".redstone_proxy");
         setRegistryName("redstone_proxy");
-        McJtyRegister.registerLater(this, XNet.instance, null, null);
+        McJtyRegister.registerLater(this, XNet.instance, null);
         McJtyRegister.registerLater(new ItemBlock(this).setRegistryName(getRegistryName()), XNet.instance);
         setCreativeTab(XNet.tabXNet);
     }
