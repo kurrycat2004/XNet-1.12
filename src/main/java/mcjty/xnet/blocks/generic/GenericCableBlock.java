@@ -3,6 +3,7 @@ package mcjty.xnet.blocks.generic;
 import mcjty.lib.McJtyRegister;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
 import mcjty.lib.compat.waila.WailaInfoProvider;
+import mcjty.lib.container.DamageMetadataItemBlock;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.ProbeMode;
@@ -134,14 +135,7 @@ public abstract class GenericCableBlock extends Block implements WailaInfoProvid
 
 
     protected ItemBlock createItemBlock() {
-        ItemBlock itemBlock = new ItemBlock(this) {
-            @Override
-            public int getMetadata(int damage) {
-                return damage;
-            }
-        };
-        itemBlock.setHasSubtypes(true);
-        return itemBlock;
+        return new DamageMetadataItemBlock(this);
     }
 
     @Override
