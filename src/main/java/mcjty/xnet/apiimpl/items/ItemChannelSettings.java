@@ -129,10 +129,10 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
         if (delay <= 0) {
             delay = 200*6;      // Multiply of the different speeds we have
         }
-        if (delay % 10 != 0) {
+        if (delay % 5 != 0) {
             return;
         }
-        int d = delay/10;
+        int d = delay/5;
 
         updateCache(channel, context);
         World world = context.getControllerWorld();

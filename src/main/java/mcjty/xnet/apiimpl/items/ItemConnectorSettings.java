@@ -94,9 +94,9 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
         advanced = gui.isAdvanced();
         String[] speeds;
         if (advanced) {
-            speeds = new String[] { "10", "20", "60", "100", "200" };
+            speeds = new String[] { "5", "10", "20", "60", "100", "200" };
         } else {
-            speeds = new String[] { "20", "60", "100", "200" };
+            speeds = new String[] { "10", "20", "60", "100", "200" };
         }
 
         sideGui(gui);
@@ -105,7 +105,7 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
         gui.nl()
                 .choices(TAG_MODE, "Insert or extract mode", itemMode, ItemMode.values())
                 .choices(TAG_STACK, "Single item or entire stack", stackMode, StackMode.values())
-                .choices(TAG_SPEED, "Number of ticks for each operation", Integer.toString(speed * 10), speeds);
+                .choices(TAG_SPEED, "Number of ticks for each operation", Integer.toString(speed * 5), speeds);
 
         if (itemMode == ItemMode.EXT) {
             gui.choices(TAG_EXTRACT, "Extract mode (first available,|random slot or round robin)", extractMode, ExtractMode.values());
@@ -194,9 +194,9 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
         itemMode = ItemMode.valueOf(((String)data.get(TAG_MODE)).toUpperCase());
         extractMode = ExtractMode.valueOf(((String)data.get(TAG_EXTRACT)).toUpperCase());
         stackMode = StackMode.valueOf(((String)data.get(TAG_STACK)).toUpperCase());
-        speed = Integer.parseInt((String) data.get(TAG_SPEED)) / 10;
+        speed = Integer.parseInt((String) data.get(TAG_SPEED)) / 5;
         if (speed == 0) {
-            speed = 2;
+            speed = 4;
         }
         oredictMode = Boolean.TRUE.equals(data.get(TAG_OREDICT));
         metaMode = Boolean.TRUE.equals(data.get(TAG_META));
@@ -217,9 +217,16 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
         itemMode = ItemMode.values()[tag.getByte("itemMode")];
         extractMode = ExtractMode.values()[tag.getByte("extractMode")];
         stackMode = StackMode.values()[tag.getByte("stackMode")];
-        speed = tag.getInteger("speed");
-        if (speed == 0) {
-            speed = 2;
+        if (tag.hasKey("spd")) {
+            // New tag
+            speed = tag.getInteger("spd");
+        } else {
+            // Old tag for compatibility
+            speed = tag.getInteger("speed");
+            if (speed == 0) {
+                speed = 2;
+            }
+            speed *= 2;
         }
         oredictMode = tag.getBoolean("oredictMode");
         metaMode = tag.getBoolean("metaMode");
@@ -252,7 +259,7 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
         tag.setByte("itemMode", (byte) itemMode.ordinal());
         tag.setByte("extractMode", (byte) extractMode.ordinal());
         tag.setByte("stackMode", (byte) stackMode.ordinal());
-        tag.setInteger("speed", speed);
+        tag.setInteger("spd", speed);
         tag.setBoolean("oredictMode", oredictMode);
         tag.setBoolean("metaMode", metaMode);
         tag.setBoolean("nbtMode", nbtMode);
