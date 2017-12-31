@@ -8,6 +8,7 @@ import mcjty.xnet.api.channels.IControllerContext;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.helper.DefaultChannelSettings;
+import mcjty.xnet.api.keys.ConsumerId;
 import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.blocks.controller.gui.GuiController;
 import mcjty.xnet.compat.RFToolsSupport;
@@ -29,10 +30,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class ItemChannelSettings extends DefaultChannelSettings implements IChannelSettings {
@@ -52,6 +50,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
     private ChannelMode channelMode = ChannelMode.PRIORITY;
     private int delay = 0;
     private int roundRobinOffset = 0;
+    private Map<ConsumerId, Integer> extractIndeces = new HashMap<>();
 
     public ChannelMode getChannelMode() {
         return channelMode;
@@ -67,6 +66,10 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
         channelMode = ChannelMode.values()[tag.getByte("mode")];
         delay = tag.getInteger("delay");
         roundRobinOffset = tag.getInteger("offset");
+        int[] cons = tag.getIntArray("extidx");
+        for (int idx = 0 ; idx < cons.length ; idx += 2) {
+            extractIndeces.put(new ConsumerId(cons[idx]), cons[idx+1]);
+        }
     }
 
     @Override
@@ -74,6 +77,28 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
         tag.setByte("mode", (byte) channelMode.ordinal());
         tag.setInteger("delay", delay);
         tag.setInteger("offset", roundRobinOffset);
+
+        if (!extractIndeces.isEmpty()) {
+            int[] cons = new int[extractIndeces.size() * 2];
+            int idx = 0;
+            for (Map.Entry<ConsumerId, Integer> entry : extractIndeces.entrySet()) {
+                cons[idx++] = entry.getKey().getId();
+                cons[idx++] = entry.getValue();
+            }
+            tag.setIntArray("extidx", cons);
+        }
+    }
+
+    private int getExtractIndex(ConsumerId consumer) {
+        if (extractIndeces.containsKey(consumer)) {
+            return extractIndeces.get(consumer);
+        } else {
+            return 0;
+        }
+    }
+
+    private void rememberExtractIndex(ConsumerId consumer, int index) {
+        extractIndeces.put(consumer, index);
     }
 
     private static class MInteger {
@@ -96,6 +121,8 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
         }
     }
 
+    private static Random random = new Random();
+
     @Override
     public void tick(int channel, IControllerContext context) {
         delay--;
@@ -115,7 +142,8 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                 continue;
             }
 
-            BlockPos extractorPos = context.findConsumerPosition(entry.getKey().getConsumerId());
+            ConsumerId consumerId = entry.getKey().getConsumerId();
+            BlockPos extractorPos = context.findConsumerPosition(consumerId);
             if (extractorPos != null) {
                 EnumFacing side = entry.getKey().getSide();
                 BlockPos pos = extractorPos.offset(side);
@@ -137,15 +165,33 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                 } else {
                     IItemHandler handler = getItemHandlerAt(te, settings.getFacing());
                     if (handler != null) {
-                        tickItemHandler(context, settings, handler);
+                        int idx = getStartExtractIndex(settings, consumerId, handler.getSlots());
+                        idx = tickItemHandler(context, settings, handler, idx);
+                        rememberExtractIndex(consumerId, (idx+1) % handler.getSlots());
                     }
                 }
             }
         }
     }
 
+    private int getStartExtractIndex(ItemConnectorSettings settings, ConsumerId consumerId, int numslots) {
+        int idx = 0;
+        switch (settings.getExtractMode()) {
+            case FIRST:
+                idx = 0;
+                break;
+            case RND:
+                idx = random.nextInt(numslots);
+                break;
+            case ORDER:
+                idx = getExtractIndex(consumerId);
+                break;
+        }
+        return idx;
+    }
 
-    private void tickItemHandler(IControllerContext context, ItemConnectorSettings settings, IItemHandler handler) {
+
+    private int tickItemHandler(IControllerContext context, ItemConnectorSettings settings, IItemHandler handler, int startIdx) {
         Predicate<ItemStack> extractMatcher = settings.getMatcher();
 
         Integer count = settings.getCount();
@@ -153,10 +199,10 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
         if (count != null) {
             amount = countItems(handler, extractMatcher);
             if (amount < count) {
-                return;
+                return startIdx;
             }
         }
-        MInteger index = new MInteger(0);
+        MInteger index = new MInteger(startIdx);
         while (true) {
             ItemStack stack = fetchItem(handler, true, extractMatcher, settings.getStackMode(), 64, index);
             if (!stack.isEmpty()) {
@@ -194,6 +240,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                 break;
             }
         }
+        return index.get();
     }
 
     // Returns what could not be inserted
@@ -390,7 +437,8 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
     }
 
     private ItemStack fetchItem(IItemHandler handler, boolean simulate, Predicate<ItemStack> matcher, ItemConnectorSettings.StackMode stackMode, int maxamount, MInteger index) {
-        for (int i = index.get(); i < handler.getSlots() ; i++) {
+        for (int j = 0 ; j < handler.getSlots() ; j++) {
+            int i = (j+index.get()) % handler.getSlots();
             ItemStack stack = handler.getStackInSlot(i);
             if (!stack.isEmpty()) {
                 int s = (stackMode == ItemConnectorSettings.StackMode.SINGLE) ? 1 : stack.getMaxStackSize();

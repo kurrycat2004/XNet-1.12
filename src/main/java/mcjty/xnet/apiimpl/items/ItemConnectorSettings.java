@@ -21,6 +21,7 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
     public static final String TAG_MODE = "mode";
     public static final String TAG_STACK = "stack";
     public static final String TAG_SPEED = "speed";
+    public static final String TAG_EXTRACT = "extract";
     public static final String TAG_OREDICT = "od";
     public static final String TAG_NBT = "nbt";
     public static final String TAG_META = "meta";
@@ -41,7 +42,14 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
         STACK
     }
 
+    public enum ExtractMode {
+        FIRST,
+        RND,
+        ORDER
+    }
+
     private ItemMode itemMode = ItemMode.INS;
+    private ExtractMode extractMode = ExtractMode.FIRST;
     private int speed = 2;
     private StackMode stackMode = StackMode.SINGLE;
     private boolean oredictMode = false;
@@ -97,7 +105,13 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
         gui.nl()
                 .choices(TAG_MODE, "Insert or extract mode", itemMode, ItemMode.values())
                 .choices(TAG_STACK, "Single item or entire stack", stackMode, StackMode.values())
-                .choices(TAG_SPEED, "Number of ticks for each operation", Integer.toString(speed * 10), speeds)
+                .choices(TAG_SPEED, "Number of ticks for each operation", Integer.toString(speed * 10), speeds);
+
+        if (itemMode == ItemMode.EXT) {
+            gui.choices(TAG_EXTRACT, "Extract mode (first available,|random slot or round robin)", extractMode, ExtractMode.values());
+        }
+
+        gui
                 .nl()
 
                 .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority, 36).shift(5)
@@ -137,6 +151,11 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
         return stackMode;
     }
 
+
+    public ExtractMode getExtractMode() {
+        return extractMode;
+    }
+
     @Nonnull
     public Integer getPriority() {
         return priority == null ? 0 : priority;
@@ -152,7 +171,7 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
     }
 
     private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_COLOR+"3", TAG_COUNT, TAG_PRIORITY, TAG_OREDICT, TAG_META, TAG_NBT, TAG_BLACKLIST);
-    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_COLOR+"3", TAG_COUNT, TAG_OREDICT, TAG_META, TAG_NBT, TAG_BLACKLIST, TAG_STACK, TAG_SPEED);
+    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_COLOR+"3", TAG_COUNT, TAG_OREDICT, TAG_META, TAG_NBT, TAG_BLACKLIST, TAG_STACK, TAG_SPEED, TAG_EXTRACT);
 
     @Override
     public boolean isEnabled(String tag) {
@@ -173,6 +192,7 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
     public void update(Map<String, Object> data) {
         super.update(data);
         itemMode = ItemMode.valueOf(((String)data.get(TAG_MODE)).toUpperCase());
+        extractMode = ExtractMode.valueOf(((String)data.get(TAG_EXTRACT)).toUpperCase());
         stackMode = StackMode.valueOf(((String)data.get(TAG_STACK)).toUpperCase());
         speed = Integer.parseInt((String) data.get(TAG_SPEED)) / 10;
         if (speed == 0) {
@@ -195,6 +215,7 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
         itemMode = ItemMode.values()[tag.getByte("itemMode")];
+        extractMode = ExtractMode.values()[tag.getByte("extractMode")];
         stackMode = StackMode.values()[tag.getByte("stackMode")];
         speed = tag.getInteger("speed");
         if (speed == 0) {
@@ -229,6 +250,7 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
         tag.setByte("itemMode", (byte) itemMode.ordinal());
+        tag.setByte("extractMode", (byte) extractMode.ordinal());
         tag.setByte("stackMode", (byte) stackMode.ordinal());
         tag.setInteger("speed", speed);
         tag.setBoolean("oredictMode", oredictMode);
