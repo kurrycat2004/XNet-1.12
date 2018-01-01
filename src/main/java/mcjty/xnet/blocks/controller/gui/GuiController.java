@@ -30,20 +30,13 @@ import mcjty.xnet.gui.GuiProxy;
 import mcjty.xnet.network.PacketGetChannels;
 import mcjty.xnet.network.PacketGetConnectedBlocks;
 import mcjty.xnet.network.XNetMessages;
-import net.minecraft.block.Block;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
-import org.lwjgl.input.Mouse;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 
 import static mcjty.xnet.logic.ChannelInfo.MAX_CHANNELS;
@@ -488,55 +481,5 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         int currentRF = GenericEnergyStorageTileEntity.getCurrentRF();
         energyBar.setValue(currentRF);
         tileEntity.requestRfFromServer(XNet.MODID);
-        drawItemTooltips(x1, x2);
-    }
-
-    private void drawItemTooltips(int mouseX, int mouseY) {
-        int x = Mouse.getEventX() * width / mc.displayWidth;
-        int y = height - Mouse.getEventY() * height / mc.displayHeight - 1;
-        Widget<?> widget = window.getToplevel().getWidgetAtPosition(x, y);
-        if (widget instanceof BlockRender) {
-            BlockRender blockRender = (BlockRender) widget;
-            Object renderItem = blockRender.getRenderItem();
-            ItemStack itemStack;
-            if (renderItem instanceof ItemStack) {
-                itemStack = (ItemStack) renderItem;
-            } else if (renderItem instanceof Block) {
-                itemStack = new ItemStack((Block) renderItem);
-            } else if (renderItem instanceof Item) {
-                itemStack = new ItemStack((Item) renderItem);
-            } else {
-                itemStack = ItemStack.EMPTY;
-            }
-            if (!itemStack.isEmpty()) {
-                customRenderToolTip(itemStack, mouseX, mouseY);
-            }
-        }
-    }
-
-
-    private void customRenderToolTip(ItemStack stack, int x, int y) {
-        List<String> list;
-        if (stack.getItem() == null) {
-            // Protection for bad itemstacks
-            list = new ArrayList<>();
-        } else {
-            ITooltipFlag flag = this.mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL;
-            list = stack.getTooltip(this.mc.player, flag);
-        }
-
-        for (int i = 0; i < list.size(); ++i) {
-            if (i == 0) {
-                list.set(i, stack.getRarity().rarityColor + list.get(i));
-            } else {
-                list.set(i, TextFormatting.GRAY + list.get(i));
-            }
-        }
-
-        FontRenderer font = null;
-        if (stack.getItem() != null) {
-            font = stack.getItem().getFontRenderer(stack);
-        }
-        this.drawHoveringText(list, x, y, (font == null ? fontRenderer : font));
     }
 }
