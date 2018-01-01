@@ -20,6 +20,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
@@ -40,6 +41,10 @@ public class RedstoneProxyBlock extends Block {
         setCreativeTab(XNet.tabXNet);
     }
 
+    public RedstoneProxyBlock(Material materialIn) {
+        super(materialIn);
+    }
+
     public static boolean activateBlock(Block block, World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         return block.onBlockActivated(world, pos, state, player, hand, facing, hitX, hitY, hitZ);
     }
@@ -54,59 +59,11 @@ public class RedstoneProxyBlock extends Block {
     }
 
 
-    public void clAddInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-        super.addInformation(stack, null, tooltip, null);
-    }
-
     @Override
     public void addInformation(ItemStack stack, @Nullable World player, List<String> tooltip, ITooltipFlag advanced) {
-        clAddInformation(stack, null, tooltip, false);  // @todo WRONG
+        tooltip.add("Acts as a proxy block for");
+        tooltip.add("redstone. XNet can connect to this");
+        tooltip.add(TextFormatting.YELLOW + "This version does no block update!");
     }
 
-    protected void clAddCollisionBoxToList(IBlockState state, World world, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> list, Entity entity) {
-        super.addCollisionBoxToList(state, world, pos, entityBox, list, entity, false);
-    }
-
-    @Override
-    public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean p_185477_7_) {
-        clAddCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn);
-    }
-
-    protected void clOnNeighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn) {
-
-    }
-
-    @Override
-    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos p_189540_5_) {
-        clOnNeighborChanged(state, worldIn, pos, blockIn);
-    }
-
-    protected boolean clOnBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-        return false;
-    }
-
-    @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-        return clOnBlockActivated(worldIn, pos, state, playerIn, hand, side, hitX, hitY, hitZ);
-    }
-
-    @Override
-    public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-        return clGetStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer);
-    }
-
-    protected IBlockState clGetStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-        return super.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer);
-    }
-
-    @SideOnly(Side.CLIENT)
-    @Override
-    public void getSubBlocks(CreativeTabs itemIn, NonNullList<ItemStack> tab) {
-        clGetSubBlocks(Item.getItemFromBlock(this), itemIn, tab);
-    }
-
-    @SideOnly(Side.CLIENT)
-    protected void clGetSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
-        super.getSubBlocks(tab, (NonNullList<ItemStack>) subItems);
-    }
 }

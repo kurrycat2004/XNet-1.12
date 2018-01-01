@@ -4,6 +4,7 @@ import mcjty.xnet.blocks.cables.NetCableSetup;
 import mcjty.xnet.blocks.controller.ControllerBlock;
 import mcjty.xnet.blocks.facade.FacadeBlock;
 import mcjty.xnet.blocks.redstoneproxy.RedstoneProxyBlock;
+import mcjty.xnet.blocks.redstoneproxy.RedstoneProxyUBlock;
 import mcjty.xnet.blocks.router.RouterBlock;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -14,12 +15,14 @@ public class ModBlocks {
     public static RouterBlock routerBlock;
     public static FacadeBlock facadeBlock;
     public static RedstoneProxyBlock redstoneProxyBlock;
+    public static RedstoneProxyUBlock redstoneProxyUBlock;
 
     public static void init() {
         controllerBlock = new ControllerBlock();
         routerBlock = new RouterBlock();
         facadeBlock = new FacadeBlock();
         redstoneProxyBlock = new RedstoneProxyBlock();
+        redstoneProxyUBlock = new RedstoneProxyUBlock();
         NetCableSetup.init();
     }
 
@@ -29,6 +32,7 @@ public class ModBlocks {
         routerBlock.initModel();
         facadeBlock.initModel();
         redstoneProxyBlock.initModel();
+        redstoneProxyUBlock.initModel();
         NetCableSetup.initClient();
     }
 

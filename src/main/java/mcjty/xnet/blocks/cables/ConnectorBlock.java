@@ -13,6 +13,7 @@ import mcjty.xnet.blocks.facade.FacadeItemBlock;
 import mcjty.xnet.blocks.generic.CableColor;
 import mcjty.xnet.blocks.generic.GenericCableBakedModel;
 import mcjty.xnet.blocks.generic.GenericCableBlock;
+import mcjty.xnet.blocks.redstoneproxy.RedstoneProxyBlock;
 import mcjty.xnet.blocks.router.TileEntityRouter;
 import mcjty.xnet.config.GeneralConfiguration;
 import mcjty.xnet.gui.GuiProxy;
@@ -295,7 +296,7 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
         if (block instanceof ConnectorBlock) {
             return false;
         }
-        if (block == ModBlocks.redstoneProxyBlock || block == Blocks.REDSTONE_LAMP || block == Blocks.LIT_REDSTONE_LAMP ||
+        if (block instanceof RedstoneProxyBlock || block == Blocks.REDSTONE_LAMP || block == Blocks.LIT_REDSTONE_LAMP ||
                 block == Blocks.PISTON || block == Blocks.STICKY_PISTON) {
             return true;
         }
