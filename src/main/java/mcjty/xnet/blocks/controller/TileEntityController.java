@@ -391,10 +391,16 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         }
         List<ConnectedBlockClientInfo> list = new ArrayList<>(set);
         list.sort((i1, i2) -> {
-            if (i1.getPos().getPos().equals(i2.getPos().getPos())) {
-                return i1.getPos().getSide().compareTo(i2.getPos().getSide());
+            if (i1.getBlockUnlocName().equals(i2.getBlockUnlocName())) {
+                SidedPos p1 = i1.getPos();
+                SidedPos p2 = i2.getPos();
+                if (p1.getPos().equals(p2.getPos())) {
+                    return p1.getSide().compareTo(p2.getSide());
+                } else {
+                    return p1.getPos().compareTo(p2.getPos());
+                }
             } else {
-                return i1.getPos().getPos().compareTo(i2.getPos().getPos());
+                return i1.getBlockUnlocName().compareTo(i2.getBlockUnlocName());
             }
         });
         return list;
