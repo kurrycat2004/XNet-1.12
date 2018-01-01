@@ -192,7 +192,12 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
     public void update(Map<String, Object> data) {
         super.update(data);
         itemMode = ItemMode.valueOf(((String)data.get(TAG_MODE)).toUpperCase());
-        extractMode = ExtractMode.valueOf(((String)data.get(TAG_EXTRACT)).toUpperCase());
+        Object emode = data.get(TAG_EXTRACT);
+        if (emode == null) {
+            extractMode = ExtractMode.FIRST;
+        } else {
+            extractMode = ExtractMode.valueOf(((String) emode).toUpperCase());
+        }
         stackMode = StackMode.valueOf(((String)data.get(TAG_STACK)).toUpperCase());
         speed = Integer.parseInt((String) data.get(TAG_SPEED)) / 5;
         if (speed == 0) {
