@@ -47,7 +47,7 @@ repositories {
     }
 }
 
-version = "1.12-1.6.2"
+version = "1.12-1.6.3"
 group= "com.github.mcjty"
 archivesBaseName = "xnet"
 
