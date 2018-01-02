@@ -108,8 +108,14 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
             this.i = i;
         }
 
+        // This can return an index out of bounds!
         public int get() {
             return i;
+        }
+
+        // Safe get that is always in bounds
+        public int getSafe(int bounds) {
+            return i % bounds;
         }
 
         public void set(int i) {
@@ -204,7 +210,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
         }
         MInteger index = new MInteger(startIdx);
         while (true) {
-            ItemStack stack = fetchItem(handler, true, extractMatcher, settings.getStackMode(), 64, index);
+            ItemStack stack = fetchItem(handler, true, extractMatcher, settings.getStackMode(), 64, index, startIdx);
             if (!stack.isEmpty()) {
                 // Now that we have a stack we first reduce the amount of the stack if we want to keep a certain
                 // number of items
@@ -230,7 +236,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                 int remaining = insertStackSimulate(inserted, context, stack);
                 if (!inserted.isEmpty()) {
                     if (context.checkAndConsumeRF(GeneralConfiguration.controllerOperationRFT)) {
-                        insertStackReal(context, inserted, fetchItem(handler, false, extractMatcher, settings.getStackMode(), toextract-remaining, index));
+                        insertStackReal(context, inserted, fetchItem(handler, false, extractMatcher, settings.getStackMode(), toextract-remaining, index, startIdx));
                     }
                     break;
                 } else {
@@ -240,7 +246,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                 break;
             }
         }
-        return index.get();
+        return index.getSafe(handler.getSlots());
     }
 
     // Returns what could not be inserted
@@ -436,14 +442,15 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
         return cnt;
     }
 
-    private ItemStack fetchItem(IItemHandler handler, boolean simulate, Predicate<ItemStack> matcher, ItemConnectorSettings.StackMode stackMode, int maxamount, MInteger index) {
-        for (int j = 0 ; j < handler.getSlots() ; j++) {
-            int i = (j+index.get()) % handler.getSlots();
-            ItemStack stack = handler.getStackInSlot(i);
+
+    private ItemStack fetchItem(IItemHandler handler, boolean simulate, Predicate<ItemStack> matcher, ItemConnectorSettings.StackMode stackMode, int maxamount, MInteger index, int startIdx) {
+        for (int i = index.get(); i < handler.getSlots()+startIdx ; i++) {
+            int j = i % handler.getSlots();
+            ItemStack stack = handler.getStackInSlot(j);
             if (!stack.isEmpty()) {
                 int s = (stackMode == ItemConnectorSettings.StackMode.SINGLE) ? 1 : stack.getMaxStackSize();
                 s = Math.min(s, maxamount);
-                stack = handler.extractItem(i, s, simulate);
+                stack = handler.extractItem(j, s, simulate);
                 if (!stack.isEmpty() && matcher.test(stack)) {
                     index.set(i);
                     return stack;
