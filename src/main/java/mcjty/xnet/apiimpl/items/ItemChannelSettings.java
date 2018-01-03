@@ -171,7 +171,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                 } else {
                     IItemHandler handler = getItemHandlerAt(te, settings.getFacing());
                     if (handler != null) {
-                        int idx = getStartExtractIndex(settings, consumerId, handler.getSlots());
+                        int idx = getStartExtractIndex(settings, consumerId, handler);
                         idx = tickItemHandler(context, settings, handler, idx);
                         rememberExtractIndex(consumerId, (idx+1) % handler.getSlots());
                     }
@@ -180,20 +180,37 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
         }
     }
 
-    private int getStartExtractIndex(ItemConnectorSettings settings, ConsumerId consumerId, int numslots) {
-        int idx = 0;
+    private int getStartExtractIndex(ItemConnectorSettings settings, ConsumerId consumerId, IItemHandler handler) {
         switch (settings.getExtractMode()) {
             case FIRST:
-                idx = 0;
-                break;
-            case RND:
-                idx = random.nextInt(numslots);
-                break;
+                return 0;
+            case RND: {
+                if (handler.getSlots() <= 0) {
+                    return 0;
+                }
+                // Try 5 times to find a non empty slot
+                for (int i = 0 ; i < 5 ; i++) {
+                    int idx = random.nextInt(handler.getSlots());
+                    if (!handler.getStackInSlot(idx).isEmpty()) {
+                        return idx;
+                    }
+                }
+                // Otherwise use a more complicated algorithm
+                List<Integer> slots = new ArrayList<>();
+                for (int i = 0 ; i < handler.getSlots() ; i++) {
+                    if (!handler.getStackInSlot(i).isEmpty()) {
+                        slots.add(i);
+                    }
+                }
+                if (slots.isEmpty()) {
+                    return 0;
+                }
+                return slots.get(random.nextInt(slots.size()));
+            }
             case ORDER:
-                idx = getExtractIndex(consumerId);
-                break;
+                return getExtractIndex(consumerId);
         }
-        return idx;
+        return 0;
     }
 
 
