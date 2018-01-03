@@ -6,6 +6,7 @@ import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.ProbeMode;
 import mcjty.theoneprobe.api.TextStyleClass;
 import mcjty.xnet.XNet;
+import mcjty.xnet.api.channels.IConnectable;
 import mcjty.xnet.api.keys.ConsumerId;
 import mcjty.xnet.blocks.controller.TileEntityController;
 import mcjty.xnet.blocks.facade.FacadeBlockId;
@@ -289,10 +290,29 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
             return false;
         }
 
+
         BlockPos pos = connectorPos.offset(facing);
         TileEntity te = world.getTileEntity(pos);
         IBlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
+        if (block instanceof IConnectable) {
+            IConnectable.ConnectResult result = ((IConnectable) block).canConnect(world, connectorPos, pos, facing);
+            if (result == IConnectable.ConnectResult.NO) {
+                return false;
+            } else if (result == IConnectable.ConnectResult.YES) {
+                return true;
+            }
+        }
+        IConnectable connectable = XNet.xNetApi.getConnectable(block.getRegistryName());
+        if (connectable != null) {
+            IConnectable.ConnectResult result = connectable.canConnect(world, connectorPos, pos, facing);
+            if (result == IConnectable.ConnectResult.NO) {
+                return false;
+            } else if (result == IConnectable.ConnectResult.YES) {
+                return true;
+            }
+        }
+
         if (block instanceof ConnectorBlock) {
             return false;
         }

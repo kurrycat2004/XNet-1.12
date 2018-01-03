@@ -1,6 +1,10 @@
 package mcjty.xnet.api;
 
 import mcjty.xnet.api.channels.IChannelType;
+import mcjty.xnet.api.channels.IConnectable;
+import net.minecraft.util.ResourceLocation;
+
+import javax.annotation.Nonnull;
 
 /**
  * Main interface for XNet.
@@ -10,4 +14,11 @@ import mcjty.xnet.api.channels.IChannelType;
 public interface IXNet {
 
     void registerChannelType(IChannelType type);
+
+    /**
+     * Register a connectable implementation. You can use this instead of implementing IConnectable
+     * on your block. The connectable interface will have the responsability of checking if it is
+     * being called on the right block
+     */
+    void registerConnectable(@Nonnull ResourceLocation blockId, @Nonnull IConnectable connectable);
 }
