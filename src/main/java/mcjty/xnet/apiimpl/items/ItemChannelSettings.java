@@ -115,7 +115,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
 
         // Safe get that is always in bounds
         public int getSafe(int bounds) {
-            return i % bounds;
+            return bounds <= 0 ? i : (i % bounds);
         }
 
         public void set(int i) {
