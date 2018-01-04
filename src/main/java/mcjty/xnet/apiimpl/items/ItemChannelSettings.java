@@ -173,7 +173,9 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                     if (handler != null) {
                         int idx = getStartExtractIndex(settings, consumerId, handler);
                         idx = tickItemHandler(context, settings, handler, idx);
-                        rememberExtractIndex(consumerId, (idx+1) % handler.getSlots());
+                        if (handler.getSlots() > 0) {
+                            rememberExtractIndex(consumerId, (idx + 1) % handler.getSlots());
+                        }
                     }
                 }
             }
@@ -461,6 +463,9 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
 
 
     private ItemStack fetchItem(IItemHandler handler, boolean simulate, Predicate<ItemStack> matcher, ItemConnectorSettings.StackMode stackMode, int maxamount, MInteger index, int startIdx) {
+        if (handler.getSlots() <= 0) {
+            return ItemStack.EMPTY;
+        }
         for (int i = index.get(); i < handler.getSlots()+startIdx ; i++) {
             int j = i % handler.getSlots();
             ItemStack stack = handler.getStackInSlot(j);
