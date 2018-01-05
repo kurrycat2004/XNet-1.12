@@ -32,7 +32,7 @@ public class BakedModelLoader implements ICustomModelLoader {
     }
 
     @Override
-    public IModel loadModel(ResourceLocation modelLocation) throws Exception {
+    public IModel loadModel(ResourceLocation modelLocation) {
         if (FacadeBlock.FACADE.equals(modelLocation.getResourcePath())) {
             return FACADE_MODEL;
         } else {

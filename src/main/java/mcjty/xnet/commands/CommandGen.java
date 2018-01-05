@@ -2,7 +2,6 @@ package mcjty.xnet.commands;
 
 import mcjty.xnet.blocks.cables.NetCableSetup;
 import mcjty.xnet.multiblock.XNetBlobData;
-import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -40,7 +39,7 @@ public class CommandGen implements ICommand {
 
 
     @Override
-    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+    public void execute(MinecraftServer server, ICommandSender sender, String[] args) {
         XNetBlobData data = XNetBlobData.getBlobData(server.getEntityWorld());
         EntityPlayer player = (EntityPlayer) sender;
 

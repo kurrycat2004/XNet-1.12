@@ -1,7 +1,6 @@
 package mcjty.xnet.blocks.generic;
 
 import mcjty.lib.container.GenericBlock;
-import mcjty.lib.container.GenericGuiContainer;
 import mcjty.lib.container.GenericItemBlock;
 import mcjty.lib.entity.GenericTileEntity;
 import mcjty.xnet.XNet;

@@ -1,6 +1,7 @@
 package mcjty.xnet.blocks.facade;
 
 import mcjty.xnet.XNet;
+import mcjty.xnet.blocks.generic.GenericCableBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -40,7 +41,7 @@ public class FacadeBakedModel implements IBakedModel {
     @Override
     public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
-        FacadeBlockId facadeId = extendedBlockState.getValue(FacadeBlock.FACADEID);
+        FacadeBlockId facadeId = extendedBlockState.getValue(GenericCableBlock.FACADEID);
         if (facadeId == null) {
             return Collections.emptyList();
         }

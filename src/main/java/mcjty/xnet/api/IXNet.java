@@ -2,7 +2,6 @@ package mcjty.xnet.api;
 
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.api.channels.IConnectable;
-import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nonnull;
 

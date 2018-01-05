@@ -1,13 +1,12 @@
 package mcjty.xnet.blocks.cables;
 
 import mcjty.xnet.XNet;
-import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class AdvancedConnectorBlock extends ConnectorBlock implements ITileEntityProvider {
+public class AdvancedConnectorBlock extends ConnectorBlock {
 
     public static final String ADVANCED_CONNECTOR = "advanced_connector";
 

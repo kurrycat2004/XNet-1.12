@@ -1,6 +1,5 @@
 package mcjty.xnet.blocks.controller;
 
-import mcjty.lib.container.GenericGuiContainer;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.ProbeMode;

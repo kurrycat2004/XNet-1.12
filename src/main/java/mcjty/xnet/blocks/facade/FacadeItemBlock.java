@@ -8,7 +8,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
@@ -72,7 +71,7 @@ public class FacadeItemBlock extends ItemBlock {
             if (block == NetCableSetup.netCableBlock) {
                 int i = this.getMetadata(itemstack.getMetadata());
                 FacadeBlock facadeBlock = (FacadeBlock) this.block;
-                IBlockState placementState = facadeBlock.getPlacementState(world, pos, facing, hitX, hitY, hitZ, i, player).withProperty(FacadeBlock.COLOR, state.getValue(GenericCableBlock.COLOR));
+                IBlockState placementState = facadeBlock.getPlacementState(world, pos, facing, hitX, hitY, hitZ, i, player).withProperty(GenericCableBlock.COLOR, state.getValue(GenericCableBlock.COLOR));
 
                 if (placeBlockAt(itemstack, player, world, pos, facing, hitX, hitY, hitZ, placementState)) {
                     SoundType soundtype = world.getBlockState(pos).getBlock().getSoundType(world.getBlockState(pos), world, pos, player);
@@ -135,11 +134,5 @@ public class FacadeItemBlock extends ItemBlock {
                 }
             }
         }
-    }
-
-
-    @Override
-    public void getSubItems(CreativeTabs itemIn, NonNullList<ItemStack> tab) {
-        super.getSubItems(itemIn, (NonNullList<ItemStack>) tab);
     }
 }
