@@ -281,6 +281,14 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
     }
 
     public static boolean isConnectable(IBlockAccess world, BlockPos connectorPos, EnumFacing facing) {
+
+        BlockPos pos = connectorPos.offset(facing);
+        IBlockState state = world.getBlockState(pos);
+        Block block = state.getBlock();
+        if (block.isAir(state, world, pos)) {
+            return false;
+        }
+
         ConnectorTileEntity connectorTE = (ConnectorTileEntity) world.getTileEntity(connectorPos);
         if (connectorTE == null) {
             return false;
@@ -291,21 +299,18 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
         }
 
 
-        BlockPos pos = connectorPos.offset(facing);
         TileEntity te = world.getTileEntity(pos);
-        IBlockState state = world.getBlockState(pos);
-        Block block = state.getBlock();
+
         if (block instanceof IConnectable) {
-            IConnectable.ConnectResult result = ((IConnectable) block).canConnect(world, connectorPos, pos, facing);
+            IConnectable.ConnectResult result = ((IConnectable) block).canConnect(world, connectorPos, pos, te, facing);
             if (result == IConnectable.ConnectResult.NO) {
                 return false;
             } else if (result == IConnectable.ConnectResult.YES) {
                 return true;
             }
         }
-        IConnectable connectable = XNet.xNetApi.getConnectable(block.getRegistryName());
-        if (connectable != null) {
-            IConnectable.ConnectResult result = connectable.canConnect(world, connectorPos, pos, facing);
+        for (IConnectable connectable : XNet.xNetApi.getConnectables()) {
+            IConnectable.ConnectResult result = connectable.canConnect(world, connectorPos, pos, te, facing);
             if (result == IConnectable.ConnectResult.NO) {
                 return false;
             } else if (result == IConnectable.ConnectResult.YES) {

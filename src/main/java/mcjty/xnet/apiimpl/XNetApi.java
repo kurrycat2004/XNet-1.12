@@ -3,17 +3,18 @@ package mcjty.xnet.apiimpl;
 import mcjty.xnet.api.IXNet;
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.api.channels.IConnectable;
-import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class XNetApi implements IXNet {
 
     private final Map<String, IChannelType> channels = new HashMap<>();
-    private final Map<ResourceLocation, IConnectable> connectables = new HashMap<>();
+    private final List<IConnectable> connectables = new ArrayList<>();
 
     @Override
     public void registerChannelType(IChannelType type) {
@@ -21,8 +22,8 @@ public class XNetApi implements IXNet {
     }
 
     @Override
-    public void registerConnectable(@Nonnull ResourceLocation blockId, @Nonnull IConnectable connectable) {
-        connectables.put(blockId, connectable);
+    public void registerConnectable(@Nonnull IConnectable connectable) {
+        connectables.add(connectable);
     }
 
     @Nullable
@@ -34,8 +35,7 @@ public class XNetApi implements IXNet {
         return channels;
     }
 
-    @Nullable
-    public IConnectable getConnectable(@Nonnull ResourceLocation blockId) {
-        return connectables.get(blockId);
+    public List<IConnectable> getConnectables() {
+        return connectables;
     }
 }

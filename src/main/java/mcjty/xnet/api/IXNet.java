@@ -20,5 +20,5 @@ public interface IXNet {
      * on your block. The connectable interface will have the responsability of checking if it is
      * being called on the right block
      */
-    void registerConnectable(@Nonnull ResourceLocation blockId, @Nonnull IConnectable connectable);
+    void registerConnectable(@Nonnull IConnectable connectable);
 }
