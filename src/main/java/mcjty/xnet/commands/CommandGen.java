@@ -77,11 +77,6 @@ public class CommandGen implements ICommand {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
-    }
-
-    @Override
     public int compareTo(ICommand o) {
         return getName().compareTo(o.getName());
     }
