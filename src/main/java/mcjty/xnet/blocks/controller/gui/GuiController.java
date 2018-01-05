@@ -35,6 +35,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
+import org.lwjgl.input.Mouse;
 
 import java.awt.*;
 import java.util.List;
@@ -401,6 +402,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                 br = new BlockRender(mc, this).setRenderItem(connectedBlock.getConnectedBlock());
                 prevPos = coordinate;
             }
+            br.setUserObject("block");
             panel.addChild(br);
             if (!name.isEmpty()) {
                 br.setTooltips(TextFormatting.GREEN + "Connector: " + TextFormatting.WHITE + name,
@@ -481,5 +483,19 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         int currentRF = GenericEnergyStorageTileEntity.getCurrentRF();
         energyBar.setValue(currentRF);
         tileEntity.requestRfFromServer(XNet.MODID);
+    }
+
+    @Override
+    protected void drawStackTooltips(int mouseX, int mouseY) {
+        int x = Mouse.getEventX() * width / mc.displayWidth;
+        int y = height - Mouse.getEventY() * height / mc.displayHeight - 1;
+        Widget<?> widget = window.getToplevel().getWidgetAtPosition(x, y);
+        if (widget instanceof BlockRender) {
+            if ("block".equals(widget.getUserObject())) {
+                System.out.println("GuiController.drawStackTooltips");
+                return;     // Don't do the normal tooltip rendering
+            }
+        }
+        super.drawStackTooltips(mouseX, mouseY);
     }
 }
