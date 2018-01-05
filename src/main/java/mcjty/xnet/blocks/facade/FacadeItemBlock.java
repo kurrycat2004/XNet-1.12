@@ -16,7 +16,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
@@ -102,12 +101,7 @@ public class FacadeItemBlock extends ItemBlock {
             } else {
                 setMimicBlock(itemstack, state);
                 if (world.isRemote) {
-                    ITextComponent component = new TextComponentString("Facade is now mimicing " + block.getLocalizedName());
-                    if (player instanceof EntityPlayer) {
-                        ((EntityPlayer) player).sendStatusMessage(component, false);
-                    } else {
-                        player.sendMessage(component);
-                    }
+                    player.sendStatusMessage(new TextComponentString("Facade is now mimicing " + block.getLocalizedName()), false);
                 }
             }
             return EnumActionResult.SUCCESS;

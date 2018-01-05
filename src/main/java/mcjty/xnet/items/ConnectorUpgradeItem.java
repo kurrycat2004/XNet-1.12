@@ -21,7 +21,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
@@ -87,19 +86,9 @@ public class ConnectorUpgradeItem extends Item {
                         world.notifyBlockUpdate(pos, blockState, blockState, 3);
                         player.inventory.decrStackSize(player.inventory.currentItem, 1);
                         player.openContainer.detectAndSendChanges();
-                        ITextComponent component = new TextComponentString(TextFormatting.GREEN + "Connector was upgraded");
-                        if (player instanceof EntityPlayer) {
-                            ((EntityPlayer) player).sendStatusMessage(component, false);
-                        } else {
-                            player.sendMessage(component);
-                        }
+                        player.sendStatusMessage(new TextComponentString(TextFormatting.GREEN + "Connector was upgraded"), false);
                     } else {
-                        ITextComponent component = new TextComponentString(TextFormatting.RED + "Something went wrong during upgrade!");
-                        if (player instanceof EntityPlayer) {
-                            ((EntityPlayer) player).sendStatusMessage(component, false);
-                        } else {
-                            player.sendMessage(component);
-                        }
+                        player.sendStatusMessage(new TextComponentString(TextFormatting.RED + "Something went wrong during upgrade!"), false);
                         return EnumActionResult.FAIL;
                     }
                 }
@@ -107,22 +96,12 @@ public class ConnectorUpgradeItem extends Item {
             return EnumActionResult.SUCCESS;
         } else if (block == NetCableSetup.advancedConnectorBlock) {
             if (!world.isRemote) {
-                ITextComponent component = new TextComponentString(TextFormatting.YELLOW + "This connector is already advanced!");
-                if (player instanceof EntityPlayer) {
-                    ((EntityPlayer) player).sendStatusMessage(component, false);
-                } else {
-                    player.sendMessage(component);
-                }
+                player.sendStatusMessage(new TextComponentString(TextFormatting.YELLOW + "This connector is already advanced!"), false);
             }
             return EnumActionResult.SUCCESS;
         } else {
             if (!world.isRemote) {
-                ITextComponent component = new TextComponentString(TextFormatting.RED + "Use this item on a connector to upgrade it!");
-                if (player instanceof EntityPlayer) {
-                    ((EntityPlayer) player).sendStatusMessage(component, false);
-                } else {
-                    player.sendMessage(component);
-                }
+                player.sendStatusMessage(new TextComponentString(TextFormatting.RED + "Use this item on a connector to upgrade it!"), false);
             }
             return EnumActionResult.SUCCESS;
         }
