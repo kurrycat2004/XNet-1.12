@@ -110,7 +110,7 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
                 .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority, 36).nl()
 
                 .label("Rate")
-                .integer(TAG_RATE, fluidMode == FluidMode.EXT ? "Fluid extraction rate|(max " + maxrate + "mb)" : "Fluid insertion rate|(max " + maxrate + "mb)", rate, 36)
+                .integer(TAG_RATE, fluidMode == FluidMode.EXT ? "Fluid extraction rate|(max " + maxrate + "mb)" : "Fluid insertion rate|(max " + maxrate + "mb)", rate, 36, maxrate)
                 .shift(10)
                 .label(fluidMode == FluidMode.EXT ? "Min" : "Max")
                 .integer(TAG_MINMAX, fluidMode == FluidMode.EXT ? "Keep this amount of|fluid in tank" : "Disable insertion if|fluid level is too high", minmax, 36)
@@ -153,15 +153,6 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
         super.update(data);
         fluidMode = FluidMode.valueOf(((String)data.get(TAG_MODE)).toUpperCase());
         rate = (Integer) data.get(TAG_RATE);
-        int maxrate;
-        if (advanced) {
-            maxrate = GeneralConfiguration.maxFluidRateAdvanced;
-        } else {
-            maxrate = GeneralConfiguration.maxFluidRateNormal;
-        }
-        if (rate != null && rate > maxrate) {
-            rate = maxrate;
-        }
         minmax = (Integer) data.get(TAG_MINMAX);
         priority = (Integer) data.get(TAG_PRIORITY);
         speed = Integer.parseInt((String) data.get(TAG_SPEED)) / 10;

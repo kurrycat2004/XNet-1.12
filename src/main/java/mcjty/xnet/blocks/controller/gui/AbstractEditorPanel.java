@@ -122,12 +122,16 @@ public abstract class AbstractEditorPanel implements IEditorGui {
         return this;
     }
 
-    private Integer parseInt(String i) {
+    private Integer parseInt(String i, Integer maximum) {
         if (i == null || i.isEmpty()) {
             return null;
         }
         try {
-            return Integer.parseInt(i);
+            int v = Integer.parseInt(i);
+            if (v > maximum) {
+                v = maximum;
+            }
+            return v;
         } catch (NumberFormatException e) {
             return null;
         }
@@ -135,14 +139,19 @@ public abstract class AbstractEditorPanel implements IEditorGui {
 
     @Override
     public IEditorGui integer(String tag, String tooltip, Integer value, int width) {
+        return integer(tag, tooltip, value, width, null);
+    }
+
+    @Override
+    public IEditorGui integer(String tag, String tooltip, Integer value, int width, Integer maximum) {
         int w = width;
         fitWidth(w);
         TextField text = new TextField(mc, gui).setText(value == null ? "" : value.toString())
                 .setTooltips(parseTooltips(tooltip))
                 .setLayoutHint(new PositionalLayout.PositionalHint(x, y, w, 14));
         data.put(tag, value);
-        text.addTextEnterEvent((parent, newText) -> update(tag, parseInt(newText)));
-        text.addTextEvent((parent, newText) -> update(tag, parseInt(newText)));
+        text.addTextEnterEvent((parent, newText) -> update(tag, parseInt(newText, maximum)));
+        text.addTextEvent((parent, newText) -> update(tag, parseInt(newText, maximum)));
         panel.addChild(text);
         components.put(tag, text);
         x += w;

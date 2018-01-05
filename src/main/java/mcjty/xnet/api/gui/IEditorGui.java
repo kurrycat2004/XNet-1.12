@@ -3,6 +3,8 @@ package mcjty.xnet.api.gui;
 import mcjty.xnet.api.channels.RSMode;
 import net.minecraft.item.ItemStack;
 
+import javax.annotation.Nonnull;
+
 public interface IEditorGui {
 
     /// This returns true if we are editing an advanced connector
@@ -17,6 +19,8 @@ public interface IEditorGui {
     IEditorGui label(String txt);
 
     IEditorGui text(String tag, String tooltip, String value, int width);
+
+    IEditorGui integer(String tag, String tooltip, Integer value, int width, Integer maximum);
 
     IEditorGui integer(String tag, String tooltip, Integer value, int width);
 

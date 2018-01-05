@@ -130,7 +130,7 @@ public class LogicConnectorSettings extends AbstractConnectorSettings {
             }
         } else {
             gui.label("Redstone:")
-                    .integer(TAG_REDSTONE_OUT, "Redstone output value", redstoneOut, 40)
+                    .integer(TAG_REDSTONE_OUT, "Redstone output value", redstoneOut, 40, 16)
                     .nl();
         }
     }
