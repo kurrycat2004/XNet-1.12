@@ -83,6 +83,7 @@ public final class ForestrySupport {
 	        case QUEEN_BEE:
 	        case PRINCESS_BEE:
 	            tagsToRemove.add(Tag.GEN);
+	            //$FALL-THROUGH$
 	        case DRONE_BEE:
 	        case LARVAE_BEE:
 	            Collections.addAll(tagsToRemove, Tag.GENOME, Tag.MATE, Tag.HEALTH, Tag.IS_ANALYZED, Tag.MAX_HEALTH);
