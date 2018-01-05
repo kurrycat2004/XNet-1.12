@@ -128,7 +128,7 @@ public abstract class AbstractEditorPanel implements IEditorGui {
         }
         try {
             int v = Integer.parseInt(i);
-            if (v > maximum) {
+            if (maximum != null && v > maximum) {
                 v = maximum;
             }
             return v;
