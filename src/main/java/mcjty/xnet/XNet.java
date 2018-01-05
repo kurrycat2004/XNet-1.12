@@ -94,6 +94,7 @@ public class XNet implements ModBase {
         event.registerServerCommand(new CommandCheck());
     }
 
+    @Override
     public String getModId() {
         return MODID;
     }
