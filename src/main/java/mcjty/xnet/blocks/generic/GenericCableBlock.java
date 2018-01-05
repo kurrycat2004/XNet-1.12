@@ -326,8 +326,8 @@ public abstract class GenericCableBlock extends Block implements WailaInfoProvid
 
     @Override
     protected BlockStateContainer createBlockState() {
-        IProperty[] listedProperties = new IProperty[] { COLOR };
-        IUnlistedProperty[] unlistedProperties = new IUnlistedProperty[] { NORTH, SOUTH, WEST, EAST, UP, DOWN,
+        IProperty<?>[] listedProperties = new IProperty<?>[] { COLOR };
+        IUnlistedProperty<?>[] unlistedProperties = new IUnlistedProperty<?>[] { NORTH, SOUTH, WEST, EAST, UP, DOWN,
             FACADEID};
         return new ExtendedBlockState(this, listedProperties, unlistedProperties);
     }

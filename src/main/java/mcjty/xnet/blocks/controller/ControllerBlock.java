@@ -47,7 +47,7 @@ public class ControllerBlock extends GenericXNetBlock<TileEntityController, Cont
 
     @SideOnly(Side.CLIENT)
     @Override
-    public Class<? extends GenericGuiContainer> getGuiClass() {
+    public Class<GuiController> getGuiClass() {
         return GuiController.class;
     }
 

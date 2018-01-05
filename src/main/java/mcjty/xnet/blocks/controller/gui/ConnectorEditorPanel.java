@@ -41,7 +41,7 @@ public class ConnectorEditorPanel extends AbstractEditorPanel {
     }
 
     public void setState(IConnectorSettings settings) {
-        for (Map.Entry<String, Widget> entry : components.entrySet()) {
+        for (Map.Entry<String, Widget<?>> entry : components.entrySet()) {
             entry.getValue().setEnabled(settings.isEnabled(entry.getKey()));
         }
     }

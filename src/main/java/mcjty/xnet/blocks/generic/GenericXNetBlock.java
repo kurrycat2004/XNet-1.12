@@ -37,10 +37,4 @@ public abstract class GenericXNetBlock<T extends GenericTileEntity, C extends Co
     public void initModel() {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
     }
-
-    @SideOnly(Side.CLIENT)
-    @Override
-    public Class<? extends GenericGuiContainer> getGuiClass() {
-        return null;
-    }
 }

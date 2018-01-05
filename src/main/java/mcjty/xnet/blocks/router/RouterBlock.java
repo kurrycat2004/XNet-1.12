@@ -47,7 +47,7 @@ public class RouterBlock extends GenericXNetBlock<TileEntityRouter, EmptyContain
 
     @SideOnly(Side.CLIENT)
     @Override
-    public Class<? extends GenericGuiContainer> getGuiClass() {
+    public Class<GuiRouter> getGuiClass() {
         return GuiRouter.class;
     }
 

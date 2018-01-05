@@ -24,14 +24,14 @@ public abstract class AbstractEditorPanel implements IEditorGui {
     private final Minecraft mc;
     private final GuiController gui;
     protected final Map<String, Object> data;
-    protected final Map<String, Widget> components = new HashMap<>();
+    protected final Map<String, Widget<?>> components = new HashMap<>();
 
     private int x;
     private int y;
 
     protected abstract void update(String tag, Object value);
 
-    public Widget getComponent(String tag) {
+    public Widget<?> getComponent(String tag) {
         return components.get(tag);
     }
 
