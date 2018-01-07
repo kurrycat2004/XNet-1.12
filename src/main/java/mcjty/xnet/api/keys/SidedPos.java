@@ -6,7 +6,7 @@ import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nonnull;
 
-public class SidedPos {
+public class SidedPos implements Comparable<SidedPos> {
     private final BlockPos pos;
     private final EnumFacing side;
 
@@ -51,5 +51,12 @@ public class SidedPos {
     @Override
     public int hashCode() {
         return 31 * pos.hashCode() + side.hashCode();
+    }
+
+    @Override
+    public int compareTo(SidedPos o) {
+        int result = pos.compareTo(o.pos);
+        if(result == 0) result = side.compareTo(o.side);
+        return result;
     }
 }
