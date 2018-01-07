@@ -45,16 +45,11 @@ public class SidedPos {
 
         SidedPos sidedPos = (SidedPos) o;
 
-        if (pos != null ? !pos.equals(sidedPos.pos) : sidedPos.pos != null) return false;
-        if (side != sidedPos.side) return false;
-
-        return true;
+        return side == sidedPos.side && pos.equals(sidedPos.pos);
     }
 
     @Override
     public int hashCode() {
-        int result = pos != null ? pos.hashCode() : 0;
-        result = 31 * result + (side != null ? side.hashCode() : 0);
-        return result;
+        return 31 * pos.hashCode() + side.hashCode();
     }
 }
