@@ -104,10 +104,9 @@ public class LogicTools {
     // Return all potential connected blocks (with or an actual connector defined in the channel)
     public static Stream<BlockPos> connectedBlocks(@Nonnull World world, @Nonnull NetworkId networkId) {
         return consumers(world, networkId)
-                .map(blockPos -> Arrays.stream(EnumFacing.VALUES)
+                .flatMap(blockPos -> Arrays.stream(EnumFacing.VALUES)
                         .filter(facing -> ConnectorBlock.isConnectable(world, blockPos, facing))
-                        .map(blockPos::offset))
-                .flatMap(s -> s);
+                        .map(blockPos::offset));
     }
 
     @Nullable
