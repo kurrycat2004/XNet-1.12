@@ -492,7 +492,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         Widget<?> widget = window.getToplevel().getWidgetAtPosition(x, y);
         if (widget instanceof BlockRender) {
             if ("block".equals(widget.getUserObject())) {
-                System.out.println("GuiController.drawStackTooltips");
+                //System.out.println("GuiController.drawStackTooltips");
                 return;     // Don't do the normal tooltip rendering
             }
         }
