@@ -85,7 +85,7 @@ public class LogicConnectorSettings extends AbstractConnectorSettings {
     @Override
     public boolean isEnabled(String tag) {
         if (tag.equals(TAG_FACING)) {
-            return advanced;
+            return advanced && logicMode != LogicMode.OUTPUT;
         }
         if (tag.equals(TAG_SPEED)) {
             return true;
