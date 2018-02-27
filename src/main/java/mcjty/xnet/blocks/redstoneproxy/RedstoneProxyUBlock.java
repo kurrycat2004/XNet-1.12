@@ -13,7 +13,10 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
+
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class RedstoneProxyUBlock extends RedstoneProxyBlock {
 
@@ -33,8 +36,16 @@ public class RedstoneProxyUBlock extends RedstoneProxyBlock {
         tooltip.add(TextFormatting.YELLOW + "This version does a block update!");
     }
 
+    private Set<BlockPos> loopDetector = new HashSet<>();
+
     @Override
     public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
-        worldIn.notifyNeighborsOfStateChange(pos, this, true);
+        if(loopDetector.add(pos)) {
+            try {
+                worldIn.notifyNeighborsOfStateChange(pos, this, true);
+            } finally {
+                loopDetector.remove(pos);
+            }
+        }
     }
 }
