@@ -10,6 +10,7 @@ import mcjty.xnet.init.ModItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
@@ -38,6 +39,11 @@ public class ClientProxy extends CommonProxy {
     public void registerModels(ModelRegistryEvent event) {
         ModItems.initModels();
         ModBlocks.initModels();
+    }
+
+    @SubscribeEvent
+    public void colorHandlerEventBlock(ColorHandlerEvent.Block event) {
+        ModBlocks.initColorHandlers(event.getBlockColors());
     }
 
     @Override

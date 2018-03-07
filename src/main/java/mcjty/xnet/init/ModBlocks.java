@@ -6,6 +6,7 @@ import mcjty.xnet.blocks.facade.FacadeBlock;
 import mcjty.xnet.blocks.redstoneproxy.RedstoneProxyBlock;
 import mcjty.xnet.blocks.redstoneproxy.RedstoneProxyUBlock;
 import mcjty.xnet.blocks.router.RouterBlock;
+import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -40,5 +41,10 @@ public class ModBlocks {
     public static void initItemModels() {
         facadeBlock.initItemModel();
         NetCableSetup.initItemModels();
+    }
+
+    public static void initColorHandlers(BlockColors blockColors) {
+        facadeBlock.initColorHandler(blockColors);
+        NetCableSetup.initColorHandlers(blockColors);
     }
 }

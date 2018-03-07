@@ -1,5 +1,6 @@
 package mcjty.xnet.blocks.cables;
 
+import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -26,6 +27,11 @@ public class NetCableSetup {
         netCableBlock.initItemModel();
         connectorBlock.initItemModel();
         advancedConnectorBlock.initItemModel();
+    }
+
+    public static void initColorHandlers(BlockColors blockColors) {
+        connectorBlock.initColorHandler(blockColors);
+        advancedConnectorBlock.initColorHandler(blockColors);
     }
 
     public static void initCrafting() {
