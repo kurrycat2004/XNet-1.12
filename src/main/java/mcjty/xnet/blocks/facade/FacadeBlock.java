@@ -166,6 +166,12 @@ public class FacadeBlock extends NetCableBlock implements ITileEntityProvider {
     }
 
     @Override
+    public boolean doesSideBlockRendering(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing face) {
+        IBlockState mimicBlock = getMimicBlock(world, pos);
+        return mimicBlock == null ? true : mimicBlock.doesSideBlockRendering(world, pos, face);
+    }
+
+    @Override
     public boolean isFullCube(IBlockState state) {
         return true;
     }
