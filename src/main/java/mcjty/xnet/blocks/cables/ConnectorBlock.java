@@ -132,6 +132,9 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
             } else {
                 // We are in mimic mode. Don't remove the connector
                 this.onBlockHarvested(world, pos, state, player);
+                if(player.capabilities.isCreativeMode) {
+                    connectorTileEntity.setMimicBlock(null);
+                }
             }
         } else {
             return super.removedByPlayer(state, world, pos, player, willHarvest);
