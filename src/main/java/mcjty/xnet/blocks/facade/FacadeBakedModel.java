@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
@@ -46,7 +47,11 @@ public class FacadeBakedModel implements IBakedModel {
             return Collections.emptyList();
         }
 
-        IBakedModel model = getModel(facadeId);
+        IBlockState facadeState = facadeId.getBlockState();
+        if (!facadeState.getBlock().canRenderInLayer(facadeState, MinecraftForgeClient.getRenderLayer())) {
+            return Collections.emptyList();
+        }
+        IBakedModel model = getModel(facadeState);
         try {
             return model.getQuads(state, side, rand);
         } catch (Exception e) {
@@ -54,10 +59,9 @@ public class FacadeBakedModel implements IBakedModel {
         }
     }
 
-    private IBakedModel getModel(@Nonnull FacadeBlockId facadeId) {
+    private IBakedModel getModel(@Nonnull IBlockState state) {
         initTextures();
-        Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(facadeId.getRegistryName()));
-        IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(block.getStateFromMeta(facadeId.getMeta()));
+        IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state);
         return model;
     }
 

@@ -1,20 +1,22 @@
 package mcjty.xnet.blocks.facade;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
+
 public class FacadeBlockId {
     private final String registryName;
     private final int meta;
 
-    public FacadeBlockId(String registryName, int meta) {
-        this.registryName = registryName;
-        this.meta = meta;
+    public FacadeBlockId(IBlockState mimicBlock) {
+        Block block = mimicBlock.getBlock();
+        this.registryName = block.getRegistryName().toString();
+        this.meta = block.getMetaFromState(mimicBlock);
     }
 
-    public String getRegistryName() {
-        return registryName;
-    }
-
-    public int getMeta() {
-        return meta;
+    public IBlockState getBlockState() {
+        return ForgeRegistries.BLOCKS.getValue(new ResourceLocation(registryName)).getStateFromMeta(meta);
     }
 
     @Override

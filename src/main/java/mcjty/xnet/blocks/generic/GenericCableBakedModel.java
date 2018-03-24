@@ -12,9 +12,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
@@ -180,8 +182,11 @@ public class GenericCableBakedModel implements IBakedModel {
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
         FacadeBlockId facadeId = extendedBlockState.getValue(GenericCableBlock.FACADEID);
         if (facadeId != null) {
-            Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(facadeId.getRegistryName()));
-            IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(block.getStateFromMeta(facadeId.getMeta()));
+            IBlockState facadeState = facadeId.getBlockState();
+            if (!facadeState.getBlock().canRenderInLayer(facadeState, MinecraftForgeClient.getRenderLayer())) {
+                return Collections.emptyList();
+            }
+            IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(facadeState);
             try {
                 return model.getQuads(state, side, rand);
             } catch (Exception e) {
@@ -189,7 +194,7 @@ public class GenericCableBakedModel implements IBakedModel {
             }
         }
 
-        if (side != null) {
+        if (side != null || (state.getBlock() instanceof ConnectorBlock && MinecraftForgeClient.getRenderLayer() != BlockRenderLayer.CUTOUT_MIPPED)) {
             return Collections.emptyList();
         }
 

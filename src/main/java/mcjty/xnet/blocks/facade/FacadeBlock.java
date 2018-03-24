@@ -104,7 +104,7 @@ public class FacadeBlock extends NetCableBlock implements ITileEntityProvider {
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
         IBlockState mimicBlock = getMimicBlock(world, pos);
         if (mimicBlock != null) {
-            return extendedBlockState.withProperty(FACADEID, new FacadeBlockId(mimicBlock.getBlock().getRegistryName().toString(), mimicBlock.getBlock().getMetaFromState(mimicBlock)));
+            return extendedBlockState.withProperty(FACADEID, new FacadeBlockId(mimicBlock));
         } else {
             return extendedBlockState;
         }
@@ -151,8 +151,8 @@ public class FacadeBlock extends NetCableBlock implements ITileEntityProvider {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public BlockRenderLayer getBlockLayer() {
-        return BlockRenderLayer.CUTOUT_MIPPED;
+    public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
+        return true; // delegated to FacadeBakedModel#getQuads
     }
 
     @Override
