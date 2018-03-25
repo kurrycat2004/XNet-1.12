@@ -29,6 +29,7 @@ public class NetCableSetup {
         advancedConnectorBlock.initItemModel();
     }
 
+    @SideOnly(Side.CLIENT)
     public static void initColorHandlers(BlockColors blockColors) {
         connectorBlock.initColorHandler(blockColors);
         advancedConnectorBlock.initColorHandler(blockColors);

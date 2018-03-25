@@ -167,6 +167,7 @@ public abstract class GenericCableBlock extends Block implements WailaInfoProvid
         }
     }
 
+    @SideOnly(Side.CLIENT)
     public void initColorHandler(BlockColors blockColors) {
         blockColors.registerBlockColorHandler((state, world, pos, tintIndex) -> {
             IBlockState mimicBlock = getMimicBlock(world, pos);
