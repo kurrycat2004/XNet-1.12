@@ -43,6 +43,7 @@ public class ModBlocks {
         NetCableSetup.initItemModels();
     }
 
+    @SideOnly(Side.CLIENT)
     public static void initColorHandlers(BlockColors blockColors) {
         facadeBlock.initColorHandler(blockColors);
         NetCableSetup.initColorHandlers(blockColors);
