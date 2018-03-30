@@ -55,6 +55,7 @@ public class RedstoneProxyBlock extends Block {
 
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World player, List<String> tooltip, ITooltipFlag advanced) {
         tooltip.add("Acts as a proxy block for");
         tooltip.add("redstone. XNet can connect to this");
