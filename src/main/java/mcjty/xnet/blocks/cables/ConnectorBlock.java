@@ -396,6 +396,7 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World player, List<String> tooltip, ITooltipFlag adv) {
         super.addInformation(stack, player, tooltip, adv);
 
