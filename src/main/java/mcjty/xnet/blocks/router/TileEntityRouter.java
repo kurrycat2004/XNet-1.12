@@ -19,6 +19,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants;
 
@@ -232,6 +233,12 @@ public final class TileEntityRouter extends GenericTileEntity {
         for (NetworkId net : worldBlob.getNetworksAt(pos)) {
             worldBlob.incNetworkVersion(net);
         }
+        for (EnumFacing facing : EnumFacing.VALUES) {
+            for (NetworkId net : worldBlob.getNetworksAt(pos.offset(facing))) {
+                worldBlob.incNetworkVersion(net);
+            }
+        }
+
 
         markDirtyQuick();
     }
