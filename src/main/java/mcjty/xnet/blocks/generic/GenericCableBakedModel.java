@@ -183,7 +183,8 @@ public class GenericCableBakedModel implements IBakedModel {
         FacadeBlockId facadeId = extendedBlockState.getValue(GenericCableBlock.FACADEID);
         if (facadeId != null) {
             IBlockState facadeState = facadeId.getBlockState();
-            if (!facadeState.getBlock().canRenderInLayer(facadeState, MinecraftForgeClient.getRenderLayer())) {
+            BlockRenderLayer layer = MinecraftForgeClient.getRenderLayer();
+            if (layer != null && !facadeState.getBlock().canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
                 return Collections.emptyList();
             }
             IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(facadeState);
