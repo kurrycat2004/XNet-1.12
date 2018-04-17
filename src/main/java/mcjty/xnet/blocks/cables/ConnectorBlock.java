@@ -376,8 +376,8 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
     }
 
     @Override
-    public List<ItemStack> getDrops(IBlockAccess blockAccess, BlockPos pos, IBlockState state, int fortune) {
-        List<ItemStack> drops = super.getDrops(blockAccess, pos, state, fortune);
+    public void getDrops(NonNullList<ItemStack> drops, IBlockAccess blockAccess, BlockPos pos, IBlockState state, int fortune) {
+        super.getDrops(drops, blockAccess, pos, state, fortune);
         if (blockAccess instanceof World) {
             World world = (World) blockAccess;
             for (ItemStack drop : drops) {
@@ -391,8 +391,6 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
                 }
             }
         }
-
-        return drops;
     }
 
     @Override
