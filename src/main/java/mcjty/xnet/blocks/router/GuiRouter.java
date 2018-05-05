@@ -60,8 +60,8 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
 
         toplevel.addChild(initLocalChannelListPanel());
         toplevel.addChild(initRemoteChannelListPanel());
-        toplevel.addChild(new Label<>(mc, this).setHorizontalAlignment(HorizontalAlignment.ALIGH_LEFT).setText("Local Channels").setColor(0xff2244aa).setLayoutHint(new PositionalLayout.PositionalHint(6, 8, 166, 13)));
-        toplevel.addChild(new Label<>(mc, this).setHorizontalAlignment(HorizontalAlignment.ALIGH_LEFT).setText("Remote Channels").setColor(0xff2244aa).setLayoutHint(new PositionalLayout.PositionalHint(172, 8, 164, 13)));
+        toplevel.addChild(new Label<>(mc, this).setHorizontalAlignment(HorizontalAlignment.ALIGN_LEFT).setText("Local Channels").setColor(0xff2244aa).setLayoutHint(new PositionalLayout.PositionalHint(6, 8, 166, 13)));
+        toplevel.addChild(new Label<>(mc, this).setHorizontalAlignment(HorizontalAlignment.ALIGN_LEFT).setText("Remote Channels").setColor(0xff2244aa).setLayoutHint(new PositionalLayout.PositionalHint(172, 8, 164, 13)));
 
         window = new Window(this, toplevel);
 
