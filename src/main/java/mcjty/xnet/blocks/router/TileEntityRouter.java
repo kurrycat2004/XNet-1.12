@@ -3,7 +3,7 @@ package mcjty.xnet.blocks.router;
 import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.network.Argument;
 import mcjty.lib.varia.BlockPosTools;
-import mcjty.typed.Type;
+import mcjty.lib.typed.Type;
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.keys.NetworkId;

@@ -2,7 +2,7 @@ package mcjty.xnet.network;
 
 import mcjty.lib.network.CommandHandler;
 import mcjty.lib.network.PacketRequestListFromServer;
-import mcjty.typed.Type;
+import mcjty.lib.typed.Type;
 import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.controller.TileEntityController;
 import mcjty.xnet.clientinfo.ConnectedBlockClientInfo;

@@ -3,7 +3,7 @@ package mcjty.xnet.blocks.controller;
 import mcjty.lib.entity.GenericEnergyReceiverTileEntity;
 import mcjty.lib.network.Argument;
 import mcjty.lib.varia.BlockPosTools;
-import mcjty.typed.Type;
+import mcjty.lib.typed.Type;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.api.channels.IConnectorSettings;

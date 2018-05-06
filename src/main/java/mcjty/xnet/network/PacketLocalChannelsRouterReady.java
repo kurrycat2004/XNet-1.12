@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import mcjty.lib.network.ClientCommandHandler;
 import mcjty.lib.network.PacketListFromServer;
 import mcjty.lib.varia.Logging;
-import mcjty.typed.Type;
+import mcjty.lib.typed.Type;
 import mcjty.xnet.XNet;
 import mcjty.xnet.clientinfo.ControllerChannelClientInfo;
 import net.minecraft.tileentity.TileEntity;
