@@ -2,8 +2,12 @@ package mcjty.xnet.blocks.cables;
 
 import cofh.redstoneflux.api.IEnergyProvider;
 import cofh.redstoneflux.api.IEnergyReceiver;
+import mcjty.lib.entity.DefaultValue;
 import mcjty.lib.entity.GenericTileEntity;
-import mcjty.lib.network.Argument;
+import mcjty.lib.entity.IValue;
+import mcjty.lib.typed.Key;
+import mcjty.lib.typed.Type;
+import mcjty.lib.typed.TypedMap;
 import mcjty.xnet.api.tiles.IConnectorTile;
 import mcjty.xnet.blocks.facade.IFacadeSupport;
 import mcjty.xnet.blocks.facade.MimicBlockSupport;
@@ -24,7 +28,6 @@ import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.common.Optional;
 
 import javax.annotation.Nonnull;
-import java.util.Map;
 
 @Optional.InterfaceList({
         @Optional.Interface(iface = "cofh.redstoneflux.api.IEnergyProvider", modid = "redstoneflux"),
@@ -33,8 +36,9 @@ import java.util.Map;
 public class ConnectorTileEntity extends GenericTileEntity implements IEnergyProvider, IEnergyReceiver,
         IFacadeSupport, IConnectorTile {
 
-    public static final String CMD_ENABLE = "enable";
-    public static final String CMD_SETNAME = "setName";
+    public static final String CMD_ENABLE = "connector.enable";
+    public static final Key<Integer> PARAM_FACING = new Key<>("facing", Type.INTEGER);
+    public static final Key<Boolean> PARAM_ENABLED = new Key<>("enabled", Type.BOOLEAN);
 
     private MimicBlockSupport mimicBlockSupport = new MimicBlockSupport();
 
@@ -49,6 +53,15 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
     private byte enabled = 0x3f;
 
     private Block[] cachedNeighbours = new Block[EnumFacing.VALUES.length];
+
+    public static final Key<String> VALUE_NAME = new Key<>("name", Type.STRING);
+
+    @Override
+    public IValue[] getValues() {
+        return new IValue[] {
+                new DefaultValue<>(VALUE_NAME, ConnectorTileEntity::getConnectorName, ConnectorTileEntity::setConnectorName),
+        };
+    }
 
     @Override
     public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet) {
@@ -183,6 +196,12 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         return powerLevel;
     }
 
+    public void setConnectorName(String n) {
+        this.name = n;
+        markDirtyClient();
+    }
+
+
     public String getConnectorName() {
         return name;
     }
@@ -279,18 +298,14 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
     private IEnergyStorage[] sidedHandlers = new IEnergyStorage[6];
 
     @Override
-    public boolean execute(EntityPlayerMP playerMP, String command, Map<String, Argument> args) {
-        boolean rc = super.execute(playerMP, command, args);
+    public boolean execute(EntityPlayerMP playerMP, String command, TypedMap params) {
+        boolean rc = super.execute(playerMP, command, params);
         if (rc) {
             return true;
         }
-        if (CMD_SETNAME.equals(command)) {
-            this.name = args.get("name").getString();
-            markDirtyClient();
-            return true;
-        } else if (CMD_ENABLE.equals(command)) {
-            int f = args.get("facing").getInteger();
-            boolean e = args.get("enabled").getBoolean();
+        if (CMD_ENABLE.equals(command)) {
+            int f = params.get(PARAM_FACING);
+            boolean e = params.get(PARAM_ENABLED);
             setEnabled(EnumFacing.VALUES[f], e);
             return true;
         }
