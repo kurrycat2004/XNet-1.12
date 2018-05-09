@@ -1,6 +1,6 @@
 package mcjty.xnet.network;
 
-import mcjty.lib.network.CommandHandler;
+import mcjty.lib.network.ICommandHandler;
 import mcjty.lib.network.PacketRequestListFromServer;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
@@ -35,7 +35,7 @@ public class PacketGetConnectedBlocks extends PacketRequestListFromServer<Connec
 
         private void handle(PacketGetConnectedBlocks message, MessageContext ctx) {
             TileEntity te = ctx.getServerHandler().player.getEntityWorld().getTileEntity(message.pos);
-            CommandHandler commandHandler = (CommandHandler) te;
+            ICommandHandler commandHandler = (ICommandHandler) te;
             List<ConnectedBlockClientInfo> list = commandHandler.executeWithResultList(message.command, message.params, Type.create(ConnectedBlockClientInfo.class));
             XNetMessages.INSTANCE.sendTo(new PacketConnectedBlocksReady(message.pos, TileEntityController.CLIENTCMD_CONNECTEDBLOCKSREADY, list), ctx.getServerHandler().player);
         }

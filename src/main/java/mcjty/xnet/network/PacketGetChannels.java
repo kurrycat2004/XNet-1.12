@@ -1,6 +1,6 @@
 package mcjty.xnet.network;
 
-import mcjty.lib.network.CommandHandler;
+import mcjty.lib.network.ICommandHandler;
 import mcjty.lib.network.PacketRequestListFromServer;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
@@ -35,7 +35,7 @@ public class PacketGetChannels extends PacketRequestListFromServer<ChannelClient
 
         private void handle(PacketGetChannels message, MessageContext ctx) {
             TileEntity te = ctx.getServerHandler().player.getEntityWorld().getTileEntity(message.pos);
-            CommandHandler commandHandler = (CommandHandler) te;
+            ICommandHandler commandHandler = (ICommandHandler) te;
             List<ChannelClientInfo> list = commandHandler.executeWithResultList(message.command, message.params, Type.create(ChannelClientInfo.class));
             XNetMessages.INSTANCE.sendTo(new PacketChannelsReady(message.pos, TileEntityController.CLIENTCMD_CHANNELSREADY, list), ctx.getServerHandler().player);
         }
