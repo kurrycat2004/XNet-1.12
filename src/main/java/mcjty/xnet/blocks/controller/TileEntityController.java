@@ -1,7 +1,6 @@
 package mcjty.xnet.blocks.controller;
 
 import mcjty.lib.entity.GenericEnergyReceiverTileEntity;
-import mcjty.lib.network.Argument;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
@@ -561,7 +560,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
     @Nonnull
     @Override
-    public <T> List<T> executeWithResultList(String command, Map<String, Argument> args, Type<T> type) {
+    public <T> List<T> executeWithResultList(String command, TypedMap args, Type<T> type) {
         List<T> rc = super.executeWithResultList(command, args, type);
         if (!rc.isEmpty()) {
             return rc;

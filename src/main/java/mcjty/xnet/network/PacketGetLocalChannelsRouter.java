@@ -3,6 +3,7 @@ package mcjty.xnet.network;
 import mcjty.lib.network.CommandHandler;
 import mcjty.lib.network.PacketRequestListFromServer;
 import mcjty.lib.typed.Type;
+import mcjty.lib.typed.TypedMap;
 import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.router.TileEntityRouter;
 import mcjty.xnet.clientinfo.ControllerChannelClientInfo;
@@ -22,7 +23,7 @@ public class PacketGetLocalChannelsRouter extends PacketRequestListFromServer<Co
     }
 
     public PacketGetLocalChannelsRouter(BlockPos pos) {
-        super(XNet.MODID, pos, TileEntityRouter.CMD_GETCHANNELS);
+        super(XNet.MODID, pos, TileEntityRouter.CMD_GETCHANNELS, TypedMap.EMPTY);
     }
 
     public static class Handler implements IMessageHandler<PacketGetLocalChannelsRouter, IMessage> {
@@ -35,7 +36,7 @@ public class PacketGetLocalChannelsRouter extends PacketRequestListFromServer<Co
         private void handle(PacketGetLocalChannelsRouter message, MessageContext ctx) {
             TileEntity te = ctx.getServerHandler().player.getEntityWorld().getTileEntity(message.pos);
             CommandHandler commandHandler = (CommandHandler) te;
-            List<ControllerChannelClientInfo> list = commandHandler.executeWithResultList(message.command, message.args, Type.create(ControllerChannelClientInfo.class));
+            List<ControllerChannelClientInfo> list = commandHandler.executeWithResultList(message.command, message.params, Type.create(ControllerChannelClientInfo.class));
             XNetMessages.INSTANCE.sendTo(new PacketLocalChannelsRouterReady(message.pos, TileEntityRouter.CLIENTCMD_CHANNELSREADY, list), ctx.getServerHandler().player);
         }
     }

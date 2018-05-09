@@ -3,6 +3,7 @@ package mcjty.xnet.network;
 import mcjty.lib.network.CommandHandler;
 import mcjty.lib.network.PacketRequestListFromServer;
 import mcjty.lib.typed.Type;
+import mcjty.lib.typed.TypedMap;
 import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.controller.TileEntityController;
 import mcjty.xnet.clientinfo.ConnectedBlockClientInfo;
@@ -22,7 +23,7 @@ public class PacketGetConnectedBlocks extends PacketRequestListFromServer<Connec
     }
 
     public PacketGetConnectedBlocks(BlockPos pos) {
-        super(XNet.MODID, pos, TileEntityController.CMD_GETCONNECTEDBLOCKS);
+        super(XNet.MODID, pos, TileEntityController.CMD_GETCONNECTEDBLOCKS, TypedMap.EMPTY);
     }
 
     public static class Handler implements IMessageHandler<PacketGetConnectedBlocks, IMessage> {
@@ -35,7 +36,7 @@ public class PacketGetConnectedBlocks extends PacketRequestListFromServer<Connec
         private void handle(PacketGetConnectedBlocks message, MessageContext ctx) {
             TileEntity te = ctx.getServerHandler().player.getEntityWorld().getTileEntity(message.pos);
             CommandHandler commandHandler = (CommandHandler) te;
-            List<ConnectedBlockClientInfo> list = commandHandler.executeWithResultList(message.command, message.args, Type.create(ConnectedBlockClientInfo.class));
+            List<ConnectedBlockClientInfo> list = commandHandler.executeWithResultList(message.command, message.params, Type.create(ConnectedBlockClientInfo.class));
             XNetMessages.INSTANCE.sendTo(new PacketConnectedBlocksReady(message.pos, TileEntityController.CLIENTCMD_CONNECTEDBLOCKSREADY, list), ctx.getServerHandler().player);
         }
     }

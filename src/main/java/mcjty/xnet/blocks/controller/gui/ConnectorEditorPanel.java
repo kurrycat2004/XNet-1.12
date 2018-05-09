@@ -2,7 +2,6 @@ package mcjty.xnet.blocks.controller.gui;
 
 import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.gui.widgets.Widget;
-import mcjty.lib.network.Argument;
 import mcjty.lib.typed.TypedMap;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.keys.SidedPos;
@@ -12,9 +11,7 @@ import net.minecraft.client.Minecraft;
 
 import java.util.Map;
 
-import static mcjty.xnet.blocks.controller.TileEntityController.PARAM_CHANNEL;
-import static mcjty.xnet.blocks.controller.TileEntityController.PARAM_POS;
-import static mcjty.xnet.blocks.controller.TileEntityController.PARAM_SIDE;
+import static mcjty.xnet.blocks.controller.TileEntityController.*;
 
 public class ConnectorEditorPanel extends AbstractEditorPanel {
 

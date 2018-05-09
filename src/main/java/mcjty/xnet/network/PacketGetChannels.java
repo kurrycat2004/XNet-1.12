@@ -3,6 +3,7 @@ package mcjty.xnet.network;
 import mcjty.lib.network.CommandHandler;
 import mcjty.lib.network.PacketRequestListFromServer;
 import mcjty.lib.typed.Type;
+import mcjty.lib.typed.TypedMap;
 import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.controller.TileEntityController;
 import mcjty.xnet.clientinfo.ChannelClientInfo;
@@ -22,7 +23,7 @@ public class PacketGetChannels extends PacketRequestListFromServer<ChannelClient
     }
 
     public PacketGetChannels(BlockPos pos) {
-        super(XNet.MODID, pos, TileEntityController.CMD_GETCHANNELS);
+        super(XNet.MODID, pos, TileEntityController.CMD_GETCHANNELS, TypedMap.EMPTY);
     }
 
     public static class Handler implements IMessageHandler<PacketGetChannels, IMessage> {
@@ -35,7 +36,7 @@ public class PacketGetChannels extends PacketRequestListFromServer<ChannelClient
         private void handle(PacketGetChannels message, MessageContext ctx) {
             TileEntity te = ctx.getServerHandler().player.getEntityWorld().getTileEntity(message.pos);
             CommandHandler commandHandler = (CommandHandler) te;
-            List<ChannelClientInfo> list = commandHandler.executeWithResultList(message.command, message.args, Type.create(ChannelClientInfo.class));
+            List<ChannelClientInfo> list = commandHandler.executeWithResultList(message.command, message.params, Type.create(ChannelClientInfo.class));
             XNetMessages.INSTANCE.sendTo(new PacketChannelsReady(message.pos, TileEntityController.CLIENTCMD_CHANNELSREADY, list), ctx.getServerHandler().player);
         }
     }
