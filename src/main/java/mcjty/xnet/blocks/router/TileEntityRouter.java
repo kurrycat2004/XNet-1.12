@@ -2,8 +2,10 @@ package mcjty.xnet.blocks.router;
 
 import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.network.Argument;
-import mcjty.lib.varia.BlockPosTools;
+import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
+import mcjty.lib.typed.TypedMap;
+import mcjty.lib.varia.BlockPosTools;
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.keys.NetworkId;
@@ -31,7 +33,11 @@ import static mcjty.xnet.logic.ChannelInfo.MAX_CHANNELS;
 
 public final class TileEntityRouter extends GenericTileEntity {
 
-    public static final String CMD_UPDATENAME = "updateName";
+    public static final String CMD_UPDATENAME = "router.updateName";
+    public static final Key<BlockPos> PARAM_POS = new Key<>("pos", Type.BLOCKPOS);
+    public static final Key<Integer> PARAM_CHANNEL = new Key<>("channel", Type.INTEGER);
+    public static final Key<String> PARAM_NAME = new Key<>("name", Type.STRING);
+
     public static final String CMD_GETCHANNELS = "getChannelInfo";
     public static final String CLIENTCMD_CHANNELSREADY = "channelsReady";
     public static final String CMD_GETREMOTECHANNELS = "getRemoteChannelInfo";
@@ -244,15 +250,15 @@ public final class TileEntityRouter extends GenericTileEntity {
     }
 
     @Override
-    public boolean execute(EntityPlayerMP playerMP, String command, Map<String, Argument> args) {
-        boolean rc = super.execute(playerMP, command, args);
+    public boolean execute(EntityPlayerMP playerMP, String command, TypedMap params) {
+        boolean rc = super.execute(playerMP, command, params);
         if (rc) {
             return true;
         }
         if (CMD_UPDATENAME.equals(command)) {
-            BlockPos controllerPos = args.get("pos").getCoordinate();
-            int channel = args.get("channel").getInteger();
-            String name = args.get("name").getString();
+            BlockPos controllerPos = params.get(PARAM_POS);
+            int channel = params.get(PARAM_CHANNEL);
+            String name = params.get(PARAM_NAME);
             updatePublishName(controllerPos, channel, name);
             return true;
         }

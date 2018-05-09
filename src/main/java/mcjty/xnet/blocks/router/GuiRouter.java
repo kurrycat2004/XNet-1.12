@@ -7,11 +7,8 @@ import mcjty.lib.gui.events.DefaultSelectionEvent;
 import mcjty.lib.gui.layout.HorizontalAlignment;
 import mcjty.lib.gui.layout.HorizontalLayout;
 import mcjty.lib.gui.layout.PositionalLayout;
-import mcjty.lib.gui.widgets.Label;
-import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.gui.widgets.*;
-import mcjty.lib.gui.widgets.TextField;
-import mcjty.lib.network.Argument;
+import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.BlockPosTools;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelType;
@@ -23,8 +20,10 @@ import mcjty.xnet.network.XNetMessages;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
-import java.awt.*;
+import java.awt.Rectangle;
 import java.util.List;
+
+import static mcjty.xnet.blocks.router.TileEntityRouter.*;
 
 public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
 
@@ -71,9 +70,11 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
 
     private void updatePublish(BlockPos pos, int index, String name) {
         sendServerCommand(XNetMessages.INSTANCE, TileEntityRouter.CMD_UPDATENAME,
-                new Argument("pos", pos),
-                new Argument("channel", index),
-                new Argument("name", name));
+                TypedMap.builder()
+                        .put(PARAM_POS, pos)
+                        .put(PARAM_CHANNEL, index)
+                        .put(PARAM_NAME, name)
+                        .build());
     }
 
     private void refresh() {

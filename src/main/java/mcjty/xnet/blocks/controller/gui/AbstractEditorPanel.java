@@ -3,8 +3,9 @@ package mcjty.xnet.blocks.controller.gui;
 import mcjty.lib.gui.events.BlockRenderEvent;
 import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.gui.widgets.*;
-import mcjty.lib.network.Argument;
-import mcjty.lib.network.ArgumentType;
+import mcjty.lib.typed.Key;
+import mcjty.lib.typed.Type;
+import mcjty.lib.typed.TypedMap;
 import mcjty.xnet.api.channels.RSMode;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.network.XNetMessages;
@@ -35,25 +36,25 @@ public abstract class AbstractEditorPanel implements IEditorGui {
         return components.get(tag);
     }
 
-    protected void performUpdate(Argument[] args, int i, String cmd) {
+    protected void performUpdate(TypedMap.Builder builder, int i, String cmd) {
         for (Map.Entry<String, Object> entry : data.entrySet()) {
             Object o = entry.getValue();
             if (o instanceof String) {
-                args[i++] = new Argument(entry.getKey(), ArgumentType.TYPE_STRING, o);
+                builder.put(new Key<>(entry.getKey(), Type.STRING), (String) o);
             } else if (o instanceof Integer) {
-                args[i++] = new Argument(entry.getKey(), ArgumentType.TYPE_INTEGER, o);
+                builder.put(new Key<>(entry.getKey(), Type.INTEGER), (Integer) o);
             } else if (o instanceof Boolean) {
-                args[i++] = new Argument(entry.getKey(), ArgumentType.TYPE_BOOLEAN, o);
+                builder.put(new Key<>(entry.getKey(), Type.BOOLEAN), (Boolean) o);
             } else if (o instanceof Double) {
-                args[i++] = new Argument(entry.getKey(), ArgumentType.TYPE_DOUBLE, o);
+                builder.put(new Key<>(entry.getKey(), Type.DOUBLE), (Double) o);
             } else if (o instanceof ItemStack) {
-                args[i++] = new Argument(entry.getKey(), ArgumentType.TYPE_STACK, o);
+                builder.put(new Key<>(entry.getKey(), Type.ITEMSTACK), (ItemStack) o);
             } else {
-                args[i++] = new Argument(entry.getKey(), ArgumentType.TYPE_STRING, o);
+                builder.put(new Key<>(entry.getKey(), Type.STRING), o == null ? null : o.toString());
             }
         }
 
-        gui.sendServerCommand(XNetMessages.INSTANCE, cmd, args);
+        gui.sendServerCommand(XNetMessages.INSTANCE, cmd, builder.build());
         gui.refresh();
     }
 

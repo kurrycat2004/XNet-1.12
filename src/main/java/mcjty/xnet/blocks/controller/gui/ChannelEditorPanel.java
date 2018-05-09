@@ -3,11 +3,14 @@ package mcjty.xnet.blocks.controller.gui;
 import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.network.Argument;
+import mcjty.lib.typed.TypedMap;
 import mcjty.xnet.api.channels.IChannelSettings;
 import mcjty.xnet.blocks.controller.TileEntityController;
 import net.minecraft.client.Minecraft;
 
 import java.util.Map;
+
+import static mcjty.xnet.blocks.controller.TileEntityController.PARAM_CHANNEL;
 
 public class ChannelEditorPanel extends AbstractEditorPanel {
 
@@ -21,10 +24,10 @@ public class ChannelEditorPanel extends AbstractEditorPanel {
     @Override
     protected void update(String tag, Object value) {
         data.put(tag, value);
-        Argument[] args = new Argument[data.size() + 1];
+        TypedMap.Builder builder = TypedMap.builder();
         int i = 0;
-        args[i++] = new Argument("channel", channel);
-        performUpdate(args, i, TileEntityController.CMD_UPDATECHANNEL);
+        builder.put(PARAM_CHANNEL, channel);
+        performUpdate(builder, i, TileEntityController.CMD_UPDATECHANNEL);
     }
 
     public ChannelEditorPanel(Panel panel, Minecraft mc, GuiController gui, int channel) {

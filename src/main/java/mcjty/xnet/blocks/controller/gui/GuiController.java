@@ -9,11 +9,8 @@ import mcjty.lib.gui.events.DefaultSelectionEvent;
 import mcjty.lib.gui.layout.HorizontalLayout;
 import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.gui.widgets.*;
-import mcjty.lib.gui.widgets.Button;
-import mcjty.lib.gui.widgets.Label;
-import mcjty.lib.gui.widgets.Panel;
-import mcjty.lib.gui.widgets.TextField;
 import mcjty.lib.network.Argument;
+import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.BlockPosTools;
 import mcjty.lib.varia.Logging;
 import mcjty.xnet.XNet;
@@ -37,9 +34,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import org.lwjgl.input.Mouse;
 
-import java.awt.*;
+import java.awt.Rectangle;
 import java.util.List;
 
+import static mcjty.xnet.blocks.controller.TileEntityController.*;
 import static mcjty.xnet.logic.ChannelInfo.MAX_CHANNELS;
 
 public class GuiController extends GenericGuiContainer<TileEntityController> {
@@ -202,30 +200,38 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
 
     private void removeConnector(SidedPos sidedPos) {
         sendServerCommand(XNetMessages.INSTANCE, TileEntityController.CMD_REMOVECONNECTOR,
-                new Argument("channel", getSelectedChannel()),
-                new Argument("pos", sidedPos.getPos()),
-                new Argument("side", sidedPos.getSide().ordinal()));
+                TypedMap.builder()
+                        .put(PARAM_CHANNEL, getSelectedChannel())
+                        .put(PARAM_POS, sidedPos.getPos())
+                        .put(PARAM_SIDE, sidedPos.getSide().ordinal())
+                        .build());
         refresh();
     }
 
     private void createConnector(SidedPos sidedPos) {
         sendServerCommand(XNetMessages.INSTANCE, TileEntityController.CMD_CREATECONNECTOR,
-                new Argument("channel", getSelectedChannel()),
-                new Argument("pos", sidedPos.getPos()),
-                new Argument("side", sidedPos.getSide().ordinal()));
+                TypedMap.builder()
+                        .put(PARAM_CHANNEL, getSelectedChannel())
+                        .put(PARAM_POS, sidedPos.getPos())
+                        .put(PARAM_SIDE, sidedPos.getSide().ordinal())
+                        .build());
         refresh();
     }
 
     private void removeChannel() {
         sendServerCommand(XNetMessages.INSTANCE, TileEntityController.CMD_REMOVECHANNEL,
-                new Argument("index", getSelectedChannel()));
+                TypedMap.builder()
+                        .put(PARAM_INDEX, getSelectedChannel())
+                        .build());
         refresh();
     }
 
     private void createChannel(String typeId) {
         sendServerCommand(XNetMessages.INSTANCE, TileEntityController.CMD_CREATECHANNEL,
-                new Argument("index", getSelectedChannel()),
-                new Argument("type", typeId));
+                TypedMap.builder()
+                        .put(PARAM_INDEX, getSelectedChannel())
+                        .put(PARAM_TYPE, typeId)
+                        .build());
         refresh();
     }
 

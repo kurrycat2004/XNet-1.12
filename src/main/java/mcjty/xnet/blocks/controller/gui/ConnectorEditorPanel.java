@@ -3,6 +3,7 @@ package mcjty.xnet.blocks.controller.gui;
 import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.network.Argument;
+import mcjty.lib.typed.TypedMap;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.keys.SidedPos;
 import mcjty.xnet.blocks.cables.ConnectorBlock;
@@ -10,6 +11,10 @@ import mcjty.xnet.blocks.controller.TileEntityController;
 import net.minecraft.client.Minecraft;
 
 import java.util.Map;
+
+import static mcjty.xnet.blocks.controller.TileEntityController.PARAM_CHANNEL;
+import static mcjty.xnet.blocks.controller.TileEntityController.PARAM_POS;
+import static mcjty.xnet.blocks.controller.TileEntityController.PARAM_SIDE;
 
 public class ConnectorEditorPanel extends AbstractEditorPanel {
 
@@ -20,12 +25,12 @@ public class ConnectorEditorPanel extends AbstractEditorPanel {
     @Override
     protected void update(String tag, Object value) {
         data.put(tag, value);
-        Argument[] args = new Argument[data.size() + 3];
+        TypedMap.Builder builder = TypedMap.builder();
         int i = 0;
-        args[i++] = new Argument("pos", sidedPos.getPos());
-        args[i++] = new Argument("side", sidedPos.getSide().ordinal());
-        args[i++] = new Argument("channel", channel);
-        performUpdate(args, i, TileEntityController.CMD_UPDATECONNECTOR);
+        builder.put(PARAM_POS, sidedPos.getPos())
+            .put(PARAM_SIDE, sidedPos.getSide().ordinal())
+            .put(PARAM_CHANNEL, channel);
+        performUpdate(builder, i, TileEntityController.CMD_UPDATECONNECTOR);
     }
 
     public ConnectorEditorPanel(Panel panel, Minecraft mc, GuiController gui, int channel, SidedPos sidedPos) {

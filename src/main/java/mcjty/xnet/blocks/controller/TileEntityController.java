@@ -2,8 +2,10 @@ package mcjty.xnet.blocks.controller;
 
 import mcjty.lib.entity.GenericEnergyReceiverTileEntity;
 import mcjty.lib.network.Argument;
-import mcjty.lib.varia.BlockPosTools;
+import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
+import mcjty.lib.typed.TypedMap;
+import mcjty.lib.varia.BlockPosTools;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.api.channels.IConnectorSettings;
@@ -51,13 +53,18 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     public static final String CMD_GETCONNECTEDBLOCKS = "getConnectedBlocks";
     public static final String CLIENTCMD_CONNECTEDBLOCKSREADY = "connectedBlocksReady";
 
-    public static final String CMD_CREATECONNECTOR = "createConnector";
-    public static final String CMD_REMOVECONNECTOR = "removeConnector";
-    public static final String CMD_UPDATECONNECTOR = "updateConnector";
+    public static final String CMD_CREATECONNECTOR = "controller.createConnector";
+    public static final String CMD_REMOVECONNECTOR = "controller.removeConnector";
+    public static final String CMD_UPDATECONNECTOR = "controller.updateConnector";
+    public static final String CMD_CREATECHANNEL = "controller.createChannel";
+    public static final String CMD_REMOVECHANNEL = "controller.removeChannel";
+    public static final String CMD_UPDATECHANNEL = "controller.updateChannel";
 
-    public static final String CMD_CREATECHANNEL = "createChannel";
-    public static final String CMD_REMOVECHANNEL = "removeChannel";
-    public static final String CMD_UPDATECHANNEL = "updateChannel";
+    public static final Key<Integer> PARAM_INDEX = new Key<>("index", Type.INTEGER);
+    public static final Key<String> PARAM_TYPE = new Key<>("type", Type.STRING);
+    public static final Key<Integer> PARAM_CHANNEL = new Key<>("channel", Type.INTEGER);
+    public static final Key<Integer> PARAM_SIDE = new Key<>("side", Type.INTEGER);
+    public static final Key<BlockPos> PARAM_POS = new Key<>("pos", Type.BLOCKPOS);
 
     private NetworkId networkId;
 
@@ -430,10 +437,10 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         return chanList;
     }
 
-    private void updateChannel(int channel, Map<String, Argument> args) {
+    private void updateChannel(int channel, TypedMap params) {
         Map<String, Object> data = new HashMap<>();
-        for (Map.Entry<String, Argument> e : args.entrySet()) {
-            data.put(e.getKey(), e.getValue().getValue());
+        for (Key<?> key : params.getKeys()) {
+            data.put(key.getName(), params.get(key));
         }
         channels[channel].getChannelSettings().update(data);
 
@@ -462,15 +469,15 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         markDirtyQuick();
     }
 
-    private void updateConnector(int channel, SidedPos pos, Map<String, Argument> args) {
+    private void updateConnector(int channel, SidedPos pos, TypedMap params) {
         WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
         ConsumerId consumerId = worldBlob.getConsumerAt(pos.getPos().offset(pos.getSide()));
         for (Map.Entry<SidedConsumer, ConnectorInfo> entry : channels[channel].getConnectors().entrySet()) {
             SidedConsumer key = entry.getKey();
             if (key.getConsumerId().equals(consumerId) && key.getSide().getOpposite().equals(pos.getSide())) {
                 Map<String, Object> data = new HashMap<>();
-                for (Map.Entry<String, Argument> e : args.entrySet()) {
-                    data.put(e.getKey(), e.getValue().getValue());
+                for (Key<?> k : params.getKeys()) {
+                    data.put(k.getName(), params.get(k));
                 }
                 channels[channel].getConnectors().get(key).getConnectorSettings().update(data);
                 networkDirty();
@@ -515,38 +522,38 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     }
 
     @Override
-    public boolean execute(EntityPlayerMP playerMP, String command, Map<String, Argument> args) {
-        boolean rc = super.execute(playerMP, command, args);
+    public boolean execute(EntityPlayerMP playerMP, String command, TypedMap params) {
+        boolean rc = super.execute(playerMP, command, params);
         if (rc) {
             return true;
         }
         if (CMD_CREATECHANNEL.equals(command)) {
-            int index = args.get("index").getInteger();
-            String typeId = args.get("type").getString();
+            int index = params.get(PARAM_INDEX);
+            String typeId = params.get(PARAM_TYPE);
             createChannel(index, typeId);
             return true;
         } else if (CMD_CREATECONNECTOR.equals(command)) {
-            int channel = args.get("channel").getInteger();
-            SidedPos pos = new SidedPos(args.get("pos").getCoordinate(), EnumFacing.VALUES[args.get("side").getInteger()]);
+            int channel = params.get(PARAM_CHANNEL);
+            SidedPos pos = new SidedPos(params.get(PARAM_POS), EnumFacing.VALUES[params.get(PARAM_SIDE)]);
             createConnector(channel, pos);
             return true;
         } else if (CMD_REMOVECHANNEL.equals(command)) {
-            int index = args.get("index").getInteger();
+            int index = params.get(PARAM_INDEX);
             removeChannel(index);
             return true;
         } else if (CMD_REMOVECONNECTOR.equals(command)) {
-            SidedPos pos = new SidedPos(args.get("pos").getCoordinate(), EnumFacing.VALUES[args.get("side").getInteger()]);
-            int channel = args.get("channel").getInteger();
+            SidedPos pos = new SidedPos(params.get(PARAM_POS), EnumFacing.VALUES[params.get(PARAM_SIDE)]);
+            int channel = params.get(PARAM_CHANNEL);
             removeConnector(channel, pos);
             return true;
         } else if (CMD_UPDATECONNECTOR.equals(command)) {
-            SidedPos pos = new SidedPos(args.get("pos").getCoordinate(), EnumFacing.VALUES[args.get("side").getInteger()]);
-            int channel = args.get("channel").getInteger();
-            updateConnector(channel, pos, args);
+            SidedPos pos = new SidedPos(params.get(PARAM_POS), EnumFacing.VALUES[params.get(PARAM_SIDE)]);
+            int channel = params.get(PARAM_CHANNEL);
+            updateConnector(channel, pos, params);
             return true;
         } else if (CMD_UPDATECHANNEL.equals(command)) {
-            int channel = args.get("channel").getInteger();
-            updateChannel(channel, args);
+            int channel = params.get(PARAM_CHANNEL);
+            updateChannel(channel, params);
             return true;
         }
         return false;
