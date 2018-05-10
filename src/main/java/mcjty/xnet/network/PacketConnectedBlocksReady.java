@@ -1,7 +1,7 @@
 package mcjty.xnet.network;
 
 import io.netty.buffer.ByteBuf;
-import mcjty.lib.network.ClientCommandHandler;
+import mcjty.lib.network.IClientCommandHandler;
 import mcjty.lib.network.PacketListFromServer;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.typed.Type;
@@ -43,7 +43,7 @@ public class PacketConnectedBlocksReady extends PacketListFromServer<PacketConne
 
         private void handle(PacketConnectedBlocksReady message, MessageContext ctx) {
             TileEntity te = XNet.proxy.getClientWorld().getTileEntity(message.pos);
-            ClientCommandHandler clientCommandHandler = (ClientCommandHandler) te;
+            IClientCommandHandler clientCommandHandler = (IClientCommandHandler) te;
             if (!clientCommandHandler.execute(message.command, message.list, Type.create(ConnectedBlockClientInfo.class))) {
                 Logging.log("Command " + message.command + " was not handled!");
             }
