@@ -87,14 +87,14 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
 
 
     private Panel initLocalChannelListPanel() {
-        localChannelList = new WidgetList(mc, this).addSelectionEvent(new DefaultSelectionEvent() {
+        localChannelList = new WidgetList(mc, this).setName("localchannel").addSelectionEvent(new DefaultSelectionEvent() {
             @Override
             public void select(Widget parent, int index) {
 //                setSelectedBlock(index);
             }
         });
         localChannelList.setPropagateEventsToChildren(true);
-        Slider listSlider = new Slider(mc, this).setDesiredWidth(10).setVertical().setScrollable(localChannelList);
+        Slider listSlider = new Slider(mc, this).setDesiredWidth(10).setVertical().setScrollableName("localchannel");
         return new Panel(mc, this)
                 .setLayout(new HorizontalLayout().setHorizontalMargin(3).setSpacing(1))
                 .addChild(localChannelList)
@@ -103,14 +103,14 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
     }
 
     private Panel initRemoteChannelListPanel() {
-        remoteChannelList = new WidgetList(mc, this).addSelectionEvent(new DefaultSelectionEvent() {
+        remoteChannelList = new WidgetList(mc, this).setName("remotechannel").addSelectionEvent(new DefaultSelectionEvent() {
             @Override
             public void select(Widget parent, int index) {
 //                setSelectedBlock(index);
             }
         });
 //        localChannelList.setPropagateEventsToChildren(true);
-        Slider listSlider = new Slider(mc, this).setDesiredWidth(10).setVertical().setScrollable(remoteChannelList);
+        Slider listSlider = new Slider(mc, this).setDesiredWidth(10).setVertical().setScrollableName("remotechannel");
         return new Panel(mc, this)
                 .setLayout(new HorizontalLayout().setHorizontalMargin(3).setSpacing(1))
                 .addChild(remoteChannelList)

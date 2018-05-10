@@ -137,7 +137,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     }
 
     private Panel initConnectorListPanel() {
-        connectorList = new WidgetList(mc, this).addSelectionEvent(new DefaultSelectionEvent() {
+        connectorList = new WidgetList(mc, this).setName("connectors").addSelectionEvent(new DefaultSelectionEvent() {
             @Override
             public void select(Widget parent, int index) {
             }
@@ -148,7 +148,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
             }
         });
         connectorList.setPropagateEventsToChildren(true);
-        Slider listSlider = new Slider(mc, this).setDesiredWidth(10).setVertical().setScrollable(connectorList);
+        Slider listSlider = new Slider(mc, this).setDesiredWidth(10).setVertical().setScrollableName("connectors");
         return new Panel(mc, this)
                 .setLayout(new HorizontalLayout().setHorizontalMargin(3).setSpacing(1))
                 .addChild(connectorList)
