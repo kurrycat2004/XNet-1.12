@@ -1,8 +1,8 @@
 package mcjty.xnet.blocks.generic;
 
-import mcjty.lib.container.GenericBlock;
-import mcjty.lib.container.GenericItemBlock;
-import mcjty.lib.entity.GenericTileEntity;
+import mcjty.lib.blocks.GenericBlock;
+import mcjty.lib.blocks.GenericItemBlock;
+import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.xnet.XNet;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;

@@ -1,7 +1,7 @@
 package mcjty.xnet.gui;
 
 import mcjty.lib.container.EmptyContainer;
-import mcjty.lib.container.GenericBlock;
+import mcjty.lib.blocks.GenericBlock;
 import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.blocks.cables.ConnectorTileEntity;
 import mcjty.xnet.blocks.cables.GuiConnector;

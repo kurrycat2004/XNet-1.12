@@ -3,7 +3,7 @@ package mcjty.xnet.blocks.generic;
 import mcjty.lib.McJtyRegister;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
 import mcjty.lib.compat.waila.WailaInfoProvider;
-import mcjty.lib.container.DamageMetadataItemBlock;
+import mcjty.lib.blocks.DamageMetadataItemBlock;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.ProbeMode;
