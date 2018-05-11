@@ -1,12 +1,16 @@
 package mcjty.xnet;
 
 
+import mcjty.lib.McJtyLib;
 import mcjty.lib.base.ModBase;
+import mcjty.lib.compat.MainCompatHandler;
 import mcjty.xnet.api.IXNet;
 import mcjty.xnet.apiimpl.XNetApi;
 import mcjty.xnet.commands.CommandCheck;
 import mcjty.xnet.commands.CommandDump;
 import mcjty.xnet.commands.CommandRebuild;
+import mcjty.xnet.compat.TOPSupport;
+import mcjty.xnet.compat.WAILASupport;
 import mcjty.xnet.items.manual.GuiXNetManual;
 import mcjty.xnet.multiblock.XNetBlobData;
 import mcjty.xnet.proxy.CommonProxy;
@@ -65,9 +69,15 @@ public class XNet implements ModBase {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event){
+        McJtyLib.registerMod(this);
+
         logger = event.getModLog();
         rftools = Loader.isModLoaded("rftools");
         redstoneflux = Loader.isModLoaded("redstoneflux");
+
+        MainCompatHandler.registerWaila();
+        MainCompatHandler.registerTOP();
+
         proxy.preInit(event);
     }
 
@@ -119,4 +129,13 @@ public class XNet implements ModBase {
         }
     }
 
+    @Override
+    public void handleTopExtras() {
+        TOPSupport.registerTopExtras();
+    }
+
+    @Override
+    public void handleWailaExtras() {
+        WAILASupport.registerWailaExtras();
+    }
 }

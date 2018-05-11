@@ -235,6 +235,8 @@ public abstract class GenericCableBlock extends Block implements WailaInfoProvid
     public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data) {
         WorldBlob worldBlob = XNetBlobData.getBlobData(world).getWorldBlob(world);
 
+
+
         if (mode == ProbeMode.DEBUG) {
             BlobId blobId = worldBlob.getBlobAt(data.getPos());
             if (blobId != null) {
