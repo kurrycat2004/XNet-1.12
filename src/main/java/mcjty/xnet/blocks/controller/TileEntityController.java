@@ -136,6 +136,13 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     }
 
     public void setNetworkId(NetworkId networkId) {
+        if (networkId == null && this.networkId == null) {
+            return;
+        }
+        if (networkId != null && networkId.equals(this.networkId)) {
+            return;
+        }
+        networkChecker = null;
         this.networkId = networkId;
         markDirtyQuick();
     }
