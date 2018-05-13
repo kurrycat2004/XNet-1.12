@@ -53,7 +53,7 @@ public class PacketChannelsReady extends PacketListFromServer<PacketChannelsRead
         private void handle(PacketChannelsReady message, MessageContext ctx) {
             TileEntity te = XNet.proxy.getClientWorld().getTileEntity(message.pos);
             IClientCommandHandler clientCommandHandler = (IClientCommandHandler) te;
-            if (!clientCommandHandler.execute(message.command, message.list, Type.create(ChannelClientInfo.class))) {
+            if (!clientCommandHandler.receiveListFromServer(message.command, message.list, Type.create(ChannelClientInfo.class))) {
                 Logging.log("Command " + message.command + " was not handled!");
             }
         }
