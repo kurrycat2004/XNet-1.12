@@ -44,7 +44,7 @@ public class PacketConnectedBlocksReady extends PacketListFromServer<PacketConne
         private void handle(PacketConnectedBlocksReady message, MessageContext ctx) {
             TileEntity te = XNet.proxy.getClientWorld().getTileEntity(message.pos);
             IClientCommandHandler clientCommandHandler = (IClientCommandHandler) te;
-            if (!clientCommandHandler.execute(message.command, message.list, Type.create(ConnectedBlockClientInfo.class))) {
+            if (!clientCommandHandler.receiveListFromServer(message.command, message.list, Type.create(ConnectedBlockClientInfo.class))) {
                 Logging.log("Command " + message.command + " was not handled!");
             }
         }
