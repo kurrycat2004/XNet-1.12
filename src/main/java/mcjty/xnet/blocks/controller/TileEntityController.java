@@ -1,10 +1,15 @@
 package mcjty.xnet.blocks.controller;
 
+import mcjty.lib.container.ContainerFactory;
 import mcjty.lib.tileentity.GenericEnergyReceiverTileEntity;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.BlockPosTools;
+import mcjty.theoneprobe.api.IProbeHitData;
+import mcjty.theoneprobe.api.IProbeInfo;
+import mcjty.theoneprobe.api.ProbeMode;
+import mcjty.theoneprobe.api.TextStyleClass;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.api.channels.IConnectorSettings;
@@ -24,10 +29,11 @@ import mcjty.xnet.clientinfo.ConnectorInfo;
 import mcjty.xnet.config.GeneralConfiguration;
 import mcjty.xnet.logic.ChannelInfo;
 import mcjty.xnet.logic.LogicTools;
-import mcjty.xnet.multiblock.NetworkChecker;
-import mcjty.xnet.multiblock.WorldBlob;
-import mcjty.xnet.multiblock.XNetBlobData;
+import mcjty.xnet.multiblock.*;
+import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -38,6 +44,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.Optional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -64,6 +71,15 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     public static final Key<Integer> PARAM_CHANNEL = new Key<>("channel", Type.INTEGER);
     public static final Key<Integer> PARAM_SIDE = new Key<>("side", Type.INTEGER);
     public static final Key<BlockPos> PARAM_POS = new Key<>("pos", Type.BLOCKPOS);
+
+    public static final PropertyBool ERROR = PropertyBool.create("error");
+
+    public static final ContainerFactory CONTAINER_FACTORY = new ContainerFactory() {
+        @Override
+        protected void setup() {
+            layoutPlayerInventorySlots(91, 157);
+        }
+    };
 
     private NetworkId networkId;
 
@@ -595,4 +611,111 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         }
         return false;
     }
+
+    @Override
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+        super.onBlockPlacedBy(world, pos, state, placer, stack);
+        findNeighbourConnector(world, pos);
+    }
+
+    @Override
+    public void onBlockBreak(World workd, BlockPos pos, IBlockState state) {
+        super.onBlockBreak(workd, pos, state);
+        XNetBlobData blobData = XNetBlobData.getBlobData(world);
+        WorldBlob worldBlob = blobData.getWorldBlob(world);
+        worldBlob.removeCableSegment(pos);
+        blobData.save(world);
+    }
+
+    @Override
+    @Optional.Method(modid = "theoneprobe")
+    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data) {
+        super.addProbeInfo(mode, probeInfo, player, world, blockState, data);
+
+        WorldBlob worldBlob = XNetBlobData.getBlobData(world).getWorldBlob(world);
+
+        NetworkId networkId = getNetworkId();
+        if (networkId != null) {
+            if (mode == ProbeMode.DEBUG) {
+                probeInfo.text(TextStyleClass.LABEL + "Network: " + TextStyleClass.INFO + networkId.getId() + ", V: " +
+                        worldBlob.getNetworkVersion(networkId));
+            } else {
+                probeInfo.text(TextStyleClass.LABEL + "Network: " + TextStyleClass.INFO + networkId.getId());
+            }
+        }
+
+        if (mode == ProbeMode.DEBUG) {
+            String s = "";
+            for (NetworkId id : getNetworkChecker().getAffectedNetworks()) {
+                s += id.getId() + " ";
+                if (s.length() > 15) {
+                    probeInfo.text(TextStyleClass.LABEL + "InfNet: " + TextStyleClass.INFO + s);
+                    s = "";
+                }
+            }
+            if (!s.isEmpty()) {
+                probeInfo.text(TextStyleClass.LABEL + "InfNet: " + TextStyleClass.INFO + s);
+            }
+        }
+        if (inError()) {
+            probeInfo.text(TextStyleClass.ERROR + "Too many controllers on network!");
+        }
+
+        if (mode == ProbeMode.DEBUG) {
+            BlobId blobId = worldBlob.getBlobAt(data.getPos());
+            if (blobId != null) {
+                probeInfo.text(TextStyleClass.LABEL + "Blob: " + TextStyleClass.INFO + blobId.getId());
+            }
+            ColorId colorId = worldBlob.getColorAt(data.getPos());
+            if (colorId != null) {
+                probeInfo.text(TextStyleClass.LABEL + "Color: " + TextStyleClass.INFO + colorId.getId());
+            }
+        }
+    }
+
+    @Override
+    public IBlockState getActualState(IBlockState state) {
+        return state.withProperty(ERROR, inError());
+    }
+
+    @Override
+    public void checkRedstone(World world, BlockPos pos) {
+        // We abuse the redstone check for something else
+        if (!world.isRemote) {
+            findNeighbourConnector(world, pos);
+        }
+    }
+
+    // Check neighbour blocks for a connector and inherit the color from that
+    private void findNeighbourConnector(World world, BlockPos pos) {
+        XNetBlobData blobData = XNetBlobData.getBlobData(world);
+        WorldBlob worldBlob = blobData.getWorldBlob(world);
+        ColorId oldColor = worldBlob.getColorAt(pos);
+        ColorId newColor = null;
+        for (EnumFacing facing : EnumFacing.VALUES) {
+            if (world.getBlockState(pos.offset(facing)).getBlock() instanceof ConnectorBlock) {
+                ColorId color = worldBlob.getColorAt(pos.offset(facing));
+                if (color != null) {
+                    if (color == oldColor) {
+                        return; // Nothing to do
+                    }
+                    newColor = color;
+                }
+            }
+        }
+        if (newColor != null) {
+            if (worldBlob.getBlobAt(pos) != null) {
+                worldBlob.removeCableSegment(pos);
+            }
+            NetworkId networkId = worldBlob.newNetwork();
+            worldBlob.createNetworkProvider(pos, newColor, networkId);
+            blobData.save(world);
+
+            TileEntity te = world.getTileEntity(pos);
+            if (te instanceof TileEntityController) {
+                ((TileEntityController) te).setNetworkId(networkId);
+            }
+        }
+    }
+
 }

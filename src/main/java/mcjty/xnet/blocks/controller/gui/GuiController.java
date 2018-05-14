@@ -1,14 +1,15 @@
 package mcjty.xnet.blocks.controller.gui;
 
 import mcjty.lib.base.StyleConfig;
-import mcjty.lib.gui.GenericGuiContainer;
-import mcjty.lib.tileentity.GenericEnergyStorageTileEntity;
 import mcjty.lib.client.RenderHelper;
+import mcjty.lib.container.GenericContainer;
+import mcjty.lib.gui.GenericGuiContainer;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.DefaultSelectionEvent;
 import mcjty.lib.gui.layout.HorizontalLayout;
 import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.gui.widgets.*;
+import mcjty.lib.tileentity.GenericEnergyStorageTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.BlockPosTools;
 import mcjty.lib.varia.Logging;
@@ -17,7 +18,6 @@ import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.api.keys.SidedPos;
-import mcjty.xnet.blocks.controller.ControllerContainer;
 import mcjty.xnet.blocks.controller.TileEntityController;
 import mcjty.xnet.clientinfo.ChannelClientInfo;
 import mcjty.xnet.clientinfo.ConnectedBlockClientInfo;
@@ -75,7 +75,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     public static List<ConnectedBlockClientInfo> fromServer_connectedBlocks = null;
     private boolean needsRefresh = true;
 
-    public GuiController(TileEntityController controller, ControllerContainer container) {
+    public GuiController(TileEntityController controller, GenericContainer container) {
         super(XNet.instance, XNetMessages.INSTANCE, controller, container, GuiProxy.GUI_MANUAL_XNET, "controller");
 
         xSize = WIDTH;

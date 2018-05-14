@@ -40,14 +40,6 @@ public class RedstoneProxyBlock extends Block {
         super(materialIn);
     }
 
-    public static boolean activateBlock(Block block, World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        return block.onBlockActivated(world, pos, state, player, hand, facing, hitX, hitY, hitZ);
-    }
-
-    public static Collection<IProperty<?>> getPropertyKeys(IBlockState state) {
-        return state.getPropertyKeys();
-    }
-
     @SideOnly(Side.CLIENT)
     public void initModel() {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
