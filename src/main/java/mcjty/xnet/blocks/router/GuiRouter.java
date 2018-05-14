@@ -1,6 +1,6 @@
 package mcjty.xnet.blocks.router;
 
-import mcjty.lib.container.EmptyContainer;
+import mcjty.lib.container.GenericContainer;
 import mcjty.lib.gui.GenericGuiContainer;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.DefaultSelectionEvent;
@@ -41,7 +41,7 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
     private boolean needsRefresh = true;
     private int listDirty;
 
-    public GuiRouter(TileEntityRouter router, EmptyContainer container) {
+    public GuiRouter(TileEntityRouter router, GenericContainer container) {
         super(XNet.instance, XNetMessages.INSTANCE, router, container, GuiProxy.GUI_MANUAL_XNET, "router");
 
         xSize = WIDTH;
