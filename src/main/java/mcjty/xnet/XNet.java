@@ -12,7 +12,6 @@ import mcjty.xnet.commands.CommandRebuild;
 import mcjty.xnet.compat.TOPSupport;
 import mcjty.xnet.compat.WAILASupport;
 import mcjty.xnet.items.manual.GuiXNetManual;
-import mcjty.xnet.multiblock.XNetBlobData;
 import mcjty.xnet.proxy.CommonProxy;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -91,11 +90,11 @@ public class XNet implements ModBase {
         proxy.postInit(e);
     }
 
-    @Mod.EventHandler
-    public void serverStopped(FMLServerStoppedEvent event) {
-        XNetBlobData.clearInstance();
-    }
-
+//    @Mod.EventHandler
+//    public void serverStopped(FMLServerStoppedEvent event) {
+//        XNetBlobData.clearInstance();
+//    }
+//
     @Mod.EventHandler
     public void serverLoad(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandDump());

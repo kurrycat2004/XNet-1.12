@@ -1,18 +1,17 @@
 package mcjty.xnet.multiblock;
 
+import mcjty.lib.worlddata.AbstractWorldData;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.WorldSavedData;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
-public class XNetBlobData extends WorldSavedData {
+public class XNetBlobData extends AbstractWorldData<XNetBlobData> {
 
-    public static final String NAME = "XNetBlobData";
-    private static XNetBlobData instance = null;
+    private static final String NAME = "XNetBlobData";
 
     private final Map<Integer, WorldBlob> worldBlobMap = new HashMap<>();
 
@@ -20,31 +19,15 @@ public class XNetBlobData extends WorldSavedData {
         super(identifier);
     }
 
-    public void save(World world) {
-        world.setData(NAME, this);
-        markDirty();
+    @Override
+    public void clear() {
+        worldBlobMap.clear();
     }
 
-    public static void clearInstance() {
-        if (instance != null) {
-            instance.worldBlobMap.clear();
-            instance = null;
-        }
-    }
 
     @Nonnull
     public static XNetBlobData getBlobData(World world) {
-        if (world.isRemote) {
-            throw new RuntimeException("Don't access this client-side!");
-        }
-        if (instance != null) {
-            return instance;
-        }
-        instance = (XNetBlobData) world.loadData(XNetBlobData.class, NAME);
-        if (instance == null) {
-            instance = new XNetBlobData(NAME);
-        }
-        return instance;
+        return getData(world, XNetBlobData.class, NAME);
     }
 
     public WorldBlob getWorldBlob(World world) {
