@@ -285,7 +285,7 @@ public abstract class GenericCableBlock extends Block implements WailaInfoProvid
         WorldBlob worldBlob = blobData.getWorldBlob(world);
         CableColor color = world.getBlockState(pos).getValue(COLOR);
         worldBlob.createCableSegment(pos, new ColorId(color.ordinal()+1));
-        blobData.save(world);
+        blobData.save();
     }
 
     @Override
@@ -299,7 +299,7 @@ public abstract class GenericCableBlock extends Block implements WailaInfoProvid
             XNetBlobData blobData = XNetBlobData.getBlobData(world);
             WorldBlob worldBlob = blobData.getWorldBlob(world);
             worldBlob.removeCableSegment(pos);
-            blobData.save(world);
+            blobData.save();
         }
     }
 

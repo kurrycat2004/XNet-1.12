@@ -15,15 +15,14 @@ public class XNetBlobData extends AbstractWorldData<XNetBlobData> {
 
     private final Map<Integer, WorldBlob> worldBlobMap = new HashMap<>();
 
-    public XNetBlobData(String identifier) {
-        super(identifier);
+    public XNetBlobData(String name) {
+        super(name);
     }
 
     @Override
     public void clear() {
         worldBlobMap.clear();
     }
-
 
     @Nonnull
     public static XNetBlobData getBlobData(World world) {

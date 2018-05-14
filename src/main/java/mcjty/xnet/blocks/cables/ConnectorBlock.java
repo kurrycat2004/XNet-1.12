@@ -433,7 +433,7 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
         WorldBlob worldBlob = blobData.getWorldBlob(world);
         CableColor color = world.getBlockState(pos).getValue(COLOR);
         worldBlob.createNetworkConsumer(pos, new ColorId(color.ordinal()+1), consumer);
-        blobData.save(world);
+        blobData.save();
     }
 
     public static boolean isAdvancedConnector(World world, BlockPos pos) {

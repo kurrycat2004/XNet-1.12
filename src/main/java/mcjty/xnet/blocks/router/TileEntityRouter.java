@@ -350,7 +350,7 @@ public final class TileEntityRouter extends GenericTileEntity {
         XNetBlobData blobData = XNetBlobData.getBlobData(world);
         WorldBlob worldBlob = blobData.getWorldBlob(world);
         worldBlob.removeCableSegment(pos);
-        blobData.save(world);
+        blobData.save();
     }
 
     @Override
@@ -360,7 +360,7 @@ public final class TileEntityRouter extends GenericTileEntity {
         WorldBlob worldBlob = blobData.getWorldBlob(world);
         NetworkId networkId = worldBlob.newNetwork();
         worldBlob.createNetworkProvider(pos, new ColorId(CableColor.ROUTING.ordinal()+1), networkId);
-        blobData.save(world);
+        blobData.save();
     }
 
     @Override

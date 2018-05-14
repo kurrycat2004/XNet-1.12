@@ -624,7 +624,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         XNetBlobData blobData = XNetBlobData.getBlobData(world);
         WorldBlob worldBlob = blobData.getWorldBlob(world);
         worldBlob.removeCableSegment(pos);
-        blobData.save(world);
+        blobData.save();
     }
 
     @Override
@@ -709,7 +709,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             }
             NetworkId networkId = worldBlob.newNetwork();
             worldBlob.createNetworkProvider(pos, newColor, networkId);
-            blobData.save(world);
+            blobData.save();
 
             TileEntity te = world.getTileEntity(pos);
             if (te instanceof TileEntityController) {
