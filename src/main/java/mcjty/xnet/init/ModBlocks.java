@@ -13,6 +13,7 @@ import mcjty.xnet.blocks.redstoneproxy.RedstoneProxyBlock;
 import mcjty.xnet.blocks.redstoneproxy.RedstoneProxyUBlock;
 import mcjty.xnet.blocks.router.GuiRouter;
 import mcjty.xnet.blocks.router.TileEntityRouter;
+import mcjty.xnet.blocks.wireless.TileEntityWirelessRouter;
 import mcjty.xnet.gui.GuiProxy;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraftforge.fml.relauncher.Side;
@@ -22,6 +23,8 @@ public class ModBlocks {
 
     public static GenericBlock<TileEntityController, GenericContainer> controllerBlock;
     public static GenericBlock<TileEntityRouter, GenericContainer> routerBlock;
+    public static GenericBlock<TileEntityWirelessRouter, GenericContainer> wirelessRouterBlock;
+
     public static FacadeBlock facadeBlock;
     public static RedstoneProxyBlock redstoneProxyBlock;
     public static RedstoneProxyUBlock redstoneProxyUBlock;
@@ -52,6 +55,13 @@ public class ModBlocks {
                 .info("message.xnet.shiftmessage")
                 .infoExtended("message.xnet.router")
                 .build();
+        wirelessRouterBlock = builderFactory.<TileEntityWirelessRouter> builder("wireless_router")
+                .tileEntityClass(TileEntityWirelessRouter.class)
+                .emptyContainer()
+                .guiId(GuiProxy.GUI_WIRELESS_ROUTER)
+                .info("message.xnet.shiftmessage")
+                .infoExtended("message.xnet.wireless_router")
+                .build();
 
         NetCableSetup.init();
     }
@@ -63,6 +73,9 @@ public class ModBlocks {
 
         routerBlock.initModel();
         routerBlock.setGuiClass(GuiRouter.class);
+
+        wirelessRouterBlock.initModel();
+        wirelessRouterBlock.setGuiClass(null);  // @todo
 
         facadeBlock.initModel();
         redstoneProxyBlock.initModel();

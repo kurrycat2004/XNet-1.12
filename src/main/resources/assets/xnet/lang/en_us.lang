@@ -40,6 +40,10 @@ itemGroup.XNet=XNet
 message.xnet.router=\
     @fWith this block you can connect\n\
     @fmultiple channels (controllers)
+message.xnet.wireless_router=\
+    @fWith this block you can connect\n\
+    @fmultiple channels remotely\n\
+    @fThis needs an antenna!
 message.xnet.controller=\
     @fThe base block for automation\n\
     @fin XNet
