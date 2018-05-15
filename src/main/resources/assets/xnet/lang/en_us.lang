@@ -35,6 +35,7 @@ tile.xnet.redstone_proxy_upd.name=Redstone Proxy (update)
 
 tile.xnet.controller.name=Controller
 tile.xnet.router.name=Router
+tile.xnet.wireless_router.name=Wireless Router
 itemGroup.XNet=XNet
 
 message.xnet.router=\

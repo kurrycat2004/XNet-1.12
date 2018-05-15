@@ -347,20 +347,24 @@ public final class TileEntityRouter extends GenericTileEntity {
     @Override
     public void onBlockBreak(World workd, BlockPos pos, IBlockState state) {
         super.onBlockBreak(workd, pos, state);
-        XNetBlobData blobData = XNetBlobData.getBlobData(world);
-        WorldBlob worldBlob = blobData.getWorldBlob(world);
-        worldBlob.removeCableSegment(pos);
-        blobData.save();
+        if (!world.isRemote) {
+            XNetBlobData blobData = XNetBlobData.getBlobData(world);
+            WorldBlob worldBlob = blobData.getWorldBlob(world);
+            worldBlob.removeCableSegment(pos);
+            blobData.save();
+        }
     }
 
     @Override
     public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
         super.onBlockPlacedBy(world, pos, state, placer, stack);
-        XNetBlobData blobData = XNetBlobData.getBlobData(world);
-        WorldBlob worldBlob = blobData.getWorldBlob(world);
-        NetworkId networkId = worldBlob.newNetwork();
-        worldBlob.createNetworkProvider(pos, new ColorId(CableColor.ROUTING.ordinal()+1), networkId);
-        blobData.save();
+        if (!world.isRemote) {
+            XNetBlobData blobData = XNetBlobData.getBlobData(world);
+            WorldBlob worldBlob = blobData.getWorldBlob(world);
+            NetworkId networkId = worldBlob.newNetwork();
+            worldBlob.createNetworkProvider(pos, new ColorId(CableColor.ROUTING.ordinal() + 1), networkId);
+            blobData.save();
+        }
     }
 
     @Override

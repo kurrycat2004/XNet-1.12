@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import mcjty.lib.McJtyLibClient;
 import mcjty.lib.font.TrueTypeFont;
 import mcjty.xnet.RenderWorldLastEventHandler;
+import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.generic.BakedModelLoader;
 import mcjty.xnet.init.ModBlocks;
 import mcjty.xnet.init.ModItems;
@@ -14,6 +15,7 @@ import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -30,7 +32,7 @@ public class ClientProxy extends CommonProxy {
     public void preInit(FMLPreInitializationEvent e) {
         super.preInit(e);
         MinecraftForge.EVENT_BUS.register(this);
-//        OBJLoader.INSTANCE.addDomain(RFTools.MODID);
+        OBJLoader.INSTANCE.addDomain(XNet.MODID);
         ModelLoaderRegistry.registerLoader(new BakedModelLoader());
         McJtyLibClient.preInit(e);
     }

@@ -1,6 +1,8 @@
 package mcjty.xnet.init;
 
+import mcjty.lib.blocks.BaseBlock;
 import mcjty.lib.blocks.GenericBlock;
+import mcjty.lib.builder.BaseBlockBuilder;
 import mcjty.lib.builder.BlockFlags;
 import mcjty.lib.builder.GenericBlockBuilderFactory;
 import mcjty.lib.container.GenericContainer;
@@ -25,6 +27,9 @@ public class ModBlocks {
     public static GenericBlock<TileEntityRouter, GenericContainer> routerBlock;
     public static GenericBlock<TileEntityWirelessRouter, GenericContainer> wirelessRouterBlock;
 
+    public static BaseBlock antennaBlock;
+    public static BaseBlock antennaBaseBlock;
+
     public static FacadeBlock facadeBlock;
     public static RedstoneProxyBlock redstoneProxyBlock;
     public static RedstoneProxyUBlock redstoneProxyUBlock;
@@ -32,7 +37,7 @@ public class ModBlocks {
     public static GenericBlockBuilderFactory builderFactory;
 
     public static void init() {
-        builderFactory = new GenericBlockBuilderFactory(XNet.instance);
+        builderFactory = new GenericBlockBuilderFactory(XNet.instance).creativeTabs(XNet.tabXNet);
 
         facadeBlock = new FacadeBlock();
         redstoneProxyBlock = new RedstoneProxyBlock();
@@ -63,6 +68,17 @@ public class ModBlocks {
                 .infoExtended("message.xnet.wireless_router")
                 .build();
 
+        antennaBlock = new BaseBlockBuilder<BaseBlockBuilder>(XNet.instance, "antenna")
+                .rotationType(BaseBlock.RotationType.NONE)
+                .flags(BlockFlags.NON_OPAQUE)
+                .creativeTabs(XNet.tabXNet)
+                .build();
+        antennaBaseBlock = new BaseBlockBuilder<BaseBlockBuilder>(XNet.instance, "antenna_base")
+                .rotationType(BaseBlock.RotationType.NONE)
+                .flags(BlockFlags.NON_OPAQUE)
+                .creativeTabs(XNet.tabXNet)
+                .build();
+
         NetCableSetup.init();
     }
 
@@ -76,6 +92,9 @@ public class ModBlocks {
 
         wirelessRouterBlock.initModel();
         wirelessRouterBlock.setGuiClass(null);  // @todo
+
+        antennaBlock.initModel();
+        antennaBaseBlock.initModel();
 
         facadeBlock.initModel();
         redstoneProxyBlock.initModel();
