@@ -30,40 +30,40 @@ public class GeneralConfiguration {
 
     public static void init(Configuration cfg) {
 
-        controllerMaxRF = cfg.getInt(CATEGORY_GENERAL, "controllerMaxRF", controllerMaxRF, 1, 1000000000,
+        controllerMaxRF = cfg.getInt("controllerMaxRF", CATEGORY_GENERAL, controllerMaxRF, 1, 1000000000,
                 "Maximum RF the controller can store");
-        controllerRfPerTick = cfg.getInt(CATEGORY_GENERAL, "controllerRfPerTick", controllerRfPerTick, 1, 1000000000,
+        controllerRfPerTick = cfg.getInt("controllerRfPerTick", CATEGORY_GENERAL, controllerRfPerTick, 1, 1000000000,
                 "Maximum RF the controller can receive per tick");
-        wirelessRouterMaxRF = cfg.getInt(CATEGORY_GENERAL, "wirelessRouterMaxRF", wirelessRouterMaxRF, 1, 1000000000,
+        wirelessRouterMaxRF = cfg.getInt("wirelessRouterMaxRF", CATEGORY_GENERAL, wirelessRouterMaxRF, 1, 1000000000,
                 "Maximum RF the wireless router can store");
-        wirelessRouterRfPerTick = cfg.getInt(CATEGORY_GENERAL, "wirelessRouterRfPerTick", wirelessRouterRfPerTick, 1, 1000000000,
+        wirelessRouterRfPerTick = cfg.getInt("wirelessRouterRfPerTick", CATEGORY_GENERAL, wirelessRouterRfPerTick, 1, 1000000000,
                 "Maximum RF the wireless router can receive per tick");
-        wirelessRouterRfPerChannel = cfg.getInt(CATEGORY_GENERAL, "wirelessRouterRfPerChannel", wirelessRouterRfPerChannel, 0, 1000000000,
+        wirelessRouterRfPerChannel = cfg.getInt("wirelessRouterRfPerChannel", CATEGORY_GENERAL, wirelessRouterRfPerChannel, 0, 1000000000,
                 "Maximum RF per tick the wireless router needs to publish a channel");
 
-        maxRfConnector = cfg.getInt(CATEGORY_GENERAL, "maxRfConnector", maxRfConnector, 1, 1000000000,
+        maxRfConnector = cfg.getInt("maxRfConnector", CATEGORY_GENERAL, maxRfConnector, 1, 1000000000,
                 "Maximum RF the normal connector can store");
-        maxRfAdvancedConnector = cfg.getInt(CATEGORY_GENERAL, "maxRfAdvancedConnector", maxRfAdvancedConnector, 1, 1000000000,
+        maxRfAdvancedConnector = cfg.getInt("maxRfAdvancedConnector", CATEGORY_GENERAL, maxRfAdvancedConnector, 1, 1000000000,
                 "Maximum RF the advanced connector can store");
-        maxRfRateNormal = cfg.getInt(CATEGORY_GENERAL, "maxRfRateNormal", maxRfRateNormal, 1, 1000000000,
+        maxRfRateNormal = cfg.getInt("maxRfRateNormal", CATEGORY_GENERAL, maxRfRateNormal, 1, 1000000000,
                 "Maximum RF/rate that a normal connector can input or output");
-        maxRfRateAdvanced = cfg.getInt(CATEGORY_GENERAL, "maxRfRateAdvanced", maxRfRateAdvanced, 1, 1000000000,
+        maxRfRateAdvanced = cfg.getInt("maxRfRateAdvanced", CATEGORY_GENERAL, maxRfRateAdvanced, 1, 1000000000,
                 "Maximum RF/rate that an advanced connector can input or output");
-        maxFluidRateNormal = cfg.getInt(CATEGORY_GENERAL, "maxFluidRateNormal", maxFluidRateNormal, 1, 1000000000,
+        maxFluidRateNormal = cfg.getInt("maxFluidRateNormal", CATEGORY_GENERAL, maxFluidRateNormal, 1, 1000000000,
                 "Maximum fluid per operation that a normal connector can input or output");
-        maxFluidRateAdvanced = cfg.getInt(CATEGORY_GENERAL, "maxFluidRateAdvanced", maxFluidRateAdvanced, 1, 1000000000,
+        maxFluidRateAdvanced = cfg.getInt("maxFluidRateAdvanced", CATEGORY_GENERAL, maxFluidRateAdvanced, 1, 1000000000,
                 "Maximum fluid per operation that an advanced connector can input or output");
 
-        maxPublishedChannels = cfg.getInt(CATEGORY_GENERAL, "maxPublishedChannels", maxPublishedChannels, 1, 1000000000,
+        maxPublishedChannels = cfg.getInt("maxPublishedChannels", CATEGORY_GENERAL, maxPublishedChannels, 1, 1000000000,
                 "Maximum number of published channels that a routing channel can support");
 
-        controllerRFT = cfg.getInt(CATEGORY_GENERAL, "controllerRFPerTick", controllerRFT, 0, 1000000000,
+        controllerRFT = cfg.getInt("controllerRFPerTick", CATEGORY_GENERAL, controllerRFT, 0, 1000000000,
                 "Power usage for the controller regardless of what it is doing");
-        controllerChannelRFT = cfg.getInt(CATEGORY_GENERAL, "controllerChannelRFT", controllerChannelRFT, 0, 1000000000,
+        controllerChannelRFT = cfg.getInt("controllerChannelRFT", CATEGORY_GENERAL, controllerChannelRFT, 0, 1000000000,
                 "Power usage for the controller per active channel");
-        controllerOperationRFT = cfg.getInt(CATEGORY_GENERAL, "controllerOperationRFT", controllerOperationRFT, 0, 1000000000,
+        controllerOperationRFT = cfg.getInt("controllerOperationRFT", CATEGORY_GENERAL, controllerOperationRFT, 0, 1000000000,
                 "Power usage for the controller per operation performed by one of the channels");
-        showNonFacadedCablesWhileSneaking = cfg.getBoolean(CATEGORY_GENERAL, "showNonFacadedCablesWhileSneaking", showNonFacadedCablesWhileSneaking,
+        showNonFacadedCablesWhileSneaking = cfg.getBoolean("showNonFacadedCablesWhileSneaking", CATEGORY_GENERAL, showNonFacadedCablesWhileSneaking,
                 "If true then cables are also shown when sneaking even if they are not in a facade");
 
     }
