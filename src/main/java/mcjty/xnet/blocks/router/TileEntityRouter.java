@@ -210,8 +210,12 @@ public final class TileEntityRouter extends GenericTileEntity {
             NetworkId networkId = findRoutingNetwork();
             if (networkId != null) {
                 LogicTools.consumers(getWorld(), networkId)
-                        .forEach(consumerPos -> LogicTools.routers(getWorld(), consumerPos)
-                                .forEach(router -> router.addConnectorsFromConnectedNetworks(connectors, publishedName, type)));
+                        .forEach(consumerPos -> {
+                            LogicTools.routers(world, consumerPos)
+                                    .forEach(router -> router.addConnectorsFromConnectedNetworks(connectors, publishedName, type));
+                            LogicTools.wirelessRouters(world, consumerPos)
+                                    .forEach(router -> router.addWirelessConnectors(connectors, publishedName, type));
+                        });
             } else {
                 // If there is no routing network that means we have a local network only
                 addConnectorsFromConnectedNetworks(connectors, publishedName, type);
@@ -219,7 +223,7 @@ public final class TileEntityRouter extends GenericTileEntity {
         }
     }
 
-    private void addConnectorsFromConnectedNetworks(Map<SidedConsumer, IConnectorSettings> connectors, String channelName, IChannelType type) {
+    public void addConnectorsFromConnectedNetworks(Map<SidedConsumer, IConnectorSettings> connectors, String channelName, IChannelType type) {
         LogicTools.connectors(getWorld(), getPos())
                 .map(connectorPos -> LogicTools.getControllerForConnector(getWorld(), connectorPos))
                 .filter(Objects::nonNull)

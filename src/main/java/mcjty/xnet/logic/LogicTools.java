@@ -7,6 +7,7 @@ import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.blocks.controller.TileEntityController;
 import mcjty.xnet.blocks.router.TileEntityRouter;
+import mcjty.xnet.blocks.wireless.TileEntityWirelessRouter;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
 import net.minecraft.tileentity.TileEntity;
@@ -69,7 +70,12 @@ public class LogicTools {
 
     // All routers from a given position
     public static Stream<TileEntityRouter> routers(@Nonnull World world, @Nonnull BlockPos pos) {
-        return new RouterIterator(world, pos).stream();
+        return new RouterIterator<>(world, pos, TileEntityRouter.class).stream();
+    }
+
+    // All wireless routers from a given position
+    public static Stream<TileEntityWirelessRouter> wirelessRouters(@Nonnull World world, @Nonnull BlockPos pos) {
+        return new RouterIterator<>(world, pos, TileEntityWirelessRouter.class).stream();
     }
 
     // Return all connected blocks that have an actual connector defined in a channel

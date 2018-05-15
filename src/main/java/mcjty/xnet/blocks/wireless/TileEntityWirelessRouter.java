@@ -1,11 +1,15 @@
 package mcjty.xnet.blocks.wireless;
 
 import mcjty.lib.tileentity.GenericEnergyReceiverTileEntity;
+import mcjty.lib.varia.GlobalCoordinate;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.ProbeMode;
 import mcjty.theoneprobe.api.TextStyleClass;
+import mcjty.xnet.api.channels.IChannelType;
+import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.keys.NetworkId;
+import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.blocks.generic.CableColor;
 import mcjty.xnet.blocks.router.TileEntityRouter;
 import mcjty.xnet.config.GeneralConfiguration;
@@ -20,12 +24,16 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.Optional;
 
 import javax.annotation.Nullable;
+import java.util.Map;
 import java.util.Set;
 
 public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEntity implements ITickable {
@@ -67,12 +75,31 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
     }
 
     private void publishChannels(TileEntityRouter router, NetworkId networkId) {
+        // @todo bug: Multiple wireless routers have same channel name and end up with only one entry in the wireless data
         XNetWirelessChannels blobData = XNetWirelessChannels.getWirelessChannels(world);
         for (String channel : router.getPublishedChannels()) {
             blobData.publishChannel(channel, world.provider.getDimension(),
                     pos, networkId);
         }
     }
+
+    public void addWirelessConnectors(Map<SidedConsumer, IConnectorSettings> connectors, String channelName, IChannelType type) {
+        // @todo test if wireless router is active/no error/enough power
+        XNetWirelessChannels.WirelessChannelInfo info = XNetWirelessChannels.getWirelessChannels(world).findChannel(channelName);
+        if (info != null) {
+            // @todo channels should match on type too!
+            // @todo check if other side is chunkloaded
+            GlobalCoordinate pos = info.getWirelessRouterPos();
+            WorldServer otherWorld = DimensionManager.getWorld(pos.getDimension());
+            TileEntity otherTE = otherWorld.getTileEntity(pos.getCoordinate());
+            if (otherTE instanceof TileEntityWirelessRouter) {
+                TileEntityWirelessRouter otherRouter = (TileEntityWirelessRouter) otherTE;
+                LogicTools.routers(otherWorld, pos.getCoordinate()).
+                        forEach(router -> router.addConnectorsFromConnectedNetworks(connectors, channelName, type));
+            }
+        }
+    }
+
 
     private void setError(boolean err) {
         if (error != err) {

@@ -35,7 +35,7 @@ public class ForgeEventHandlers {
             cnt = AMOUNT;
 
             XNetWirelessChannels data = XNetWirelessChannels.getWirelessChannels(event.world);
-            data.tick(AMOUNT);
+            data.tick(event.world, AMOUNT);
         }
     }
 }

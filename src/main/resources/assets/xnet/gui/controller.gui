@@ -1,5 +1,5 @@
 window {
-    size(336,236)
+    size(256,236)
     sidesize(80,0)
     panel('','positional') {
         bg1('xnet:textures/gui/sidegui.png')

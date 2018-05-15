@@ -16,6 +16,7 @@ import mcjty.xnet.blocks.generic.GenericCableBakedModel;
 import mcjty.xnet.blocks.generic.GenericCableBlock;
 import mcjty.xnet.blocks.redstoneproxy.RedstoneProxyBlock;
 import mcjty.xnet.blocks.router.TileEntityRouter;
+import mcjty.xnet.blocks.wireless.TileEntityWirelessRouter;
 import mcjty.xnet.config.GeneralConfiguration;
 import mcjty.xnet.gui.GuiProxy;
 import mcjty.xnet.init.ModBlocks;
@@ -280,7 +281,7 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
         if (te == null) {
             return false;
         }
-        if (te instanceof TileEntityRouter) {
+        if (te instanceof TileEntityRouter || te instanceof TileEntityWirelessRouter) {
             return true;
         }
         return false;

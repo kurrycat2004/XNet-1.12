@@ -75,6 +75,10 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
         return getData(world, XNetWirelessChannels.class, NAME);
     }
 
+    public WirelessChannelInfo findChannel(String name) {
+        return channelToWireless.get(name);
+    }
+
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         channelToWireless.clear();

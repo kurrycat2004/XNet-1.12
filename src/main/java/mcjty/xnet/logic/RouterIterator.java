@@ -1,5 +1,6 @@
 package mcjty.xnet.logic;
 
+import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.xnet.blocks.router.TileEntityRouter;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -13,21 +14,23 @@ import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class RouterIterator implements Iterator<TileEntityRouter> {
+public class RouterIterator<T extends GenericTileEntity> implements Iterator<T> {
 
     @Nonnull private final World world;
     @Nonnull private final BlockPos pos;
+    @Nonnull private final Class<T> clazz;
 
     private int facingIdx = 0;
-    private TileEntityRouter foundRouter = null;
+    private T foundRouter = null;
 
-    Stream<TileEntityRouter> stream() {
+    Stream<T> stream() {
         return StreamSupport.stream(Spliterators.spliterator(this, EnumFacing.VALUES.length, Spliterator.ORDERED), false);
     }
 
-    RouterIterator(@Nonnull World world, @Nonnull BlockPos pos) {
+    RouterIterator(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull Class<T> clazz) {
         this.world = world;
         this.pos = pos;
+        this.clazz = clazz;
         findNext();
     }
 
@@ -40,8 +43,8 @@ public class RouterIterator implements Iterator<TileEntityRouter> {
                 facingIdx = -1;
             }
             TileEntity te = world.getTileEntity(routerPos);
-            if (te instanceof TileEntityRouter) {
-                foundRouter = (TileEntityRouter) te;
+            if (clazz.isInstance(te)) {
+                foundRouter = (T) te;
                 return;
             }
         }
@@ -53,8 +56,8 @@ public class RouterIterator implements Iterator<TileEntityRouter> {
     }
 
     @Override
-    public TileEntityRouter next() {
-        TileEntityRouter f = foundRouter;
+    public T next() {
+        T f = foundRouter;
         findNext();
         return f;
     }
