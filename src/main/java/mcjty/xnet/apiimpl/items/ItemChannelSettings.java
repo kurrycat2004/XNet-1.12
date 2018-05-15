@@ -19,6 +19,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -34,6 +35,8 @@ import java.util.*;
 import java.util.function.Predicate;
 
 public class ItemChannelSettings extends DefaultChannelSettings implements IChannelSettings {
+
+    public static final ResourceLocation iconGuiElements = new ResourceLocation(XNet.MODID, "textures/gui/guielements.png");
 
     public static final String TAG_MODE = "mode";
 
@@ -522,7 +525,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
     @Nullable
     @Override
     public IndicatorIcon getIndicatorIcon() {
-        return new IndicatorIcon(GuiController.iconGuiElements, 0, 80, 11, 10);
+        return new IndicatorIcon(iconGuiElements, 0, 80, 11, 10);
     }
 
     @Nullable

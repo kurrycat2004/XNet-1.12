@@ -1,6 +1,7 @@
 package mcjty.xnet.apiimpl.fluids;
 
 import mcjty.lib.varia.WorldTools;
+import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelSettings;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.channels.IControllerContext;
@@ -13,6 +14,7 @@ import mcjty.xnet.config.GeneralConfiguration;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
@@ -29,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 
 public class FluidChannelSettings extends DefaultChannelSettings implements IChannelSettings {
+
+    public static final ResourceLocation iconGuiElements = new ResourceLocation(XNet.MODID, "textures/gui/guielements.png");
 
     public static final String TAG_MODE = "mode";
 
@@ -287,7 +291,7 @@ public class FluidChannelSettings extends DefaultChannelSettings implements ICha
     @Nullable
     @Override
     public IndicatorIcon getIndicatorIcon() {
-        return new IndicatorIcon(GuiController.iconGuiElements, 22, 80, 11, 10);
+        return new IndicatorIcon(iconGuiElements, 22, 80, 11, 10);
     }
 
     @Nullable

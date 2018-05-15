@@ -5,7 +5,6 @@ import mcjty.lib.client.RenderHelper;
 import mcjty.lib.container.GenericContainer;
 import mcjty.lib.gui.GenericGuiContainer;
 import mcjty.lib.gui.Window;
-import mcjty.lib.gui.events.DefaultSelectionEvent;
 import mcjty.lib.gui.layout.HorizontalLayout;
 import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.gui.widgets.*;
@@ -33,17 +32,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import org.lwjgl.input.Mouse;
 
-import java.awt.Rectangle;
 import java.util.List;
 
 import static mcjty.xnet.blocks.controller.TileEntityController.*;
 import static mcjty.xnet.logic.ChannelInfo.MAX_CHANNELS;
 
 public class GuiController extends GenericGuiContainer<TileEntityController> {
-
-    public static final int SIDEWIDTH = 80;
-    public static final int WIDTH = 256;
-    public static final int HEIGHT = 236;
 
     public static final String TAG_ENABLED = "enabled";
     public static final String TAG_NAME = "name";
@@ -66,10 +60,6 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
 
     private EnergyBar energyBar;
 
-    public static final ResourceLocation iconGuiElements = new ResourceLocation(XNet.MODID, "textures/gui/guielements.png");
-    private static final ResourceLocation mainBackground = new ResourceLocation(XNet.MODID, "textures/gui/controller.png");
-    private static final ResourceLocation sideBackground = new ResourceLocation(XNet.MODID, "textures/gui/sidegui.png");
-
     // From server.
     public static List<ChannelClientInfo> fromServer_channels = null;
     public static List<ConnectedBlockClientInfo> fromServer_connectedBlocks = null;
@@ -77,32 +67,15 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
 
     public GuiController(TileEntityController controller, GenericContainer container) {
         super(XNet.instance, XNetMessages.INSTANCE, controller, container, GuiProxy.GUI_MANUAL_XNET, "controller");
-
-        xSize = WIDTH;
-        ySize = HEIGHT;
     }
 
     @Override
     public void initGui() {
+        window = new Window(this, tileEntity, XNetMessages.INSTANCE, new ResourceLocation(XNet.MODID, "gui/controller.gui"));
         super.initGui();
 
-        Panel toplevel = new Panel(mc, this).setLayout(new PositionalLayout())
-                .setBackgrounds(sideBackground, mainBackground)
-                .setBackgroundLayout(true, SIDEWIDTH);
-        toplevel.setBounds(new Rectangle(guiLeft-SIDEWIDTH, guiTop, xSize+SIDEWIDTH, ySize));
-
-        initEnergyBar();
-        searchBar = new TextField(mc, this).setLayoutHint(new PositionalLayout.PositionalHint(5, 21, 163, 14));
-        searchBar.addTextEvent((parent, newText) -> needsRefresh = true );
-        Panel listPanel = initConnectorListPanel();
-        Panel channelSelectionPanel = initChannelSelectionPanel();
-        initEditPanels();
-
-        toplevel.addChild(channelSelectionPanel).addChild(listPanel).addChild(channelEditPanel).addChild(connectorEditPanel)
-                .addChild(searchBar)
-                .addChild(energyBar);
-
-        window = new Window(this, toplevel);
+        initializeFields();
+        setupEvents();
 
         editingConnector = null;
         editingChannel = -1;
@@ -110,50 +83,34 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         refresh();
         listDirty = 0;
 
-        int currentRF = GenericEnergyStorageTileEntity.getCurrentRF();
-        energyBar.setValue(currentRF);
         tileEntity.requestRfFromServer(XNet.MODID);
     }
 
-    private void initEnergyBar() {
-        int maxEnergyStored = tileEntity.getMaxEnergyStored();
-        energyBar = new EnergyBar(mc, this)
-                .setHorizontal()
-                .setMaxValue(maxEnergyStored)
-                .setLayoutHint(new PositionalLayout.PositionalHint(5, 7, 35, 11))
-                .setShowText(false);
-        energyBar.setValue(GenericEnergyStorageTileEntity.getCurrentRF());
+    private void setupEvents() {
+        window.event("searchbar", (source, params) -> { needsRefresh = true; });
+        for (int i = 0 ; i < MAX_CHANNELS ; i++) {
+            String channel = "channel" + (i+1);
+            int finalI = i;
+            window.event(channel, (source, params) -> selectChannelEditor(finalI));
+        }
     }
 
-    private void initEditPanels() {
-        channelEditPanel = new Panel(mc, this).setLayout(new PositionalLayout())
-                .setFilledRectThickness(-1)
-                .setFilledBackground(StyleConfig.colorListBackground)
-                .setLayoutHint(new PositionalLayout.PositionalHint(171, 5, 161, 37));
-        connectorEditPanel = new Panel(mc, this).setLayout(new PositionalLayout())
-                .setFilledRectThickness(-1)
-                .setFilledBackground(StyleConfig.colorListBackground)
-                .setLayoutHint(new PositionalLayout.PositionalHint(171, 45, 161, 108));
-    }
+    private void initializeFields() {
+        channelEditPanel = window.findChild("channeleditpanel");
+        connectorEditPanel = window.findChild("connectoreditpanel");
 
-    private Panel initConnectorListPanel() {
-        connectorList = new WidgetList(mc, this).setName("connectors").addSelectionEvent(new DefaultSelectionEvent() {
-            @Override
-            public void select(Widget parent, int index) {
-            }
+        searchBar = window.findChild("searchbar");
+        connectorList = window.findChild("connectors");
 
-            @Override
-            public void doubleClick(Widget parent, int index) {
-                hilightSelectedContainer(index);
-            }
-        });
-        connectorList.setPropagateEventsToChildren(true);
-        Slider listSlider = new Slider(mc, this).setDesiredWidth(10).setVertical().setScrollableName("connectors");
-        return new Panel(mc, this)
-                .setLayout(new HorizontalLayout().setHorizontalMargin(3).setSpacing(1))
-                .addChild(connectorList)
-                .addChild(listSlider)
-                .setLayoutHint(new PositionalLayout.PositionalHint(2, 36, 169, 198));
+        for (int i = 0 ; i < MAX_CHANNELS ; i++) {
+            String name = "channel" + (i+1);
+            channelButtons[i] = window.findChild(name);
+        }
+
+        int currentRF = GenericEnergyStorageTileEntity.getCurrentRF();
+        energyBar = window.findChild("energybar");
+        energyBar.setMaxValue(tileEntity.getMaxEnergyStored());
+        energyBar.setValue(currentRF);
     }
 
     private void hilightSelectedContainer(int index) {
@@ -166,24 +123,6 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
             Logging.message(mc.player, "The block is now highlighted");
             mc.player.closeScreen();
         }
-    }
-
-    private Panel initChannelSelectionPanel() {
-        Panel channelSelectionPanel = new Panel(mc, this)
-                .setLayout(new HorizontalLayout().setHorizontalMargin(0).setSpacing(0))
-                .setLayoutHint(new PositionalLayout.PositionalHint(41, 1, 124, 24));
-        for (int i = 0 ; i < MAX_CHANNELS ; i++) {
-            String channel = String.valueOf(i + 1);
-            channelButtons[i] = new ToggleButton(mc, this).setDesiredWidth(14)
-                    .setText(channel)
-                    .setTooltips("Edit channel " + channel);
-            int finalI = i;
-            channelButtons[i].addButtonEvent(parent -> {
-                selectChannelEditor(finalI);
-            });
-            channelSelectionPanel.addChild(channelButtons[i]);
-        }
-        return channelSelectionPanel;
     }
 
     private void selectChannelEditor(int finalI) {

@@ -1,6 +1,7 @@
 package mcjty.xnet.apiimpl.logic;
 
 import mcjty.lib.varia.WorldTools;
+import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelSettings;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.channels.IControllerContext;
@@ -13,6 +14,7 @@ import mcjty.xnet.blocks.controller.gui.GuiController;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.tuple.Pair;
@@ -23,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 public class LogicChannelSettings extends DefaultChannelSettings implements IChannelSettings {
+
+    public static final ResourceLocation iconGuiElements = new ResourceLocation(XNet.MODID, "textures/gui/guielements.png");
 
     private int delay = 0;
     private int colors = 0;     // Colors for this channel
@@ -162,7 +166,7 @@ public class LogicChannelSettings extends DefaultChannelSettings implements ICha
     @Nullable
     @Override
     public IndicatorIcon getIndicatorIcon() {
-        return new IndicatorIcon(GuiController.iconGuiElements, 11, 90, 11, 10);
+        return new IndicatorIcon(iconGuiElements, 11, 90, 11, 10);
     }
 
     @Nullable

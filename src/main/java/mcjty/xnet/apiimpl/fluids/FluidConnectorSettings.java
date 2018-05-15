@@ -2,6 +2,7 @@ package mcjty.xnet.apiimpl.fluids;
 
 import com.google.common.collect.ImmutableSet;
 import mcjty.lib.varia.FluidTools;
+import mcjty.xnet.XNet;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.helper.AbstractConnectorSettings;
@@ -10,6 +11,7 @@ import mcjty.xnet.config.GeneralConfiguration;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
 
 import javax.annotation.Nonnull;
@@ -18,6 +20,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class FluidConnectorSettings extends AbstractConnectorSettings {
+
+    public static final ResourceLocation iconGuiElements = new ResourceLocation(XNet.MODID, "textures/gui/guielements.png");
 
     public static final String TAG_MODE = "mode";
     public static final String TAG_RATE = "rate";
@@ -73,9 +77,9 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
     public IndicatorIcon getIndicatorIcon() {
         switch (fluidMode) {
             case INS:
-                return new IndicatorIcon(GuiController.iconGuiElements, 0, 70, 13, 10);
+                return new IndicatorIcon(iconGuiElements, 0, 70, 13, 10);
             case EXT:
-                return new IndicatorIcon(GuiController.iconGuiElements, 13, 70, 13, 10);
+                return new IndicatorIcon(iconGuiElements, 13, 70, 13, 10);
         }
         return null;
     }

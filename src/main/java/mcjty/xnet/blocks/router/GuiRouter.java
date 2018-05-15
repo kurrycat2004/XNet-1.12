@@ -3,11 +3,12 @@ package mcjty.xnet.blocks.router;
 import mcjty.lib.container.GenericContainer;
 import mcjty.lib.gui.GenericGuiContainer;
 import mcjty.lib.gui.Window;
-import mcjty.lib.gui.events.DefaultSelectionEvent;
-import mcjty.lib.gui.layout.HorizontalAlignment;
 import mcjty.lib.gui.layout.HorizontalLayout;
 import mcjty.lib.gui.layout.PositionalLayout;
-import mcjty.lib.gui.widgets.*;
+import mcjty.lib.gui.widgets.Label;
+import mcjty.lib.gui.widgets.Panel;
+import mcjty.lib.gui.widgets.TextField;
+import mcjty.lib.gui.widgets.WidgetList;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.BlockPosTools;
 import mcjty.xnet.XNet;
@@ -20,19 +21,11 @@ import mcjty.xnet.network.XNetMessages;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
-import java.awt.Rectangle;
 import java.util.List;
 
 import static mcjty.xnet.blocks.router.TileEntityRouter.*;
 
 public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
-
-    public static final int SIDEWIDTH = 80;
-    public static final int WIDTH = 256;
-    public static final int HEIGHT = 236;
-
-    private static final ResourceLocation mainBackground = new ResourceLocation(XNet.MODID, "textures/gui/router.png");
-    private static final ResourceLocation sideBackground = new ResourceLocation(XNet.MODID, "textures/gui/sidegui.png");
 
     private WidgetList localChannelList;
     private WidgetList remoteChannelList;
@@ -43,26 +36,15 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
 
     public GuiRouter(TileEntityRouter router, GenericContainer container) {
         super(XNet.instance, XNetMessages.INSTANCE, router, container, GuiProxy.GUI_MANUAL_XNET, "router");
-
-        xSize = WIDTH;
-        ySize = HEIGHT;
     }
 
     @Override
     public void initGui() {
+        window = new Window(this, tileEntity, XNetMessages.INSTANCE, new ResourceLocation(XNet.MODID, "gui/router.gui"));
         super.initGui();
 
-        Panel toplevel = new Panel(mc, this).setLayout(new PositionalLayout())
-                .setBackgrounds(sideBackground, mainBackground)
-                .setBackgroundLayout(true, SIDEWIDTH);
-        toplevel.setBounds(new Rectangle(guiLeft - SIDEWIDTH, guiTop, xSize + SIDEWIDTH, ySize));
-
-        toplevel.addChild(initLocalChannelListPanel());
-        toplevel.addChild(initRemoteChannelListPanel());
-        toplevel.addChild(new Label<>(mc, this).setHorizontalAlignment(HorizontalAlignment.ALIGN_LEFT).setText("Local Channels").setColor(0xff2244aa).setLayoutHint(new PositionalLayout.PositionalHint(6, 8, 166, 13)));
-        toplevel.addChild(new Label<>(mc, this).setHorizontalAlignment(HorizontalAlignment.ALIGN_LEFT).setText("Remote Channels").setColor(0xff2244aa).setLayoutHint(new PositionalLayout.PositionalHint(172, 8, 164, 13)));
-
-        window = new Window(this, toplevel);
+        localChannelList = window.findChild("localchannels");
+        remoteChannelList = window.findChild("remotechannels");
 
         refresh();
         listDirty = 0;
@@ -85,38 +67,6 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
         requestListsIfNeeded();
     }
 
-
-    private Panel initLocalChannelListPanel() {
-        localChannelList = new WidgetList(mc, this).setName("localchannel").addSelectionEvent(new DefaultSelectionEvent() {
-            @Override
-            public void select(Widget parent, int index) {
-//                setSelectedBlock(index);
-            }
-        });
-        localChannelList.setPropagateEventsToChildren(true);
-        Slider listSlider = new Slider(mc, this).setDesiredWidth(10).setVertical().setScrollableName("localchannel");
-        return new Panel(mc, this)
-                .setLayout(new HorizontalLayout().setHorizontalMargin(3).setSpacing(1))
-                .addChild(localChannelList)
-                .addChild(listSlider)
-                .setLayoutHint(new PositionalLayout.PositionalHint(2, 28, 167, 208));
-    }
-
-    private Panel initRemoteChannelListPanel() {
-        remoteChannelList = new WidgetList(mc, this).setName("remotechannel").addSelectionEvent(new DefaultSelectionEvent() {
-            @Override
-            public void select(Widget parent, int index) {
-//                setSelectedBlock(index);
-            }
-        });
-//        localChannelList.setPropagateEventsToChildren(true);
-        Slider listSlider = new Slider(mc, this).setDesiredWidth(10).setVertical().setScrollableName("remotechannel");
-        return new Panel(mc, this)
-                .setLayout(new HorizontalLayout().setHorizontalMargin(3).setSpacing(1))
-                .addChild(remoteChannelList)
-                .addChild(listSlider)
-                .setLayoutHint(new PositionalLayout.PositionalHint(169, 28, 167, 208));
-    }
 
     private boolean listsReady() {
         return fromServer_localChannels != null && fromServer_remoteChannels != null;

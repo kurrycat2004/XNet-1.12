@@ -6,17 +6,21 @@ import mcjty.lib.gui.widgets.*;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
+import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.RSMode;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.network.XNetMessages;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public abstract class AbstractEditorPanel implements IEditorGui {
+
+    public static final ResourceLocation iconGuiElements = new ResourceLocation(XNet.MODID, "textures/gui/guielements.png");
 
     public static final int LEFTMARGIN = 3;
     public static final int TOPMARGIN = 3;
@@ -266,10 +270,10 @@ public abstract class AbstractEditorPanel implements IEditorGui {
         int w = 14;
         fitWidth(w);
         ImageChoiceLabel redstoneMode = new ImageChoiceLabel(mc, gui)
-                .addChoice("Ignored", "Redstone mode:\nIgnored", GuiController.iconGuiElements, 1, 1)
-                .addChoice("Off", "Redstone mode:\nOff to activate", GuiController.iconGuiElements, 17, 1)
-                .addChoice("On", "Redstone mode:\nOn to activate", GuiController.iconGuiElements, 33, 1)
-                .addChoice("Pulse", "Do one operation\non a pulse", GuiController.iconGuiElements, 49, 1);
+                .addChoice("Ignored", "Redstone mode:\nIgnored", iconGuiElements, 1, 1)
+                .addChoice("Off", "Redstone mode:\nOff to activate", iconGuiElements, 17, 1)
+                .addChoice("On", "Redstone mode:\nOn to activate", iconGuiElements, 33, 1)
+                .addChoice("Pulse", "Do one operation\non a pulse", iconGuiElements, 49, 1);
         switch (current) {
             case IGNORED:
                 redstoneMode.setCurrentChoice("Ignored");

@@ -688,6 +688,9 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
     // Check neighbour blocks for a connector and inherit the color from that
     private void findNeighbourConnector(World world, BlockPos pos) {
+        if (world.isRemote) {
+            return;
+        }
         XNetBlobData blobData = XNetBlobData.getBlobData(world);
         WorldBlob worldBlob = blobData.getWorldBlob(world);
         ColorId oldColor = worldBlob.getColorAt(pos);

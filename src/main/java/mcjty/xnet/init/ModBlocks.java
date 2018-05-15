@@ -68,15 +68,19 @@ public class ModBlocks {
                 .infoExtended("message.xnet.wireless_router")
                 .build();
 
-        antennaBlock = new BaseBlockBuilder<BaseBlockBuilder>(XNet.instance, "antenna")
+        antennaBlock = new BaseBlockBuilder<>(XNet.instance, "antenna")
                 .rotationType(BaseBlock.RotationType.NONE)
                 .flags(BlockFlags.NON_OPAQUE)
                 .creativeTabs(XNet.tabXNet)
+                .info("message.xnet.shiftmessage")
+                .infoExtended("message.xnet.antenna")
                 .build();
-        antennaBaseBlock = new BaseBlockBuilder<BaseBlockBuilder>(XNet.instance, "antenna_base")
+        antennaBaseBlock = new BaseBlockBuilder<>(XNet.instance, "antenna_base")
                 .rotationType(BaseBlock.RotationType.NONE)
                 .flags(BlockFlags.NON_OPAQUE)
                 .creativeTabs(XNet.tabXNet)
+                .info("message.xnet.shiftmessage")
+                .infoExtended("message.xnet.antenna_base")
                 .build();
 
         NetCableSetup.init();

@@ -38,6 +38,8 @@ tile.xnet.router.name=Router
 tile.xnet.wireless_router.name=Wireless Router
 itemGroup.XNet=XNet
 
+message.xnet.shiftmessage=<Press Shift>
+
 message.xnet.router=\
     @fWith this block you can connect\n\
     @fmultiple channels (controllers)
@@ -48,3 +50,9 @@ message.xnet.wireless_router=\
 message.xnet.controller=\
     @fThe base block for automation\n\
     @fin XNet
+message.xnet.antenna=\
+    @fPlace one or two antenna's on\n\
+    @ftop of an antenna base
+message.xnet.antenna_base=\
+    @fAn antenna base has to be placed\n\
+    @fon top of a wireless router
