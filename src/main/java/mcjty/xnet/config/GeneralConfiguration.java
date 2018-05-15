@@ -5,6 +5,12 @@ import net.minecraftforge.common.config.Configuration;
 public class GeneralConfiguration {
     public static final String CATEGORY_GENERAL = "general";
 
+    public static int controllerMaxRF = 100000;
+    public static int controllerRfPerTick = 1000;
+    public static int wirelessRouterMaxRF = 1000000;
+    public static int wirelessRouterRfPerTick = 5000;
+    public static int wirelessRouterRfPerChannel = 500;
+
     public static int maxRfConnector = 50000;
     public static int maxRfAdvancedConnector = 500000;
 
@@ -23,6 +29,17 @@ public class GeneralConfiguration {
     public static boolean showNonFacadedCablesWhileSneaking = true;
 
     public static void init(Configuration cfg) {
+
+        controllerMaxRF = cfg.getInt(CATEGORY_GENERAL, "controllerMaxRF", controllerMaxRF, 1, 1000000000,
+                "Maximum RF the controller can store");
+        controllerRfPerTick = cfg.getInt(CATEGORY_GENERAL, "controllerRfPerTick", controllerRfPerTick, 1, 1000000000,
+                "Maximum RF the controller can receive per tick");
+        wirelessRouterMaxRF = cfg.getInt(CATEGORY_GENERAL, "wirelessRouterMaxRF", wirelessRouterMaxRF, 1, 1000000000,
+                "Maximum RF the wireless router can store");
+        wirelessRouterRfPerTick = cfg.getInt(CATEGORY_GENERAL, "wirelessRouterRfPerTick", wirelessRouterRfPerTick, 1, 1000000000,
+                "Maximum RF the wireless router can receive per tick");
+        wirelessRouterRfPerChannel = cfg.getInt(CATEGORY_GENERAL, "wirelessRouterRfPerChannel", wirelessRouterRfPerChannel, 0, 1000000000,
+                "Maximum RF per tick the wireless router needs to publish a channel");
 
         maxRfConnector = cfg.getInt(CATEGORY_GENERAL, "maxRfConnector", maxRfConnector, 1, 1000000000,
                 "Maximum RF the normal connector can store");

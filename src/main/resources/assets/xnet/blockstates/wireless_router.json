@@ -14,6 +14,14 @@
       "east": {"y": 90},
       "up": {"x": -90},
       "down": {"x": 90}
+    },
+    "error": {
+      "false": {
+        "textures": { "txt": "xnet:blocks/machine_wireless_router" }
+      },
+      "true": {
+        "textures": { "txt": "xnet:blocks/machine_wireless_router_error" }
+      }
     }
   }
 }

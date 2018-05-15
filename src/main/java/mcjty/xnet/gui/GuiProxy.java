@@ -19,7 +19,6 @@ public class GuiProxy implements IGuiHandler {
     public static final int GUI_CONTROLLER = 1;
     public static final int GUI_CONNECTOR = 2;
     public static final int GUI_ROUTER = 3;
-    public static final int GUI_WIRELESS_ROUTER = 4;
 
     @Override
     public Object getServerGuiElement(int guiid, EntityPlayer entityPlayer, World world, int x, int y, int z) {

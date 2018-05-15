@@ -94,6 +94,10 @@ public final class TileEntityRouter extends GenericTileEntity {
         markDirtyClient();
     }
 
+    public Collection<String> getPublishedChannels() {
+        return publishedChannels.values();
+    }
+
     @Override
     public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet) {
         boolean oldError = inError();
@@ -139,7 +143,7 @@ public final class TileEntityRouter extends GenericTileEntity {
         super.readRestorableFromNBT(tagCompound);
         channelCount = tagCompound.getInteger("chancnt");
         NBTTagList published = tagCompound.getTagList("published", Constants.NBT.TAG_COMPOUND);
-        for (int i = 0 ; i < published.tagCount() ; i++) {
+        for (int i = 0; i < published.tagCount(); i++) {
             NBTTagCompound tc = published.getCompoundTagAt(i);
             LocalChannelId id = new LocalChannelId(BlockPosTools.readFromNBT(tc, "pos"), tc.getInteger("index"));
             String name = tc.getString("name");

@@ -63,7 +63,7 @@ public class ModBlocks {
         wirelessRouterBlock = builderFactory.<TileEntityWirelessRouter> builder("wireless_router")
                 .tileEntityClass(TileEntityWirelessRouter.class)
                 .emptyContainer()
-                .guiId(GuiProxy.GUI_WIRELESS_ROUTER)
+                .property(TileEntityWirelessRouter.ERROR)
                 .info("message.xnet.shiftmessage")
                 .infoExtended("message.xnet.wireless_router")
                 .build();
@@ -95,7 +95,6 @@ public class ModBlocks {
         routerBlock.setGuiClass(GuiRouter.class);
 
         wirelessRouterBlock.initModel();
-        wirelessRouterBlock.setGuiClass(null);  // @todo
 
         antennaBlock.initModel();
         antennaBaseBlock.initModel();
