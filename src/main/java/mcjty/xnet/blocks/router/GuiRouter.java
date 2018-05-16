@@ -111,24 +111,24 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
 
         Panel panel = new Panel(mc, this).setLayout(new PositionalLayout()).setDesiredHeight(30);
         Panel panel1 = new Panel(mc, this).setLayout(new HorizontalLayout().setHorizontalMargin(0).setSpacing(0)).setLayoutHint(new PositionalLayout.PositionalHint(0, 0, 160, 13));
-        panel1.addChild(new Label<>(mc, this).setText("Ch").setColor(0xff2244aa));
-        panel1.addChild(new Label<>(mc, this).setText(name));
-        panel1.addChild(new Label<>(mc, this).setText(">").setColor(0xff2244aa));
+        panel1.addChild(new Label(mc, this).setText("Ch").setColor(0xff2244aa));
+        panel1.addChild(new Label(mc, this).setText(name));
+        panel1.addChild(new Label(mc, this).setText(">").setColor(0xff2244aa));
         if (local) {
             TextField pubName = new TextField(mc, this).setText(publishedName).setDesiredWidth(50).setDesiredHeight(13)
                     .addTextEvent((parent, newText) -> updatePublish(controllerPos, index, newText));
             panel1.addChild(pubName);
         } else {
-            panel1.addChild(new Label<>(mc, this).setText(publishedName).setColor(0xff33ff00));
+            panel1.addChild(new Label(mc, this).setText(publishedName).setColor(0xff33ff00));
         }
 
         Panel panel2 = new Panel(mc, this).setLayout(new HorizontalLayout().setHorizontalMargin(0).setSpacing(0)).setLayoutHint(new PositionalLayout.PositionalHint(0, 13, 160, 13));
-        panel2.addChild(new Label<>(mc, this).setText("Pos").setColor(0xff2244aa));
-        panel2.addChild(new Label<>(mc, this).setText(BlockPosTools.toString(controllerPos)));
+        panel2.addChild(new Label(mc, this).setText("Pos").setColor(0xff2244aa));
+        panel2.addChild(new Label(mc, this).setText(BlockPosTools.toString(controllerPos)));
 
         Panel panel3 = new Panel(mc, this).setLayout(new HorizontalLayout().setHorizontalMargin(0).setSpacing(0)).setLayoutHint(new PositionalLayout.PositionalHint(0, 26, 160, 13));
-        panel3.addChild(new Label<>(mc, this).setText("Index").setColor(0xff2244aa));
-        panel3.addChild(new Label<>(mc, this).setText(index + " (" + type.getName() + ")"));
+        panel3.addChild(new Label(mc, this).setText("Index").setColor(0xff2244aa));
+        panel3.addChild(new Label(mc, this).setText(index + " (" + type.getName() + ")"));
 
         panel.addChild(panel1).addChild(panel2).addChild(panel3);
         return panel;
