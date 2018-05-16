@@ -179,6 +179,7 @@ public final class TileEntityRouter extends GenericTileEntity {
 
     @Nonnull
     private List<ControllerChannelClientInfo> findRemoteChannelInfo() {
+        // @todo, list wireless channels
         List<ControllerChannelClientInfo> list = new ArrayList<>();
         NetworkId networkId = findRoutingNetwork();
         if (networkId != null) {

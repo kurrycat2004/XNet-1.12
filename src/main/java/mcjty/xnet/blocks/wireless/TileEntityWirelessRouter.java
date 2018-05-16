@@ -78,6 +78,7 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
         // @todo bug: Multiple wireless routers have same channel name and end up with only one entry in the wireless data
         XNetWirelessChannels blobData = XNetWirelessChannels.getWirelessChannels(world);
         for (String channel : router.getPublishedChannels()) {
+            System.out.println("channel = " + channel);
             blobData.publishChannel(channel, world.provider.getDimension(),
                     pos, networkId);
         }
@@ -89,13 +90,24 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
         if (info != null) {
             // @todo channels should match on type too!
             // @todo check if other side is chunkloaded
-            GlobalCoordinate pos = info.getWirelessRouterPos();
-            WorldServer otherWorld = DimensionManager.getWorld(pos.getDimension());
-            TileEntity otherTE = otherWorld.getTileEntity(pos.getCoordinate());
-            if (otherTE instanceof TileEntityWirelessRouter) {
-                TileEntityWirelessRouter otherRouter = (TileEntityWirelessRouter) otherTE;
-                LogicTools.routers(otherWorld, pos.getCoordinate()).
-                        forEach(router -> router.addConnectorsFromConnectedNetworks(connectors, channelName, type));
+            for (Map.Entry<GlobalCoordinate, XNetWirelessChannels.WirelessRouterInfo> entry : info.getRouters().entrySet()) {
+                GlobalCoordinate routerPos = entry.getKey();
+                // Don't this for our own wireless router
+                if (routerPos.getDimension() != world.provider.getDimension() || !routerPos.getCoordinate().equals(pos)) {
+                    WorldServer otherWorld = DimensionManager.getWorld(routerPos.getDimension());
+                    TileEntity otherTE = otherWorld.getTileEntity(routerPos.getCoordinate());
+                    if (otherTE instanceof TileEntityWirelessRouter) {
+                        TileEntityWirelessRouter otherRouter = (TileEntityWirelessRouter) otherTE;
+                        NetworkId routingNetwork = otherRouter.findRoutingNetwork();
+                        if (routingNetwork != null) {
+                            LogicTools.consumers(getWorld(), routingNetwork)
+                                    .forEach(consumerPos -> {
+                                        LogicTools.routers(otherWorld, consumerPos).
+                                                forEach(router -> router.addConnectorsFromConnectedNetworks(connectors, channelName, type));
+                                    });
+                        }
+                    }
+                }
             }
         }
     }
@@ -126,7 +138,7 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
     }
 
     @Nullable
-    private NetworkId findRoutingNetwork() {
+    public NetworkId findRoutingNetwork() {
         WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
         return LogicTools.routingConnectors(getWorld(), getPos())
                 .findFirst()
