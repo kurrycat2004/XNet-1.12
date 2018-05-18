@@ -151,9 +151,7 @@ public final class TileEntityRouter extends GenericTileEntity {
         }
     }
 
-    @Nonnull
-    private List<ControllerChannelClientInfo> findLocalChannelInfo(boolean onlyPublished) {
-        List<ControllerChannelClientInfo> list = new ArrayList<>();
+    public void findLocalChannelInfo(List<ControllerChannelClientInfo> list, boolean onlyPublished, boolean remote) {
         LogicTools.connectors(getWorld(), getPos())
                 .map(connectorPos -> LogicTools.getControllerForConnector(getWorld(), connectorPos))
                 .filter(Objects::nonNull)
@@ -167,28 +165,26 @@ public final class TileEntityRouter extends GenericTileEntity {
                                 publishedName = "";
                             }
                             if ((!onlyPublished) || !publishedName.isEmpty()) {
-                                ControllerChannelClientInfo ci = new ControllerChannelClientInfo(channelInfo.getChannelName(), publishedName, controller.getPos(), channelInfo.getType(), i);
+                                ControllerChannelClientInfo ci = new ControllerChannelClientInfo(channelInfo.getChannelName(), publishedName, controller.getPos(), channelInfo.getType(), remote, i);
                                 list.add(ci);
                             }
                         }
                     }
                 });
-
-        return list;
     }
 
-    @Nonnull
-    private List<ControllerChannelClientInfo> findRemoteChannelInfo() {
-        // @todo, list wireless channels
-        List<ControllerChannelClientInfo> list = new ArrayList<>();
+    private void findRemoteChannelInfo(List<ControllerChannelClientInfo> list) {
         NetworkId networkId = findRoutingNetwork();
         if (networkId != null) {
-            LogicTools.consumers(getWorld(), networkId)
-                    .forEach(consumerPos -> LogicTools.routers(getWorld(), consumerPos)
-                            .filter(r -> r != this)
-                            .forEach(router -> list.addAll(router.findLocalChannelInfo(true))));
+            LogicTools.consumers(world, networkId)
+                    .forEach(consumerPos -> {
+                        LogicTools.routers(world, consumerPos)
+                                .filter(r -> r != this)
+                                .forEach(router -> router.findLocalChannelInfo(list, true, false));
+                        LogicTools.wirelessRouters(world, consumerPos)
+                                .forEach(router -> router.findRemoteChannelInfo(list));
+                    });
         }
-        return list;
     }
 
     @Nullable
@@ -298,9 +294,13 @@ public final class TileEntityRouter extends GenericTileEntity {
             return rc;
         }
         if (CMD_GETCHANNELS.equals(command)) {
-            return type.convert(findLocalChannelInfo(false));
+            List<ControllerChannelClientInfo> list = new ArrayList<>();
+            findLocalChannelInfo(list, false, false);
+            return type.convert(list);
         } else if (CMD_GETREMOTECHANNELS.equals(command)) {
-            return type.convert(findRemoteChannelInfo());
+            List<ControllerChannelClientInfo> list = new ArrayList<>();
+            findRemoteChannelInfo(list);
+            return type.convert(list);
         }
         return Collections.emptyList();
     }

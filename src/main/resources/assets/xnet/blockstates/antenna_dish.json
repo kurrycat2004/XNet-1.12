@@ -9,7 +9,27 @@
   "variants": {
     "normal": [{}],
     "inventory": [{
-      "transform": { }
-    }]
+      "transform": {
+        "gui": {
+          "scale": 0.65,
+          "rotation": [ { "x": 15 }, { "y": 45 } ]
+        },
+        "ground": {
+          "scale": 0.45
+        },
+        "firstperson": {
+          "scale": 0.45
+        },
+        "thirdperson": {
+          "scale": 0.45
+        }
+      }
+    }],
+    "facing": {
+      "north": {},
+      "south": {"y": 180},
+      "west": {"y": 270},
+      "east": {"y": 90}
+    }
   }
 }

@@ -111,9 +111,14 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
 
         Panel panel = new Panel(mc, this).setLayout(new PositionalLayout()).setDesiredHeight(30);
         Panel panel1 = new Panel(mc, this).setLayout(new HorizontalLayout().setHorizontalMargin(0).setSpacing(0)).setLayoutHint(new PositionalLayout.PositionalHint(0, 0, 160, 13));
-        panel1.addChild(new Label(mc, this).setText("Ch").setColor(0xff2244aa));
+        int labelColor = 0xff2244aa;
+        // @todo, better way to show remote channels
+        if (channel.isRemote()) {
+            labelColor = 0xffaa1133;
+        }
+        panel1.addChild(new Label(mc, this).setText("Ch").setColor(labelColor));
         panel1.addChild(new Label(mc, this).setText(name));
-        panel1.addChild(new Label(mc, this).setText(">").setColor(0xff2244aa));
+        panel1.addChild(new Label(mc, this).setText(">").setColor(labelColor));
         if (local) {
             TextField pubName = new TextField(mc, this).setText(publishedName).setDesiredWidth(50).setDesiredHeight(13)
                     .addTextEvent((parent, newText) -> updatePublish(controllerPos, index, newText));
@@ -123,11 +128,11 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
         }
 
         Panel panel2 = new Panel(mc, this).setLayout(new HorizontalLayout().setHorizontalMargin(0).setSpacing(0)).setLayoutHint(new PositionalLayout.PositionalHint(0, 13, 160, 13));
-        panel2.addChild(new Label(mc, this).setText("Pos").setColor(0xff2244aa));
+        panel2.addChild(new Label(mc, this).setText("Pos").setColor(labelColor));
         panel2.addChild(new Label(mc, this).setText(BlockPosTools.toString(controllerPos)));
 
         Panel panel3 = new Panel(mc, this).setLayout(new HorizontalLayout().setHorizontalMargin(0).setSpacing(0)).setLayoutHint(new PositionalLayout.PositionalHint(0, 26, 160, 13));
-        panel3.addChild(new Label(mc, this).setText("Index").setColor(0xff2244aa));
+        panel3.addChild(new Label(mc, this).setText("Index").setColor(labelColor));
         panel3.addChild(new Label(mc, this).setText(index + " (" + type.getName() + ")"));
 
         panel.addChild(panel1).addChild(panel2).addChild(panel3);

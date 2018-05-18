@@ -58,7 +58,9 @@ message.xnet.controller=\
     @fin XNet
 message.xnet.antenna=\
     @fPlace one or two antenna's on\n\
-    @ftop of an antenna base
+    @ftop of an antenna base.\n\
+    @6One antenna: range %s blocks\n\
+    @6Two antennas: range %s blocks
 message.xnet.antenna_base=\
     @fAn antenna base has to be placed\n\
     @fon top of a wireless router

@@ -15,7 +15,9 @@ import mcjty.xnet.blocks.redstoneproxy.RedstoneProxyBlock;
 import mcjty.xnet.blocks.redstoneproxy.RedstoneProxyUBlock;
 import mcjty.xnet.blocks.router.GuiRouter;
 import mcjty.xnet.blocks.router.TileEntityRouter;
+import mcjty.xnet.blocks.wireless.GuiWirelessRouter;
 import mcjty.xnet.blocks.wireless.TileEntityWirelessRouter;
+import mcjty.xnet.config.GeneralConfiguration;
 import mcjty.xnet.gui.GuiProxy;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraftforge.fml.relauncher.Side;
@@ -64,17 +66,20 @@ public class ModBlocks {
         wirelessRouterBlock = builderFactory.<TileEntityWirelessRouter> builder("wireless_router")
                 .tileEntityClass(TileEntityWirelessRouter.class)
                 .emptyContainer()
+                .guiId(GuiProxy.GUI_WIRELESS_ROUTER)
                 .property(TileEntityWirelessRouter.ERROR)
                 .info("message.xnet.shiftmessage")
                 .infoExtended("message.xnet.wireless_router")
                 .build();
 
         antennaBlock = new BaseBlockBuilder<>(XNet.instance, "antenna")
-                .rotationType(BaseBlock.RotationType.NONE)
+                .rotationType(BaseBlock.RotationType.HORIZROTATION)
                 .flags(BlockFlags.NON_OPAQUE)
                 .creativeTabs(XNet.tabXNet)
                 .info("message.xnet.shiftmessage")
                 .infoExtended("message.xnet.antenna")
+                .infoExtendedParameter(stack -> Integer.toString(GeneralConfiguration.antennaTier1Range))
+                .infoExtendedParameter(stack -> Integer.toString(GeneralConfiguration.antennaTier2Range))
                 .build();
         antennaBaseBlock = new BaseBlockBuilder<>(XNet.instance, "antenna_base")
                 .rotationType(BaseBlock.RotationType.NONE)
@@ -84,7 +89,7 @@ public class ModBlocks {
                 .infoExtended("message.xnet.antenna_base")
                 .build();
         antennaDishBlock = new BaseBlockBuilder<>(XNet.instance, "antenna_dish")
-                .rotationType(BaseBlock.RotationType.NONE)
+                .rotationType(BaseBlock.RotationType.HORIZROTATION)
                 .flags(BlockFlags.NON_OPAQUE)
                 .creativeTabs(XNet.tabXNet)
                 .info("message.xnet.shiftmessage")
@@ -103,6 +108,7 @@ public class ModBlocks {
         routerBlock.setGuiClass(GuiRouter.class);
 
         wirelessRouterBlock.initModel();
+        wirelessRouterBlock.setGuiClass(GuiWirelessRouter.class);
 
         antennaBlock.initModel();
         antennaBaseBlock.initModel();

@@ -3,6 +3,7 @@ package mcjty.xnet.multiblock;
 import mcjty.lib.varia.BlockPosTools;
 import mcjty.lib.varia.GlobalCoordinate;
 import mcjty.lib.worlddata.AbstractWorldData;
+import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.api.keys.NetworkId;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -12,10 +13,8 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nonnull;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import javax.annotation.Nullable;
+import java.util.*;
 
 public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels> {
 
@@ -34,7 +33,7 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
 
     private int cnt = 30;
 
-    public void publishChannel(String channel, int dimension, BlockPos wirelessRouterPos, NetworkId network) {
+    public void publishChannel(String channel, @Nullable UUID ownerUUID, int dimension, BlockPos wirelessRouterPos, NetworkId network) {
         WirelessChannelInfo channelInfo;
         if (channelToWireless.containsKey(channel)) {
             channelInfo = channelToWireless.get(channel);
@@ -51,6 +50,7 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
         }
         info.setAge(0);
         info.setNetworkId(network);
+        info.setOwnerID(ownerUUID);
         save();
 
         cnt--;
@@ -68,7 +68,7 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
             for (Map.Entry<GlobalCoordinate, WirelessRouterInfo> infoEntry : channelInfo.getRouters().entrySet()) {
                 GlobalCoordinate pos = infoEntry.getKey();
                 WirelessRouterInfo info = infoEntry.getValue();
-                System.out.println("    Pos = " + BlockPosTools.toString(pos.getCoordinate()) + " (age " + info.age + ", net " + info.networkId.getId() + ")");
+                System.out.println("    Pos = " + BlockPosTools.toString(pos.getCoordinate()) + " (age " + info.age + ", net " + info.networkId.getId() + ", owner " + info.getOwnerID() + ")");
             }
         }
     }
@@ -142,6 +142,9 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
             WirelessRouterInfo info = new WirelessRouterInfo();
             info.setAge(tc.getInteger("age"));
             info.setNetworkId(new NetworkId(tc.getInteger("network")));
+            if (tc.hasKey("owner")) {
+                info.setOwnerID(tc.getUniqueId("owner"));
+            }
             channelInfo.updateRouterInfo(pos, info);
         }
     }
@@ -173,10 +176,13 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
             tc.setInteger("x", pos.getCoordinate().getX());
             tc.setInteger("y", pos.getCoordinate().getY());
             tc.setInteger("z", pos.getCoordinate().getZ());
-            tc.setInteger("age", infoEntry.getValue().getAge());
-            tc.setInteger("network", infoEntry.getValue().getNetworkId().getId());
-            tagList.appendTag(tc);
             WirelessRouterInfo info = infoEntry.getValue();
+            tc.setInteger("age", info.getAge());
+            tc.setInteger("network", info.getNetworkId().getId());
+            if (info.getOwnerID() != null) {
+                tc.setUniqueId("owner", info.getOwnerID());
+            }
+            tagList.appendTag(tc);
         }
         return tagList;
     }
@@ -204,6 +210,7 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
     public static class WirelessRouterInfo {
         private int age;
         private NetworkId networkId;
+        private UUID ownerID;
 
         public WirelessRouterInfo() {
             age = 0;
@@ -215,6 +222,14 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
 
         public void setNetworkId(NetworkId networkId) {
             this.networkId = networkId;
+        }
+
+        public UUID getOwnerID() {
+            return ownerID;
+        }
+
+        public void setOwnerID(UUID ownerID) {
+            this.ownerID = ownerID;
         }
 
         public int getAge() {

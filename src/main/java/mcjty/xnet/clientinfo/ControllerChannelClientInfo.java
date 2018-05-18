@@ -13,13 +13,15 @@ public class ControllerChannelClientInfo {
     @Nonnull private final String publishedName;
     @Nonnull private final BlockPos pos;
     @Nonnull private final IChannelType channelType;
+    private final boolean remote;      // If this channel was made available through a wireless router
     private final int index;        // Index of the channel within that controller (0 through 7)
 
-    public ControllerChannelClientInfo(@Nonnull String channelName, @Nonnull String publishedName, @Nonnull BlockPos pos, @Nonnull IChannelType channelType, int index) {
+    public ControllerChannelClientInfo(@Nonnull String channelName, @Nonnull String publishedName, @Nonnull BlockPos pos, @Nonnull IChannelType channelType, boolean remote, int index) {
         this.channelName = channelName;
         this.publishedName = publishedName;
         this.pos = pos;
         this.channelType = channelType;
+        this.remote = remote;
         this.index = index;
     }
 
@@ -33,6 +35,7 @@ public class ControllerChannelClientInfo {
         }
         channelType = t;
         pos = NetworkTools.readPos(buf);
+        remote = buf.readBoolean();
         index = buf.readInt();
     }
 
@@ -41,6 +44,7 @@ public class ControllerChannelClientInfo {
         NetworkTools.writeStringUTF8(buf, publishedName);
         NetworkTools.writeString(buf, channelType.getID());
         NetworkTools.writePos(buf, pos);
+        buf.writeBoolean(remote);
         buf.writeInt(index);
     }
 
@@ -66,5 +70,9 @@ public class ControllerChannelClientInfo {
 
     public int getIndex() {
         return index;
+    }
+
+    public boolean isRemote() {
+        return remote;
     }
 }

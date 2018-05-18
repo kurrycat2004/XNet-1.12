@@ -1,6 +1,10 @@
 package mcjty.xnet.blocks.wireless;
 
+import mcjty.lib.bindings.DefaultValue;
+import mcjty.lib.bindings.IValue;
 import mcjty.lib.tileentity.GenericEnergyReceiverTileEntity;
+import mcjty.lib.typed.Key;
+import mcjty.lib.typed.Type;
 import mcjty.lib.varia.GlobalCoordinate;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
@@ -12,10 +16,12 @@ import mcjty.xnet.api.keys.NetworkId;
 import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.blocks.generic.CableColor;
 import mcjty.xnet.blocks.router.TileEntityRouter;
+import mcjty.xnet.clientinfo.ControllerChannelClientInfo;
 import mcjty.xnet.config.GeneralConfiguration;
 import mcjty.xnet.init.ModBlocks;
 import mcjty.xnet.logic.LogicTools;
 import mcjty.xnet.multiblock.*;
+import net.minecraft.block.Block;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
@@ -33,18 +39,39 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.Optional;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEntity implements ITickable {
 
     public static final PropertyBool ERROR = PropertyBool.create("error");
 
+    public static final Key<Boolean> VALUE_PUBLIC = new Key<>("public", Type.BOOLEAN);
+
     private boolean error = false;
     private int counter = 10;
+    private boolean publicAccess = false;
 
     public TileEntityWirelessRouter() {
         super(GeneralConfiguration.wirelessRouterMaxRF, GeneralConfiguration.wirelessRouterRfPerTick);
+    }
+
+    @Override
+    public IValue<?, ?>[] getValues() {
+        return new IValue[] {
+                new DefaultValue<>(VALUE_PUBLIC, TileEntityWirelessRouter::isPublicAccess, TileEntityWirelessRouter::setPublicAccess)
+        };
+    }
+
+    public boolean isPublicAccess() {
+        return publicAccess;
+    }
+
+    public void setPublicAccess(boolean publicAccess) {
+        this.publicAccess = publicAccess;
+        markDirtyClient();
     }
 
     @Override
@@ -57,15 +84,17 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
             counter = 10;
 
             boolean err = false;
-            if (world.getBlockState(pos.up()).getBlock() != ModBlocks.antennaBaseBlock) {
+            int range = getAntennaRange();
+            if (range < 0) {
                 err = true;
             }
 
             if (!err) {
                 NetworkId networkId = findRoutingNetwork();
                 if (networkId != null) {
-                    LogicTools.consumers(getWorld(), networkId)
-                            .forEach(consumerPos -> LogicTools.routers(getWorld(), consumerPos)
+                    LogicTools.consumers(world, networkId)
+                            .forEach(consumerPos -> LogicTools.routers(world, consumerPos)
+                                    // @todo check if router is chunkloaded?
                                     .forEach(r -> publishChannels(r, networkId)));
                 }
             }
@@ -74,12 +103,44 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
         }
     }
 
+    public int getAntennaRange() {
+        if (world.getBlockState(pos.up()).getBlock() != ModBlocks.antennaBaseBlock) {
+            return -1;
+        }
+        Block aboveAntenna = world.getBlockState(pos.up(2)).getBlock();
+        if (aboveAntenna == ModBlocks.antennaDishBlock) {
+            return Integer.MAX_VALUE;
+        }
+        if (aboveAntenna != ModBlocks.antennaBlock) {
+            return -1;
+        }
+        if (world.getBlockState(pos.up(3)).getBlock() == ModBlocks.antennaBlock) {
+            return GeneralConfiguration.antennaTier2Range;
+        } else {
+            return GeneralConfiguration.antennaTier1Range;
+        }
+    }
+
+    public void findRemoteChannelInfo(List<ControllerChannelClientInfo> list) {
+        NetworkId networkId = findRoutingNetwork();
+        if (networkId != null) {
+            LogicTools.consumers(world, networkId)
+                    .forEach(consumerPos -> LogicTools.routers(world, consumerPos)
+                        .forEach(router -> {
+                            // @todo check if router is chunkloaded?
+                            router.findLocalChannelInfo(list, true, true);
+                        }));
+        }
+    }
+
+
     private void publishChannels(TileEntityRouter router, NetworkId networkId) {
+        UUID ownerUUID = publicAccess ? null : getOwnerUUID();
         // @todo bug: Multiple wireless routers have same channel name and end up with only one entry in the wireless data
         XNetWirelessChannels blobData = XNetWirelessChannels.getWirelessChannels(world);
         for (String channel : router.getPublishedChannels()) {
             System.out.println("channel = " + channel);
-            blobData.publishChannel(channel, world.provider.getDimension(),
+            blobData.publishChannel(channel, ownerUUID, world.provider.getDimension(),
                     pos, networkId);
         }
     }
@@ -100,7 +161,7 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
                         TileEntityWirelessRouter otherRouter = (TileEntityWirelessRouter) otherTE;
                         NetworkId routingNetwork = otherRouter.findRoutingNetwork();
                         if (routingNetwork != null) {
-                            LogicTools.consumers(getWorld(), routingNetwork)
+                            LogicTools.consumers(world, routingNetwork)
                                     .forEach(consumerPos -> {
                                         LogicTools.routers(otherWorld, consumerPos).
                                                 forEach(router -> router.addConnectorsFromConnectedNetworks(connectors, channelName, type));
@@ -129,18 +190,18 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
 
         super.onDataPacket(net, packet);
 
-        if (getWorld().isRemote) {
+        if (world.isRemote) {
             // If needed send a render update.
             if (oldError != inError()) {
-                getWorld().markBlockRangeForRenderUpdate(getPos(), getPos());
+                world.markBlockRangeForRenderUpdate(getPos(), getPos());
             }
         }
     }
 
     @Nullable
     public NetworkId findRoutingNetwork() {
-        WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
-        return LogicTools.routingConnectors(getWorld(), getPos())
+        WorldBlob worldBlob = XNetBlobData.getBlobData(world).getWorldBlob(world);
+        return LogicTools.routingConnectors(world, getPos())
                 .findFirst()
                 .map(worldBlob::getNetworkAt)
                 .orElse(null);
@@ -162,11 +223,13 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
     @Override
     public void writeRestorableToNBT(NBTTagCompound tagCompound) {
         super.writeRestorableToNBT(tagCompound);
+        tagCompound.setBoolean("publicAcc", publicAccess);
     }
 
     @Override
     public void readRestorableFromNBT(NBTTagCompound tagCompound) {
         super.readRestorableFromNBT(tagCompound);
+        publicAccess = tagCompound.getBoolean("publicAcc");
     }
 
     @Override
