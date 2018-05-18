@@ -29,6 +29,7 @@ public class ModBlocks {
 
     public static BaseBlock antennaBlock;
     public static BaseBlock antennaBaseBlock;
+    public static BaseBlock antennaDishBlock;
 
     public static FacadeBlock facadeBlock;
     public static RedstoneProxyBlock redstoneProxyBlock;
@@ -82,6 +83,13 @@ public class ModBlocks {
                 .info("message.xnet.shiftmessage")
                 .infoExtended("message.xnet.antenna_base")
                 .build();
+        antennaDishBlock = new BaseBlockBuilder<>(XNet.instance, "antenna_dish")
+                .rotationType(BaseBlock.RotationType.NONE)
+                .flags(BlockFlags.NON_OPAQUE)
+                .creativeTabs(XNet.tabXNet)
+                .info("message.xnet.shiftmessage")
+                .infoExtended("message.xnet.antenna_dish")
+                .build();
 
         NetCableSetup.init();
     }
@@ -98,6 +106,7 @@ public class ModBlocks {
 
         antennaBlock.initModel();
         antennaBaseBlock.initModel();
+        antennaDishBlock.initModel();
 
         facadeBlock.initModel();
         redstoneProxyBlock.initModel();
