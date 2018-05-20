@@ -102,13 +102,13 @@ public class ModBlocks {
     @SideOnly(Side.CLIENT)
     public static void initModels() {
         controllerBlock.initModel();
-        controllerBlock.setGuiClass(GuiController.class);
+        controllerBlock.setGuiFactory(GuiController::new);
 
         routerBlock.initModel();
-        routerBlock.setGuiClass(GuiRouter.class);
+        routerBlock.setGuiFactory(GuiRouter::new);
 
         wirelessRouterBlock.initModel();
-        wirelessRouterBlock.setGuiClass(GuiWirelessRouter.class);
+        wirelessRouterBlock.setGuiFactory(GuiWirelessRouter::new);
 
         antennaBlock.initModel();
         antennaBaseBlock.initModel();
