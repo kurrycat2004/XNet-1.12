@@ -107,7 +107,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
             channelButtons[i] = window.findChild(name);
         }
 
-        int currentRF = GenericEnergyStorageTileEntity.getCurrentRF();
+        long currentRF = GenericEnergyStorageTileEntity.getCurrentRF();
         energyBar = window.findChild("energybar");
         energyBar.setMaxValue(tileEntity.getMaxEnergyStored());
         energyBar.setValue(currentRF);
@@ -424,7 +424,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
             int y = (int) window.getToplevel().getBounds().getY();
             RenderHelper.drawVerticalGradientRect(x+channel * 14 + 41, y+22, x+channel * 14 + 41+12, y+230, 0x33aaffff, 0x33aaffff);
         }
-        int currentRF = GenericEnergyStorageTileEntity.getCurrentRF();
+        long currentRF = GenericEnergyStorageTileEntity.getCurrentRF();
         energyBar.setValue(currentRF);
         tileEntity.requestRfFromServer(XNet.MODID);
     }

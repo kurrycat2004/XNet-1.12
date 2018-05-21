@@ -188,7 +188,7 @@ public class EnergyChannelSettings extends DefaultChannelSettings implements ICh
                         rate = advanced ? GeneralConfiguration.maxRfRateAdvanced : GeneralConfiguration.maxRfRateNormal;
                     }
                     int totransfer = Math.min(rate, energy);
-                    int e = EnergyTools.receiveEnergy(te, settings.getFacing(), totransfer);
+                    long e = EnergyTools.receiveEnergy(te, settings.getFacing(), totransfer);
                     energy -= e;
                     total += e;
                     if (energy <= 0) {
