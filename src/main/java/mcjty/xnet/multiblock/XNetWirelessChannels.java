@@ -3,6 +3,7 @@ package mcjty.xnet.multiblock;
 import mcjty.lib.varia.BlockPosTools;
 import mcjty.lib.varia.GlobalCoordinate;
 import mcjty.lib.worlddata.AbstractWorldData;
+import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.api.keys.NetworkId;
 import net.minecraft.nbt.NBTTagCompound;
@@ -20,7 +21,7 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
 
     private static final String NAME = "XNetWirelessChannels";
 
-    private final Map<String, WirelessChannelInfo> channelToWireless = new HashMap<>();
+    private final Map<WirelessChannelKey, WirelessChannelInfo> channelToWireless = new HashMap<>();
 
     public XNetWirelessChannels(String name) {
         super(name);
@@ -33,13 +34,14 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
 
     private int cnt = 30;
 
-    public void publishChannel(String channel, @Nullable UUID ownerUUID, int dimension, BlockPos wirelessRouterPos, NetworkId network) {
+    public void transmitChannel(String channel, @Nonnull IChannelType channelType, @Nullable UUID ownerUUID, int dimension, BlockPos wirelessRouterPos, NetworkId network) {
         WirelessChannelInfo channelInfo;
-        if (channelToWireless.containsKey(channel)) {
-            channelInfo = channelToWireless.get(channel);
+        WirelessChannelKey key = new WirelessChannelKey(channel, channelType, ownerUUID);
+        if (channelToWireless.containsKey(key)) {
+            channelInfo = channelToWireless.get(key);
         } else {
             channelInfo = new WirelessChannelInfo();
-            channelToWireless.put(channel, channelInfo);
+            channelToWireless.put(key, channelInfo);
         }
 
         GlobalCoordinate pos = new GlobalCoordinate(wirelessRouterPos, dimension);
@@ -50,7 +52,6 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
         }
         info.setAge(0);
         info.setNetworkId(network);
-        info.setOwnerID(ownerUUID);
         save();
 
         cnt--;
@@ -62,13 +63,13 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
     }
 
     public void dump() {
-        for (Map.Entry<String, WirelessChannelInfo> entry : channelToWireless.entrySet()) {
+        for (Map.Entry<WirelessChannelKey, WirelessChannelInfo> entry : channelToWireless.entrySet()) {
             System.out.println("Channel = " + entry.getKey());
             WirelessChannelInfo channelInfo = entry.getValue();
             for (Map.Entry<GlobalCoordinate, WirelessRouterInfo> infoEntry : channelInfo.getRouters().entrySet()) {
                 GlobalCoordinate pos = infoEntry.getKey();
                 WirelessRouterInfo info = infoEntry.getValue();
-                System.out.println("    Pos = " + BlockPosTools.toString(pos.getCoordinate()) + " (age " + info.age + ", net " + info.networkId.getId() + ", owner " + info.getOwnerID() + ")");
+                System.out.println("    Pos = " + BlockPosTools.toString(pos.getCoordinate()) + " (age " + info.age + ", net " + info.networkId.getId() + ")");
             }
         }
     }
@@ -80,8 +81,8 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
 
         XNetBlobData blobData = XNetBlobData.getBlobData(world);
 
-        Set<String> toDeleteChannel = new HashSet<>();
-        for (Map.Entry<String, WirelessChannelInfo> entry : channelToWireless.entrySet()) {
+        Set<WirelessChannelKey> toDeleteChannel = new HashSet<>();
+        for (Map.Entry<WirelessChannelKey, WirelessChannelInfo> entry : channelToWireless.entrySet()) {
             WirelessChannelInfo channelInfo = entry.getValue();
             Set<GlobalCoordinate> toDelete = new HashSet<>();
             for (Map.Entry<GlobalCoordinate, WirelessRouterInfo> infoEntry : channelInfo.getRouters().entrySet()) {
@@ -106,7 +107,7 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
         }
 
         if (!toDeleteChannel.isEmpty()) {
-            for (String key : toDeleteChannel) {
+            for (WirelessChannelKey key : toDeleteChannel) {
                 channelToWireless.remove(key);
             }
         }
@@ -119,8 +120,8 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
         return getData(world, XNetWirelessChannels.class, NAME);
     }
 
-    public WirelessChannelInfo findChannel(String name) {
-        return channelToWireless.get(name);
+    public WirelessChannelInfo findChannel(String name, @Nonnull IChannelType channelType, @Nullable UUID owner) {
+        return channelToWireless.get(new WirelessChannelKey(name, channelType, owner));
     }
 
     @Override
@@ -131,7 +132,13 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
             NBTTagCompound tc = tagList.getCompoundTagAt(i);
             WirelessChannelInfo channelInfo = new WirelessChannelInfo();
             readRouters(tc.getTagList("routers", Constants.NBT.TAG_COMPOUND), channelInfo);
-            channelToWireless.put(tc.getString("name"), channelInfo);
+            UUID owner = null;
+            if (tc.hasKey("owner")) {
+                owner = tc.getUniqueId("owner");
+            }
+            String name = tc.getString("name");
+            IChannelType type = XNet.xNetApi.findType(tc.getString("type"));
+            channelToWireless.put(new WirelessChannelKey(name, type, owner), channelInfo);
         }
     }
 
@@ -142,9 +149,6 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
             WirelessRouterInfo info = new WirelessRouterInfo();
             info.setAge(tc.getInteger("age"));
             info.setNetworkId(new NetworkId(tc.getInteger("network")));
-            if (tc.hasKey("owner")) {
-                info.setOwnerID(tc.getUniqueId("owner"));
-            }
             channelInfo.updateRouterInfo(pos, info);
         }
     }
@@ -153,10 +157,15 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         NBTTagList channelTagList = new NBTTagList();
 
-        for (Map.Entry<String, WirelessChannelInfo> entry : channelToWireless.entrySet()) {
+        for (Map.Entry<WirelessChannelKey, WirelessChannelInfo> entry : channelToWireless.entrySet()) {
             NBTTagCompound channelTc = new NBTTagCompound();
             WirelessChannelInfo channelInfo = entry.getValue();
-            channelTc.setString("name", entry.getKey());
+            WirelessChannelKey key = entry.getKey();
+            channelTc.setString("name", key.getName());
+            channelTc.setString("type", key.getChannelType().getID());
+            if (key.getOwner() != null) {
+                channelTc.setUniqueId("owner", key.getOwner());
+            }
             channelTc.setTag("routers", writeRouters(channelInfo));
             channelTagList.appendTag(channelTc);
         }
@@ -179,9 +188,6 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
             WirelessRouterInfo info = infoEntry.getValue();
             tc.setInteger("age", info.getAge());
             tc.setInteger("network", info.getNetworkId().getId());
-            if (info.getOwnerID() != null) {
-                tc.setUniqueId("owner", info.getOwnerID());
-            }
             tagList.appendTag(tc);
         }
         return tagList;
@@ -210,7 +216,6 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
     public static class WirelessRouterInfo {
         private int age;
         private NetworkId networkId;
-        private UUID ownerID;
 
         public WirelessRouterInfo() {
             age = 0;
@@ -222,14 +227,6 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
 
         public void setNetworkId(NetworkId networkId) {
             this.networkId = networkId;
-        }
-
-        public UUID getOwnerID() {
-            return ownerID;
-        }
-
-        public void setOwnerID(UUID ownerID) {
-            this.ownerID = ownerID;
         }
 
         public int getAge() {

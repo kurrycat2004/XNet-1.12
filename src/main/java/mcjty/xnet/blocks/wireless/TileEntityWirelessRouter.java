@@ -138,21 +138,26 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
         UUID ownerUUID = publicAccess ? null : getOwnerUUID();
         // @todo bug: Multiple wireless routers have same channel name and end up with only one entry in the wireless data
         XNetWirelessChannels blobData = XNetWirelessChannels.getWirelessChannels(world);
-        for (String channel : router.getPublishedChannels()) {
-            System.out.println("channel = " + channel);
-            blobData.publishChannel(channel, ownerUUID, world.provider.getDimension(),
-                    pos, networkId);
-        }
+        router.localChannelStream(true)
+                .forEach(pair -> {
+                    String name = pair.getKey();
+                    IChannelType channelType = pair.getValue();
+                    System.out.println("channel = " + name + ", " + channelType.getID());
+                    blobData.transmitChannel(name, channelType, ownerUUID, world.provider.getDimension(),
+                            pos, networkId);
+                });
     }
 
-    public void addWirelessConnectors(Map<SidedConsumer, IConnectorSettings> connectors, String channelName, IChannelType type) {
+    public void addWirelessConnectors(Map<SidedConsumer, IConnectorSettings> connectors, String channelName, IChannelType type,
+                                      @Nullable UUID owner) {
         // @todo test if wireless router is active/no error/enough power
-        XNetWirelessChannels.WirelessChannelInfo info = XNetWirelessChannels.getWirelessChannels(world).findChannel(channelName);
+        XNetWirelessChannels.WirelessChannelInfo info = XNetWirelessChannels.getWirelessChannels(world).findChannel(
+                channelName, type, owner);
         if (info != null) {
-            // @todo channels should match on type too!
             // @todo check if other side is chunkloaded
             for (Map.Entry<GlobalCoordinate, XNetWirelessChannels.WirelessRouterInfo> entry : info.getRouters().entrySet()) {
                 GlobalCoordinate routerPos = entry.getKey();
+                // Check for range!
                 // Don't this for our own wireless router
                 if (routerPos.getDimension() != world.provider.getDimension() || !routerPos.getCoordinate().equals(pos)) {
                     WorldServer otherWorld = DimensionManager.getWorld(routerPos.getDimension());

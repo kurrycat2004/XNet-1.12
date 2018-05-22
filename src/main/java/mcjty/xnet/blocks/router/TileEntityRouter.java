@@ -37,10 +37,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.Optional;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static mcjty.xnet.logic.ChannelInfo.MAX_CHANNELS;
 
@@ -94,10 +97,6 @@ public final class TileEntityRouter extends GenericTileEntity {
         markDirtyClient();
     }
 
-    public Collection<String> getPublishedChannels() {
-        return publishedChannels.values();
-    }
-
     @Override
     public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet) {
         boolean oldError = inError();
@@ -149,6 +148,28 @@ public final class TileEntityRouter extends GenericTileEntity {
             String name = tc.getString("name");
             publishedChannels.put(id, name);
         }
+    }
+
+    public Stream<Pair<String, IChannelType>> localChannelStream(boolean onlyPublished) {
+        return LogicTools.connectors(world, pos)
+                .map(connectorPos -> LogicTools.getControllerForConnector(getWorld(), connectorPos))
+                .filter(Objects::nonNull)
+                .flatMap(controller -> IntStream.range(0, MAX_CHANNELS)
+                        .mapToObj(i -> {
+                            ChannelInfo channelInfo = controller.getChannels()[i];
+                            if (channelInfo != null && !channelInfo.getChannelName().isEmpty()) {
+                                LocalChannelId id = new LocalChannelId(controller.getPos(), i);
+                                String publishedName = publishedChannels.get(id);
+                                if (publishedName == null) {
+                                    publishedName = "";
+                                }
+                                if ((!onlyPublished) || !publishedName.isEmpty()) {
+                                    return Pair.of(channelInfo.getChannelName(), channelInfo.getType());
+                                }
+                            }
+                            return null;
+                        })
+                        .filter(Objects::nonNull));
     }
 
     public void findLocalChannelInfo(List<ControllerChannelClientInfo> list, boolean onlyPublished, boolean remote) {
@@ -210,8 +231,14 @@ public final class TileEntityRouter extends GenericTileEntity {
                         .forEach(consumerPos -> {
                             LogicTools.routers(world, consumerPos)
                                     .forEach(router -> router.addConnectorsFromConnectedNetworks(connectors, publishedName, type));
+                            // First public channels
                             LogicTools.wirelessRouters(world, consumerPos)
-                                    .forEach(router -> router.addWirelessConnectors(connectors, publishedName, type));
+                                    .forEach(router -> router.addWirelessConnectors(connectors, publishedName, type, null));
+                            // Then private channels
+                            if (getOwnerUUID() != null) {
+                                LogicTools.wirelessRouters(world, consumerPos)
+                                        .forEach(router -> router.addWirelessConnectors(connectors, publishedName, type, getOwnerUUID()));
+                            }
                         });
             } else {
                 // If there is no routing network that means we have a local network only
