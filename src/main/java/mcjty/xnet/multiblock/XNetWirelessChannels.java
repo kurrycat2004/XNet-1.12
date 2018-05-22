@@ -16,6 +16,7 @@ import net.minecraftforge.common.util.Constants;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.stream.Stream;
 
 public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels> {
 
@@ -122,6 +123,13 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
 
     public WirelessChannelInfo findChannel(String name, @Nonnull IChannelType channelType, @Nullable UUID owner) {
         return channelToWireless.get(new WirelessChannelKey(name, channelType, owner));
+    }
+
+    public Stream<WirelessChannelInfo> findChannels(@Nullable UUID owner) {
+        return channelToWireless.entrySet().stream().filter(pair -> {
+            WirelessChannelKey key = pair.getKey();
+            return (owner == null && key.getOwner() == null) || (owner != null && owner.equals(key.getOwner()));
+        }).map(pair -> pair.getValue());
     }
 
     @Override

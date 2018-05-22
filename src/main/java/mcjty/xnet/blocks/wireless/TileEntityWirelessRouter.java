@@ -60,7 +60,7 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
 
     @Override
     public IValue<?, ?>[] getValues() {
-        return new IValue[] {
+        return new IValue[]{
                 new DefaultValue<>(VALUE_PUBLIC, TileEntityWirelessRouter::isPublicAccess, TileEntityWirelessRouter::setPublicAccess)
         };
     }
@@ -122,28 +122,38 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
     }
 
     public void findRemoteChannelInfo(List<ControllerChannelClientInfo> list) {
-        NetworkId networkId = findRoutingNetwork();
-        if (networkId != null) {
-            LogicTools.consumers(world, networkId)
-                    .forEach(consumerPos -> LogicTools.routers(world, consumerPos)
-                        .forEach(router -> {
-                            // @todo check if router is chunkloaded?
-                            router.findLocalChannelInfo(list, true, true);
-                        }));
+        NetworkId network = findRoutingNetwork();
+        if (network == null) {
+            return;
         }
+        // @todo check if the other router is chunloaded before getting channels?
+        XNetWirelessChannels wirelessData = XNetWirelessChannels.getWirelessChannels(world);
+        wirelessData.findChannels(getOwnerUUID())
+                .forEach(channel -> {
+                    channel.getRouters().values().stream()
+                            .filter(wirelessRouter -> !network.equals(wirelessRouter.getNetworkId()))
+                            .forEach(wirelessRouter -> {
+                                LogicTools.consumers(world, wirelessRouter.getNetworkId())
+                                        .forEach(consumerPos -> LogicTools.routers(world, consumerPos)
+                                                .forEach(router -> {
+                                                    // @todo check if router is chunkloaded?
+                                                    router.findLocalChannelInfo(list, true, true);
+                                                }));
+
+                            });
+                });
     }
 
 
     private void publishChannels(TileEntityRouter router, NetworkId networkId) {
         UUID ownerUUID = publicAccess ? null : getOwnerUUID();
-        // @todo bug: Multiple wireless routers have same channel name and end up with only one entry in the wireless data
-        XNetWirelessChannels blobData = XNetWirelessChannels.getWirelessChannels(world);
+        XNetWirelessChannels wirelessData = XNetWirelessChannels.getWirelessChannels(world);
         router.localChannelStream(true)
                 .forEach(pair -> {
                     String name = pair.getKey();
                     IChannelType channelType = pair.getValue();
-                    System.out.println("channel = " + name + ", " + channelType.getID());
-                    blobData.transmitChannel(name, channelType, ownerUUID, world.provider.getDimension(),
+                    System.out.println("channel = " + name + ", " + channelType.getID() + ", owner = " + ownerUUID);
+                    wirelessData.transmitChannel(name, channelType, ownerUUID, world.provider.getDimension(),
                             pos, networkId);
                 });
     }
@@ -185,6 +195,7 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
             markDirtyClient();
         }
     }
+
     private boolean inError() {
         return error;
     }

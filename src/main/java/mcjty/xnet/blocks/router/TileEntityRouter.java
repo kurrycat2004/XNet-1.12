@@ -209,7 +209,7 @@ public final class TileEntityRouter extends GenericTileEntity {
     }
 
     @Nullable
-    private NetworkId findRoutingNetwork() {
+    public NetworkId findRoutingNetwork() {
         WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
         return LogicTools.routingConnectors(getWorld(), getPos())
                 .findFirst()
