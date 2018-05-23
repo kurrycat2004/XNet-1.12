@@ -210,7 +210,7 @@ public class EnergyChannelSettings extends DefaultChannelSettings implements ICh
 
     public static int getEnergyLevel(TileEntity tileEntity, @Nonnull EnumFacing side) {
         if (XNet.redstoneflux && RedstoneFluxCompatibility.isEnergyHandler(tileEntity)) {
-            return RedstoneFluxCompatibility.getEnergy(tileEntity);
+            return RedstoneFluxCompatibility.getEnergy(tileEntity, side);
         } else if (tileEntity != null && tileEntity.hasCapability(CapabilityEnergy.ENERGY, side)) {
             IEnergyStorage energy = tileEntity.getCapability(CapabilityEnergy.ENERGY, side);
             return energy.getEnergyStored();

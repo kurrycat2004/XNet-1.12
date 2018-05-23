@@ -341,7 +341,7 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
         if (te instanceof IInventory) {
             return true;
         }
-        if (EnergyTools.isEnergyTE(te)) {
+        if (EnergyTools.isEnergyTE(te, null)) {
             return true;
         }
         if (te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
