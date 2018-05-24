@@ -150,7 +150,7 @@ public final class TileEntityRouter extends GenericTileEntity {
         }
     }
 
-    public Stream<Pair<String, IChannelType>> localChannelStream(boolean onlyPublished) {
+    public Stream<Pair<String, IChannelType>> publishedChannelStream() {
         return LogicTools.connectors(world, pos)
                 .map(connectorPos -> LogicTools.getControllerForConnector(getWorld(), connectorPos))
                 .filter(Objects::nonNull)
@@ -160,11 +160,8 @@ public final class TileEntityRouter extends GenericTileEntity {
                             if (channelInfo != null && !channelInfo.getChannelName().isEmpty()) {
                                 LocalChannelId id = new LocalChannelId(controller.getPos(), i);
                                 String publishedName = publishedChannels.get(id);
-                                if (publishedName == null) {
-                                    publishedName = "";
-                                }
-                                if ((!onlyPublished) || !publishedName.isEmpty()) {
-                                    return Pair.of(channelInfo.getChannelName(), channelInfo.getType());
+                                if (publishedName != null && !publishedName.isEmpty()) {
+                                    return Pair.of(publishedName, channelInfo.getType());
                                 }
                             }
                             return null;

@@ -190,10 +190,11 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
     private void publishChannels(TileEntityRouter router, NetworkId networkId) {
         UUID ownerUUID = publicAccess ? null : getOwnerUUID();
         XNetWirelessChannels wirelessData = XNetWirelessChannels.getWirelessChannels(world);
-        router.localChannelStream(true)
+        router.publishedChannelStream()
                 .forEach(pair -> {
                     String name = pair.getKey();
                     IChannelType channelType = pair.getValue();
+
                     System.out.println("channel = " + name + ", " + channelType.getID() + ", owner = " + ownerUUID);
                     int energyStored = getEnergyStored();
                     if (GeneralConfiguration.wirelessRouterRfPerChannel <= energyStored) {
