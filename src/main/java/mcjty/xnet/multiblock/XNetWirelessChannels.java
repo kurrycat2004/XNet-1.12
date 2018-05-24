@@ -48,7 +48,7 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
         GlobalCoordinate pos = new GlobalCoordinate(wirelessRouterPos, dimension);
         WirelessRouterInfo info = channelInfo.getRouter(pos);
         if (info == null) {
-            info = new WirelessRouterInfo();
+            info = new WirelessRouterInfo(pos);
             channelInfo.updateRouterInfo(pos, info);
         }
         info.setAge(0);
@@ -128,7 +128,7 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
     public Stream<WirelessChannelInfo> findChannels(@Nullable UUID owner) {
         return channelToWireless.entrySet().stream().filter(pair -> {
             WirelessChannelKey key = pair.getKey();
-            return (owner == null && key.getOwner() == null) || (owner != null && owner.equals(key.getOwner()));
+            return (owner == null && key.getOwner() == null) || (owner != null && (key.getOwner() == null || owner.equals(key.getOwner())));
         }).map(pair -> pair.getValue());
     }
 
@@ -154,7 +154,7 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
         for (int i = 0 ; i < tagList.tagCount() ; i++) {
             NBTTagCompound tc = tagList.getCompoundTagAt(i);
             GlobalCoordinate pos = new GlobalCoordinate(new BlockPos(tc.getInteger("x"), tc.getInteger("y"), tc.getInteger("z")), tc.getInteger("dim"));
-            WirelessRouterInfo info = new WirelessRouterInfo();
+            WirelessRouterInfo info = new WirelessRouterInfo(pos);
             info.setAge(tc.getInteger("age"));
             info.setNetworkId(new NetworkId(tc.getInteger("network")));
             channelInfo.updateRouterInfo(pos, info);
@@ -224,9 +224,11 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
     public static class WirelessRouterInfo {
         private int age;
         private NetworkId networkId;
+        private final GlobalCoordinate coordinate;
 
-        public WirelessRouterInfo() {
+        public WirelessRouterInfo(GlobalCoordinate coordinate) {
             age = 0;
+            this.coordinate = coordinate;
         }
 
         public NetworkId getNetworkId() {
@@ -243,6 +245,10 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
 
         public void setAge(int age) {
             this.age = age;
+        }
+
+        public GlobalCoordinate getCoordinate() {
+            return coordinate;
         }
     }
 }

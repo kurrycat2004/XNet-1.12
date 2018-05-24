@@ -197,11 +197,15 @@ public final class TileEntityRouter extends GenericTileEntity {
     private void findRemoteChannelInfo(List<ControllerChannelClientInfo> list) {
         NetworkId networkId = findRoutingNetwork();
         if (networkId != null) {
+            // For each consumer on this network:
             LogicTools.consumers(world, networkId)
                     .forEach(consumerPos -> {
+                        // Find all routers connected to this network and add their published local channels
                         LogicTools.routers(world, consumerPos)
                                 .filter(r -> r != this)
                                 .forEach(router -> router.findLocalChannelInfo(list, true, false));
+                        // Find all wireless routers connected to this network and add the public or private
+                        // channels that can be reached by them
                         LogicTools.wirelessRouters(world, consumerPos)
                                 .forEach(router -> router.findRemoteChannelInfo(list));
                     });
@@ -233,12 +237,12 @@ public final class TileEntityRouter extends GenericTileEntity {
                                     .forEach(router -> router.addConnectorsFromConnectedNetworks(connectors, publishedName, type));
                             // First public channels
                             LogicTools.wirelessRouters(world, consumerPos)
-                                    .forEach(router -> router.addWirelessConnectors(connectors, publishedName, type, null));
-                            // Then private channels
-                            if (getOwnerUUID() != null) {
-                                LogicTools.wirelessRouters(world, consumerPos)
-                                        .forEach(router -> router.addWirelessConnectors(connectors, publishedName, type, getOwnerUUID()));
-                            }
+                                    .forEach(router -> {
+                                        // First public
+                                        router.addWirelessConnectors(connectors, publishedName, type, null);
+                                        // Now private
+                                        router.addWirelessConnectors(connectors, publishedName, type, getOwnerUUID());
+                                    });
                         });
             } else {
                 // If there is no routing network that means we have a local network only

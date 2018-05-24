@@ -5,7 +5,7 @@ import mcjty.lib.bindings.IValue;
 import mcjty.lib.tileentity.GenericEnergyReceiverTileEntity;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
-import mcjty.lib.varia.GlobalCoordinate;
+import mcjty.lib.varia.WorldTools;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.ProbeMode;
@@ -94,7 +94,6 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
                 if (networkId != null) {
                     LogicTools.consumers(world, networkId)
                             .forEach(consumerPos -> LogicTools.routers(world, consumerPos)
-                                    // @todo check if router is chunkloaded?
                                     .forEach(r -> publishChannels(r, networkId)));
                 }
             }
@@ -121,22 +120,61 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
         }
     }
 
+    private boolean inRange(TileEntityWirelessRouter otherRouter) {
+        // Both wireless routers have to support the range
+        int thisRange = getAntennaRange();
+        int otherRange = otherRouter.getAntennaRange();
+        if (thisRange >= Integer.MAX_VALUE && otherRange >= Integer.MAX_VALUE) {
+            return true;
+        }
+        if (thisRange <= 0 || otherRange <= 0) {
+            return false;
+        }
+
+        // If the dimension is different at this point there is no connection
+        if (world.provider.getDimension() != otherRouter.world.provider.getDimension()) {
+            return false;
+        }
+
+        double maxSqdist = Math.min(thisRange, otherRange);
+        maxSqdist *= maxSqdist;
+        double sqdist = pos.distanceSq(otherRouter.pos);
+        return sqdist <= maxSqdist;
+    }
+
+    private boolean inRange(XNetWirelessChannels.WirelessRouterInfo wirelessRouter) {
+        World otherWorld = DimensionManager.getWorld(wirelessRouter.getCoordinate().getDimension());
+        if (otherWorld == null) {
+            return false;
+        }
+        return LogicTools.consumers(otherWorld, wirelessRouter.getNetworkId())
+                .filter(consumerPos -> WorldTools.chunkLoaded(otherWorld, consumerPos))
+                .anyMatch(consumerPos -> LogicTools.wirelessRouters(otherWorld, consumerPos)
+                        .anyMatch(this::inRange));
+    }
+
     public void findRemoteChannelInfo(List<ControllerChannelClientInfo> list) {
         NetworkId network = findRoutingNetwork();
         if (network == null) {
             return;
         }
-        // @todo check if the other router is chunloaded before getting channels?
+
         XNetWirelessChannels wirelessData = XNetWirelessChannels.getWirelessChannels(world);
         wirelessData.findChannels(getOwnerUUID())
                 .forEach(channel -> {
+                    // Find all wireless routers on a given channel but remove the ones on our own channel
                     channel.getRouters().values().stream()
-                            .filter(wirelessRouter -> !network.equals(wirelessRouter.getNetworkId()))
-                            .forEach(wirelessRouter -> {
-                                LogicTools.consumers(world, wirelessRouter.getNetworkId())
-                                        .forEach(consumerPos -> LogicTools.routers(world, consumerPos)
+                            // Make sure this is not the same router
+                            .filter(routerInfo -> isDifferentRouter(network, routerInfo))
+                            .filter(this::inRange)
+                            .forEach(routerInfo -> {
+                                // Find all routers on this network
+                                World otherWorld = DimensionManager.getWorld(routerInfo.getCoordinate().getDimension());
+                                LogicTools.consumers(otherWorld, routerInfo.getNetworkId())
+                                        .filter(otherWorld::isBlockLoaded)
+                                        // Range check not needed here since the check is already done on the wireless router
+                                        .forEach(consumerPos -> LogicTools.routers(otherWorld, consumerPos)
                                                 .forEach(router -> {
-                                                    // @todo check if router is chunkloaded?
                                                     router.findLocalChannelInfo(list, true, true);
                                                 }));
 
@@ -144,6 +182,10 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
                 });
     }
 
+    // Test if the given router is not a router on this network
+    private boolean isDifferentRouter(NetworkId thisNetwork, XNetWirelessChannels.WirelessRouterInfo routerInfo) {
+        return routerInfo.getCoordinate().getDimension() != world.provider.getDimension() || !thisNetwork.equals(routerInfo.getNetworkId());
+    }
 
     private void publishChannels(TileEntityRouter router, NetworkId networkId) {
         UUID ownerUUID = publicAccess ? null : getOwnerUUID();
@@ -153,38 +195,38 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
                     String name = pair.getKey();
                     IChannelType channelType = pair.getValue();
                     System.out.println("channel = " + name + ", " + channelType.getID() + ", owner = " + ownerUUID);
-                    wirelessData.transmitChannel(name, channelType, ownerUUID, world.provider.getDimension(),
-                            pos, networkId);
+                    int energyStored = getEnergyStored();
+                    if (GeneralConfiguration.wirelessRouterRfPerChannel <= energyStored) {
+                        consumeEnergy(GeneralConfiguration.wirelessRouterRfPerChannel);
+                        wirelessData.transmitChannel(name, channelType, ownerUUID, world.provider.getDimension(),
+                                pos, networkId);
+                    }
                 });
     }
 
     public void addWirelessConnectors(Map<SidedConsumer, IConnectorSettings> connectors, String channelName, IChannelType type,
                                       @Nullable UUID owner) {
-        // @todo test if wireless router is active/no error/enough power
         XNetWirelessChannels.WirelessChannelInfo info = XNetWirelessChannels.getWirelessChannels(world).findChannel(
                 channelName, type, owner);
         if (info != null) {
-            // @todo check if other side is chunkloaded
-            for (Map.Entry<GlobalCoordinate, XNetWirelessChannels.WirelessRouterInfo> entry : info.getRouters().entrySet()) {
-                GlobalCoordinate routerPos = entry.getKey();
-                // Check for range!
-                // Don't this for our own wireless router
-                if (routerPos.getDimension() != world.provider.getDimension() || !routerPos.getCoordinate().equals(pos)) {
-                    WorldServer otherWorld = DimensionManager.getWorld(routerPos.getDimension());
-                    TileEntity otherTE = otherWorld.getTileEntity(routerPos.getCoordinate());
-                    if (otherTE instanceof TileEntityWirelessRouter) {
-                        TileEntityWirelessRouter otherRouter = (TileEntityWirelessRouter) otherTE;
-                        NetworkId routingNetwork = otherRouter.findRoutingNetwork();
-                        if (routingNetwork != null) {
-                            LogicTools.consumers(world, routingNetwork)
-                                    .forEach(consumerPos -> {
-                                        LogicTools.routers(otherWorld, consumerPos).
-                                                forEach(router -> router.addConnectorsFromConnectedNetworks(connectors, channelName, type));
-                                    });
+            info.getRouters().keySet().stream()
+                    // Don't do this for ourselves
+                    .filter(routerPos -> routerPos.getDimension() != world.provider.getDimension() || !routerPos.getCoordinate().equals(pos))
+                    .filter(routerPos -> WorldTools.chunkLoaded(DimensionManager.getWorld(routerPos.getDimension()), routerPos.getCoordinate()))
+                    .forEach(routerPos -> {
+                        WorldServer otherWorld = DimensionManager.getWorld(routerPos.getDimension());
+                        TileEntity otherTE = otherWorld.getTileEntity(routerPos.getCoordinate());
+                        if (otherTE instanceof TileEntityWirelessRouter) {
+                            TileEntityWirelessRouter otherRouter = (TileEntityWirelessRouter) otherTE;
+                            NetworkId routingNetwork = otherRouter.findRoutingNetwork();
+                            if (routingNetwork != null) {
+                                LogicTools.consumers(world, routingNetwork)
+                                        .forEach(consumerPos -> LogicTools.routers(otherWorld, consumerPos).
+                                                forEach(router -> router.addConnectorsFromConnectedNetworks(connectors, channelName, type)));
+                            }
                         }
-                    }
-                }
-            }
+
+                    });
         }
     }
 
