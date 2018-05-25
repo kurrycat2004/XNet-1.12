@@ -10,6 +10,7 @@ Table of Contents:
 {l:connector}Connectors
 {l:controller}Controller
 {l:router}Router
+{l:wirelessrouter}Wireless Router
 {l:proxy}Redstone Proxy
 
 {-------------------------------------------------------------}
@@ -153,6 +154,25 @@ same published name.
 
 Also note that there is a limit of 32 published channels on a
 routing network.
+{-------------------------------------------------------------}
+{b}Wireless Router (part 1)
+{n:wireless_router}
+{rb:wireless_router}
+A wireless router allows transmission of published channels
+wirelessly to outer wireless routers. To make this work you
+have to put the wireless router on a routing network connected
+to one or more routers. The wireless router will make all
+published channels available (provided it has enough power).
+{-------------------------------------------------------------}
+{b}Wireless Router (part 2)
+By default a wireless router is set to 'private' mode which
+means that only you will be able to use it. You can change this
+in the GUI. Wireless channels are made available in the router
+where you can connect them to channels of local controllers.
+
+A wireless router needs an antenna base on which a normal
+antenna (one or two) or a dish is placed. The dish allows
+for unlimited range.
 {-------------------------------------------------------------}
 {b}Redstone Proxy
 {n:orixt}

@@ -18,10 +18,7 @@ import mcjty.xnet.clientinfo.ControllerChannelClientInfo;
 import mcjty.xnet.config.GeneralConfiguration;
 import mcjty.xnet.logic.ChannelInfo;
 import mcjty.xnet.logic.LogicTools;
-import mcjty.xnet.multiblock.BlobId;
-import mcjty.xnet.multiblock.ColorId;
-import mcjty.xnet.multiblock.WorldBlob;
-import mcjty.xnet.multiblock.XNetBlobData;
+import mcjty.xnet.multiblock.*;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
@@ -42,6 +39,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -218,7 +216,8 @@ public final class TileEntityRouter extends GenericTileEntity {
                 .orElse(null);
     }
 
-    public void addRoutedConnectors(Map<SidedConsumer, IConnectorSettings> connectors, @Nonnull BlockPos controllerPos, int channel, IChannelType type) {
+    public void addRoutedConnectors(Map<SidedConsumer, IConnectorSettings> connectors, @Nonnull BlockPos controllerPos, int channel, IChannelType type,
+                                    Map<WirelessChannelKey, Integer> wirelessVersions) {
         if (inError()) {
             // We are in error. Don't do anything
             return;
@@ -236,9 +235,9 @@ public final class TileEntityRouter extends GenericTileEntity {
                             LogicTools.wirelessRouters(world, consumerPos)
                                     .forEach(router -> {
                                         // First public
-                                        router.addWirelessConnectors(connectors, publishedName, type, null);
+                                        router.addWirelessConnectors(connectors, publishedName, type, null, wirelessVersions);
                                         // Now private
-                                        router.addWirelessConnectors(connectors, publishedName, type, getOwnerUUID());
+                                        router.addWirelessConnectors(connectors, publishedName, type, getOwnerUUID(), wirelessVersions);
                                     });
                         });
             } else {
@@ -248,7 +247,8 @@ public final class TileEntityRouter extends GenericTileEntity {
         }
     }
 
-    public void addConnectorsFromConnectedNetworks(Map<SidedConsumer, IConnectorSettings> connectors, String channelName, IChannelType type) {
+    public boolean addConnectorsFromConnectedNetworks(Map<SidedConsumer, IConnectorSettings> connectors, String channelName, IChannelType type) {
+        AtomicBoolean rc = new AtomicBoolean(false);
         LogicTools.connectors(getWorld(), getPos())
                 .map(connectorPos -> LogicTools.getControllerForConnector(getWorld(), connectorPos))
                 .filter(Objects::nonNull)
@@ -260,11 +260,13 @@ public final class TileEntityRouter extends GenericTileEntity {
                             if (publishedName != null && !publishedName.isEmpty()) {
                                 if (channelName.equals(publishedName) && type.equals(info.getType())) {
                                     connectors.putAll(controller.getConnectors(i));
+                                    rc.set(true);
                                 }
                             }
                         }
                     }
                 });
+        return rc.get();
     }
 
     private void updatePublishName(@Nonnull BlockPos controllerPos, int channel, String name) {

@@ -38,6 +38,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.Optional;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
@@ -206,9 +207,9 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
     }
 
     public void addWirelessConnectors(Map<SidedConsumer, IConnectorSettings> connectors, String channelName, IChannelType type,
-                                      @Nullable UUID owner) {
-        XNetWirelessChannels.WirelessChannelInfo info = XNetWirelessChannels.getWirelessChannels(world).findChannel(
-                channelName, type, owner);
+                                      @Nullable UUID owner, @Nonnull Map<WirelessChannelKey, Integer> wirelessVersions) {
+        WirelessChannelKey key = new WirelessChannelKey(channelName, type, owner);
+        XNetWirelessChannels.WirelessChannelInfo info = XNetWirelessChannels.getWirelessChannels(world).findChannel(key);
         if (info != null) {
             info.getRouters().keySet().stream()
                     // Don't do this for ourselves
@@ -223,7 +224,11 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
                             if (routingNetwork != null) {
                                 LogicTools.consumers(world, routingNetwork)
                                         .forEach(consumerPos -> LogicTools.routers(otherWorld, consumerPos).
-                                                forEach(router -> router.addConnectorsFromConnectedNetworks(connectors, channelName, type)));
+                                                forEach(router -> {
+                                                    if (router.addConnectorsFromConnectedNetworks(connectors, channelName, type)) {
+                                                        wirelessVersions.put(key, info.getVersion());
+                                                    }
+                                                }));
                             }
                         }
 

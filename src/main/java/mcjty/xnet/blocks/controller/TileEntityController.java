@@ -92,6 +92,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     // Cached/transient data
     private Map<SidedConsumer, IConnectorSettings> cachedConnectors[] = new Map[MAX_CHANNELS];
     private Map<SidedConsumer, IConnectorSettings> cachedRoutedConnectors[] = new Map[MAX_CHANNELS];
+    private Map<WirelessChannelKey, Integer> wirelessVersions = new HashMap<>();
 
     private NetworkChecker networkChecker = null;
 
@@ -169,10 +170,29 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
     private void checkNetwork(WorldBlob worldBlob) {
         if (networkId != null && getNetworkChecker().isDirtyAndMarkClean(worldBlob)) {
-            for (int i = 0; i < MAX_CHANNELS; i++) {
-                if (channels[i] != null) {
-                    cleanCache(i);
-                }
+            cleanCaches();
+            return;
+        }
+
+        // Check wireless
+        for (Map.Entry<WirelessChannelKey, Integer> entry : wirelessVersions.entrySet()) {
+            XNetWirelessChannels channels = XNetWirelessChannels.getWirelessChannels(world);
+            XNetWirelessChannels.WirelessChannelInfo channel = channels.findChannel(entry.getKey());
+            if (channel == null) {
+                cleanCaches();
+                return;
+            }
+            if (channel.getVersion() != entry.getValue()) {
+                cleanCaches();
+                return;
+            }
+        }
+    }
+
+    private void cleanCaches() {
+        for (int i = 0; i < MAX_CHANNELS; i++) {
+            if (channels[i] != null) {
+                cleanCache(i);
             }
         }
     }
@@ -275,12 +295,14 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     @Nonnull
     public Map<SidedConsumer, IConnectorSettings> getRoutedConnectors(int channel) {
         if (cachedRoutedConnectors[channel] == null) {
-
             cachedRoutedConnectors[channel] = new HashMap<>();
 
+            wirelessVersions.clear();
             if (!channels[channel].getChannelName().isEmpty()) {
                 LogicTools.routers(getWorld(), networkId)
-                        .forEach(router -> router.addRoutedConnectors(cachedRoutedConnectors[channel], getPos(), channel, channels[channel].getType()));
+                        .forEach(router -> router.addRoutedConnectors(cachedRoutedConnectors[channel], getPos(),
+                                channel, channels[channel].getType(),
+                                wirelessVersions));
             }
         }
         return cachedRoutedConnectors[channel];

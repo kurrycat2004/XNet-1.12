@@ -50,6 +50,7 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
         if (info == null) {
             info = new WirelessRouterInfo(pos);
             channelInfo.updateRouterInfo(pos, info);
+            channelInfo.incVersion();
         }
         info.setAge(0);
         info.setNetworkId(network);
@@ -101,6 +102,7 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
                 System.out.println("Clean up wireless network = " + networkId + " (" + entry.getKey() + ")");
                 worldBlob.incNetworkVersion(networkId);
                 channelInfo.removeRouterInfo(pos);
+                channelInfo.incVersion();
             }
             if (channelInfo.getRouters().isEmpty()) {
                 toDeleteChannel.add(entry.getKey());
@@ -122,7 +124,12 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
     }
 
     public WirelessChannelInfo findChannel(String name, @Nonnull IChannelType channelType, @Nullable UUID owner) {
-        return channelToWireless.get(new WirelessChannelKey(name, channelType, owner));
+        WirelessChannelKey key = new WirelessChannelKey(name, channelType, owner);
+        return findChannel(key);
+    }
+
+    public WirelessChannelInfo findChannel(WirelessChannelKey key) {
+        return channelToWireless.get(key);
     }
 
     public Stream<WirelessChannelInfo> findChannels(@Nullable UUID owner) {
@@ -203,6 +210,7 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
 
     public static class WirelessChannelInfo {
         private final Map<GlobalCoordinate, WirelessRouterInfo> routers = new HashMap<>();
+        private int version = 0;
 
         public void updateRouterInfo(GlobalCoordinate pos, WirelessRouterInfo info) {
             routers.put(pos, info);
@@ -218,6 +226,18 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
 
         public Map<GlobalCoordinate, WirelessRouterInfo> getRouters() {
             return routers;
+        }
+
+        public int getVersion() {
+            return version;
+        }
+
+        public void setVersion(int version) {
+            this.version = version;
+        }
+
+        public void incVersion() {
+            version++;
         }
     }
 
