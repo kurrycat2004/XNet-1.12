@@ -5,10 +5,7 @@ import mcjty.lib.gui.GenericGuiContainer;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.layout.HorizontalLayout;
 import mcjty.lib.gui.layout.PositionalLayout;
-import mcjty.lib.gui.widgets.Label;
-import mcjty.lib.gui.widgets.Panel;
-import mcjty.lib.gui.widgets.TextField;
-import mcjty.lib.gui.widgets.WidgetList;
+import mcjty.lib.gui.widgets.*;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.BlockPosTools;
 import mcjty.xnet.XNet;
@@ -33,6 +30,8 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
     public static List<ControllerChannelClientInfo> fromServer_remoteChannels = null;
     private boolean needsRefresh = true;
     private int listDirty;
+
+    private static final ResourceLocation iconGuiElements = new ResourceLocation(XNet.MODID, "textures/gui/guielements.png");
 
     public GuiRouter(TileEntityRouter router, GenericContainer container) {
         super(XNet.instance, XNetMessages.INSTANCE, router, container, GuiProxy.GUI_MANUAL_XNET, "router");
@@ -119,6 +118,9 @@ public class GuiRouter extends GenericGuiContainer<TileEntityRouter> {
         panel1.addChild(new Label(mc, this).setText("Ch").setColor(labelColor));
         panel1.addChild(new Label(mc, this).setText(name));
         panel1.addChild(new Label(mc, this).setText(">").setColor(labelColor));
+        if (channel.isRemote()) {
+            panel1.addChild(new ImageLabel(mc, this).setImage(iconGuiElements, 48, 80).setDesiredWidth(16));
+        }
         if (local) {
             TextField pubName = new TextField(mc, this).setText(publishedName).setDesiredWidth(50).setDesiredHeight(13)
                     .addTextEvent((parent, newText) -> updatePublish(controllerPos, index, newText));

@@ -55,6 +55,8 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
     private int counter = 10;
     private boolean publicAccess = false;
 
+    private int globalChannelVersion = -1;      // Used to detect if a wireless channel has been published and we might need to recheck
+
     public TileEntityWirelessRouter() {
         super(GeneralConfiguration.wirelessRouterMaxRF, GeneralConfiguration.wirelessRouterRfPerTick);
     }
@@ -83,6 +85,16 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
                 return;
             }
             counter = 10;
+
+            int version = XNetWirelessChannels.getWirelessChannels(world).getGlobalChannelVersion();
+            if (globalChannelVersion != version) {
+                globalChannelVersion = version;
+                NetworkId networkId = findRoutingNetwork();
+                if (networkId != null) {
+                    WorldBlob worldBlob = XNetBlobData.getBlobData(world).getWorldBlob(world);
+                    worldBlob.incNetworkVersion(networkId);
+                }
+            }
 
             boolean err = false;
             int range = getAntennaRange();
@@ -195,8 +207,6 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
                 .forEach(pair -> {
                     String name = pair.getKey();
                     IChannelType channelType = pair.getValue();
-
-                    System.out.println("channel = " + name + ", " + channelType.getID() + ", owner = " + ownerUUID);
                     int energyStored = getEnergyStored();
                     if (GeneralConfiguration.wirelessRouterRfPerChannel <= energyStored) {
                         consumeEnergy(GeneralConfiguration.wirelessRouterRfPerChannel);

@@ -35,6 +35,8 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
 
     private int cnt = 30;
 
+    private int globalChannelVersion = 0;
+
     public void transmitChannel(String channel, @Nonnull IChannelType channelType, @Nullable UUID ownerUUID, int dimension, BlockPos wirelessRouterPos, NetworkId network) {
         WirelessChannelInfo channelInfo;
         WirelessChannelKey key = new WirelessChannelKey(channel, channelType, ownerUUID);
@@ -51,20 +53,33 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
             info = new WirelessRouterInfo(pos);
             channelInfo.updateRouterInfo(pos, info);
             channelInfo.incVersion();
+
+            // Global version increase to make sure all wireless routers can detect if there is a need
+            // to make their local network dirty to ensure that all controllers connected to that network
+            // get a chance to pick up the new transmitted channel
+            channelUpdated();
         }
         info.setAge(0);
         info.setNetworkId(network);
         save();
 
-        cnt--;
-        if (cnt > 0) {
-            return;
-        }
-        cnt = 30;
-        dump();
+//        cnt--;
+//        if (cnt > 0) {
+//            return;
+//        }
+//        cnt = 30;
+//        dump();
     }
 
-    public void dump() {
+    private void channelUpdated() {
+        globalChannelVersion++;
+    }
+
+    public int getGlobalChannelVersion() {
+        return globalChannelVersion;
+    }
+
+    private void dump() {
         for (Map.Entry<WirelessChannelKey, WirelessChannelInfo> entry : channelToWireless.entrySet()) {
             System.out.println("Channel = " + entry.getKey());
             WirelessChannelInfo channelInfo = entry.getValue();
@@ -99,7 +114,7 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
             for (GlobalCoordinate pos : toDelete) {
                 WorldBlob worldBlob = blobData.getWorldBlob(DimensionManager.getWorld(pos.getDimension()));
                 NetworkId networkId = channelInfo.getRouter(pos).getNetworkId();
-                System.out.println("Clean up wireless network = " + networkId + " (" + entry.getKey() + ")");
+//                System.out.println("Clean up wireless network = " + networkId + " (" + entry.getKey() + ")");
                 worldBlob.incNetworkVersion(networkId);
                 channelInfo.removeRouterInfo(pos);
                 channelInfo.incVersion();

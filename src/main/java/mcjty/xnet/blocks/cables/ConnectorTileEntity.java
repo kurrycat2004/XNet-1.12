@@ -70,10 +70,10 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
 
         super.onDataPacket(net, packet);
 
-        if (getWorld().isRemote) {
+        if (world.isRemote) {
             // If needed send a render update.
             if (enabled != oldEnabled || mimicBlockSupport.getMimicBlock() != oldMimicBlock) {
-                getWorld().markBlockRangeForRenderUpdate(getPos(), getPos());
+                world.markBlockRangeForRenderUpdate(getPos(), getPos());
             }
         }
     }
@@ -91,7 +91,7 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
         }
         this.powerOut[side.ordinal()] = powerOut;
         markDirty();
-        getWorld().neighborChanged(pos.offset(side), this.getBlockType(), this.pos);
+        world.neighborChanged(pos.offset(side), this.getBlockType(), this.pos);
     }
 
     public void setEnabled(EnumFacing direction, boolean e) {
@@ -134,10 +134,10 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
     public void possiblyMarkNetworkDirty(@Nonnull BlockPos neighbor) {
         for (EnumFacing facing : EnumFacing.VALUES) {
             if (getPos().offset(facing).equals(neighbor)) {
-                Block newblock = getWorld().getBlockState(neighbor).getBlock();
+                Block newblock = world.getBlockState(neighbor).getBlock();
                 if (newblock != cachedNeighbours[facing.ordinal()]) {
                     cachedNeighbours[facing.ordinal()] = newblock;
-                    WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
+                    WorldBlob worldBlob = XNetBlobData.getBlobData(world).getWorldBlob(world);
                     worldBlob.incNetworkVersion(worldBlob.getNetworkAt(getPos()));
                 }
                 return;
