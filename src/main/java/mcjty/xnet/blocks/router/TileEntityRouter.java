@@ -182,7 +182,11 @@ public final class TileEntityRouter extends GenericTileEntity {
                             }
                             if ((!onlyPublished) || !publishedName.isEmpty()) {
                                 ControllerChannelClientInfo ci = new ControllerChannelClientInfo(channelInfo.getChannelName(), publishedName, controller.getPos(), channelInfo.getType(), remote, i);
-                                list.add(ci);
+                                if (list.stream().noneMatch(ii -> Objects.equals(ii.getPublishedName(), ci.getPublishedName())
+                                        && Objects.equals(ii.getChannelType(), ci.getChannelType())
+                                        && Objects.equals(ii.getPos(), ci.getPos()))) {
+                                    list.add(ci);
+                                }
                             }
                         }
                     }
@@ -202,6 +206,7 @@ public final class TileEntityRouter extends GenericTileEntity {
                         // Find all wireless routers connected to this network and add the public or private
                         // channels that can be reached by them
                         LogicTools.wirelessRouters(world, consumerPos)
+                                .filter(router -> !router.inError())
                                 .forEach(router -> router.findRemoteChannelInfo(list));
                     });
         }
@@ -233,6 +238,7 @@ public final class TileEntityRouter extends GenericTileEntity {
                                     .forEach(router -> router.addConnectorsFromConnectedNetworks(connectors, publishedName, type));
                             // First public channels
                             LogicTools.wirelessRouters(world, consumerPos)
+                                    .filter(router -> !router.inError())
                                     .forEach(router -> {
                                         // First public
                                         router.addWirelessConnectors(connectors, publishedName, type, null, wirelessVersions);

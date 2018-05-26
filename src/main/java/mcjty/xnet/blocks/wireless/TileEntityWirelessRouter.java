@@ -220,15 +220,17 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
                         TileEntity otherTE = otherWorld.getTileEntity(routerPos.getCoordinate());
                         if (otherTE instanceof TileEntityWirelessRouter) {
                             TileEntityWirelessRouter otherRouter = (TileEntityWirelessRouter) otherTE;
-                            NetworkId routingNetwork = otherRouter.findRoutingNetwork();
-                            if (routingNetwork != null) {
-                                LogicTools.consumers(world, routingNetwork)
-                                        .forEach(consumerPos -> LogicTools.routers(otherWorld, consumerPos).
-                                                forEach(router -> {
-                                                    if (router.addConnectorsFromConnectedNetworks(connectors, channelName, type)) {
-                                                        wirelessVersions.put(key, info.getVersion());
-                                                    }
-                                                }));
+                            if (inRange(otherRouter) && !otherRouter.inError()) {
+                                NetworkId routingNetwork = otherRouter.findRoutingNetwork();
+                                if (routingNetwork != null) {
+                                    LogicTools.consumers(world, routingNetwork)
+                                            .forEach(consumerPos -> LogicTools.routers(otherWorld, consumerPos).
+                                                    forEach(router -> {
+                                                        if (router.addConnectorsFromConnectedNetworks(connectors, channelName, type)) {
+                                                            wirelessVersions.put(key, info.getVersion());
+                                                        }
+                                                    }));
+                                }
                             }
                         }
 
@@ -244,7 +246,7 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
         }
     }
 
-    private boolean inError() {
+    public boolean inError() {
         return error;
     }
 
@@ -310,7 +312,7 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
             }
         }
         if (inError()) {
-            probeInfo.text(TextStyleClass.ERROR + "Missing antenna or not enough power for channels!");
+            probeInfo.text(TextStyleClass.ERROR + "Missing antenna!");
         } else {
 //            probeInfo.text(TextStyleClass.LABEL + "Channels: " + TextStyleClass.INFO + getChannelCount());
         }
