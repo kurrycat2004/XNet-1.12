@@ -19,9 +19,4 @@ public class GuiWirelessRouter extends GenericGuiContainer<TileEntityWirelessRou
         window = new Window(this, tileEntity, XNetMessages.INSTANCE, new ResourceLocation(XNet.MODID, "gui/wireless_router.gui"));
         super.initGui();
     }
-
-    @Override
-    protected void drawGuiContainerBackgroundLayer(float v, int x1, int x2) {
-        drawWindow();
-    }
 }
