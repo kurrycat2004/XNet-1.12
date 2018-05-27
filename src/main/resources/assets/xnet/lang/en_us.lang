@@ -61,12 +61,13 @@ message.xnet.controller=\
 message.xnet.antenna=\
     @fPlace one or two antenna's on\n\
     @ftop of an antenna base.\n\
-    @6One antenna: range %s blocks\n\
-    @6Two antennas: range %s blocks
+    @6One: range %s (%s rf/t/channel)\n\
+    @6Two: range %s (%s rf/t/channel)
 message.xnet.antenna_base=\
     @fAn antenna base has to be placed\n\
     @fon top of a wireless router
 message.xnet.antenna_dish=\
     @fAn antenna dish has to be placed\n\
     @fon top of an antenna base and\n\
-    @fallows very extreme wireless range
+    @fallows very extreme wireless range\n\
+    @6(%s rf/t/channel)

@@ -49,6 +49,11 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
 
     public static final PropertyBool ERROR = PropertyBool.create("error");
 
+    public static final int TIER_INVALID = -1;
+    public static final int TIER_1 = 0;
+    public static final int TIER_2 = 1;
+    public static final int TIER_INF = 2;
+
     public static final Key<Boolean> VALUE_PUBLIC = new Key<>("public", Type.BOOLEAN);
 
     private boolean error = false;
@@ -115,22 +120,37 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
         }
     }
 
-    public int getAntennaRange() {
+    private int getAntennaTier() {
         if (world.getBlockState(pos.up()).getBlock() != ModBlocks.antennaBaseBlock) {
-            return -1;
+            return TIER_INVALID;
         }
         Block aboveAntenna = world.getBlockState(pos.up(2)).getBlock();
         if (aboveAntenna == ModBlocks.antennaDishBlock) {
-            return Integer.MAX_VALUE;
+            return TIER_INF;
         }
         if (aboveAntenna != ModBlocks.antennaBlock) {
-            return -1;
+            return TIER_INVALID;
         }
         if (world.getBlockState(pos.up(3)).getBlock() == ModBlocks.antennaBlock) {
-            return GeneralConfiguration.antennaTier2Range;
+            return TIER_2;
         } else {
-            return GeneralConfiguration.antennaTier1Range;
+            return TIER_1;
         }
+    }
+
+    private int getAntennaRange() {
+        int tier = getAntennaTier();
+        switch (tier) {
+            case TIER_INVALID:
+                return -1;
+            case TIER_1:
+                return GeneralConfiguration.antennaTier1Range;
+            case TIER_2:
+                return GeneralConfiguration.antennaTier2Range;
+            case TIER_INF:
+                return Integer.MAX_VALUE;
+        }
+        return -1;
     }
 
     private boolean inRange(TileEntityWirelessRouter otherRouter) {
@@ -201,6 +221,7 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
     }
 
     private void publishChannels(TileEntityRouter router, NetworkId networkId) {
+        int tier = getAntennaTier();
         UUID ownerUUID = publicAccess ? null : getOwnerUUID();
         XNetWirelessChannels wirelessData = XNetWirelessChannels.getWirelessChannels(world);
         router.publishedChannelStream()
@@ -208,8 +229,8 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
                     String name = pair.getKey();
                     IChannelType channelType = pair.getValue();
                     int energyStored = getEnergyStored();
-                    if (GeneralConfiguration.wirelessRouterRfPerChannel <= energyStored) {
-                        consumeEnergy(GeneralConfiguration.wirelessRouterRfPerChannel);
+                    if (GeneralConfiguration.wirelessRouterRfPerChannel[tier] <= energyStored) {
+                        consumeEnergy(GeneralConfiguration.wirelessRouterRfPerChannel[tier]);
                         wirelessData.transmitChannel(name, channelType, ownerUUID, world.provider.getDimension(),
                                 pos, networkId);
                     }
