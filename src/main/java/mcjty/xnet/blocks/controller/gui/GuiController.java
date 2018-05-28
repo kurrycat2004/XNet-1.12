@@ -5,6 +5,7 @@ import mcjty.lib.client.RenderHelper;
 import mcjty.lib.container.GenericContainer;
 import mcjty.lib.gui.GenericGuiContainer;
 import mcjty.lib.gui.Window;
+import mcjty.lib.gui.events.DefaultSelectionEvent;
 import mcjty.lib.gui.layout.HorizontalLayout;
 import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.gui.widgets.*;
@@ -101,6 +102,13 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
 
         searchBar = window.findChild("searchbar");
         connectorList = window.findChild("connectors");
+
+        connectorList.addSelectionEvent(new DefaultSelectionEvent() {
+            @Override
+            public void doubleClick(Widget<?> parent, int index) {
+                hilightSelectedContainer(index);
+            }
+        });
 
         for (int i = 0 ; i < MAX_CHANNELS ; i++) {
             String name = "channel" + (i+1);
