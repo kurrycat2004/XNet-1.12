@@ -38,11 +38,11 @@ public class XNet implements ModBase {
 
     public static final String MODID = "xnet";
     public static final String MODNAME = "XNet";
-    public static final String MODVERSION = "1.7.0alpha";
+    public static final String MODVERSION = "1.7.0-alpha";
 
     public static final String MIN_FORGE11_VER = "13.19.0.2176";
-    public static final String MIN_MCJTYLIB_VER = "2.6.2";
-    public static final String MIN_RFTOOLS_VER = "7.50";
+    public static final String MIN_MCJTYLIB_VER = "3.0.0-alpha";
+    public static final String MIN_RFTOOLS_VER = "7.50-alpha";
 
     public static final String SHIFT_MESSAGE = "<Press Shift>";
 
