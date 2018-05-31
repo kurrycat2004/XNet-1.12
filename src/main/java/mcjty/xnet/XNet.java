@@ -56,7 +56,6 @@ public class XNet implements ModBase {
     public static Logger logger;
 
     public static boolean rftools = false;
-    public static boolean redstoneflux = false;
     public static XNetApi xNetApi = new XNetApi();
 
     public static CreativeTabs tabXNet = new CreativeTabs("XNet") {
@@ -72,7 +71,6 @@ public class XNet implements ModBase {
 
         logger = event.getModLog();
         rftools = Loader.isModLoaded("rftools");
-        redstoneflux = Loader.isModLoaded("redstoneflux");
 
         MainCompatHandler.registerWaila();
         MainCompatHandler.registerTOP();
