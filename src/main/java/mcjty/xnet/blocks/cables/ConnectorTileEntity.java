@@ -3,8 +3,8 @@ package mcjty.xnet.blocks.cables;
 import cofh.redstoneflux.api.IEnergyProvider;
 import cofh.redstoneflux.api.IEnergyReceiver;
 import mcjty.lib.bindings.DefaultValue;
-import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.bindings.IValue;
+import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
@@ -57,9 +57,9 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
     public static final Key<String> VALUE_NAME = new Key<>("name", Type.STRING);
 
     @Override
-    public IValue[] getValues() {
+    public IValue<?>[] getValues() {
         return new IValue[] {
-                new DefaultValue<>(VALUE_NAME, ConnectorTileEntity::getConnectorName, ConnectorTileEntity::setConnectorName),
+                new DefaultValue<>(VALUE_NAME, this::getConnectorName, this::setConnectorName),
         };
     }
 

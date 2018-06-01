@@ -67,9 +67,9 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
     }
 
     @Override
-    public IValue<?, ?>[] getValues() {
+    public IValue<?>[] getValues() {
         return new IValue[]{
-                new DefaultValue<>(VALUE_PUBLIC, TileEntityWirelessRouter::isPublicAccess, TileEntityWirelessRouter::setPublicAccess)
+                new DefaultValue<>(VALUE_PUBLIC, this::isPublicAccess, this::setPublicAccess)
         };
     }
 
