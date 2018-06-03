@@ -228,7 +228,7 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
                 .forEach(pair -> {
                     String name = pair.getKey();
                     IChannelType channelType = pair.getValue();
-                    int energyStored = getEnergyStored();
+                    long energyStored = getStoredPower();
                     if (GeneralConfiguration.wirelessRouterRfPerChannel[tier] <= energyStored) {
                         consumeEnergy(GeneralConfiguration.wirelessRouterRfPerChannel[tier]);
                         wirelessData.transmitChannel(name, channelType, ownerUUID, world.provider.getDimension(),

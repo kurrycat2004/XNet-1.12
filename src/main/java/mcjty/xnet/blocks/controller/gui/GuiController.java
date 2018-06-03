@@ -117,7 +117,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
 
         long currentRF = GenericEnergyStorageTileEntity.getCurrentRF();
         energyBar = window.findChild("energybar");
-        energyBar.setMaxValue(tileEntity.getMaxEnergyStored());
+        energyBar.setMaxValue(tileEntity.getCapacity());
         energyBar.setValue(currentRF);
     }
 

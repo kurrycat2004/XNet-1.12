@@ -252,7 +252,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     @Override
     public boolean checkAndConsumeRF(int rft) {
         if (rft > 0) {
-            if (getEnergyStored() < rft) {
+            if (getStoredPower() < rft) {
                 // Not enough energy
                 return false;
             }
