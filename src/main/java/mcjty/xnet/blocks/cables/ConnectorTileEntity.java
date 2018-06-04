@@ -30,10 +30,9 @@ import net.minecraftforge.fml.common.Optional;
 import javax.annotation.Nonnull;
 
 @Optional.InterfaceList({
-        @Optional.Interface(iface = "cofh.redstoneflux.api.IEnergyProvider", modid = "redstoneflux"),
         @Optional.Interface(iface = "cofh.redstoneflux.api.IEnergyReceiver", modid = "redstoneflux")
 })
-public class ConnectorTileEntity extends GenericTileEntity implements IEnergyProvider, IEnergyReceiver,
+public class ConnectorTileEntity extends GenericTileEntity implements IEnergyReceiver,
         IFacadeSupport, IConnectorTile {
 
     public static final String CMD_ENABLE = "connector.enable";
@@ -229,12 +228,6 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyPro
 
     public int getMaxEnergy() {
         return GeneralConfiguration.maxRfConnector;
-    }
-
-    @Optional.Method(modid = "redstoneflux")
-    @Override
-    public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate) {
-        return 0;
     }
 
     @Optional.Method(modid = "redstoneflux")
