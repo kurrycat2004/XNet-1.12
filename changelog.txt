@@ -1,3 +1,7 @@
+1.7.0:
+- Made compatible with the latest McJtyLib (3.0.0)
+- New wireless router. A wireless router must be connected to a routing network (using the special routing cables) to a normal router. All published channels on that router will be made available remotely to another wireless router. Note that a wireless router needs an antenna to work
+
 1.7.0alpha:
 - Made compatible with the latest McJtyLib (3.0.0)
 - New wireless router. A wireless router must be connected to a routing network (using the special routing cables) to a normal router. All published channels on that router will be made available remotely to another wireless router. Note that a wireless router needs an antenna to work
