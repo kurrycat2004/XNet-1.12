@@ -329,7 +329,7 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyRec
     }
 
     private void createSidedHandler(EnumFacing facing) {
-        sidedHandlers[facing.ordinal()] = new IEnergyStorage() {
+        class SidedHandler implements IEnergyStorage {
             @Override
             public int receiveEnergy(int maxReceive, boolean simulate) {
                 return ConnectorTileEntity.this.receiveEnergyInternal(facing, maxReceive, simulate);
@@ -359,7 +359,8 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyRec
             public boolean canReceive() {
                 return true;
             }
-        };
+        }
+        sidedHandlers[facing.ordinal()] = new SidedHandler();
     }
 
 }
