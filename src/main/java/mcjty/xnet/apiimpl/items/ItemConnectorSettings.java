@@ -111,6 +111,7 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
         redstoneGui(gui);
         gui.nl()
                 .choices(TAG_MODE, "Insert or extract mode", itemMode, ItemMode.values())
+                .shift(5)
                 .choices(TAG_STACK, "Single item, stack, or count", stackMode, StackMode.values());
 
         if (stackMode == StackMode.COUNT && itemMode == ItemMode.EXT) {
@@ -119,16 +120,19 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
         }
 
         gui
+                .shift(10)
                 .choices(TAG_SPEED, "Number of ticks for each operation", Integer.toString(speed * 5), speeds)
                 .nl();
 
         gui
                 .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority, 36).shift(5)
                 .label("#")
-                .integer(TAG_COUNT, itemMode == ItemMode.EXT ? "Amount in destination inventory|to keep" : "Max amount in destination|inventory", count, 36);
+                .integer(TAG_COUNT, itemMode == ItemMode.EXT ? "Amount in destination inventory|to keep" : "Max amount in destination|inventory", count, 30);
 
         if (itemMode == ItemMode.EXT) {
-            gui.choices(TAG_EXTRACT, "Extract mode (first available,|random slot or round robin)", extractMode, ExtractMode.values());
+            gui
+                    .shift(5)
+                    .choices(TAG_EXTRACT, "Extract mode (first available,|random slot or round robin)", extractMode, ExtractMode.values());
         }
 
         gui
