@@ -11,7 +11,7 @@ public class GeneralConfiguration {
 
     public static int wirelessRouterMaxRF = 100000;
     public static int wirelessRouterRfPerTick = 5000;
-    public static int wirelessRouterRfPerChannel[] = new int[] { 50, 100, 500 };
+    public static int wirelessRouterRfPerChannel[] = new int[] { 20, 50, 200 };
 
     public static int maxRfConnector = 50000;
     public static int maxRfAdvancedConnector = 500000;
@@ -43,11 +43,11 @@ public class GeneralConfiguration {
                 "Maximum RF the wireless router can store");
         wirelessRouterRfPerTick = cfg.getInt("wirelessRouterRfPerTick", CATEGORY_GENERAL, wirelessRouterRfPerTick, 1, 1000000000,
                 "Maximum RF the wireless router can receive per tick");
-        wirelessRouterRfPerChannel[TileEntityWirelessRouter.TIER_1] = cfg.getInt("wirelessRouter1RfPerChannel", CATEGORY_GENERAL, wirelessRouterRfPerChannel[TileEntityWirelessRouter.TIER_1], 0, 1000000000,
+        wirelessRouterRfPerChannel[TileEntityWirelessRouter.TIER_1] = cfg.getInt("wireless1RfPerChannel", CATEGORY_GENERAL, wirelessRouterRfPerChannel[TileEntityWirelessRouter.TIER_1], 0, 1000000000,
                 "Maximum RF per tick the wireless router (tier 1) needs to publish a channel");
-        wirelessRouterRfPerChannel[TileEntityWirelessRouter.TIER_2] = cfg.getInt("wirelessRouter2RfPerChannel", CATEGORY_GENERAL, wirelessRouterRfPerChannel[TileEntityWirelessRouter.TIER_2], 0, 1000000000,
+        wirelessRouterRfPerChannel[TileEntityWirelessRouter.TIER_2] = cfg.getInt("wireless2RfPerChannel", CATEGORY_GENERAL, wirelessRouterRfPerChannel[TileEntityWirelessRouter.TIER_2], 0, 1000000000,
                 "Maximum RF per tick the wireless router (tier 2) needs to publish a channel");
-        wirelessRouterRfPerChannel[TileEntityWirelessRouter.TIER_INF] = cfg.getInt("wirelessRouterInfRfPerChannel", CATEGORY_GENERAL, wirelessRouterRfPerChannel[TileEntityWirelessRouter.TIER_INF], 0, 1000000000,
+        wirelessRouterRfPerChannel[TileEntityWirelessRouter.TIER_INF] = cfg.getInt("wirelessInfRfPerChannel", CATEGORY_GENERAL, wirelessRouterRfPerChannel[TileEntityWirelessRouter.TIER_INF], 0, 1000000000,
                 "Maximum RF per tick the wireless router (infinite tier) needs to publish a channel");
 
         maxRfConnector = cfg.getInt("maxRfConnector", CATEGORY_GENERAL, maxRfConnector, 1, 1000000000,
