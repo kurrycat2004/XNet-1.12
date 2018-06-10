@@ -232,7 +232,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
         }
         MInteger index = new MInteger(startIdx);
         while (true) {
-            ItemStack stack = fetchItem(handler, true, extractMatcher, settings.getStackMode(), 64, index, startIdx);
+            ItemStack stack = fetchItem(handler, true, extractMatcher, settings.getStackMode(), settings.getExtractAmount(), 64, index, startIdx);
             if (!stack.isEmpty()) {
                 // Now that we have a stack we first reduce the amount of the stack if we want to keep a certain
                 // number of items
@@ -258,7 +258,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                 int remaining = insertStackSimulate(inserted, context, stack);
                 if (!inserted.isEmpty()) {
                     if (context.checkAndConsumeRF(GeneralConfiguration.controllerOperationRFT)) {
-                        insertStackReal(context, inserted, fetchItem(handler, false, extractMatcher, settings.getStackMode(), toextract-remaining, index, startIdx));
+                        insertStackReal(context, inserted, fetchItem(handler, false, extractMatcher, settings.getStackMode(), settings.getExtractAmount(), toextract-remaining, index, startIdx));
                     }
                     break;
                 } else {
@@ -465,7 +465,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
     }
 
 
-    private ItemStack fetchItem(IItemHandler handler, boolean simulate, Predicate<ItemStack> matcher, ItemConnectorSettings.StackMode stackMode, int maxamount, MInteger index, int startIdx) {
+    private ItemStack fetchItem(IItemHandler handler, boolean simulate, Predicate<ItemStack> matcher, ItemConnectorSettings.StackMode stackMode, int extractAmount, int maxamount, MInteger index, int startIdx) {
         if (handler.getSlots() <= 0) {
             return ItemStack.EMPTY;
         }
@@ -473,7 +473,18 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
             int j = i % handler.getSlots();
             ItemStack stack = handler.getStackInSlot(j);
             if (!stack.isEmpty()) {
-                int s = (stackMode == ItemConnectorSettings.StackMode.SINGLE) ? 1 : stack.getMaxStackSize();
+                int s = 0;
+                switch (stackMode) {
+                    case SINGLE:
+                        s = 1;
+                        break;
+                    case STACK:
+                        s = stack.getMaxStackSize();
+                        break;
+                    case COUNT:
+                        s = extractAmount;
+                        break;
+                }
                 s = Math.min(s, maxamount);
                 stack = handler.extractItem(j, s, simulate);
                 if (!stack.isEmpty() && matcher.test(stack)) {

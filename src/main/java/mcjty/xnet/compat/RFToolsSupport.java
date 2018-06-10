@@ -32,7 +32,19 @@ public class RFToolsSupport {
                 return;
             }
         }
-        ItemStack stack = scanner.requestItem(extractMatcher, true, settings.getStackMode() == ItemConnectorSettings.StackMode.STACK ? 64 : 1, true);
+        int cnt = 0;
+        switch (settings.getStackMode()) {
+            case SINGLE:
+                cnt = 1;
+                break;
+            case STACK:
+                cnt = 64;
+                break;
+            case COUNT:
+                cnt = settings.getExtractAmount();
+                break;
+        }
+        ItemStack stack = scanner.requestItem(extractMatcher, true, cnt, true);
         if (!stack.isEmpty()) {
             // Now that we have a stack we first reduce the amount of the stack if we want to keep a certain
             // number of items

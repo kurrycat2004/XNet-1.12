@@ -24,6 +24,7 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
 
     public static final String TAG_MODE = "mode";
     public static final String TAG_STACK = "stack";
+    public static final String TAG_EXTRACT_AMOUNT = "extract_amount";
     public static final String TAG_SPEED = "speed";
     public static final String TAG_EXTRACT = "extract";
     public static final String TAG_OREDICT = "od";
@@ -43,7 +44,8 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
 
     public enum StackMode {
         SINGLE,
-        STACK
+        STACK,
+        COUNT
     }
 
     public enum ExtractMode {
@@ -62,6 +64,7 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
     private boolean blacklist = false;
     @Nullable private Integer priority = 0;
     @Nullable private Integer count = null;
+    @Nullable private Integer extractAmount = null;
     private ItemStackList filters = ItemStackList.create(FILTER_SIZE);
 
     // Cached matcher for items
@@ -108,19 +111,27 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
         redstoneGui(gui);
         gui.nl()
                 .choices(TAG_MODE, "Insert or extract mode", itemMode, ItemMode.values())
-                .choices(TAG_STACK, "Single item or entire stack", stackMode, StackMode.values())
-                .choices(TAG_SPEED, "Number of ticks for each operation", Integer.toString(speed * 5), speeds);
+                .choices(TAG_STACK, "Single item, stack, or count", stackMode, StackMode.values());
+
+        if (stackMode == StackMode.COUNT && itemMode == ItemMode.EXT) {
+            gui
+                    .integer(TAG_EXTRACT_AMOUNT, "Amount of items to extract|per operation", extractAmount, 30, 64);
+        }
+
+        gui
+                .choices(TAG_SPEED, "Number of ticks for each operation", Integer.toString(speed * 5), speeds)
+                .nl();
+
+        gui
+                .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority, 36).shift(5)
+                .label("#")
+                .integer(TAG_COUNT, itemMode == ItemMode.EXT ? "Amount in destination inventory|to keep" : "Max amount in destination|inventory", count, 36);
 
         if (itemMode == ItemMode.EXT) {
             gui.choices(TAG_EXTRACT, "Extract mode (first available,|random slot or round robin)", extractMode, ExtractMode.values());
         }
 
         gui
-                .nl()
-
-                .label("Pri").integer(TAG_PRIORITY, "Insertion priority", priority, 36).shift(5)
-                .label("#")
-                .integer(TAG_COUNT, itemMode == ItemMode.EXT ? "Amount in destination inventory|to keep" : "Max amount in destination|inventory", count, 36)
                 .nl()
 
                 .toggleText(TAG_BLACKLIST, "Enable blacklist mode", "BL", blacklist).shift(2)
@@ -170,12 +181,17 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
         return count;
     }
 
+    @Nullable
+    public Integer getExtractAmount() {
+        return extractAmount == null ? 1 : extractAmount;
+    }
+
     public int getSpeed() {
         return speed;
     }
 
     private static Set<String> INSERT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_COLOR+"3", TAG_COUNT, TAG_PRIORITY, TAG_OREDICT, TAG_META, TAG_NBT, TAG_BLACKLIST);
-    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_COLOR+"3", TAG_COUNT, TAG_OREDICT, TAG_META, TAG_NBT, TAG_BLACKLIST, TAG_STACK, TAG_SPEED, TAG_EXTRACT);
+    private static Set<String> EXTRACT_TAGS = ImmutableSet.of(TAG_MODE, TAG_RS, TAG_COLOR+"0", TAG_COLOR+"1", TAG_COLOR+"2", TAG_COLOR+"3", TAG_COUNT, TAG_OREDICT, TAG_META, TAG_NBT, TAG_BLACKLIST, TAG_STACK, TAG_SPEED, TAG_EXTRACT, TAG_EXTRACT_AMOUNT);
 
     @Override
     public boolean isEnabled(String tag) {
@@ -214,6 +230,7 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
         blacklist = Boolean.TRUE.equals(data.get(TAG_BLACKLIST));
         priority = (Integer) data.get(TAG_PRIORITY);
         count = (Integer) data.get(TAG_COUNT);
+        extractAmount = (Integer) data.get(TAG_EXTRACT_AMOUNT);
         for (int i = 0 ; i < FILTER_SIZE ; i++) {
             filters.set(i, (ItemStack) data.get(TAG_FILTER+i));
         }
@@ -246,6 +263,11 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
         } else {
             priority = null;
         }
+        if (tag.hasKey("extractAmount")) {
+            extractAmount = tag.getInteger("extractAmount");
+        } else {
+            extractAmount = null;
+        }
         if (tag.hasKey("count")) {
             count = tag.getInteger("count");
         } else {
@@ -275,6 +297,9 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
         tag.setBoolean("blacklist", blacklist);
         if (priority != null) {
             tag.setInteger("priority", priority);
+        }
+        if (extractAmount != null) {
+            tag.setInteger("extractAmount", extractAmount);
         }
         if (count != null) {
             tag.setInteger("count", count);
