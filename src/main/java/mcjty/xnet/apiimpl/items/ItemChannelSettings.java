@@ -10,7 +10,6 @@ import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.helper.DefaultChannelSettings;
 import mcjty.xnet.api.keys.ConsumerId;
 import mcjty.xnet.api.keys.SidedConsumer;
-import mcjty.xnet.blocks.controller.gui.GuiController;
 import mcjty.xnet.compat.RFToolsSupport;
 import mcjty.xnet.config.GeneralConfiguration;
 import net.minecraft.inventory.IInventory;
@@ -53,7 +52,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
     private ChannelMode channelMode = ChannelMode.PRIORITY;
     private int delay = 0;
     private int roundRobinOffset = 0;
-    private Map<ConsumerId, Integer> extractIndeces = new HashMap<>();
+    private Map<ConsumerId, Integer> extractIndices = new HashMap<>();
 
     public ChannelMode getChannelMode() {
         return channelMode;
@@ -71,7 +70,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
         roundRobinOffset = tag.getInteger("offset");
         int[] cons = tag.getIntArray("extidx");
         for (int idx = 0 ; idx < cons.length ; idx += 2) {
-            extractIndeces.put(new ConsumerId(cons[idx]), cons[idx+1]);
+            extractIndices.put(new ConsumerId(cons[idx]), cons[idx+1]);
         }
     }
 
@@ -81,10 +80,10 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
         tag.setInteger("delay", delay);
         tag.setInteger("offset", roundRobinOffset);
 
-        if (!extractIndeces.isEmpty()) {
-            int[] cons = new int[extractIndeces.size() * 2];
+        if (!extractIndices.isEmpty()) {
+            int[] cons = new int[extractIndices.size() * 2];
             int idx = 0;
-            for (Map.Entry<ConsumerId, Integer> entry : extractIndeces.entrySet()) {
+            for (Map.Entry<ConsumerId, Integer> entry : extractIndices.entrySet()) {
                 cons[idx++] = entry.getKey().getId();
                 cons[idx++] = entry.getValue();
             }
@@ -93,15 +92,11 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
     }
 
     private int getExtractIndex(ConsumerId consumer) {
-        if (extractIndeces.containsKey(consumer)) {
-            return extractIndeces.get(consumer);
-        } else {
-            return 0;
-        }
+        return extractIndices.getOrDefault(consumer, 0);
     }
 
     private void rememberExtractIndex(ConsumerId consumer, int index) {
-        extractIndeces.put(consumer, index);
+        extractIndices.put(consumer, index);
     }
 
     private static class MInteger {
@@ -230,6 +225,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                 return startIdx;
             }
         }
+
         MInteger index = new MInteger(startIdx);
         while (true) {
             ItemStack stack = fetchItem(handler, true, extractMatcher, settings.getStackMode(), settings.getExtractAmount(), 64, index, startIdx);
@@ -246,11 +242,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                     if (canextract < toextract) {
                         toextract = canextract;
                         stack = stack.copy();
-                        if (toextract <= 0) {
-                            stack.setCount(0);
-                        } else {
-                            stack.setCount(toextract);
-                        }
+                        stack.setCount(toextract);
                     }
                 }
 
