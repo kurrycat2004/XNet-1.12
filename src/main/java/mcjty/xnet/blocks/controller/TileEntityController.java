@@ -692,6 +692,8 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             if (colorId != null) {
                 probeInfo.text(TextStyleClass.LABEL + "Color: " + TextStyleClass.INFO + colorId.getId());
             }
+
+            probeInfo.text(TextStyleClass.LABEL + "Color mask: " + colors);
         }
     }
 

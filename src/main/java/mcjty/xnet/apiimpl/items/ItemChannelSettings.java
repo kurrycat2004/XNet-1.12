@@ -156,10 +156,10 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                 }
 
                 if (checkRedstone(world, settings, extractorPos)) {
-                    return;
+                    continue;
                 }
                 if (!context.matchColor(settings.getColorsMask())) {
-                    return;
+                    continue;
                 }
 
                 TileEntity te = world.getTileEntity(pos);
