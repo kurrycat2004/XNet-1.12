@@ -1,3 +1,6 @@
+1.7.2:
+- Fixed a very stupid bug in the item handling when there were multiple extraction points and some of these were disabled by color mask and/or redstone mode. As soon as it tested one of those extraction points it would ignore all remaining extraction points if the conditions didn't match
+
 1.7.1:
 - Reduced power consumption of the wireless router. It was a bit too much. Changed the name of the config so that everyone will get the new values
 - New feature to extract a specific amount of items per tick
