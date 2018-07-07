@@ -6,6 +6,7 @@ import mcjty.xnet.blocks.cables.ConnectorBlock;
 import mcjty.xnet.blocks.cables.NetCableBlock;
 import mcjty.xnet.blocks.facade.FacadeBlock;
 import mcjty.xnet.blocks.facade.FacadeModel;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ICustomModelLoader;
@@ -26,6 +27,9 @@ public class BakedModelLoader implements ICustomModelLoader {
     @Override
     public boolean accepts(ResourceLocation modelLocation) {
         if (!modelLocation.getResourceDomain().equals(XNet.MODID)) {
+            return false;
+        }
+        if (modelLocation instanceof ModelResourceLocation && ((ModelResourceLocation)modelLocation).getVariant().equals("inventory")) {
             return false;
         }
         return NAMES.contains(modelLocation.getResourcePath());

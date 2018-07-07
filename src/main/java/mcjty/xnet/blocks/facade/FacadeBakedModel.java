@@ -42,9 +42,6 @@ public class FacadeBakedModel implements IBakedModel {
 
     @Override
     public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
-        if (state == null) {
-            return Collections.emptyList();
-        }
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
         FacadeBlockId facadeId = extendedBlockState.getValue(GenericCableBlock.FACADEID);
         if (facadeId == null) {
