@@ -22,7 +22,7 @@ public class ForgeEventHandlers {
 
     @SubscribeEvent
     public void registerBlocks(RegistryEvent.Register<Block> event) {
-        ModFixs modFixs = FMLCommonHandler.instance().getDataFixer().init(XNet.MODID, 1);
+        ModFixs modFixs = FMLCommonHandler.instance().getDataFixer().init(XNet.MODID, 2);
         McJtyRegister.registerBlocks(XNet.instance, event.getRegistry(), modFixs, 1);
 
         // We used to accidentally register TEs with names like "minecraft:xnet_facade" instead of "xnet:facade".
@@ -35,7 +35,7 @@ public class ForgeEventHandlers {
         oldToNewIdMap.put("minecraft:" + XNet.MODID + "_connector", XNet.MODID + ":connector");
         oldToNewIdMap.put(XNet.MODID + "_advanced_connector", XNet.MODID + ":advanced_connector");
         oldToNewIdMap.put("minecraft:" + XNet.MODID + "_advanced_connector", XNet.MODID + ":advanced_connector");
-        modFixs.registerFix(FixTypes.BLOCK_ENTITY, new TileEntityNamespace(oldToNewIdMap, 1));
+        modFixs.registerFix(FixTypes.BLOCK_ENTITY, new TileEntityNamespace(oldToNewIdMap, 2));
     }
 
     @SubscribeEvent
