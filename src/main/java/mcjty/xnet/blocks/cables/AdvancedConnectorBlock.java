@@ -16,7 +16,7 @@ public class AdvancedConnectorBlock extends ConnectorBlock {
 
     @Override
     protected void initTileEntity() {
-        GameRegistry.registerTileEntity(AdvancedConnectorTileEntity.class, XNet.MODID + "_advanced_connector");
+        GameRegistry.registerTileEntity(AdvancedConnectorTileEntity.class, XNet.MODID + ":advanced_connector");
     }
 
     @Override

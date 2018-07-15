@@ -57,7 +57,7 @@ public class FacadeBlock extends NetCableBlock implements ITileEntityProvider {
     }
 
     protected void initTileEntity() {
-        GameRegistry.registerTileEntity(FacadeTileEntity.class, XNet.MODID + "_facade");
+        GameRegistry.registerTileEntity(FacadeTileEntity.class, XNet.MODID + ":facade");
     }
 
     @Nullable

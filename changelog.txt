@@ -1,3 +1,6 @@
+1.7.4:
+- Joseph fixed log warnings due to tile entities being registered with names like "minecraft:xnet_facade" instead of "xnet:facade".
+
 1.7.3:
 - Fixed a few baked models that didn't test for null state. This fixes XNet for recent versions of Forge
 

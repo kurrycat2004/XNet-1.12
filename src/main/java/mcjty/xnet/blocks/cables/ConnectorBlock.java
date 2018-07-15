@@ -74,7 +74,7 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
     }
 
     protected void initTileEntity() {
-        GameRegistry.registerTileEntity(ConnectorTileEntity.class, XNet.MODID + "_connector");
+        GameRegistry.registerTileEntity(ConnectorTileEntity.class, XNet.MODID + ":connector");
     }
 
     @Override
