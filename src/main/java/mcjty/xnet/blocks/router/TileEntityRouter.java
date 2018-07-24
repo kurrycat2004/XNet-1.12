@@ -183,6 +183,7 @@ public final class TileEntityRouter extends GenericTileEntity {
                             if ((!onlyPublished) || !publishedName.isEmpty()) {
                                 ControllerChannelClientInfo ci = new ControllerChannelClientInfo(channelInfo.getChannelName(), publishedName, controller.getPos(), channelInfo.getType(), remote, i);
                                 if (list.stream().noneMatch(ii -> Objects.equals(ii.getPublishedName(), ci.getPublishedName())
+                                        && Objects.equals(ii.getChannelName(), ci.getChannelName())
                                         && Objects.equals(ii.getChannelType(), ci.getChannelType())
                                         && Objects.equals(ii.getPos(), ci.getPos()))) {
                                     list.add(ci);
