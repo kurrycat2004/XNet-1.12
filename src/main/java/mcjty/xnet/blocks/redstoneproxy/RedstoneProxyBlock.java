@@ -3,6 +3,7 @@ package mcjty.xnet.blocks.redstoneproxy;
 import mcjty.lib.McJtyRegister;
 import mcjty.xnet.XNet;
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
@@ -31,6 +32,9 @@ public class RedstoneProxyBlock extends Block {
         super(Material.IRON);
         setUnlocalizedName(XNet.MODID + ".redstone_proxy");
         setRegistryName("redstone_proxy");
+        setHardness(2.0f);
+        setSoundType(SoundType.METAL);
+        setHarvestLevel("pickaxe", 0);
         McJtyRegister.registerLater(this, XNet.instance, null);
         McJtyRegister.registerLater(new ItemBlock(this).setRegistryName(getRegistryName()), XNet.instance);
         setCreativeTab(XNet.tabXNet);
