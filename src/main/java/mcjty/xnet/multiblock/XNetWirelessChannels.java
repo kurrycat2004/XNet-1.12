@@ -10,7 +10,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nonnull;
@@ -112,7 +111,7 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
                 }
             }
             for (GlobalCoordinate pos : toDelete) {
-                WorldBlob worldBlob = blobData.getWorldBlob(DimensionManager.getWorld(pos.getDimension()));
+                WorldBlob worldBlob = blobData.getWorldBlob(pos.getDimension());
                 NetworkId networkId = channelInfo.getRouter(pos).getNetworkId();
 //                System.out.println("Clean up wireless network = " + networkId + " (" + entry.getKey() + ")");
                 worldBlob.incNetworkVersion(networkId);

@@ -2,6 +2,7 @@
 - WARNING: Do not load any worlds with XNet 1.7.3 or earlier if you last saved them with XNet 1.7.4 or later!
 - Joseph fixed log warnings due to tile entities being registered with names like "minecraft:xnet_facade" instead of "xnet:facade".
 - Fixed a problem with the redstone proxy blocks being breakable by hand (and not giving any drops)
+- Fixed a possible crash with the wireless routers when used in different (unloaded) dimensions
 
 1.7.3:
 - Fixed a few baked models that didn't test for null state. This fixes XNet for recent versions of Forge

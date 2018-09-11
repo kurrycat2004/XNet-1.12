@@ -30,7 +30,10 @@ public class XNetBlobData extends AbstractWorldData<XNetBlobData> {
     }
 
     public WorldBlob getWorldBlob(World world) {
-        int dimId = world.provider.getDimension();
+        return getWorldBlob(world.provider.getDimension());
+    }
+
+    public WorldBlob getWorldBlob(int dimId) {
         if (!worldBlobMap.containsKey(dimId)) {
             worldBlobMap.put(dimId, new WorldBlob(dimId));
         }
