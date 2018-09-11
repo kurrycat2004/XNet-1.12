@@ -4,6 +4,7 @@
 - Fixed a problem with the redstone proxy blocks being breakable by hand (and not giving any drops)
 - Fixed a possible crash with the wireless routers when used in different (unloaded) dimensions
 - Made sure that the baked models for cables never return null for the particle texture
+- Fixed a problem with the router not showing multiple local channels of the same type
 
 1.7.3:
 - Fixed a few baked models that didn't test for null state. This fixes XNet for recent versions of Forge
