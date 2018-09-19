@@ -162,7 +162,7 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
             WirelessChannelInfo channelInfo = new WirelessChannelInfo();
             readRouters(tc.getTagList("routers", Constants.NBT.TAG_COMPOUND), channelInfo);
             UUID owner = null;
-            if (tc.hasKey("owner")) {
+            if (tc.hasUniqueId("owner")) {
                 owner = tc.getUniqueId("owner");
             }
             String name = tc.getString("name");
