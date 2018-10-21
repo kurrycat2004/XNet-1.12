@@ -1,5 +1,6 @@
 package mcjty.xnet.blocks.controller;
 
+import com.google.gson.*;
 import mcjty.lib.container.ContainerFactory;
 import mcjty.lib.tileentity.GenericEnergyReceiverTileEntity;
 import mcjty.lib.typed.Key;
@@ -11,6 +12,7 @@ import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.ProbeMode;
 import mcjty.theoneprobe.api.TextStyleClass;
 import mcjty.xnet.XNet;
+import mcjty.xnet.api.channels.IChannelSettings;
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.channels.IControllerContext;
@@ -30,6 +32,8 @@ import mcjty.xnet.config.GeneralConfiguration;
 import mcjty.xnet.logic.ChannelInfo;
 import mcjty.xnet.logic.LogicTools;
 import mcjty.xnet.multiblock.*;
+import mcjty.xnet.network.PacketJsonToClipboard;
+import mcjty.xnet.network.XNetMessages;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
@@ -63,11 +67,14 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     public static final String CMD_REMOVECONNECTOR = "controller.removeConnector";
     public static final String CMD_UPDATECONNECTOR = "controller.updateConnector";
     public static final String CMD_CREATECHANNEL = "controller.createChannel";
+    public static final String CMD_PASTECHANNEL = "controller.pasteChannel";
+    public static final String CMD_COPYCHANNEL = "controller.copyChannel";
     public static final String CMD_REMOVECHANNEL = "controller.removeChannel";
     public static final String CMD_UPDATECHANNEL = "controller.updateChannel";
 
     public static final Key<Integer> PARAM_INDEX = new Key<>("index", Type.INTEGER);
     public static final Key<String> PARAM_TYPE = new Key<>("type", Type.STRING);
+    public static final Key<String> PARAM_JSON = new Key<>("json", Type.STRING);
     public static final Key<Integer> PARAM_CHANNEL = new Key<>("channel", Type.INTEGER);
     public static final Key<Integer> PARAM_SIDE = new Key<>("side", Type.INTEGER);
     public static final Key<BlockPos> PARAM_POS = new Key<>("pos", Type.BLOCKPOS);
@@ -565,6 +572,75 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         markDirtyQuick();
     }
 
+    private void copyChannel(EntityPlayerMP player, int index) {
+        ChannelInfo channel = channels[index];
+        IChannelSettings settings = channel.getChannelSettings();
+        JsonObject parent = new JsonObject();
+        JsonObject channelObject = settings.writeToJson();
+
+        if (channelObject != null) {
+            parent.add("type", new JsonPrimitive(channel.getType().getID()));
+            parent.add("name", new JsonPrimitive(channel.getChannelName()));
+            parent.add("channel", channelObject);
+
+            JsonArray connectors = new JsonArray();
+
+            // @TODO TODO TODO
+            List<ConnectedBlockClientInfo> connectedBlocks = findConnectedBlocks();
+            for (ConnectedBlockClientInfo connectedBlock : connectedBlocks) {
+            }
+
+
+            for (Map.Entry<SidedConsumer, ConnectorInfo> entry : channel.getConnectors().entrySet()) {
+                SidedConsumer sidedConsumer = entry.getKey();
+                ConnectorInfo info = entry.getValue();
+                IConnectorSettings connectorSettings = info.getConnectorSettings();
+                JsonObject object = connectorSettings.writeToJson();
+                if (object != null) {
+                    connectors.add(object);
+
+                    WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
+                    BlockPos consumerPos = findConsumerPosition(worldBlob, sidedConsumer.getConsumerId());
+                    if (consumerPos != null) {
+                        BlockPos pos = consumerPos.offset(sidedConsumer.getSide().getOpposite());
+//                        SidedPos sidedPos = new SidedPos(pos, facing.getOpposite());
+//                        IBlockState state = getWorld().getBlockState(pos);
+//                        ItemStack item = state.getBlock().getItem(getWorld(), pos, state);
+//                        ConnectedBlockClientInfo info = new ConnectedBlockClientInfo(sidedPos, item, name);
+                    }
+
+                }
+            }
+
+            parent.add("connectors", connectors);
+
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            String json = gson.toJson(parent);
+
+            XNetMessages.INSTANCE.sendTo(new PacketJsonToClipboard(json, ""), player);
+        } else {
+            XNetMessages.INSTANCE.sendTo(new PacketJsonToClipboard("", "Channel does not support this!"), player);
+        }
+
+    }
+
+    private void pasteChannel(int channel, String typeId) {
+        JsonParser parser = new JsonParser();
+        JsonObject root = parser.parse(typeId).getAsJsonObject();
+        String name = root.get("name").getAsString();
+        IChannelType type = XNet.xNetApi.findType(typeId);
+        channels[channel] = new ChannelInfo(type);
+        channels[channel].setChannelName(name);
+        channels[channel].getChannelSettings().readFromJson(root.get("channel").getAsJsonObject());
+
+        // @todo connectors
+
+        networkDirty();
+        markDirtyQuick();
+    }
+
+
+
     @Override
     public boolean execute(EntityPlayerMP playerMP, String command, TypedMap params) {
         boolean rc = super.execute(playerMP, command, params);
@@ -575,6 +651,15 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             int index = params.get(PARAM_INDEX);
             String typeId = params.get(PARAM_TYPE);
             createChannel(index, typeId);
+            return true;
+        } else if (CMD_PASTECHANNEL.equals(command)) {
+            int index = params.get(PARAM_INDEX);
+            String json = params.get(PARAM_JSON);
+            pasteChannel(index, json);
+            return true;
+        } else if (CMD_COPYCHANNEL.equals(command)) {
+            int index = params.get(PARAM_INDEX);
+            copyChannel(playerMP, index);
             return true;
         } else if (CMD_CREATECONNECTOR.equals(command)) {
             int channel = params.get(PARAM_CHANNEL);

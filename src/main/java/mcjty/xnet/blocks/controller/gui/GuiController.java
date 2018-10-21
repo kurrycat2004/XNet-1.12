@@ -1,14 +1,22 @@
 package mcjty.xnet.blocks.controller.gui;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.container.GenericContainer;
 import mcjty.lib.gui.GenericGuiContainer;
 import mcjty.lib.gui.Window;
+import mcjty.lib.gui.WindowManager;
 import mcjty.lib.gui.events.DefaultSelectionEvent;
 import mcjty.lib.gui.layout.HorizontalLayout;
 import mcjty.lib.gui.layout.PositionalLayout;
+import mcjty.lib.gui.layout.VerticalLayout;
 import mcjty.lib.gui.widgets.*;
+import mcjty.lib.gui.widgets.Button;
+import mcjty.lib.gui.widgets.Label;
+import mcjty.lib.gui.widgets.Panel;
+import mcjty.lib.gui.widgets.TextField;
 import mcjty.lib.tileentity.GenericEnergyStorageTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.BlockPosTools;
@@ -26,6 +34,8 @@ import mcjty.xnet.gui.GuiProxy;
 import mcjty.xnet.network.PacketGetChannels;
 import mcjty.xnet.network.PacketGetConnectedBlocks;
 import mcjty.xnet.network.XNetMessages;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -33,6 +43,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import org.lwjgl.input.Mouse;
 
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.util.List;
 
 import static mcjty.xnet.blocks.controller.TileEntityController.*;
@@ -58,6 +73,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     private int showingChannel = -1;
     private SidedPos showingConnector = null;
 
+    private static GuiController openController = null;
 
     private EnergyBar energyBar;
 
@@ -68,6 +84,13 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
 
     public GuiController(TileEntityController controller, GenericContainer container) {
         super(XNet.instance, XNetMessages.INSTANCE, controller, container, GuiProxy.GUI_MANUAL_XNET, "controller");
+        openController = this;
+    }
+
+    @Override
+    public void onGuiClosed() {
+        super.onGuiClosed();
+        openController = null;
     }
 
     @Override
@@ -223,23 +246,105 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                             .addButtonEvent(parent -> removeChannel());
                     channelEditPanel.addChild(remove);
                     editor.setState(info.getChannelSettings());
+
+                    Button copy = new Button(mc, this)
+                            .setText("Copy")
+                            .setTooltips("Copy this channel to", "the clipboard")
+                            .setLayoutHint(new PositionalLayout.PositionalHint(104, 19, 53, 14))
+                            .addButtonEvent(parent -> copyChannel());
+                    channelEditPanel.addChild(copy);
+
                 } else {
                     ChoiceLabel type = new ChoiceLabel(mc, this)
-                            .setLayoutHint(new PositionalLayout.PositionalHint(5, 12, 95, 14));
+                            .setLayoutHint(new PositionalLayout.PositionalHint(5, 3, 95, 14));
                     for (IChannelType channelType : XNet.xNetApi.getChannels().values()) {
                         type.addChoices(channelType.getID());       // Show names?
                     }
                     Button create = new Button(mc, this)
                             .setText("Create")
-                            .setLayoutHint(new PositionalLayout.PositionalHint(100, 12, 53, 14))
+                            .setLayoutHint(new PositionalLayout.PositionalHint(100, 3, 53, 14))
                             .addButtonEvent(parent -> createChannel(type.getCurrentChoice()));
-                    channelEditPanel.addChild(type).addChild(create);
+
+                    Button paste = new Button(mc, this)
+                            .setText("Paste")
+                            .setTooltips("Create a new channel", "from the clipboard")
+                            .setLayoutHint(new PositionalLayout.PositionalHint(100, 17, 53, 14))
+                            .addButtonEvent(parent -> pasteChannel());
+
+                    channelEditPanel.addChild(type).addChild(create).addChild(paste);
                 }
             }
         } else if (showingChannel != -1 && editingChannel == -1) {
             showingChannel = -1;
             channelEditPanel.removeChildren();
         }
+    }
+
+    public static void showMessage(Minecraft mc, Gui gui, WindowManager windowManager, int x, int y, String title) {
+        Panel ask = new Panel(mc, gui)
+                .setLayout(new VerticalLayout())
+                .setFilledBackground(0xff666666, 0xffaaaaaa)
+                .setFilledRectThickness(1);
+        ask.setBounds(new Rectangle(x, y, 200, 40));
+        Window askWindow = windowManager.createModalWindow(ask);
+        ask.addChild(new Label(mc, gui).setText(title));
+        Panel buttons = new Panel(mc, gui).setLayout(new HorizontalLayout()).setDesiredWidth(100).setDesiredHeight(18);
+        buttons.addChild(new Button(mc, gui).setText("Cancel").addButtonEvent((parent -> {
+            windowManager.closeWindow(askWindow);
+        })));
+        ask.addChild(buttons);
+    }
+
+    private void copyChannel() {
+        sendServerCommand(XNetMessages.INSTANCE, TileEntityController.CMD_COPYCHANNEL,
+                TypedMap.builder()
+                        .put(PARAM_INDEX, getSelectedChannel())
+                        .build());
+    }
+
+    public static void toClipboard(String json, String error) {
+        Minecraft mc = Minecraft.getMinecraft();
+        if (error.isEmpty()) {
+            try {
+                StringSelection selection = new StringSelection(json);
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clipboard.setContents(selection, selection);
+            } catch (Exception e) {
+                if (openController != null) {
+                    showMessage(mc, openController, openController.getWindowManager(), 50, 50, TextFormatting.RED + "Error copying to clipboard!");
+                }
+            }
+        } else {
+            if (openController != null) {
+                showMessage(mc, openController, openController.getWindowManager(), 50, 50, TextFormatting.RED + "No support for this channel!!");
+            }
+        }
+    }
+
+    private void pasteChannel() {
+        try {
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            String json = (String) clipboard.getData(DataFlavor.stringFlavor);
+            JsonParser parser = new JsonParser();
+            JsonObject root = parser.parse(json).getAsJsonObject();
+            String type = root.get("type").getAsString();
+            IChannelType channelType = XNet.xNetApi.findType(type);
+            if (channelType == null) {
+                showMessage(mc, this, getWindowManager(), 50, 50, TextFormatting.RED + "Unsupported channel type: " + type + "!");
+                return;
+            }
+            sendServerCommand(XNetMessages.INSTANCE, TileEntityController.CMD_PASTECHANNEL,
+                    TypedMap.builder()
+                            .put(PARAM_INDEX, getSelectedChannel())
+                            .put(PARAM_JSON, json)
+                            .build());
+            refresh();
+        } catch (UnsupportedFlavorException e) {
+            showMessage(mc, this, getWindowManager(), 50, 50, TextFormatting.RED + "Clipboard does not contain channel!");
+        } catch (Exception e) {
+            showMessage(mc, this, getWindowManager(), 50, 50, TextFormatting.RED + "Error reading from clipboard!");
+        }
+
     }
 
     private ConnectorClientInfo findClientInfo(ChannelClientInfo info, SidedPos p) {

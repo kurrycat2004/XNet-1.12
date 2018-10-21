@@ -1,5 +1,6 @@
 package mcjty.xnet.api.channels;
 
+import com.google.gson.JsonObject;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import net.minecraft.nbt.NBTTagCompound;
@@ -15,6 +16,18 @@ public interface IChannelSettings {
     void readFromNBT(NBTTagCompound tag);
 
     void writeToNBT(NBTTagCompound tag);
+
+    /**
+     * Write the channel settings to json. The default implementation does nothing.
+     * Return null if your channel does not support this. This feature is used for
+     * copy/pasting channels.
+     */
+    default JsonObject writeToJson() { return null; }
+
+    /**
+     * Initialize this channel from the JSon data
+     */
+    default void readFromJson(JsonObject data) { }
 
     /**
      * Do a tick on this channel. This is called server-side

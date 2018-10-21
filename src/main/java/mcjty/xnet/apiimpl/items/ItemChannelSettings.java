@@ -1,5 +1,7 @@
 package mcjty.xnet.apiimpl.items;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import mcjty.lib.varia.WorldTools;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelSettings;
@@ -62,6 +64,20 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
     public int getColors() {
         return 0;
     }
+
+    @Override
+    public JsonObject writeToJson() {
+        JsonObject object = new JsonObject();
+        object.add("mode", new JsonPrimitive(channelMode.ordinal()));
+        return object;
+    }
+
+    @Override
+    public void readFromJson(JsonObject data) {
+        int mode = data.get("mode").getAsInt();
+        channelMode = ChannelMode.values()[mode];
+    }
+
 
     @Override
     public void readFromNBT(NBTTagCompound tag) {

@@ -1,5 +1,6 @@
 package mcjty.xnet.api.channels;
 
+import com.google.gson.JsonObject;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import net.minecraft.nbt.NBTTagCompound;
@@ -15,6 +16,18 @@ public interface IConnectorSettings {
     void readFromNBT(NBTTagCompound tag);
 
     void writeToNBT(NBTTagCompound tag);
+
+    /**
+     * Write the connector settings to json. The default implementation does nothing.
+     * Return null if your connector does not support this. This feature is used for
+     * copy/pasting channels.
+     */
+    default JsonObject writeToJson() { return null; }
+
+    /**
+     * Initialize this connector from the JSon data
+     */
+    default void readFromJson(JsonObject data) { }
 
     /**
      * Return an optional indicator icon
