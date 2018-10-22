@@ -672,7 +672,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     }
 
     private int calculateMatchingScore(ConnectedBlockClientInfo info, String name, ResourceLocation block,
-                                       @Nonnull EnumFacing side, boolean advanced) {
+                                       @Nonnull EnumFacing side, @Nonnull EnumFacing facingOverride, boolean advanced) {
         int score = 0;
 
         String infoName = info.getName();
@@ -684,6 +684,14 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         if (advanced) {
             if (infoAdvanced) {
                 score += 50;
+            } else {
+                // If advanced is desired but our actual connector is not advanced then we give a penalty. The penalty is big
+                // if we can't match with the actual side
+                if (!facingOverride.equals(info.getPos().getSide())) {
+                    score -= 1000;
+                } else {
+                    score -= 40;
+                }
             }
         } else {
             // If we don't need advanced then we add a small penalty if it is advanced
@@ -706,10 +714,11 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         return score;
     }
 
-    private void pasteChannel(EntityPlayerMP player, int channel, String typeId) {
+    private void pasteChannel(EntityPlayerMP player, int channel, String json) {
         try {
             JsonParser parser = new JsonParser();
-            JsonObject root = parser.parse(typeId).getAsJsonObject();
+            JsonObject root = parser.parse(json).getAsJsonObject();
+            String typeId = root.get("type").getAsString();
             IChannelType type = XNet.xNetApi.findType(typeId);
             channels[channel] = new ChannelInfo(type);
             channels[channel].setChannelName(root.get("name").getAsString());
@@ -727,16 +736,17 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
                 JsonObject connectorObject = connector.get("connector").getAsJsonObject();
                 EnumFacing side = EnumFacing.byName(connectorObject.get("side").getAsString());
+                EnumFacing facingOverride = connectorObject.has("facingoverride") ? EnumFacing.byName(connectorObject.get("facingoverride").getAsString()) : side;
 
                 List<Pair<ConnectedBlockClientInfo, Integer>> sortedMatches = connectedBlocks.stream()
-                        .map(info -> Pair.of(info, calculateMatchingScore(info, name, block, side, advanced)))
+                        .map(info -> Pair.of(info, calculateMatchingScore(info, name, block, side, facingOverride, advanced)))
                         .sorted((p1, p2) -> Integer.compare(p2.getRight(), p1.getRight()))
                         .collect(Collectors.toList());
-                if (!sortedMatches.isEmpty()) {
+                if (!sortedMatches.isEmpty() && sortedMatches.get(0).getRight() > -50) {
                     connections.add(Pair.of(connector, sortedMatches.get(0).getKey()));
                     connectedBlocks.remove(sortedMatches.get(0).getKey());
                 } else {
-                    XNetMessages.INSTANCE.sendTo(new PacketControllerError("Not enough matching connectors to paste this!"), player);
+                    XNetMessages.INSTANCE.sendTo(new PacketControllerError("Not enough matching connectors!"), player);
                     return;
                 }
             }
