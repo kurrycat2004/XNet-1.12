@@ -423,7 +423,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     }
 
     @Nonnull
-    private List<ConnectedBlockClientInfo> findConnectedBlocks() {
+    private List<ConnectedBlockClientInfo> findConnectedBlocksForClient() {
         WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
 
         Set<ConnectedBlockClientInfo> set = new HashSet<>();
@@ -572,6 +572,54 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         markDirtyQuick();
     }
 
+    private IConnectorSettings findConnectorSettings(ChannelInfo channel, SidedPos p) {
+        WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
+
+        for (Map.Entry<SidedConsumer, ConnectorInfo> entry : channel.getConnectors().entrySet()) {
+            SidedConsumer sidedConsumer = entry.getKey();
+            ConnectorInfo info = entry.getValue();
+            if (info.getConnectorSettings() != null) {
+                BlockPos consumerPos = findConsumerPosition(worldBlob, sidedConsumer.getConsumerId());
+                if (consumerPos != null) {
+                    SidedPos pos = new SidedPos(consumerPos.offset(sidedConsumer.getSide()), sidedConsumer.getSide().getOpposite());
+                    if (pos.equals(p)) {
+                        return info.getConnectorSettings();
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    @Nonnull
+    private Set<ConnectedBlockClientInfo> findConnectedBlocks() {
+        WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
+
+        Set<ConnectedBlockClientInfo> set = new HashSet<>();
+        for (BlockPos consumerPos : worldBlob.getConsumers(networkId)) {
+            String name = "";
+            TileEntity te = getWorld().getTileEntity(consumerPos);
+            if (te instanceof ConnectorTileEntity) {
+                // Should always be the case. @todo error?
+                name = ((ConnectorTileEntity) te).getConnectorName();
+            } else {
+                XNet.logger.warn("What? The connector at " + BlockPosTools.toString(consumerPos) + " is not a connector?");
+            }
+            for (EnumFacing facing : EnumFacing.VALUES) {
+                if (ConnectorBlock.isConnectable(getWorld(), consumerPos, facing)) {
+                    BlockPos pos = consumerPos.offset(facing);
+                    SidedPos sidedPos = new SidedPos(pos, facing.getOpposite());
+                    IBlockState state = getWorld().getBlockState(pos);
+                    ItemStack item = state.getBlock().getItem(getWorld(), pos, state);
+                    ConnectedBlockClientInfo info = new ConnectedBlockClientInfo(sidedPos, item, name);
+                    set.add(info);
+                }
+            }
+        }
+        return set;
+    }
+
+
     private void copyChannel(EntityPlayerMP player, int index) {
         ChannelInfo channel = channels[index];
         IChannelSettings settings = channel.getChannelSettings();
@@ -585,30 +633,22 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
             JsonArray connectors = new JsonArray();
 
-            // @TODO TODO TODO
-            List<ConnectedBlockClientInfo> connectedBlocks = findConnectedBlocks();
+            Set<ConnectedBlockClientInfo> connectedBlocks = findConnectedBlocks();
             for (ConnectedBlockClientInfo connectedBlock : connectedBlocks) {
-            }
-
-
-            for (Map.Entry<SidedConsumer, ConnectorInfo> entry : channel.getConnectors().entrySet()) {
-                SidedConsumer sidedConsumer = entry.getKey();
-                ConnectorInfo info = entry.getValue();
-                IConnectorSettings connectorSettings = info.getConnectorSettings();
-                JsonObject object = connectorSettings.writeToJson();
-                if (object != null) {
-                    connectors.add(object);
-
-                    WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
-                    BlockPos consumerPos = findConsumerPosition(worldBlob, sidedConsumer.getConsumerId());
-                    if (consumerPos != null) {
-                        BlockPos pos = consumerPos.offset(sidedConsumer.getSide().getOpposite());
-//                        SidedPos sidedPos = new SidedPos(pos, facing.getOpposite());
-//                        IBlockState state = getWorld().getBlockState(pos);
-//                        ItemStack item = state.getBlock().getItem(getWorld(), pos, state);
-//                        ConnectedBlockClientInfo info = new ConnectedBlockClientInfo(sidedPos, item, name);
+                SidedPos sidedPos = connectedBlock.getPos();
+                IConnectorSettings connectorSettings = findConnectorSettings(channel, sidedPos);
+                if (connectorSettings != null) {
+                    JsonObject object = connectorSettings.writeToJson();
+                    if (object != null) {
+                        JsonObject connectorObject = new JsonObject();
+                        connectorObject.add("connector", object);
+                        connectorObject.add("name", new JsonPrimitive(connectedBlock.getName()));
+                        ItemStack block = connectedBlock.getConnectedBlock();
+                        if (!block.isEmpty()) {
+                            connectorObject.add("block", new JsonPrimitive(block.getItem().getRegistryName().toString()));
+                        }
+                        connectors.add(connectorObject);
                     }
-
                 }
             }
 
@@ -698,7 +738,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         if (CMD_GETCHANNELS.equals(command)) {
             return type.convert(findChannelInfo());
         } else if (CMD_GETCONNECTEDBLOCKS.equals(command)) {
-            return type.convert(findConnectedBlocks());
+            return type.convert(findConnectedBlocksForClient());
         }
         return Collections.emptyList();
     }

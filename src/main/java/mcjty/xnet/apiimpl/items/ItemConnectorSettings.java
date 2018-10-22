@@ -1,7 +1,10 @@
 package mcjty.xnet.apiimpl.items;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import mcjty.lib.varia.ItemStackList;
+import mcjty.lib.varia.ItemStackTools;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
@@ -237,6 +240,40 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
             filters.set(i, (ItemStack) data.get(TAG_FILTER+i));
         }
         matcher = null;
+    }
+
+    @Override
+    public JsonObject writeToJson() {
+        JsonObject object = new JsonObject();
+        object.add("itemmode", new JsonPrimitive(itemMode.ordinal()));
+        object.add("extractmode", new JsonPrimitive(extractMode.ordinal()));
+        object.add("stackmode", new JsonPrimitive(stackMode.ordinal()));
+        object.add("oredictmode", new JsonPrimitive(oredictMode));
+        object.add("metamode", new JsonPrimitive(metaMode));
+        object.add("nbtmode", new JsonPrimitive(nbtMode));
+        object.add("blacklist", new JsonPrimitive(blacklist));
+        if (priority != null) {
+            object.add("priority", new JsonPrimitive(priority));
+        }
+        if (extractAmount != null) {
+            object.add("extractamount", new JsonPrimitive(extractAmount));
+        }
+        if (count != null) {
+            object.add("count", new JsonPrimitive(count));
+        }
+        object.add("speed", new JsonPrimitive(speed));
+        for (int i = 0 ; i < FILTER_SIZE ; i++) {
+            if (!filters.get(i).isEmpty()) {
+                object.add("filter" + i, ItemStackTools.itemStackToJson(filters.get(i)));
+            }
+        }
+
+        return object;
+    }
+
+    @Override
+    public void readFromJson(JsonObject data) {
+
     }
 
     @Override

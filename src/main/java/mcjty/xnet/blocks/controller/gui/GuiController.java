@@ -488,9 +488,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                     }
                 }
                 int finalI = i;
-                but.addButtonEvent(parent -> {
-                    selectConnectorEditor(sidedPos, finalI);
-                });
+                but.addButtonEvent(parent -> selectConnectorEditor(sidedPos, finalI));
                 panel.addChild(but);
             }
             connectorList.addChild(panel);
