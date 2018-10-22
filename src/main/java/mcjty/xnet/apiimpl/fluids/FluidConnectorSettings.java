@@ -1,12 +1,14 @@
 package mcjty.xnet.apiimpl.fluids;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.gson.JsonObject;
 import mcjty.lib.varia.FluidTools;
+import mcjty.lib.varia.ItemStackTools;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.helper.AbstractConnectorSettings;
-import mcjty.xnet.blocks.controller.gui.GuiController;
+import mcjty.xnet.apiimpl.EnumStringTranslators;
 import mcjty.xnet.config.GeneralConfiguration;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -31,7 +33,7 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
     public static final String TAG_SPEED = "speed";
 
 
-    enum FluidMode {
+    public enum FluidMode {
         INS,
         EXT
     }
@@ -168,6 +170,37 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
             filter = ItemStack.EMPTY;
         }
     }
+
+    @Override
+    public JsonObject writeToJson() {
+        JsonObject object = new JsonObject();
+        super.writeToJsonInternal(object);
+        setEnumSafe(object, "fluidmode", fluidMode);
+        setIntegerSafe(object, "priority", priority);
+        setIntegerSafe(object, "rate", rate);
+        setIntegerSafe(object, "minmax", minmax);
+        setIntegerSafe(object, "speed", speed);
+        if (!filter.isEmpty()) {
+            object.add("filter", ItemStackTools.itemStackToJson(filter));
+        }
+        return object;
+    }
+
+    @Override
+    public void readFromJson(JsonObject object) {
+        super.readFromJsonInternal(object);
+        fluidMode = getEnumSafe(object, "fluidmode", EnumStringTranslators::getFluidMode);
+        priority = getIntegerSafe(object, "priority");
+        rate = getIntegerSafe(object, "rate");
+        minmax = getIntegerSafe(object, "minmax");
+        speed = getIntegerNotNull(object, "speed");
+        if (object.has("filter")) {
+            filter = ItemStackTools.jsonToItemStack(object.get("filter").getAsJsonObject());
+        } else {
+            filter = ItemStack.EMPTY;
+        }
+    }
+
 
     @Override
     public void readFromNBT(NBTTagCompound tag) {

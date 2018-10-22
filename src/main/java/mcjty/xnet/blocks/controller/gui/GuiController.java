@@ -13,10 +13,6 @@ import mcjty.lib.gui.layout.HorizontalLayout;
 import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.gui.layout.VerticalLayout;
 import mcjty.lib.gui.widgets.*;
-import mcjty.lib.gui.widgets.Button;
-import mcjty.lib.gui.widgets.Label;
-import mcjty.lib.gui.widgets.Panel;
-import mcjty.lib.gui.widgets.TextField;
 import mcjty.lib.tileentity.GenericEnergyStorageTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.BlockPosTools;
@@ -43,7 +39,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import org.lwjgl.input.Mouse;
 
-import java.awt.*;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -302,22 +299,20 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                         .build());
     }
 
-    public static void toClipboard(String json, String error) {
-        Minecraft mc = Minecraft.getMinecraft();
-        if (error.isEmpty()) {
-            try {
-                StringSelection selection = new StringSelection(json);
-                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                clipboard.setContents(selection, selection);
-            } catch (Exception e) {
-                if (openController != null) {
-                    showMessage(mc, openController, openController.getWindowManager(), 50, 50, TextFormatting.RED + "Error copying to clipboard!");
-                }
-            }
-        } else {
-            if (openController != null) {
-                showMessage(mc, openController, openController.getWindowManager(), 50, 50, TextFormatting.RED + "No support for this channel!!");
-            }
+    public static void showError(String error) {
+        if (openController != null) {
+            Minecraft mc = Minecraft.getMinecraft();
+            showMessage(mc, openController, openController.getWindowManager(), 50, 50, TextFormatting.RED + error);
+        }
+    }
+
+    public static void toClipboard(String json) {
+        try {
+            StringSelection selection = new StringSelection(json);
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            clipboard.setContents(selection, selection);
+        } catch (Exception e) {
+            showError("Error copying to clipboard!");
         }
     }
 

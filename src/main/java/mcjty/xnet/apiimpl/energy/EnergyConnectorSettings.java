@@ -1,10 +1,12 @@
 package mcjty.xnet.apiimpl.energy;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.gson.JsonObject;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.helper.AbstractConnectorSettings;
+import mcjty.xnet.apiimpl.EnumStringTranslators;
 import mcjty.xnet.config.GeneralConfiguration;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -24,7 +26,7 @@ public class EnergyConnectorSettings extends AbstractConnectorSettings {
     public static final String TAG_MINMAX = "minmax";
     public static final String TAG_PRIORITY = "priority";
 
-    enum EnergyMode {
+    public enum EnergyMode {
         INS,
         EXT
     }
@@ -122,6 +124,26 @@ public class EnergyConnectorSettings extends AbstractConnectorSettings {
         rate = (Integer) data.get(TAG_RATE);
         minmax = (Integer) data.get(TAG_MINMAX);
         priority = (Integer) data.get(TAG_PRIORITY);
+    }
+
+    @Override
+    public JsonObject writeToJson() {
+        JsonObject object = new JsonObject();
+        super.writeToJsonInternal(object);
+        setEnumSafe(object, "energymode", energyMode);
+        setIntegerSafe(object, "priority", priority);
+        setIntegerSafe(object, "rate", rate);
+        setIntegerSafe(object, "minmax", minmax);
+        return object;
+    }
+
+    @Override
+    public void readFromJson(JsonObject object) {
+        super.readFromJsonInternal(object);
+        energyMode = getEnumSafe(object, "energymode", EnumStringTranslators::getEnergyMode);
+        priority = getIntegerSafe(object, "priority");
+        rate = getIntegerSafe(object, "rate");
+        minmax = getIntegerSafe(object, "minmax");
     }
 
     @Override

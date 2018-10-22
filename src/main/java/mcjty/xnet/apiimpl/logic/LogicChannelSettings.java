@@ -1,5 +1,6 @@
 package mcjty.xnet.apiimpl.logic;
 
+import com.google.gson.JsonObject;
 import mcjty.lib.varia.WorldTools;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelSettings;
@@ -10,7 +11,6 @@ import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.helper.DefaultChannelSettings;
 import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.blocks.cables.ConnectorTileEntity;
-import mcjty.xnet.blocks.controller.gui.GuiController;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -32,6 +32,17 @@ public class LogicChannelSettings extends DefaultChannelSettings implements ICha
     private int colors = 0;     // Colors for this channel
     private List<Pair<SidedConsumer, LogicConnectorSettings>> sensors = null;
     private List<Pair<SidedConsumer, LogicConnectorSettings>> outputs = null;
+
+    @Override
+    public JsonObject writeToJson() {
+        JsonObject object = new JsonObject();
+        return object;
+    }
+
+    @Override
+    public void readFromJson(JsonObject data) {
+    }
+
 
     @Override
     public void readFromNBT(NBTTagCompound tag) {

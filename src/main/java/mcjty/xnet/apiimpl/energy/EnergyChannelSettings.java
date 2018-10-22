@@ -1,5 +1,6 @@
 package mcjty.xnet.apiimpl.energy;
 
+import com.google.gson.JsonObject;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.compat.RedstoneFluxCompatibility;
 import mcjty.lib.varia.EnergyTools;
@@ -39,6 +40,17 @@ public class EnergyChannelSettings extends DefaultChannelSettings implements ICh
     // Cache data
     private List<Pair<SidedConsumer, EnergyConnectorSettings>> energyExtractors = null;
     private List<Pair<SidedConsumer, EnergyConnectorSettings>> energyConsumers = null;
+
+    @Override
+    public JsonObject writeToJson() {
+        JsonObject object = new JsonObject();
+        return object;
+    }
+
+    @Override
+    public void readFromJson(JsonObject data) {
+    }
+
 
     @Override
     public void readFromNBT(NBTTagCompound tag) {

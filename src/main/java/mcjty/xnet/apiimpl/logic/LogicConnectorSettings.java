@@ -1,11 +1,16 @@
 package mcjty.xnet.apiimpl.logic;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import mcjty.lib.varia.ItemStackTools;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.helper.AbstractConnectorSettings;
-import mcjty.xnet.blocks.controller.gui.GuiController;
+import mcjty.xnet.apiimpl.EnumStringTranslators;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -25,11 +30,10 @@ public class LogicConnectorSettings extends AbstractConnectorSettings {
     public static final String TAG_SPEED = "speed";
     public static final String TAG_REDSTONE_OUT = "rsout";
 
-    enum LogicMode {
+    public enum LogicMode {
         SENSOR,
         OUTPUT
     }
-
 
     public static final int SENSORS = 4;
 
@@ -156,6 +160,51 @@ public class LogicConnectorSettings extends AbstractConnectorSettings {
             }
         } else {
             redstoneOut = (Integer) data.get(TAG_REDSTONE_OUT);
+        }
+    }
+
+    @Override
+    public JsonObject writeToJson() {
+        JsonObject object = new JsonObject();
+        super.writeToJsonInternal(object);
+        setEnumSafe(object, "logicmode", logicMode);
+        setIntegerSafe(object, "speed", speed);
+        JsonArray sensorArray = new JsonArray();
+        for (Sensor sensor : sensors) {
+            JsonObject o = new JsonObject();
+            setEnumSafe(o, "sensormode", sensor.getSensorMode());
+            setEnumSafe(o, "outputcolor", sensor.getOutputColor());
+            setEnumSafe(o, "operator", sensor.getOperator());
+            setIntegerSafe(o, "amount", sensor.getAmount());
+            if (!sensor.getFilter().isEmpty()) {
+                o.add("filter", ItemStackTools.itemStackToJson(sensor.getFilter()));
+            }
+            sensorArray.add(o);
+        }
+        object.add("sensors", sensorArray);
+        return object;
+    }
+
+    @Override
+    public void readFromJson(JsonObject object) {
+        super.readFromJsonInternal(object);
+        logicMode = getEnumSafe(object, "logicmode", EnumStringTranslators::getLogicMode);
+        speed = getIntegerNotNull(object, "speed");
+        JsonArray sensorArray = object.get("sensors").getAsJsonArray();
+        sensors.clear();
+        for (JsonElement oe : sensorArray) {
+            JsonObject o = oe.getAsJsonObject();
+            Sensor sensor = new Sensor(sensors.size());
+            sensor.setAmount(getIntegerNotNull(o, "amount"));
+            sensor.setOperator(getEnumSafe(o, "operator", EnumStringTranslators::getOperator));
+            sensor.setOutputColor(getEnumSafe(o, "outputcolor", EnumStringTranslators::getColor));
+            sensor.setSensorMode(getEnumSafe(o, "sensormode", EnumStringTranslators::getSensorMode));
+            if (o.has("filter")) {
+                sensor.setFilter(ItemStackTools.jsonToItemStack(o.get("filter").getAsJsonObject()));
+            } else {
+                sensor.setFilter(ItemStack.EMPTY);
+            }
+            sensors.add(sensor);
         }
     }
 

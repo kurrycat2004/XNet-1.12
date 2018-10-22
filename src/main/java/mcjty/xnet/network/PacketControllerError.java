@@ -8,36 +8,36 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class PacketJsonToClipboard implements IMessage {
+public class PacketControllerError implements IMessage {
 
-    private String json;
+    private String error;
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        json = NetworkTools.readStringUTF8(buf);
+        error = NetworkTools.readStringUTF8(buf);
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
-        NetworkTools.writeStringUTF8(buf, json);
+        NetworkTools.writeStringUTF8(buf, error);
     }
 
-    public PacketJsonToClipboard() {
+    public PacketControllerError() {
     }
 
-    public PacketJsonToClipboard(String json) {
-        this.json = json;
+    public PacketControllerError(String error) {
+        this.error = error;
     }
 
-    public static class Handler implements IMessageHandler<PacketJsonToClipboard, IMessage> {
+    public static class Handler implements IMessageHandler<PacketControllerError, IMessage> {
         @Override
-        public IMessage onMessage(PacketJsonToClipboard message, MessageContext ctx) {
+        public IMessage onMessage(PacketControllerError message, MessageContext ctx) {
             XNet.proxy.addScheduledTaskClient(() -> handle(message, ctx));
             return null;
         }
 
-        private void handle(PacketJsonToClipboard message, MessageContext ctx) {
-            GuiController.toClipboard(message.json);
+        private void handle(PacketControllerError message, MessageContext ctx) {
+            GuiController.showError(message.error);
         }
     }
 }

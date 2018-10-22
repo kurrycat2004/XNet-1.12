@@ -10,6 +10,7 @@ import mcjty.xnet.api.channels.IControllerContext;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.helper.DefaultChannelSettings;
+import mcjty.xnet.apiimpl.EnumStringTranslators;
 import mcjty.xnet.api.keys.ConsumerId;
 import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.compat.RFToolsSupport;
@@ -46,7 +47,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
     private List<Pair<SidedConsumer, ItemConnectorSettings>> itemConsumers = null;
 
 
-    enum ChannelMode {
+    public enum ChannelMode {
         PRIORITY,
         ROUNDROBIN
     }
@@ -68,14 +69,13 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
     @Override
     public JsonObject writeToJson() {
         JsonObject object = new JsonObject();
-        object.add("mode", new JsonPrimitive(channelMode.ordinal()));
+        object.add("mode", new JsonPrimitive(channelMode.name()));
         return object;
     }
 
     @Override
     public void readFromJson(JsonObject data) {
-        int mode = data.get("mode").getAsInt();
-        channelMode = ChannelMode.values()[mode];
+        channelMode = EnumStringTranslators.getItemChannelMode(data.get("mode").getAsString());
     }
 
 

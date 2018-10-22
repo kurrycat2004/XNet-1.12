@@ -27,7 +27,7 @@ import java.util.function.BiPredicate;
 import static mcjty.xnet.api.channels.Color.COLORS;
 import static mcjty.xnet.api.channels.Color.OFF;
 
-class Sensor {
+public class Sensor {
 
     public static final String TAG_MODE = "mode";
     public static final String TAG_OPERATOR = "op";
@@ -36,7 +36,7 @@ class Sensor {
     public static final String TAG_STACK = "stack";
 
 
-    enum SensorMode {
+    public enum SensorMode {
         OFF,
         ITEM,
         FLUID,
@@ -44,7 +44,7 @@ class Sensor {
         RS
     }
 
-    enum Operator {
+    public enum Operator {
         EQUAL("=", (i1, i2) -> i1 == i2),
         NOTEQUAL("!=", (i1, i2) -> i1 != i2),
         LESS("<", (i1, i2) -> i1 < i2),
@@ -112,6 +112,14 @@ class Sensor {
 
     public void setOperator(Operator operator) {
         this.operator = operator;
+    }
+
+    public ItemStack getFilter() {
+        return filter;
+    }
+
+    public void setFilter(ItemStack filter) {
+        this.filter = filter;
     }
 
     public int getAmount() {

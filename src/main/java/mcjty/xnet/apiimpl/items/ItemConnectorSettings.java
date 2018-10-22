@@ -9,6 +9,7 @@ import mcjty.xnet.XNet;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.helper.AbstractConnectorSettings;
+import mcjty.xnet.apiimpl.EnumStringTranslators;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -245,23 +246,18 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
     @Override
     public JsonObject writeToJson() {
         JsonObject object = new JsonObject();
-        object.add("itemmode", new JsonPrimitive(itemMode.ordinal()));
-        object.add("extractmode", new JsonPrimitive(extractMode.ordinal()));
-        object.add("stackmode", new JsonPrimitive(stackMode.ordinal()));
+        super.writeToJsonInternal(object);
+        setEnumSafe(object, "itemmode", itemMode);
+        setEnumSafe(object, "extractmode", extractMode);
+        setEnumSafe(object, "stackmode", stackMode);
         object.add("oredictmode", new JsonPrimitive(oredictMode));
         object.add("metamode", new JsonPrimitive(metaMode));
         object.add("nbtmode", new JsonPrimitive(nbtMode));
         object.add("blacklist", new JsonPrimitive(blacklist));
-        if (priority != null) {
-            object.add("priority", new JsonPrimitive(priority));
-        }
-        if (extractAmount != null) {
-            object.add("extractamount", new JsonPrimitive(extractAmount));
-        }
-        if (count != null) {
-            object.add("count", new JsonPrimitive(count));
-        }
-        object.add("speed", new JsonPrimitive(speed));
+        setIntegerSafe(object, "priority", priority);
+        setIntegerSafe(object, "extractamount", extractAmount);
+        setIntegerSafe(object, "count", count);
+        setIntegerSafe(object, "speed", speed);
         for (int i = 0 ; i < FILTER_SIZE ; i++) {
             if (!filters.get(i).isEmpty()) {
                 object.add("filter" + i, ItemStackTools.itemStackToJson(filters.get(i)));
@@ -272,8 +268,26 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
     }
 
     @Override
-    public void readFromJson(JsonObject data) {
-
+    public void readFromJson(JsonObject object) {
+        super.readFromJsonInternal(object);
+        itemMode = getEnumSafe(object, "itemmode", EnumStringTranslators::getItemMode);
+        extractMode = getEnumSafe(object, "extractmode", EnumStringTranslators::getExtractMode);
+        stackMode = getEnumSafe(object, "stackmode", EnumStringTranslators::getStackMode);
+        oredictMode = getBoolSafe(object, "oredictmode");
+        metaMode = getBoolSafe(object, "metamode");
+        nbtMode = getBoolSafe(object, "nbtmode");
+        blacklist = getBoolSafe(object, "blacklist");
+        priority = getIntegerSafe(object, "priority");
+        extractAmount = getIntegerSafe(object, "extractamount");
+        count = getIntegerSafe(object, "count");
+        speed = getIntegerNotNull(object, "speed");
+        for (int i = 0 ; i < FILTER_SIZE ; i++) {
+            if (object.has("filter" + i)) {
+                filters.set(i, ItemStackTools.jsonToItemStack(object.get("filter" + i).getAsJsonObject()));
+            } else {
+                filters.set(i, ItemStack.EMPTY);
+            }
+        }
     }
 
     @Override

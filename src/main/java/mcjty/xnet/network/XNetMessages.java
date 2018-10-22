@@ -22,5 +22,6 @@ public class XNetMessages {
         net.registerMessage(PacketRemoteChannelsRouterReady.Handler.class, PacketRemoteChannelsRouterReady.class, PacketHandler.nextPacketID(), Side.CLIENT);
         net.registerMessage(PacketConnectedBlocksReady.Handler.class, PacketConnectedBlocksReady.class, PacketHandler.nextPacketID(), Side.CLIENT);
         net.registerMessage(PacketJsonToClipboard.Handler.class, PacketJsonToClipboard.class, PacketHandler.nextPacketID(), Side.CLIENT);
+        net.registerMessage(PacketControllerError.Handler.class, PacketControllerError.class, PacketHandler.nextPacketID(), Side.CLIENT);
     }
 }

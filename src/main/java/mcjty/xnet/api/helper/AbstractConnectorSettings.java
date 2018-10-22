@@ -1,15 +1,19 @@
 package mcjty.xnet.api.helper;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import mcjty.xnet.api.channels.Color;
 import mcjty.xnet.api.channels.IConnectorSettings;
 import mcjty.xnet.api.channels.RSMode;
 import mcjty.xnet.api.gui.IEditorGui;
+import mcjty.xnet.apiimpl.EnumStringTranslators;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Map;
+import java.util.function.Function;
 
 public abstract class AbstractConnectorSettings implements IConnectorSettings {
 
@@ -98,6 +102,69 @@ public abstract class AbstractConnectorSettings implements IConnectorSettings {
         calculateColorsMask();
         String facing = (String) data.get(TAG_FACING);
         facingOverride = facing == null ? null : EnumFacing.byName(facing);
+    }
+
+    protected static <T extends Enum<T>> void setEnumSafe(JsonObject object, String tag, T value) {
+        if (value != null) {
+            object.add(tag, new JsonPrimitive(value.name()));
+        }
+    }
+
+    protected static <T extends Enum<T>> T getEnumSafe(JsonObject object, String tag, Function<String, T> translator) {
+        if (object.has(tag)) {
+            return translator.apply(object.get(tag).getAsString());
+        } else {
+            return null;
+        }
+    }
+
+    protected static void setIntegerSafe(JsonObject object, String tag, Integer value) {
+        if (value != null) {
+            object.add(tag, new JsonPrimitive(value));
+        }
+    }
+
+    protected static Integer getIntegerSafe(JsonObject object, String tag) {
+        if (object.has(tag)) {
+            return object.get(tag).getAsInt();
+        } else {
+            return null;
+        }
+    }
+
+    protected static int getIntegerNotNull(JsonObject object, String tag) {
+        if (object.has(tag)) {
+            return object.get(tag).getAsInt();
+        } else {
+            return 0;
+        }
+    }
+
+    protected static boolean getBoolSafe(JsonObject object, String tag) {
+        if (object.has(tag)) {
+            return object.get(tag).getAsBoolean();
+        } else {
+            return false;
+        }
+    }
+
+    protected void writeToJsonInternal(JsonObject object) {
+        setEnumSafe(object, "rsmode", rsMode);
+        setEnumSafe(object, "color0", colors[0]);
+        setEnumSafe(object, "color1", colors[1]);
+        setEnumSafe(object, "color2", colors[2]);
+        setEnumSafe(object, "color3", colors[3]);
+        setEnumSafe(object, "side", side);   // Informative, isn't used to load
+        setEnumSafe(object, "facingoverride", facingOverride);
+    }
+
+    protected void readFromJsonInternal(JsonObject object) {
+        rsMode = getEnumSafe(object, "rsmode", EnumStringTranslators::getRSMode);
+        colors[0] = getEnumSafe(object, "color0", EnumStringTranslators::getColor);
+        colors[1] = getEnumSafe(object, "color1", EnumStringTranslators::getColor);
+        colors[2] = getEnumSafe(object, "color2", EnumStringTranslators::getColor);
+        colors[3] = getEnumSafe(object, "color3", EnumStringTranslators::getColor);
+        facingOverride = getEnumSafe(object, "facingoverride", EnumFacing::byName);
     }
 
     @Override

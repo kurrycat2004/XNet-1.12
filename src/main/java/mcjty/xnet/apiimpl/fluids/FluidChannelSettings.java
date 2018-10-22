@@ -1,5 +1,7 @@
 package mcjty.xnet.apiimpl.fluids;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import mcjty.lib.varia.WorldTools;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelSettings;
@@ -8,8 +10,8 @@ import mcjty.xnet.api.channels.IControllerContext;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.helper.DefaultChannelSettings;
+import mcjty.xnet.apiimpl.EnumStringTranslators;
 import mcjty.xnet.api.keys.SidedConsumer;
-import mcjty.xnet.blocks.controller.gui.GuiController;
 import mcjty.xnet.config.GeneralConfiguration;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -36,7 +38,7 @@ public class FluidChannelSettings extends DefaultChannelSettings implements ICha
 
     public static final String TAG_MODE = "mode";
 
-    enum ChannelMode {
+    public enum ChannelMode {
         PRIORITY,
         DISTRIBUTE
     }
@@ -52,6 +54,19 @@ public class FluidChannelSettings extends DefaultChannelSettings implements ICha
     public ChannelMode getChannelMode() {
         return channelMode;
     }
+
+    @Override
+    public JsonObject writeToJson() {
+        JsonObject object = new JsonObject();
+        object.add("mode", new JsonPrimitive(channelMode.name()));
+        return object;
+    }
+
+    @Override
+    public void readFromJson(JsonObject data) {
+        channelMode = EnumStringTranslators.getFluidChannelMode(data.get("mode").getAsString());
+    }
+
 
     @Override
     public void readFromNBT(NBTTagCompound tag) {

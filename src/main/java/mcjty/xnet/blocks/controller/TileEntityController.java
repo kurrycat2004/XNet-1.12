@@ -32,6 +32,7 @@ import mcjty.xnet.config.GeneralConfiguration;
 import mcjty.xnet.logic.ChannelInfo;
 import mcjty.xnet.logic.LogicTools;
 import mcjty.xnet.multiblock.*;
+import mcjty.xnet.network.PacketControllerError;
 import mcjty.xnet.network.PacketJsonToClipboard;
 import mcjty.xnet.network.XNetMessages;
 import net.minecraft.block.properties.PropertyBool;
@@ -46,13 +47,16 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Optional;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static mcjty.xnet.logic.ChannelInfo.MAX_CHANNELS;
 
@@ -558,7 +562,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         }
     }
 
-    private void createConnector(int channel, SidedPos pos) {
+    private ConnectorInfo createConnector(int channel, SidedPos pos) {
         WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
         BlockPos consumerPos = pos.getPos().offset(pos.getSide());
         ConsumerId consumerId = worldBlob.getConsumerAt(consumerPos);
@@ -567,9 +571,10 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         }
         SidedConsumer id = new SidedConsumer(consumerId, pos.getSide().getOpposite());
         boolean advanced = getWorld().getBlockState(consumerPos).getBlock() == NetCableSetup.advancedConnectorBlock;
-        channels[channel].createConnector(id, advanced);
+        ConnectorInfo info = channels[channel].createConnector(id, advanced);
         networkDirty();
         markDirtyQuick();
+        return info;
     }
 
     private IConnectorSettings findConnectorSettings(ChannelInfo channel, SidedPos p) {
@@ -643,10 +648,13 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                         JsonObject connectorObject = new JsonObject();
                         connectorObject.add("connector", object);
                         connectorObject.add("name", new JsonPrimitive(connectedBlock.getName()));
+                        boolean advanced = ConnectorBlock.isAdvancedConnector(world, sidedPos.getPos().offset(sidedPos.getSide()));
+                        connectorObject.add("advanced", new JsonPrimitive(advanced));
                         ItemStack block = connectedBlock.getConnectedBlock();
                         if (!block.isEmpty()) {
                             connectorObject.add("block", new JsonPrimitive(block.getItem().getRegistryName().toString()));
                         }
+
                         connectors.add(connectorObject);
                     }
                 }
@@ -657,28 +665,97 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             String json = gson.toJson(parent);
 
-            XNetMessages.INSTANCE.sendTo(new PacketJsonToClipboard(json, ""), player);
+            XNetMessages.INSTANCE.sendTo(new PacketJsonToClipboard(json), player);
         } else {
-            XNetMessages.INSTANCE.sendTo(new PacketJsonToClipboard("", "Channel does not support this!"), player);
+            XNetMessages.INSTANCE.sendTo(new PacketControllerError("Channel does not support this!"), player);
         }
-
     }
 
-    private void pasteChannel(int channel, String typeId) {
-        JsonParser parser = new JsonParser();
-        JsonObject root = parser.parse(typeId).getAsJsonObject();
-        String name = root.get("name").getAsString();
-        IChannelType type = XNet.xNetApi.findType(typeId);
-        channels[channel] = new ChannelInfo(type);
-        channels[channel].setChannelName(name);
-        channels[channel].getChannelSettings().readFromJson(root.get("channel").getAsJsonObject());
+    private int calculateMatchingScore(ConnectedBlockClientInfo info, String name, ResourceLocation block,
+                                       @Nonnull EnumFacing side, boolean advanced) {
+        int score = 0;
 
-        // @todo connectors
+        String infoName = info.getName();
+        if (Objects.equals(name, infoName)) {
+            score += 100;
+        }
+
+        boolean infoAdvanced = ConnectorBlock.isAdvancedConnector(world, info.getPos().getPos().offset(info.getPos().getSide()));
+        if (advanced) {
+            if (infoAdvanced) {
+                score += 50;
+            }
+        } else {
+            // If we don't need advanced then we add a small penalty if it is advanced
+            if (infoAdvanced) {
+                score--;
+            }
+        }
+
+        if (!info.getConnectedBlock().isEmpty()) {
+            ResourceLocation infoBlock = info.getConnectedBlock().getItem().getRegistryName();
+            if (Objects.equals(infoBlock, block)) {
+                score += 10;
+            }
+        }
+
+        if (info.getPos().getSide().equals(side)) {
+            score += 2;
+        }
+
+        return score;
+    }
+
+    private void pasteChannel(EntityPlayerMP player, int channel, String typeId) {
+        try {
+            JsonParser parser = new JsonParser();
+            JsonObject root = parser.parse(typeId).getAsJsonObject();
+            IChannelType type = XNet.xNetApi.findType(typeId);
+            channels[channel] = new ChannelInfo(type);
+            channels[channel].setChannelName(root.get("name").getAsString());
+            channels[channel].getChannelSettings().readFromJson(root.get("channel").getAsJsonObject());
+
+            Set<ConnectedBlockClientInfo> connectedBlocks = findConnectedBlocks();
+
+            JsonArray connectors = root.get("connectors").getAsJsonArray();
+            List<Pair<JsonObject, ConnectedBlockClientInfo>> connections = new ArrayList<>();
+            for (JsonElement con : connectors) {
+                JsonObject connector = con.getAsJsonObject();
+                String name = connector.get("name").getAsString();
+                boolean advanced = connector.get("advanced").getAsBoolean();
+                ResourceLocation block = connector.has("block") ? new ResourceLocation(connector.get("block").getAsString()) : null;
+
+                JsonObject connectorObject = connector.get("connector").getAsJsonObject();
+                EnumFacing side = EnumFacing.byName(connectorObject.get("side").getAsString());
+
+                List<Pair<ConnectedBlockClientInfo, Integer>> sortedMatches = connectedBlocks.stream()
+                        .map(info -> Pair.of(info, calculateMatchingScore(info, name, block, side, advanced)))
+                        .sorted((p1, p2) -> Integer.compare(p2.getRight(), p1.getRight()))
+                        .collect(Collectors.toList());
+                if (!sortedMatches.isEmpty()) {
+                    connections.add(Pair.of(connector, sortedMatches.get(0).getKey()));
+                    connectedBlocks.remove(sortedMatches.get(0).getKey());
+                } else {
+                    XNetMessages.INSTANCE.sendTo(new PacketControllerError("Not enough matching connectors to paste this!"), player);
+                    return;
+                }
+            }
+
+            for (Pair<JsonObject, ConnectedBlockClientInfo> pair : connections) {
+                JsonObject connector = pair.getLeft();
+                ConnectedBlockClientInfo clientInfo = pair.getRight();
+                JsonObject connectorObject = connector.get("connector").getAsJsonObject();
+                ConnectorInfo info = createConnector(channel, clientInfo.getPos());
+                info.getConnectorSettings().readFromJson(connectorObject);
+            }
+
+        } catch (JsonSyntaxException e) {
+            XNetMessages.INSTANCE.sendTo(new PacketControllerError("Error pasting clipboard data!"), player);
+        }
 
         networkDirty();
         markDirtyQuick();
     }
-
 
 
     @Override
@@ -695,7 +772,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         } else if (CMD_PASTECHANNEL.equals(command)) {
             int index = params.get(PARAM_INDEX);
             String json = params.get(PARAM_JSON);
-            pasteChannel(index, json);
+            pasteChannel(playerMP, index, json);
             return true;
         } else if (CMD_COPYCHANNEL.equals(command)) {
             int index = params.get(PARAM_INDEX);
