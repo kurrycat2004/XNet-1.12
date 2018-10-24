@@ -73,6 +73,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     private static GuiController openController = null;
 
     private EnergyBar energyBar;
+    private Button copyConnector = null;
 
     // From server.
     public static List<ChannelClientInfo> fromServer_channels = null;
@@ -224,6 +225,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
             showingChannel = editingChannel;
             channelButtons[editingChannel].setPressed(true);
 
+            copyConnector = null;
             channelEditPanel.removeChildren();
             if (channelButtons[editingChannel].isPressed()) {
                 ChannelClientInfo info = fromServer_channels.get(editingChannel);
@@ -244,12 +246,19 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                     channelEditPanel.addChild(remove);
                     editor.setState(info.getChannelSettings());
 
-                    Button copy = new Button(mc, this)
+                    Button copyChannel = new Button(mc, this)
                             .setText("Copy")
                             .setTooltips("Copy this channel to", "the clipboard")
                             .setLayoutHint(new PositionalLayout.PositionalHint(104, 19, 53, 14))
                             .addButtonEvent(parent -> copyChannel());
-                    channelEditPanel.addChild(copy);
+                    channelEditPanel.addChild(copyChannel);
+
+                    copyConnector = new Button(mc, this)
+                            .setText("Copy")
+                            .setTooltips("Copy this connector", "to the clipboard")
+                            .setLayoutHint(new PositionalLayout.PositionalHint(50, 19, 53, 14))
+                            .addButtonEvent(parent -> copyConnector());
+                    channelEditPanel.addChild(copyConnector);
 
                 } else {
                     ChoiceLabel type = new ChoiceLabel(mc, this)
@@ -292,6 +301,18 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         ask.addChild(buttons);
     }
 
+    private void copyConnector() {
+        if (editingConnector != null) {
+            sendServerCommand(XNetMessages.INSTANCE, TileEntityController.CMD_COPYCONNECTOR,
+                    TypedMap.builder()
+                            .put(PARAM_INDEX, getSelectedChannel())
+                            .put(PARAM_POS, editingConnector.getPos())
+                            .put(PARAM_SIDE, editingConnector.getSide().ordinal())
+                            .build());
+        }
+    }
+
+
     private void copyChannel() {
         sendServerCommand(XNetMessages.INSTANCE, TileEntityController.CMD_COPYCHANNEL,
                 TypedMap.builder()
@@ -316,10 +337,45 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         }
     }
 
+    private void pasteConnector() {
+        try {
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            String json = (String) clipboard.getData(DataFlavor.stringFlavor);
+            if (json.length() > 26000) {
+                showMessage(mc, this, getWindowManager(), 50, 50, TextFormatting.RED + "Clipboard too large!");
+                return;
+            }
+            JsonParser parser = new JsonParser();
+            JsonObject root = parser.parse(json).getAsJsonObject();
+            String type = root.get("type").getAsString();
+            IChannelType channelType = XNet.xNetApi.findType(type);
+            if (channelType == null) {
+                showMessage(mc, this, getWindowManager(), 50, 50, TextFormatting.RED + "Unsupported channel type: " + type + "!");
+                return;
+            }
+            sendServerCommand(XNetMessages.INSTANCE, TileEntityController.CMD_PASTECONNECTOR,
+                    TypedMap.builder()
+                            .put(PARAM_INDEX, getSelectedChannel())
+                            .put(PARAM_POS, editingConnector.getPos())
+                            .put(PARAM_SIDE, editingConnector.getSide().ordinal())
+                            .put(PARAM_JSON, json)
+                            .build());
+            refresh();
+        } catch (UnsupportedFlavorException e) {
+            showMessage(mc, this, getWindowManager(), 50, 50, TextFormatting.RED + "Clipboard does not contain channel!");
+        } catch (Exception e) {
+            showMessage(mc, this, getWindowManager(), 50, 50, TextFormatting.RED + "Error reading from clipboard!");
+        }
+    }
+
     private void pasteChannel() {
         try {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             String json = (String) clipboard.getData(DataFlavor.stringFlavor);
+            if (json.length() > 26000) {
+                showMessage(mc, this, getWindowManager(), 50, 50, TextFormatting.RED + "Clipboard too large!");
+                return;
+            }
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(json).getAsJsonObject();
             String type = root.get("type").getAsString();
@@ -339,7 +395,6 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         } catch (Exception e) {
             showMessage(mc, this, getWindowManager(), 50, 50, TextFormatting.RED + "Error reading from clipboard!");
         }
-
     }
 
     private ConnectorClientInfo findClientInfo(ChannelClientInfo info, SidedPos p) {
@@ -383,6 +438,13 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                             .setLayoutHint(new PositionalLayout.PositionalHint(85, 20, 60, 14))
                             .addButtonEvent(parent -> createConnector(editingConnector));
                     connectorEditPanel.addChild(create);
+
+                    Button paste = new Button(mc, this)
+                            .setText("Paste")
+                            .setTooltips("Create a new connector", "from the clipboard")
+                            .setLayoutHint(new PositionalLayout.PositionalHint(85, 40, 60, 14))
+                            .addButtonEvent(parent -> pasteConnector());
+                    connectorEditPanel.addChild(paste);
                 }
             }
         } else if (showingConnector != null && editingConnector == null) {
@@ -502,6 +564,9 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         populateList();
         refreshChannelEditor();
         refreshConnectorEditor();
+        if (copyConnector != null) {
+            copyConnector.setEnabled(showingConnector != null);
+        }
         if (fromServer_channels != null) {
             for (int i = 0; i < MAX_CHANNELS; i++) {
                 String channel = String.valueOf(i + 1);

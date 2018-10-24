@@ -73,6 +73,8 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     public static final String CMD_CREATECHANNEL = "controller.createChannel";
     public static final String CMD_PASTECHANNEL = "controller.pasteChannel";
     public static final String CMD_COPYCHANNEL = "controller.copyChannel";
+    public static final String CMD_PASTECONNECTOR = "controller.pasteConnector";
+    public static final String CMD_COPYCONNECTOR = "controller.copyConnector";
     public static final String CMD_REMOVECHANNEL = "controller.removeChannel";
     public static final String CMD_UPDATECHANNEL = "controller.updateChannel";
 
@@ -624,6 +626,28 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         return set;
     }
 
+    private void copyConnector(EntityPlayerMP player, int index, SidedPos sidedPos) {
+        ChannelInfo channel = channels[index];
+        IChannelSettings settings = channel.getChannelSettings();
+        JsonObject parent = new JsonObject();
+        IConnectorSettings connectorSettings = findConnectorSettings(channel, sidedPos);
+        if (connectorSettings != null) {
+            JsonObject object = connectorSettings.writeToJson();
+            if (object != null) {
+                parent.add("type", new JsonPrimitive(channel.getType().getID()));
+                parent.add("connector", object);
+                boolean advanced = ConnectorBlock.isAdvancedConnector(world, sidedPos.getPos().offset(sidedPos.getSide()));
+                parent.add("advanced", new JsonPrimitive(advanced));
+
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                String json = gson.toJson(parent);
+
+                XNetMessages.INSTANCE.sendTo(new PacketJsonToClipboard(json), player);
+                return;
+            }
+        }
+        XNetMessages.INSTANCE.sendTo(new PacketControllerError("Error copying connector!"), player);
+    }
 
     private void copyChannel(EntityPlayerMP player, int index) {
         ChannelInfo channel = channels[index];
@@ -683,7 +707,6 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
         BlockPos blockPos = info.getPos().getPos();
         EnumFacing facing = info.getPos().getSide();
-        TileEntity tileEntity = world.getTileEntity(blockPos);
 
         // This block doesn't support this type. So bad score
         if (!type.supportsBlock(world, blockPos, facing)) {
@@ -722,6 +745,44 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         }
 
         return score;
+    }
+
+    private void pasteConnector(EntityPlayerMP player, int channel, SidedPos sidedPos, String json) {
+        try {
+            JsonParser parser = new JsonParser();
+            JsonObject root = parser.parse(json).getAsJsonObject();
+            String typeId = root.get("type").getAsString();
+            IChannelType type = XNet.xNetApi.findType(typeId);
+            boolean advanced = root.get("advanced").getAsBoolean();
+            JsonObject connectorObject = root.get("connector").getAsJsonObject();
+            boolean advancedNeeded = connectorObject.get("advancedneeded").getAsBoolean();
+
+            BlockPos blockPos = sidedPos.getPos();
+            EnumFacing facing = sidedPos.getSide();
+
+            EnumFacing side = EnumFacing.byName(connectorObject.get("side").getAsString());
+            EnumFacing facingOverride = connectorObject.has("facingoverride") ? EnumFacing.byName(connectorObject.get("facingoverride").getAsString()) : side;
+            boolean infoAdvanced = ConnectorBlock.isAdvancedConnector(world, blockPos.offset(facing));
+            if (advanced) {
+                if (!infoAdvanced) {
+                    // If advanced is desired but our actual connector is not advanced then we give a penalty. The penalty is big
+                    // if we can't match with the actual side or if we actually need advanced
+                    if (advancedNeeded || !facingOverride.equals(facing)) {
+                        XNetMessages.INSTANCE.sendTo(new PacketControllerError("Advanced connector is needed!"), player);
+                        return;
+                    }
+                }
+            }
+
+            ConnectorInfo info = createConnector(channel, sidedPos);
+            info.getConnectorSettings().readFromJson(connectorObject);
+        } catch (JsonSyntaxException e) {
+            XNetMessages.INSTANCE.sendTo(new PacketControllerError("Error pasting clipboard data!"), player);
+        }
+
+        networkDirty();
+        markDirtyQuick();
+
     }
 
     private void pasteChannel(EntityPlayerMP player, int channel, String json) {
@@ -799,9 +860,20 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             String json = params.get(PARAM_JSON);
             pasteChannel(playerMP, index, json);
             return true;
+        } else if (CMD_PASTECONNECTOR.equals(command)) {
+            int index = params.get(PARAM_INDEX);
+            SidedPos pos = new SidedPos(params.get(PARAM_POS), EnumFacing.VALUES[params.get(PARAM_SIDE)]);
+            String json = params.get(PARAM_JSON);
+            pasteConnector(playerMP, index, pos, json);
+            return true;
         } else if (CMD_COPYCHANNEL.equals(command)) {
             int index = params.get(PARAM_INDEX);
             copyChannel(playerMP, index);
+            return true;
+        } else if (CMD_COPYCONNECTOR.equals(command)) {
+            int index = params.get(PARAM_INDEX);
+            SidedPos pos = new SidedPos(params.get(PARAM_POS), EnumFacing.VALUES[params.get(PARAM_SIDE)]);
+            copyConnector(playerMP, index, pos);
             return true;
         } else if (CMD_CREATECONNECTOR.equals(command)) {
             int channel = params.get(PARAM_CHANNEL);
