@@ -214,7 +214,7 @@ public class EnergyChannelSettings extends DefaultChannelSettings implements ICh
     }
 
 
-    public static boolean isEnergyTE(TileEntity te, @Nonnull EnumFacing side) {
+    public static boolean isEnergyTE(@Nullable TileEntity te, @Nonnull EnumFacing side) {
         if (te == null) {
             return false;
         }

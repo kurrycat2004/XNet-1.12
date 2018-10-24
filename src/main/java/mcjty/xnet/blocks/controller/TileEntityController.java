@@ -597,13 +597,13 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     }
 
     @Nonnull
-    private Set<ConnectedBlockClientInfo> findConnectedBlocks() {
-        WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
+    private Set<ConnectedBlockInfo> findConnectedBlocks() {
+        WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(world);
 
-        Set<ConnectedBlockClientInfo> set = new HashSet<>();
+        Set<ConnectedBlockInfo> set = new HashSet<>();
         for (BlockPos consumerPos : worldBlob.getConsumers(networkId)) {
             String name = "";
-            TileEntity te = getWorld().getTileEntity(consumerPos);
+            TileEntity te = world.getTileEntity(consumerPos);
             if (te instanceof ConnectorTileEntity) {
                 // Should always be the case. @todo error?
                 name = ((ConnectorTileEntity) te).getConnectorName();
@@ -611,12 +611,12 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                 XNet.logger.warn("What? The connector at " + BlockPosTools.toString(consumerPos) + " is not a connector?");
             }
             for (EnumFacing facing : EnumFacing.VALUES) {
-                if (ConnectorBlock.isConnectable(getWorld(), consumerPos, facing)) {
+                if (ConnectorBlock.isConnectable(world, consumerPos, facing)) {
                     BlockPos pos = consumerPos.offset(facing);
                     SidedPos sidedPos = new SidedPos(pos, facing.getOpposite());
-                    IBlockState state = getWorld().getBlockState(pos);
-                    ItemStack item = state.getBlock().getItem(getWorld(), pos, state);
-                    ConnectedBlockClientInfo info = new ConnectedBlockClientInfo(sidedPos, item, name);
+                    IBlockState state = world.getBlockState(pos);
+                    state = state.getBlock().isAir(state, world, pos) ? null : state;
+                    ConnectedBlockInfo info = new ConnectedBlockInfo(sidedPos, state, name);
                     set.add(info);
                 }
             }
@@ -638,8 +638,8 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
             JsonArray connectors = new JsonArray();
 
-            Set<ConnectedBlockClientInfo> connectedBlocks = findConnectedBlocks();
-            for (ConnectedBlockClientInfo connectedBlock : connectedBlocks) {
+            Set<ConnectedBlockInfo> connectedBlocks = findConnectedBlocks();
+            for (ConnectedBlockInfo connectedBlock : connectedBlocks) {
                 SidedPos sidedPos = connectedBlock.getPos();
                 IConnectorSettings connectorSettings = findConnectorSettings(channel, sidedPos);
                 if (connectorSettings != null) {
@@ -650,9 +650,9 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                         connectorObject.add("name", new JsonPrimitive(connectedBlock.getName()));
                         boolean advanced = ConnectorBlock.isAdvancedConnector(world, sidedPos.getPos().offset(sidedPos.getSide()));
                         connectorObject.add("advanced", new JsonPrimitive(advanced));
-                        ItemStack block = connectedBlock.getConnectedBlock();
-                        if (!block.isEmpty()) {
-                            connectorObject.add("block", new JsonPrimitive(block.getItem().getRegistryName().toString()));
+                        if (!connectedBlock.isAir()) {
+                            IBlockState state = connectedBlock.getConnectedState();
+                            connectorObject.add("block", new JsonPrimitive(state.getBlock().getRegistryName().toString()));
                         }
 
                         connectors.add(connectorObject);
@@ -671,7 +671,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         }
     }
 
-    private int calculateMatchingScore(ConnectedBlockClientInfo info, String name, ResourceLocation block,
+    private int calculateMatchingScore(IChannelType type, ConnectedBlockInfo info, String name, ResourceLocation block,
                                        @Nonnull EnumFacing side, @Nonnull EnumFacing facingOverride, boolean advanced,
                                        boolean advancedNeeded) {
         int score = 0;
@@ -681,14 +681,23 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             score += 100;
         }
 
-        boolean infoAdvanced = ConnectorBlock.isAdvancedConnector(world, info.getPos().getPos().offset(info.getPos().getSide()));
+        BlockPos blockPos = info.getPos().getPos();
+        EnumFacing facing = info.getPos().getSide();
+        TileEntity tileEntity = world.getTileEntity(blockPos);
+
+        // This block doesn't support this type. So bad score
+        if (!type.supportsBlock(world, blockPos, facing)) {
+            score -= 1000;
+        }
+
+        boolean infoAdvanced = ConnectorBlock.isAdvancedConnector(world, blockPos.offset(facing));
         if (advanced) {
             if (infoAdvanced) {
                 score += 50;
             } else {
                 // If advanced is desired but our actual connector is not advanced then we give a penalty. The penalty is big
                 // if we can't match with the actual side or if we actually need advanced
-                if (advancedNeeded || !facingOverride.equals(info.getPos().getSide())) {
+                if (advancedNeeded || !facingOverride.equals(facing)) {
                     score -= 1000;
                 } else {
                     score -= 40;
@@ -701,14 +710,14 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             }
         }
 
-        if (!info.getConnectedBlock().isEmpty()) {
-            ResourceLocation infoBlock = info.getConnectedBlock().getItem().getRegistryName();
+        if (!info.isAir()) {
+            ResourceLocation infoBlock = info.getConnectedState().getBlock().getRegistryName();
             if (Objects.equals(infoBlock, block)) {
                 score += 10;
             }
         }
 
-        if (info.getPos().getSide().equals(side)) {
+        if (facing.equals(side)) {
             score += 2;
         }
 
@@ -725,12 +734,12 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             channels[channel].setChannelName(root.get("name").getAsString());
             channels[channel].getChannelSettings().readFromJson(root.get("channel").getAsJsonObject());
 
-            Set<ConnectedBlockClientInfo> connectedBlocks = findConnectedBlocks();
+            Set<ConnectedBlockInfo> connectedBlocks = findConnectedBlocks();
 
             boolean notEnoughConnectors = false;
 
             JsonArray connectors = root.get("connectors").getAsJsonArray();
-            List<Pair<JsonObject, ConnectedBlockClientInfo>> connections = new ArrayList<>();
+            List<Pair<JsonObject, ConnectedBlockInfo>> connections = new ArrayList<>();
             for (JsonElement con : connectors) {
                 JsonObject connector = con.getAsJsonObject();
                 String name = connector.get("name").getAsString();
@@ -742,8 +751,8 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                 EnumFacing facingOverride = connectorObject.has("facingoverride") ? EnumFacing.byName(connectorObject.get("facingoverride").getAsString()) : side;
                 boolean advancedNeeded = connectorObject.get("advancedneeded").getAsBoolean();
 
-                List<Pair<ConnectedBlockClientInfo, Integer>> sortedMatches = connectedBlocks.stream()
-                        .map(info -> Pair.of(info, calculateMatchingScore(info, name, block, side, facingOverride, advanced, advancedNeeded)))
+                List<Pair<ConnectedBlockInfo, Integer>> sortedMatches = connectedBlocks.stream()
+                        .map(info -> Pair.of(info, calculateMatchingScore(type, info, name, block, side, facingOverride, advanced, advancedNeeded)))
                         .sorted((p1, p2) -> Integer.compare(p2.getRight(), p1.getRight()))
                         .collect(Collectors.toList());
                 if (!sortedMatches.isEmpty() && sortedMatches.get(0).getRight() > -50) {
@@ -754,9 +763,9 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                 }
             }
 
-            for (Pair<JsonObject, ConnectedBlockClientInfo> pair : connections) {
+            for (Pair<JsonObject, ConnectedBlockInfo> pair : connections) {
                 JsonObject connector = pair.getLeft();
-                ConnectedBlockClientInfo clientInfo = pair.getRight();
+                ConnectedBlockInfo clientInfo = pair.getRight();
                 JsonObject connectorObject = connector.get("connector").getAsJsonObject();
                 ConnectorInfo info = createConnector(channel, clientInfo.getPos());
                 info.getConnectorSettings().readFromJson(connectorObject);
