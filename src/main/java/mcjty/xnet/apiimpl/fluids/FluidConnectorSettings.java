@@ -2,6 +2,7 @@ package mcjty.xnet.apiimpl.fluids;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import mcjty.lib.varia.FluidTools;
 import mcjty.lib.varia.ItemStackTools;
 import mcjty.xnet.XNet;
@@ -97,7 +98,7 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
         advanced = gui.isAdvanced();
         String[] speeds;
         int maxrate;
-        if (gui.isAdvanced()) {
+        if (advanced) {
             speeds = new String[] { "10", "20", "60", "100", "200" };
             maxrate = GeneralConfiguration.maxFluidRateAdvanced;
         } else {
@@ -182,6 +183,12 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
         setIntegerSafe(object, "speed", speed);
         if (!filter.isEmpty()) {
             object.add("filter", ItemStackTools.itemStackToJson(filter));
+        }
+        if (rate != null && rate > GeneralConfiguration.maxFluidRateNormal) {
+            object.add("advancedneeded", new JsonPrimitive(true));
+        }
+        if (speed == 1) {
+            object.add("advancedneeded", new JsonPrimitive(true));
         }
         return object;
     }

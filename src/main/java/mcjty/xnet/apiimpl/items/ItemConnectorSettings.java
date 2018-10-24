@@ -10,6 +10,7 @@ import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.helper.AbstractConnectorSettings;
 import mcjty.xnet.apiimpl.EnumStringTranslators;
+import mcjty.xnet.config.GeneralConfiguration;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -262,6 +263,9 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
             if (!filters.get(i).isEmpty()) {
                 object.add("filter" + i, ItemStackTools.itemStackToJson(filters.get(i)));
             }
+        }
+        if (speed == 1) {
+            object.add("advancedneeded", new JsonPrimitive(true));
         }
 
         return object;

@@ -25,9 +25,10 @@ public interface IConnectorSettings {
     default JsonObject writeToJson() { return null; }
 
     /**
-     * Initialize this connector from the JSon data
+     * Initialize this connector from the JSon data.
      */
-    default void readFromJson(JsonObject data) { }
+    default void readFromJson(JsonObject data) {
+    }
 
     /**
      * Return an optional indicator icon

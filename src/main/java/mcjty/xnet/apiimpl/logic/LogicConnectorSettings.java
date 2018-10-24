@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import mcjty.lib.varia.ItemStackTools;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.gui.IEditorGui;
@@ -182,6 +183,9 @@ public class LogicConnectorSettings extends AbstractConnectorSettings {
             sensorArray.add(o);
         }
         object.add("sensors", sensorArray);
+        if (speed == 1) {
+            object.add("advancedneeded", new JsonPrimitive(true));
+        }
         return object;
     }
 

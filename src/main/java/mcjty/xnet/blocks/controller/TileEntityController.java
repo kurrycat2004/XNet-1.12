@@ -672,7 +672,8 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     }
 
     private int calculateMatchingScore(ConnectedBlockClientInfo info, String name, ResourceLocation block,
-                                       @Nonnull EnumFacing side, @Nonnull EnumFacing facingOverride, boolean advanced) {
+                                       @Nonnull EnumFacing side, @Nonnull EnumFacing facingOverride, boolean advanced,
+                                       boolean advancedNeeded) {
         int score = 0;
 
         String infoName = info.getName();
@@ -686,8 +687,8 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                 score += 50;
             } else {
                 // If advanced is desired but our actual connector is not advanced then we give a penalty. The penalty is big
-                // if we can't match with the actual side
-                if (!facingOverride.equals(info.getPos().getSide())) {
+                // if we can't match with the actual side or if we actually need advanced
+                if (advancedNeeded || !facingOverride.equals(info.getPos().getSide())) {
                     score -= 1000;
                 } else {
                     score -= 40;
@@ -726,6 +727,8 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
             Set<ConnectedBlockClientInfo> connectedBlocks = findConnectedBlocks();
 
+            boolean notEnoughConnectors = false;
+
             JsonArray connectors = root.get("connectors").getAsJsonArray();
             List<Pair<JsonObject, ConnectedBlockClientInfo>> connections = new ArrayList<>();
             for (JsonElement con : connectors) {
@@ -737,17 +740,17 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                 JsonObject connectorObject = connector.get("connector").getAsJsonObject();
                 EnumFacing side = EnumFacing.byName(connectorObject.get("side").getAsString());
                 EnumFacing facingOverride = connectorObject.has("facingoverride") ? EnumFacing.byName(connectorObject.get("facingoverride").getAsString()) : side;
+                boolean advancedNeeded = connectorObject.get("advancedneeded").getAsBoolean();
 
                 List<Pair<ConnectedBlockClientInfo, Integer>> sortedMatches = connectedBlocks.stream()
-                        .map(info -> Pair.of(info, calculateMatchingScore(info, name, block, side, facingOverride, advanced)))
+                        .map(info -> Pair.of(info, calculateMatchingScore(info, name, block, side, facingOverride, advanced, advancedNeeded)))
                         .sorted((p1, p2) -> Integer.compare(p2.getRight(), p1.getRight()))
                         .collect(Collectors.toList());
                 if (!sortedMatches.isEmpty() && sortedMatches.get(0).getRight() > -50) {
                     connections.add(Pair.of(connector, sortedMatches.get(0).getKey()));
                     connectedBlocks.remove(sortedMatches.get(0).getKey());
                 } else {
-                    XNetMessages.INSTANCE.sendTo(new PacketControllerError("Not enough matching connectors!"), player);
-                    return;
+                    notEnoughConnectors = true;
                 }
             }
 
@@ -759,6 +762,9 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                 info.getConnectorSettings().readFromJson(connectorObject);
             }
 
+            if (notEnoughConnectors) {
+                XNetMessages.INSTANCE.sendTo(new PacketControllerError("Not everything could be pasted!"), player);
+            }
         } catch (JsonSyntaxException e) {
             XNetMessages.INSTANCE.sendTo(new PacketControllerError("Error pasting clipboard data!"), player);
         }
