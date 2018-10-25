@@ -156,6 +156,7 @@ public abstract class AbstractConnectorSettings implements IConnectorSettings {
         setEnumSafe(object, "color3", colors[3]);
         setEnumSafe(object, "side", side);   // Informative, isn't used to load
         setEnumSafe(object, "facingoverride", facingOverride);
+        object.add("advancedneeded", new JsonPrimitive(false));
     }
 
     protected void readFromJsonInternal(JsonObject object) {

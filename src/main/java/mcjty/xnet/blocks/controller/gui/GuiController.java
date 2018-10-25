@@ -247,16 +247,16 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                     editor.setState(info.getChannelSettings());
 
                     Button copyChannel = new Button(mc, this)
-                            .setText("Copy")
+                            .setText("C")
                             .setTooltips("Copy this channel to", "the clipboard")
-                            .setLayoutHint(new PositionalLayout.PositionalHint(104, 19, 53, 14))
+                            .setLayoutHint(new PositionalLayout.PositionalHint(134, 19, 25, 14))
                             .addButtonEvent(parent -> copyChannel());
                     channelEditPanel.addChild(copyChannel);
 
                     copyConnector = new Button(mc, this)
-                            .setText("Copy")
+                            .setText("C")
                             .setTooltips("Copy this connector", "to the clipboard")
-                            .setLayoutHint(new PositionalLayout.PositionalHint(50, 19, 53, 14))
+                            .setLayoutHint(new PositionalLayout.PositionalHint(114, 19, 25, 14))
                             .addButtonEvent(parent -> copyConnector());
                     channelEditPanel.addChild(copyConnector);
 
@@ -564,8 +564,10 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         populateList();
         refreshChannelEditor();
         refreshConnectorEditor();
-        if (copyConnector != null) {
-            copyConnector.setEnabled(showingConnector != null);
+        if (listsReady() && copyConnector != null && editingChannel != -1) {
+            ChannelClientInfo info = fromServer_channels.get(editingChannel);
+            ConnectorClientInfo clientInfo = findClientInfo(info, editingConnector);
+            copyConnector.setEnabled(clientInfo != null);
         }
         if (fromServer_channels != null) {
             for (int i = 0; i < MAX_CHANNELS; i++) {

@@ -753,6 +753,10 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             JsonObject root = parser.parse(json).getAsJsonObject();
             String typeId = root.get("type").getAsString();
             IChannelType type = XNet.xNetApi.findType(typeId);
+            if (type != channels[channel].getType()) {
+                XNetMessages.INSTANCE.sendTo(new PacketControllerError("Wrong channel type!"), player);
+                return;
+            }
             boolean advanced = root.get("advanced").getAsBoolean();
             JsonObject connectorObject = root.get("connector").getAsJsonObject();
             boolean advancedNeeded = connectorObject.get("advancedneeded").getAsBoolean();
