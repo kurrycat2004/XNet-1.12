@@ -701,7 +701,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         int score = 0;
 
         String infoName = info.getName();
-        if (Objects.equals(name, infoName)) {
+        if (!name.isEmpty() && Objects.equals(name, infoName)) {
             score += 100;
         }
 
@@ -713,6 +713,13 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             score -= 1000;
         }
 
+        ResourceLocation infoBlock = info.getConnectedState().getBlock().getRegistryName();
+
+        // If the side doesn't match we give a bad penalty
+        if (!KnownUnsidedBlocks.isUnsided(infoBlock) && !facingOverride.equals(facing)) {
+            score -= 1000;
+        }
+
         boolean infoAdvanced = ConnectorBlock.isAdvancedConnector(world, blockPos.offset(facing));
         if (advanced) {
             if (infoAdvanced) {
@@ -720,7 +727,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             } else {
                 // If advanced is desired but our actual connector is not advanced then we give a penalty. The penalty is big
                 // if we can't match with the actual side or if we actually need advanced
-                if (advancedNeeded || !facingOverride.equals(facing)) {
+                if (advancedNeeded) {
                     score -= 1000;
                 } else {
                     score -= 40;
@@ -734,9 +741,8 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         }
 
         if (!info.isAir()) {
-            ResourceLocation infoBlock = info.getConnectedState().getBlock().getRegistryName();
             if (Objects.equals(infoBlock, block)) {
-                score += 10;
+                score += 200;
             }
         }
 
@@ -777,6 +783,10 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                     }
                 }
             }
+            if (!infoAdvanced) {
+                // Remove the facingoverride
+                connectorObject.remove("facingoverride");
+            }
 
             ConnectorInfo info = createConnector(channel, sidedPos);
             info.getConnectorSettings().readFromJson(connectorObject);
@@ -789,22 +799,37 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
     }
 
+    private static class PossibleConnection {
+        private final JsonObject connector;
+        private List<Pair<ConnectedBlockInfo, Integer>> sortedMatches;
+
+        public PossibleConnection(JsonObject connector, List<Pair<ConnectedBlockInfo, Integer>> sortedMatches) {
+            this.connector = connector;
+            this.sortedMatches = sortedMatches;
+        }
+    }
+
     private void pasteChannel(EntityPlayerMP player, int channel, String json) {
         try {
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(json).getAsJsonObject();
+            if (!root.has("channel")) {
+                XNetMessages.INSTANCE.sendTo(new PacketControllerError("Invalid channel data!"), player);
+                return;
+            }
             String typeId = root.get("type").getAsString();
             IChannelType type = XNet.xNetApi.findType(typeId);
             channels[channel] = new ChannelInfo(type);
             channels[channel].setChannelName(root.get("name").getAsString());
             channels[channel].getChannelSettings().readFromJson(root.get("channel").getAsJsonObject());
+            channels[channel].setEnabled(false);
 
             Set<ConnectedBlockInfo> connectedBlocks = findConnectedBlocks();
 
             boolean notEnoughConnectors = false;
 
             JsonArray connectors = root.get("connectors").getAsJsonArray();
-            List<Pair<JsonObject, ConnectedBlockInfo>> connections = new ArrayList<>();
+            List<PossibleConnection> connections = new ArrayList<>();
             for (JsonElement con : connectors) {
                 JsonObject connector = con.getAsJsonObject();
                 String name = connector.get("name").getAsString();
@@ -821,20 +846,66 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                         .sorted((p1, p2) -> Integer.compare(p2.getRight(), p1.getRight()))
                         .collect(Collectors.toList());
                 if (!sortedMatches.isEmpty() && sortedMatches.get(0).getRight() > -50) {
-                    connections.add(Pair.of(connector, sortedMatches.get(0).getKey()));
-                    connectedBlocks.remove(sortedMatches.get(0).getKey());
+                    connections.add(new PossibleConnection(connector, sortedMatches));
+//                    connectedBlocks.remove(sortedMatches.get(0).getKey());
                 } else {
-                    notEnoughConnectors = true;
+//                    notEnoughConnectors = true;
                 }
             }
 
-            for (Pair<JsonObject, ConnectedBlockInfo> pair : connections) {
-                JsonObject connector = pair.getLeft();
-                ConnectedBlockInfo clientInfo = pair.getRight();
+            connections.sort((p1, p2) -> Integer.compare(p2.sortedMatches.get(0).getRight(), p1.sortedMatches.get(0).getRight()));
+
+            while (!connections.isEmpty()) {
+                PossibleConnection pair = connections.remove(0);
+
+                // This is the best match we have at this moment
+                JsonObject connector = pair.connector;
+                if (pair.sortedMatches.isEmpty()) {
+                    notEnoughConnectors = true;
+                    break;
+                }
+                ConnectedBlockInfo info = pair.sortedMatches.get(0).getKey();
                 JsonObject connectorObject = connector.get("connector").getAsJsonObject();
-                ConnectorInfo info = createConnector(channel, clientInfo.getPos());
-                info.getConnectorSettings().readFromJson(connectorObject);
+                boolean infoAdvanced = ConnectorBlock.isAdvancedConnector(world, info.getPos().getPos());
+                if (!infoAdvanced) {
+                    // Remove the facingoverride
+                    connectorObject.remove("facingoverride");
+                }
+                ResourceLocation block = connector.has("block") ? new ResourceLocation(connector.get("block").getAsString()) : null;
+                System.out.println("Pasting " + info.getName() + " (" + block.toString() + " into " + info.getConnectedState().getBlock().getRegistryName().toString() + ") with score = " + pair.sortedMatches.get(0).getRight());
+                ConnectorInfo connectorInfo = createConnector(channel, info.getPos());
+                connectorInfo.getConnectorSettings().readFromJson(connectorObject);
+
+                // Remove the connected block info we just used from all remaining connection proposals
+                for (PossibleConnection connection : connections) {
+                    List<Pair<ConnectedBlockInfo, Integer>> newMatches = new ArrayList<>();
+                    for (Pair<ConnectedBlockInfo, Integer> match : connection.sortedMatches) {
+                        if (match.getLeft() != info) {
+                            newMatches.add(match);
+                        }
+                    }
+                    connection.sortedMatches = newMatches;
+                }
+                connections.sort((p1, p2) -> Integer.compare(p2.sortedMatches.get(0).getRight(), p1.sortedMatches.get(0).getRight()));
+
+
             }
+
+//            for (PossibleConnection pair : connections) {
+//                JsonObject connector = pair.connector;
+//                int index = 0;
+//                ConnectedBlockInfo info = pair.sortedMatches.get(index).getKey();
+//                JsonObject connectorObject = connector.get("connector").getAsJsonObject();
+//                boolean infoAdvanced = ConnectorBlock.isAdvancedConnector(world, info.getPos().getPos());
+//                if (!infoAdvanced) {
+//                    // Remove the facingoverride
+//                    connectorObject.remove("facingoverride");
+//                }
+//                ResourceLocation block = connector.has("block") ? new ResourceLocation(connector.get("block").getAsString()) : null;
+//                System.out.println("Pasting " + info.getName() + " (" + block.toString() + " into " + info.getConnectedState().getBlock().getRegistryName().toString() + ") with score = " + pair.sortedMatches.get(0).getRight());
+//                ConnectorInfo connectorInfo = createConnector(channel, info.getPos());
+//                connectorInfo.getConnectorSettings().readFromJson(connectorObject);
+//            }
 
             if (notEnoughConnectors) {
                 XNetMessages.INSTANCE.sendTo(new PacketControllerError("Not everything could be pasted!"), player);
