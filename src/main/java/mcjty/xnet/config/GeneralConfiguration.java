@@ -33,7 +33,17 @@ public class GeneralConfiguration {
 
     public static boolean showNonFacadedCablesWhileSneaking = true;
 
+    public static String[] unsidedBlocks = new String[] {
+            "minecraft:chest",
+            "minecraft:trapped_chest",
+            "rftools:modular_storage",
+            "rftools:storage_scanner",
+            "rftools:pearl_injector",
+    };
+
     public static void init(Configuration cfg) {
+
+        unsidedBlocks = cfg.getStringList("unsidedBlocks", CATEGORY_GENERAL, unsidedBlocks, "This is a list of blocks that XNet considers to be 'unsided' meaning that it doesn't matter from what side you access things. This is currently only used to help with pasting channels");
 
         controllerMaxRF = cfg.getInt("controllerMaxRF", CATEGORY_GENERAL, controllerMaxRF, 1, 1000000000,
                 "Maximum RF the controller can store");

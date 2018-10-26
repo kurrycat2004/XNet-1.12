@@ -1,6 +1,6 @@
 package mcjty.xnet.blocks.controller;
 
-import net.minecraft.init.Blocks;
+import mcjty.xnet.config.GeneralConfiguration;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.HashSet;
@@ -12,11 +12,9 @@ public class KnownUnsidedBlocks {
 
     public static boolean isUnsided(ResourceLocation resourceLocation) {
         if (UNSIDED_BLOCKS.isEmpty()) {
-            UNSIDED_BLOCKS.add(Blocks.CHEST.getRegistryName());
-            UNSIDED_BLOCKS.add(Blocks.TRAPPED_CHEST.getRegistryName());
-            UNSIDED_BLOCKS.add(new ResourceLocation("rftools", "modular_storage"));
-            UNSIDED_BLOCKS.add(new ResourceLocation("rftools", "pearl_injector"));
-            UNSIDED_BLOCKS.add(new ResourceLocation("rftools", "storage_scanner"));
+            for (String block : GeneralConfiguration.unsidedBlocks) {
+                UNSIDED_BLOCKS.add(new ResourceLocation(block));
+            }
         }
         return UNSIDED_BLOCKS.contains(resourceLocation);
     }
