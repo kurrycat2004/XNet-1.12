@@ -757,6 +757,12 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         try {
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(json).getAsJsonObject();
+
+            if (!root.has("connector") || !root.has("type")) {
+                XNetMessages.INSTANCE.sendTo(new PacketControllerError("Invalid connector json!"), player);
+                return;
+            }
+
             String typeId = root.get("type").getAsString();
             IChannelType type = XNet.xNetApi.findType(typeId);
             if (type != channels[channel].getType()) {
@@ -813,8 +819,8 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         try {
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(json).getAsJsonObject();
-            if (!root.has("channel")) {
-                XNetMessages.INSTANCE.sendTo(new PacketControllerError("Invalid channel data!"), player);
+            if (!root.has("channel") || !root.has("type") || !root.has("name")) {
+                XNetMessages.INSTANCE.sendTo(new PacketControllerError("Invalid channel json!"), player);
                 return;
             }
             String typeId = root.get("type").getAsString();
@@ -824,57 +830,88 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             channels[channel].getChannelSettings().readFromJson(root.get("channel").getAsJsonObject());
             channels[channel].setEnabled(false);
 
+            // Find all blocks connected to this controller. We'll try to match and paste the json data
+            // to these blocks in the best way possible
             Set<ConnectedBlockInfo> connectedBlocks = findConnectedBlocks();
 
+            // We try to paste the best matches first. If there are any connectors in the clip that can't
+            // be pasted we'll give a warning to the user
             boolean notEnoughConnectors = false;
 
+            // First scan all connectors from the json clip and from that make a list of possible connections
+            // on the in-world blocks
             JsonArray connectors = root.get("connectors").getAsJsonArray();
             List<PossibleConnection> connections = new ArrayList<>();
             for (JsonElement con : connectors) {
                 JsonObject connector = con.getAsJsonObject();
+
+                // Fetch some useful information from the connector as it is defined in the json. Basically we
+                // need the connector name, wether or not the original connector (we copied from) was advanced
+                // and also the name of the block we were connecting too
                 String name = connector.get("name").getAsString();
                 boolean advanced = connector.get("advanced").getAsBoolean();
                 ResourceLocation block = connector.has("block") ? new ResourceLocation(connector.get("block").getAsString()) : null;
 
-                JsonObject connectorObject = connector.get("connector").getAsJsonObject();
-                EnumFacing side = EnumFacing.byName(connectorObject.get("side").getAsString());
-                EnumFacing facingOverride = connectorObject.has("facingoverride") ? EnumFacing.byName(connectorObject.get("facingoverride").getAsString()) : side;
-                boolean advancedNeeded = connectorObject.get("advancedneeded").getAsBoolean();
+                // Also get some useful settings from the connector data itself. Using these we can estimate a
+                // matching score to see how well the destination connector matches with this one
+                JsonObject connectorSettings = connector.get("connector").getAsJsonObject();
+                EnumFacing side = EnumFacing.byName(connectorSettings.get("side").getAsString());
+                EnumFacing facingOverride = connectorSettings.has("facingoverride") ? EnumFacing.byName(connectorSettings.get("facingoverride").getAsString()) : side;
 
+                // 'advancedNeeded' is true if the connector settings are such that they only work in an advanced connector. This
+                // is unrelated to the actual 'side' differing from the side that is set in the connector (only advanced connectors
+                // can change that) as it is still possible that in the pasted setup the side happens to be at the right side and
+                // then we don't need an advanced connector
+                boolean advancedNeeded = connectorSettings.get("advancedneeded").getAsBoolean();
+
+                // Given these desired settings from the json connector we calculate a sorted list of connection
+                // candidates. If there are good candidates in this list we remember this sorted list and
+                // add it to our list of possible connections
                 List<Pair<ConnectedBlockInfo, Integer>> sortedMatches = connectedBlocks.stream()
                         .map(info -> Pair.of(info, calculateMatchingScore(type, info, name, block, side, facingOverride, advanced, advancedNeeded)))
                         .sorted((p1, p2) -> Integer.compare(p2.getRight(), p1.getRight()))
                         .collect(Collectors.toList());
                 if (!sortedMatches.isEmpty() && sortedMatches.get(0).getRight() > -50) {
                     connections.add(new PossibleConnection(connector, sortedMatches));
-//                    connectedBlocks.remove(sortedMatches.get(0).getKey());
                 } else {
-//                    notEnoughConnectors = true;
+                    notEnoughConnectors = true;
                 }
             }
 
-            connections.sort((p1, p2) -> Integer.compare(p2.sortedMatches.get(0).getRight(), p1.sortedMatches.get(0).getRight()));
-
+            // Now we go over all possible connections by always selecting the best one from the list. The best
+            // possible connection is one that has a connection candidate with the highest score on its first spot
+            // (remember that the list of connection candidates is itself sorted with the highest scored candidates
+            // in front of the list)
             while (!connections.isEmpty()) {
-                PossibleConnection pair = connections.remove(0);
+                connections.sort((p1, p2) -> Integer.compare(p2.sortedMatches.get(0).getRight(), p1.sortedMatches.get(0).getRight()));
 
+                // Get rid of the highest priority one at the front of the list
                 // This is the best match we have at this moment
+                PossibleConnection pair = connections.remove(0);
                 JsonObject connector = pair.connector;
                 if (pair.sortedMatches.isEmpty()) {
+                    // This connector has no more valid candidates so that means all remaining connectors
+                    // are bad as well. We just stop here
                     notEnoughConnectors = true;
                     break;
                 }
+
+                // 'info' refers to the real block on this local network
                 ConnectedBlockInfo info = pair.sortedMatches.get(0).getKey();
-                JsonObject connectorObject = connector.get("connector").getAsJsonObject();
                 boolean infoAdvanced = ConnectorBlock.isAdvancedConnector(world, info.getPos().getPos());
+
+                JsonObject connectorSettings = connector.get("connector").getAsJsonObject();
                 if (!infoAdvanced) {
-                    // Remove the facingoverride
-                    connectorObject.remove("facingoverride");
+                    // Remove the facingoverride because this is not an advanced connector so it doesn't
+                    // support different facings
+                    connectorSettings.remove("facingoverride");
                 }
+
+                // Actually create the connector and paste the connector settings
                 ResourceLocation block = connector.has("block") ? new ResourceLocation(connector.get("block").getAsString()) : null;
                 System.out.println("Pasting " + info.getName() + " (" + block.toString() + " into " + info.getConnectedState().getBlock().getRegistryName().toString() + ") with score = " + pair.sortedMatches.get(0).getRight());
                 ConnectorInfo connectorInfo = createConnector(channel, info.getPos());
-                connectorInfo.getConnectorSettings().readFromJson(connectorObject);
+                connectorInfo.getConnectorSettings().readFromJson(connectorSettings);
 
                 // Remove the connected block info we just used from all remaining connection proposals
                 for (PossibleConnection connection : connections) {
@@ -886,26 +923,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                     }
                     connection.sortedMatches = newMatches;
                 }
-                connections.sort((p1, p2) -> Integer.compare(p2.sortedMatches.get(0).getRight(), p1.sortedMatches.get(0).getRight()));
-
-
             }
-
-//            for (PossibleConnection pair : connections) {
-//                JsonObject connector = pair.connector;
-//                int index = 0;
-//                ConnectedBlockInfo info = pair.sortedMatches.get(index).getKey();
-//                JsonObject connectorObject = connector.get("connector").getAsJsonObject();
-//                boolean infoAdvanced = ConnectorBlock.isAdvancedConnector(world, info.getPos().getPos());
-//                if (!infoAdvanced) {
-//                    // Remove the facingoverride
-//                    connectorObject.remove("facingoverride");
-//                }
-//                ResourceLocation block = connector.has("block") ? new ResourceLocation(connector.get("block").getAsString()) : null;
-//                System.out.println("Pasting " + info.getName() + " (" + block.toString() + " into " + info.getConnectedState().getBlock().getRegistryName().toString() + ") with score = " + pair.sortedMatches.get(0).getRight());
-//                ConnectorInfo connectorInfo = createConnector(channel, info.getPos());
-//                connectorInfo.getConnectorSettings().readFromJson(connectorObject);
-//            }
 
             if (notEnoughConnectors) {
                 XNetMessages.INSTANCE.sendTo(new PacketControllerError("Not everything could be pasted!"), player);
