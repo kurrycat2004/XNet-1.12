@@ -1,5 +1,6 @@
-1.7.5 (upcoming):
+1.7.5:
 - Fixed a bug with wireless channels not storing the owner correctly
+- New feature to copy/paste channels and connectors!
 
 1.7.4:
 - WARNING: Do not load any worlds with XNet 1.7.3 or earlier if you last saved them with XNet 1.7.4 or later!
