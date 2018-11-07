@@ -57,6 +57,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static mcjty.xnet.logic.ChannelInfo.MAX_CHANNELS;
 
@@ -277,7 +278,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
     private void networkDirty() {
         if (networkId != null) {
-            XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld()).incNetworkVersion(networkId);
+            XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld()).markNetworkDirty(networkId);
         }
     }
 
@@ -407,7 +408,8 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
         List<SidedPos> result = new ArrayList<>();
         Set<ConnectedBlockClientInfo> set = new HashSet<>();
-        for (BlockPos consumerPos : worldBlob.getConsumers(networkId)) {
+        Stream<BlockPos> consumers = getConsumerStream(worldBlob);
+        consumers.forEach(consumerPos -> {
             String name = "";
             TileEntity te = getWorld().getTileEntity(consumerPos);
             if (te instanceof ConnectorTileEntity) {
@@ -423,7 +425,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                     result.add(sidedPos);
                 }
             }
-        }
+        });
 
         return result;
     }
@@ -433,7 +435,8 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(getWorld());
 
         Set<ConnectedBlockClientInfo> set = new HashSet<>();
-        for (BlockPos consumerPos : worldBlob.getConsumers(networkId)) {
+        Stream<BlockPos> consumers = getConsumerStream(worldBlob);
+        consumers.forEach(consumerPos -> {
             String name = "";
             TileEntity te = getWorld().getTileEntity(consumerPos);
             if (te instanceof ConnectorTileEntity) {
@@ -452,11 +455,17 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                     set.add(info);
                 }
             }
-        }
+        });
         List<ConnectedBlockClientInfo> list = new ArrayList<>(set);
         list.sort(Comparator.comparing(ConnectedBlockClientInfo::getBlockUnlocName)
                 .thenComparing(ConnectedBlockClientInfo::getPos));
         return list;
+    }
+
+    private Stream<BlockPos> getConsumerStream(WorldBlob worldBlob) {
+        return XNet.xNetApi.getConsumerProviders().stream()
+                .map(provider -> provider.getConsumers(worldBlob, getNetworkId()).stream())
+                .flatMap(s -> s);
     }
 
     @Nonnull
@@ -603,7 +612,8 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         WorldBlob worldBlob = XNetBlobData.getBlobData(getWorld()).getWorldBlob(world);
 
         Set<ConnectedBlockInfo> set = new HashSet<>();
-        for (BlockPos consumerPos : worldBlob.getConsumers(networkId)) {
+        Stream<BlockPos> consumers = getConsumerStream(worldBlob);
+        consumers.forEach(consumerPos -> {
             String name = "";
             TileEntity te = world.getTileEntity(consumerPos);
             if (te instanceof ConnectorTileEntity) {
@@ -622,7 +632,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                     set.add(info);
                 }
             }
-        }
+        });
         return set;
     }
 

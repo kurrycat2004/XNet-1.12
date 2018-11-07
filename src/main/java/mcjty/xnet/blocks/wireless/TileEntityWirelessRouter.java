@@ -97,7 +97,7 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
                 NetworkId networkId = findRoutingNetwork();
                 if (networkId != null) {
                     WorldBlob worldBlob = XNetBlobData.getBlobData(world).getWorldBlob(world);
-                    worldBlob.incNetworkVersion(networkId);
+                    worldBlob.markNetworkDirty(networkId);
                 }
             }
 

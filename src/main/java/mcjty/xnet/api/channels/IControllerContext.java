@@ -12,6 +12,9 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The controller tile entity implements this interface
+ */
 public interface IControllerContext {
 
     World getControllerWorld();
@@ -35,6 +38,8 @@ public interface IControllerContext {
      * This allows other mods to iterate over all blocks the controller is
      * connected to without worrying about configured channels. With this
      * they can basically piggy-back onto the existing XNet network.
+     * Note that this does also contain all connected blocks that are connected
+     * through IConsumerProviders
      */
     List<SidedPos> getConnectedBlockPositions();
 

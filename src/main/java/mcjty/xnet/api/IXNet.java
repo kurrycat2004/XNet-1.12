@@ -2,6 +2,9 @@ package mcjty.xnet.api;
 
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.api.channels.IConnectable;
+import mcjty.xnet.api.channels.IConsumerProvider;
+import mcjty.xnet.api.net.IWorldBlob;
+import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
 
@@ -20,4 +23,15 @@ public interface IXNet {
      * being called on the right block
      */
     void registerConnectable(@Nonnull IConnectable connectable);
+
+    /**
+     * Register a consumer provider. You can use this to provide additional consumers
+     * (connectors) to controllers.
+     */
+    void registerConsumerProvider(@Nonnull IConsumerProvider consumerProvider);
+
+    /**
+     * Get the world blob for a given dimension
+     */
+    IWorldBlob getWorldBlob(World world);
 }

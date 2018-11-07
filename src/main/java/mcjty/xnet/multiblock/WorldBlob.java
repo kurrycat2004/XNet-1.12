@@ -2,6 +2,7 @@ package mcjty.xnet.multiblock;
 
 import mcjty.xnet.api.keys.ConsumerId;
 import mcjty.xnet.api.keys.NetworkId;
+import mcjty.xnet.api.net.IWorldBlob;
 import mcjty.xnet.logic.VersionNumber;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -15,7 +16,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
-public class WorldBlob {
+public class WorldBlob implements IWorldBlob {
 
     private final int dimId;
     private final Map<Long, ChunkBlob> chunkBlobMap = new HashMap<>();
@@ -67,6 +68,7 @@ public class WorldBlob {
         return blob.getBlobIdForPosition(intPos);
     }
 
+    @Override
     @Nonnull
     public Set<NetworkId> getNetworksAt(@Nonnull BlockPos pos) {
         ChunkBlob blob = getBlob(pos);
@@ -86,6 +88,7 @@ public class WorldBlob {
         return networks.iterator().next();
     }
 
+    @Override
     @Nullable
     public ConsumerId getConsumerAt(@Nonnull BlockPos pos) {
         ChunkBlob blob = getBlob(pos);
@@ -107,6 +110,7 @@ public class WorldBlob {
     }
 
     // Find the position of the network provider
+    @Override
     @Nullable
     public BlockPos getProviderPosition(@Nonnull NetworkId networkId) {
         if (!providerPositions.containsKey(networkId)) {
@@ -123,6 +127,7 @@ public class WorldBlob {
         return providerPositions.get(networkId);
     }
 
+    @Override
     @Nonnull
     public Set<BlockPos> getConsumers(NetworkId network) {
         if (!consumersOnNetwork.containsKey(network)) {
@@ -144,11 +149,12 @@ public class WorldBlob {
     private void removeCachedNetworksForBlob(ChunkBlob blob) {
         for (NetworkId id : blob.getNetworks()) {
             consumersOnNetwork.remove(id);
-            incNetworkVersion(id);
+            markNetworkDirty(id);
         }
     }
 
-    public void incNetworkVersion(NetworkId id) {
+    @Override
+    public void markNetworkDirty(NetworkId id) {
         if (!networkVersions.containsKey(id)) {
             networkVersions.put(id, new VersionNumber(1));
         }
@@ -163,6 +169,7 @@ public class WorldBlob {
         }
     }
 
+    @Override
     @Nullable
     public BlockPos getConsumerPosition(@Nonnull ConsumerId consumer) {
         if (!consumerPositions.containsKey(consumer)) {

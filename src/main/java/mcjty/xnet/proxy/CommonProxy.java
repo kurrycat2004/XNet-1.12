@@ -7,6 +7,7 @@ import mcjty.lib.varia.WrenchChecker;
 import mcjty.xnet.CommandHandler;
 import mcjty.xnet.ForgeEventHandlers;
 import mcjty.xnet.XNet;
+import mcjty.xnet.api.net.IWorldBlob;
 import mcjty.xnet.apiimpl.energy.EnergyChannelType;
 import mcjty.xnet.apiimpl.fluids.FluidChannelType;
 import mcjty.xnet.apiimpl.items.ItemChannelType;
@@ -48,6 +49,7 @@ public abstract class CommonProxy extends AbstractCommonProxy {
         ModItems.init();
         ModBlocks.init();
 
+        XNet.xNetApi.registerConsumerProvider(IWorldBlob::getConsumers);
         XNet.xNetApi.registerChannelType(new ItemChannelType());
         XNet.xNetApi.registerChannelType(new EnergyChannelType());
         XNet.xNetApi.registerChannelType(new FluidChannelType());

@@ -114,7 +114,7 @@ public class XNetWirelessChannels extends AbstractWorldData<XNetWirelessChannels
                 WorldBlob worldBlob = blobData.getWorldBlob(pos.getDimension());
                 NetworkId networkId = channelInfo.getRouter(pos).getNetworkId();
 //                System.out.println("Clean up wireless network = " + networkId + " (" + entry.getKey() + ")");
-                worldBlob.incNetworkVersion(networkId);
+                worldBlob.markNetworkDirty(networkId);
                 channelInfo.removeRouterInfo(pos);
                 channelInfo.incVersion();
             }

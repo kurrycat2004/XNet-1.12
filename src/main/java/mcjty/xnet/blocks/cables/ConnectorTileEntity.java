@@ -1,6 +1,5 @@
 package mcjty.xnet.blocks.cables;
 
-import cofh.redstoneflux.api.IEnergyProvider;
 import cofh.redstoneflux.api.IEnergyReceiver;
 import mcjty.lib.bindings.DefaultValue;
 import mcjty.lib.bindings.IValue;
@@ -137,7 +136,7 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyRec
                 if (newblock != cachedNeighbours[facing.ordinal()]) {
                     cachedNeighbours[facing.ordinal()] = newblock;
                     WorldBlob worldBlob = XNetBlobData.getBlobData(world).getWorldBlob(world);
-                    worldBlob.incNetworkVersion(worldBlob.getNetworkAt(getPos()));
+                    worldBlob.markNetworkDirty(worldBlob.getNetworkAt(getPos()));
                 }
                 return;
             }

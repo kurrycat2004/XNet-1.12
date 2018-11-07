@@ -291,14 +291,14 @@ public final class TileEntityRouter extends GenericTileEntity {
                 LogicTools.routers(getWorld(), networkId)
                         .forEach(router -> router.setChannelCount(number));
             }
-            worldBlob.incNetworkVersion(networkId); // Force a recalc of affected networks
+            worldBlob.markNetworkDirty(networkId); // Force a recalc of affected networks
         }
         for (NetworkId net : worldBlob.getNetworksAt(pos)) {
-            worldBlob.incNetworkVersion(net);
+            worldBlob.markNetworkDirty(net);
         }
         for (EnumFacing facing : EnumFacing.VALUES) {
             for (NetworkId net : worldBlob.getNetworksAt(pos.offset(facing))) {
-                worldBlob.incNetworkVersion(net);
+                worldBlob.markNetworkDirty(net);
             }
         }
 

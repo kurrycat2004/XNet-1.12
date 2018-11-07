@@ -17,7 +17,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 /**
- * All blobs in a single chunk are represented here as wel
+ * All blobs in a single chunk are represented here as well
  * as how blob id's are mapped to global network id's.
  */
 public class ChunkBlob {

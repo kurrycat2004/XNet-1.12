@@ -1,9 +1,9 @@
 package mcjty.xnet.blocks.generic;
 
 import mcjty.lib.McJtyRegister;
+import mcjty.lib.blocks.DamageMetadataItemBlock;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
 import mcjty.lib.compat.waila.WailaInfoProvider;
-import mcjty.lib.blocks.DamageMetadataItemBlock;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.ProbeMode;
@@ -234,8 +234,6 @@ public abstract class GenericCableBlock extends Block implements WailaInfoProvid
     @Optional.Method(modid = "theoneprobe")
     public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data) {
         WorldBlob worldBlob = XNetBlobData.getBlobData(world).getWorldBlob(world);
-
-
 
         if (mode == ProbeMode.DEBUG) {
             BlobId blobId = worldBlob.getBlobAt(data.getPos());
