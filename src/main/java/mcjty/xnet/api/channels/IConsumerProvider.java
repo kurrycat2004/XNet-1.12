@@ -3,6 +3,7 @@ package mcjty.xnet.api.channels;
 import mcjty.xnet.api.keys.NetworkId;
 import mcjty.xnet.api.net.IWorldBlob;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
 import java.util.Set;
@@ -20,5 +21,5 @@ public interface IConsumerProvider {
      * given network
      */
     @Nonnull
-    Set<BlockPos> getConsumers(IWorldBlob worldBlob, NetworkId networkId);
+    Set<BlockPos> getConsumers(World world, IWorldBlob worldBlob, NetworkId networkId);
 }

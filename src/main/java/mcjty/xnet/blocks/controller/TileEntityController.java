@@ -464,7 +464,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
     private Stream<BlockPos> getConsumerStream(WorldBlob worldBlob) {
         return XNet.xNetApi.getConsumerProviders().stream()
-                .map(provider -> provider.getConsumers(worldBlob, getNetworkId()).stream())
+                .map(provider -> provider.getConsumers(world, worldBlob, getNetworkId()).stream())
                 .flatMap(s -> s);
     }
 
