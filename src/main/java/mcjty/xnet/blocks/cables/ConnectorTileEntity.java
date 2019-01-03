@@ -1,6 +1,5 @@
 package mcjty.xnet.blocks.cables;
 
-import cofh.redstoneflux.api.IEnergyReceiver;
 import mcjty.lib.bindings.DefaultValue;
 import mcjty.lib.bindings.IValue;
 import mcjty.lib.tileentity.GenericTileEntity;
@@ -24,15 +23,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.fml.common.Optional;
 
 import javax.annotation.Nonnull;
 
-@Optional.InterfaceList({
-        @Optional.Interface(iface = "cofh.redstoneflux.api.IEnergyReceiver", modid = "redstoneflux")
-})
-public class ConnectorTileEntity extends GenericTileEntity implements IEnergyReceiver,
-        IFacadeSupport, IConnectorTile {
+public class ConnectorTileEntity extends GenericTileEntity implements IFacadeSupport, IConnectorTile {
 
     public static final String CMD_ENABLE = "connector.enable";
     public static final Key<Integer> PARAM_FACING = new Key<>("facing", Type.INTEGER);
@@ -229,12 +223,6 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyRec
         return GeneralConfiguration.maxRfConnector;
     }
 
-    @Optional.Method(modid = "redstoneflux")
-    @Override
-    public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
-        return receiveEnergyInternal(from, maxReceive, simulate);
-    }
-
     private int receiveEnergyInternal(EnumFacing from, int maxReceive, boolean simulate) {
         if (from == null) {
             return 0;
@@ -257,34 +245,12 @@ public class ConnectorTileEntity extends GenericTileEntity implements IEnergyRec
         return 0;
     }
 
-    @Optional.Method(modid = "redstoneflux")
-    @Override
-    public int getEnergyStored(EnumFacing from) {
-        return energy;
-    }
-
     private int getEnergyStoredInternal() {
         return energy;
     }
 
-
-    @Optional.Method(modid = "redstoneflux")
-    @Override
-    public int getMaxEnergyStored(EnumFacing from) {
-        return getMaxEnergy();
-    }
-
     private int getMaxEnergyStoredInternal() {
         return getMaxEnergy();
-    }
-
-    @Optional.Method(modid = "redstoneflux")
-    @Override
-    public boolean canConnectEnergy(EnumFacing from) {
-        if (from == null) {
-            return false;
-        }
-        return inputFromSide[from.ordinal()] > 0;
     }
 
     private IEnergyStorage[] sidedHandlers = new IEnergyStorage[6];

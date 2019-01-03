@@ -1,8 +1,6 @@
 package mcjty.xnet.apiimpl.energy;
 
 import com.google.gson.JsonObject;
-import mcjty.lib.McJtyLib;
-import mcjty.lib.compat.RedstoneFluxCompatibility;
 import mcjty.lib.varia.EnergyTools;
 import mcjty.lib.varia.WorldTools;
 import mcjty.xnet.XNet;
@@ -218,13 +216,11 @@ public class EnergyChannelSettings extends DefaultChannelSettings implements ICh
         if (te == null) {
             return false;
         }
-        return (McJtyLib.redstoneflux && RedstoneFluxCompatibility.isEnergyHandler(te)) || te.hasCapability(CapabilityEnergy.ENERGY, side);
+        return te.hasCapability(CapabilityEnergy.ENERGY, side);
     }
 
     public static int getEnergyLevel(TileEntity tileEntity, @Nonnull EnumFacing side) {
-        if (McJtyLib.redstoneflux && RedstoneFluxCompatibility.isEnergyHandler(tileEntity)) {
-            return RedstoneFluxCompatibility.getEnergy(tileEntity, side);
-        } else if (tileEntity != null && tileEntity.hasCapability(CapabilityEnergy.ENERGY, side)) {
+        if (tileEntity != null && tileEntity.hasCapability(CapabilityEnergy.ENERGY, side)) {
             IEnergyStorage energy = tileEntity.getCapability(CapabilityEnergy.ENERGY, side);
             return energy.getEnergyStored();
         } else {
