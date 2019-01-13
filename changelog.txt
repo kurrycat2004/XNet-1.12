@@ -1,3 +1,9 @@
+1.7.6:
+- API improvements to allow other mods to add connectors to a controller
+- Needs McJtyLib 3.1.0
+- Support for COFH RF API is removed. Only Forge Energy is supported now
+- Various cleanups
+
 1.7.5:
 - Fixed a bug with wireless channels not storing the owner correctly
 - New feature to copy/paste channels and connectors!
