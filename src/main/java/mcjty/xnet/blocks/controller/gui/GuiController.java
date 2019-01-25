@@ -8,6 +8,7 @@ import mcjty.lib.container.GenericContainer;
 import mcjty.lib.gui.GenericGuiContainer;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.WindowManager;
+import mcjty.lib.gui.events.ButtonEvent;
 import mcjty.lib.gui.events.DefaultSelectionEvent;
 import mcjty.lib.gui.layout.HorizontalLayout;
 import mcjty.lib.gui.layout.PositionalLayout;
@@ -186,11 +187,13 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     }
 
     private void removeChannel() {
-        sendServerCommand(XNetMessages.INSTANCE, TileEntityController.CMD_REMOVECHANNEL,
-                TypedMap.builder()
-                        .put(PARAM_INDEX, getSelectedChannel())
-                        .build());
-        refresh();
+        showMessage(mc, this, getWindowManager(), 50, 50, TextFormatting.RED + "Really remove channel " + (getSelectedChannel() + 1) + "?", parent -> {
+            sendServerCommand(XNetMessages.INSTANCE, TileEntityController.CMD_REMOVECHANNEL,
+                    TypedMap.builder()
+                            .put(PARAM_INDEX, getSelectedChannel())
+                            .build());
+            refresh();
+        });
     }
 
     private void createChannel(String typeId) {
@@ -287,6 +290,10 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     }
 
     public static void showMessage(Minecraft mc, Gui gui, WindowManager windowManager, int x, int y, String title) {
+        showMessage(mc, gui, windowManager, x, y, title, null);
+    }
+
+    public static void showMessage(Minecraft mc, Gui gui, WindowManager windowManager, int x, int y, String title, ButtonEvent okEvent) {
         Panel ask = new Panel(mc, gui)
                 .setLayout(new VerticalLayout())
                 .setFilledBackground(0xff666666, 0xffaaaaaa)
@@ -298,6 +305,12 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         buttons.addChild(new Button(mc, gui).setText("Cancel").addButtonEvent((parent -> {
             windowManager.closeWindow(askWindow);
         })));
+        if (okEvent != null) {
+            buttons.addChild(new Button(mc, gui).setText("OK").addButtonEvent(parent -> {
+                windowManager.closeWindow(askWindow);
+                okEvent.buttonClicked(parent);
+            }));
+        }
         ask.addChild(buttons);
     }
 
