@@ -1043,10 +1043,10 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     }
 
     @Override
-    public void onBlockBreak(World workd, BlockPos pos, IBlockState state) {
-        super.onBlockBreak(workd, pos, state);
-        XNetBlobData blobData = XNetBlobData.getBlobData(world);
-        WorldBlob worldBlob = blobData.getWorldBlob(world);
+    public void onBlockBreak(World world, BlockPos pos, IBlockState state) {
+        super.onBlockBreak(world, pos, state);
+        XNetBlobData blobData = XNetBlobData.getBlobData(this.world);
+        WorldBlob worldBlob = blobData.getWorldBlob(this.world);
         worldBlob.removeCableSegment(pos);
         blobData.save();
     }
