@@ -20,7 +20,7 @@ public class XNetManualItem extends Item {
     public XNetManualItem() {
         setUnlocalizedName(XNet.MODID + ".xnet_manual");
         setRegistryName("xnet_manual");
-        setCreativeTab(XNet.tabXNet);
+        setCreativeTab(XNet.setup.getTab());
         McJtyRegister.registerLater(this, XNet.instance);
         setMaxStackSize(1);
     }

@@ -19,6 +19,6 @@ public abstract class GenericXNetBlock<T extends GenericTileEntity, C extends Co
                             BiFunction<EntityPlayer, IInventory, C> containerFactory,
                             Function<Block, ItemBlock> itemBlockFunction, String name, boolean isContainer) {
         super(XNet.instance, material, tileEntityClass, containerFactory, itemBlockFunction, name, isContainer);
-        setCreativeTab(XNet.tabXNet);
+        setCreativeTab(XNet.setup.getTab());
     }
 }

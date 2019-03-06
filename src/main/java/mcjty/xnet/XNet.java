@@ -1,9 +1,8 @@
 package mcjty.xnet;
 
 
-import mcjty.lib.McJtyLib;
 import mcjty.lib.base.ModBase;
-import mcjty.lib.compat.MainCompatHandler;
+import mcjty.lib.proxy.IProxy;
 import mcjty.xnet.api.IXNet;
 import mcjty.xnet.apiimpl.XNetApi;
 import mcjty.xnet.commands.CommandCheck;
@@ -12,17 +11,11 @@ import mcjty.xnet.commands.CommandRebuild;
 import mcjty.xnet.compat.TOPSupport;
 import mcjty.xnet.compat.WAILASupport;
 import mcjty.xnet.items.manual.GuiXNetManual;
-import mcjty.xnet.proxy.CommonProxy;
-import net.minecraft.creativetab.CreativeTabs;
+import mcjty.xnet.proxy.CommonSetup;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
-import org.apache.logging.log4j.Logger;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -44,47 +37,32 @@ public class XNet implements ModBase {
     public static final String MIN_MCJTYLIB_VER = "3.1.0";
     public static final String MIN_RFTOOLS_VER = "7.50";
 
-    public static final String SHIFT_MESSAGE = "<Press Shift>";
-
     @SidedProxy(clientSide = "mcjty.xnet.proxy.ClientProxy", serverSide = "mcjty.xnet.proxy.ServerProxy")
-    public static CommonProxy proxy;
+    public static IProxy proxy;
+    public static CommonSetup setup = new CommonSetup();
 
     public ClientInfo clientInfo = new ClientInfo();
 
     @Mod.Instance(MODID)
     public static XNet instance;
-    public static Logger logger;
 
-    public static boolean rftools = false;
     public static XNetApi xNetApi = new XNetApi();
-
-    public static CreativeTabs tabXNet = new CreativeTabs("XNet") {
-        @Override
-        public ItemStack getTabIconItem() {
-            return new ItemStack(Item.getItemFromBlock(Blocks.ANVIL));
-        }
-    };
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event){
-        McJtyLib.registerMod(this);
-
-        logger = event.getModLog();
-        rftools = Loader.isModLoaded("rftools");
-
-        MainCompatHandler.registerWaila();
-        MainCompatHandler.registerTOP();
-
+        setup.preInit(event);
         proxy.preInit(event);
     }
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent e) {
+        setup.init(e);
         proxy.init(e);
     }
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent e) {
+        setup.postInit(e);
         proxy.postInit(e);
     }
 
@@ -115,7 +93,7 @@ public class XNet implements ModBase {
                 if (value.isPresent()) {
                     value.get().apply(xNetApi);
                 } else {
-                    logger.warn("Some mod didn't return a valid result with getXNet!");
+                    setup.getLogger().warn("Some mod didn't return a valid result with getXNet!");
                 }
             }
         }

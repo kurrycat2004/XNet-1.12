@@ -1,8 +1,10 @@
 package mcjty.xnet.proxy;
 
+import mcjty.lib.McJtyLib;
 import mcjty.lib.base.GeneralConfig;
+import mcjty.lib.compat.MainCompatHandler;
 import mcjty.lib.network.PacketHandler;
-import mcjty.lib.proxy.AbstractCommonProxy;
+import mcjty.lib.setup.DefaultCommonSetup;
 import mcjty.lib.varia.WrenchChecker;
 import mcjty.xnet.CommandHandler;
 import mcjty.xnet.ForgeEventHandlers;
@@ -16,9 +18,13 @@ import mcjty.xnet.gui.GuiProxy;
 import mcjty.xnet.init.ModBlocks;
 import mcjty.xnet.init.ModItems;
 import mcjty.xnet.network.XNetMessages;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.FMLLog;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -28,11 +34,16 @@ import org.apache.logging.log4j.Level;
 
 import java.io.File;
 
-public abstract class CommonProxy extends AbstractCommonProxy {
+public class CommonSetup extends DefaultCommonSetup {
+
+    public static boolean rftools = false;
 
     @Override
     public void preInit(FMLPreInitializationEvent e) {
         super.preInit(e);
+
+        McJtyLib.registerMod(XNet.instance);    // @todo why only xnet?
+
         MinecraftForge.EVENT_BUS.register(new ForgeEventHandlers());
         CommandHandler.registerCommands();
 
@@ -53,6 +64,16 @@ public abstract class CommonProxy extends AbstractCommonProxy {
         XNet.xNetApi.registerChannelType(new EnergyChannelType());
         XNet.xNetApi.registerChannelType(new FluidChannelType());
         XNet.xNetApi.registerChannelType(new LogicChannelType());
+
+        rftools = Loader.isModLoaded("rftools");
+
+        MainCompatHandler.registerWaila();
+        MainCompatHandler.registerTOP();
+    }
+
+    @Override
+    public void createTabs() {
+        createTab("XNet", new ItemStack(Item.getItemFromBlock(Blocks.ANVIL)));
     }
 
     private void readMainConfig() {

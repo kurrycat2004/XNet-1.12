@@ -100,11 +100,11 @@ public class ChannelInfo {
             String id = tc.getString("type");
             IChannelType type = XNet.xNetApi.findType(id);
             if (type == null) {
-                XNet.logger.warn("Unsupported type " + id + "!");
+                XNet.setup.getLogger().warn("Unsupported type " + id + "!");
                 continue;
             }
             if (!getType().equals(type)) {
-                XNet.logger.warn("Trying to load a connector with non-matching type " + type + "!");
+                XNet.setup.getLogger().warn("Trying to load a connector with non-matching type " + type + "!");
                 continue;
             }
             ConsumerId consumerId = new ConsumerId(tc.getInteger("consumerId"));

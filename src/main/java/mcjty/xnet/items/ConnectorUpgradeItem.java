@@ -36,7 +36,7 @@ public class ConnectorUpgradeItem extends Item {
     public ConnectorUpgradeItem() {
         setUnlocalizedName(XNet.MODID + ".connector_upgrade");
         setRegistryName("connector_upgrade");
-        setCreativeTab(XNet.tabXNet);
+        setCreativeTab(XNet.setup.getTab());
         McJtyRegister.registerLater(this, XNet.instance);
     }
 

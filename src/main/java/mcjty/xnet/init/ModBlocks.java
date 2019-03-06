@@ -40,7 +40,7 @@ public class ModBlocks {
     public static GenericBlockBuilderFactory builderFactory;
 
     public static void init() {
-        builderFactory = new GenericBlockBuilderFactory(XNet.instance).creativeTabs(XNet.tabXNet);
+        builderFactory = new GenericBlockBuilderFactory(XNet.instance).creativeTabs(XNet.setup.getTab());
 
         facadeBlock = new FacadeBlock();
         redstoneProxyBlock = new RedstoneProxyBlock();
@@ -75,7 +75,7 @@ public class ModBlocks {
         antennaBlock = new BaseBlockBuilder<>(XNet.instance, "antenna")
                 .rotationType(BaseBlock.RotationType.HORIZROTATION)
                 .flags(BlockFlags.NON_OPAQUE)
-                .creativeTabs(XNet.tabXNet)
+                .creativeTabs(XNet.setup.getTab())
                 .info("message.xnet.shiftmessage")
                 .infoExtended("message.xnet.antenna")
                 .infoExtendedParameter(stack -> Integer.toString(GeneralConfiguration.antennaTier1Range))
@@ -86,14 +86,14 @@ public class ModBlocks {
         antennaBaseBlock = new BaseBlockBuilder<>(XNet.instance, "antenna_base")
                 .rotationType(BaseBlock.RotationType.NONE)
                 .flags(BlockFlags.NON_OPAQUE)
-                .creativeTabs(XNet.tabXNet)
+                .creativeTabs(XNet.setup.getTab())
                 .info("message.xnet.shiftmessage")
                 .infoExtended("message.xnet.antenna_base")
                 .build();
         antennaDishBlock = new BaseBlockBuilder<>(XNet.instance, "antenna_dish")
                 .rotationType(BaseBlock.RotationType.HORIZROTATION)
                 .flags(BlockFlags.NON_OPAQUE)
-                .creativeTabs(XNet.tabXNet)
+                .creativeTabs(XNet.setup.getTab())
                 .info("message.xnet.shiftmessage")
                 .infoExtended("message.xnet.antenna_dish")
                 .infoExtendedParameter(stack -> Integer.toString(GeneralConfiguration.wirelessRouterRfPerChannel[TileEntityWirelessRouter.TIER_INF]))

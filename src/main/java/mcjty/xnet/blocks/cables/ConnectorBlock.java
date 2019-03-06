@@ -411,7 +411,7 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
                 tooltip.add(TextFormatting.GRAY + "Supports faster item transfer");
             }
         } else {
-            tooltip.add(TextFormatting.WHITE + XNet.SHIFT_MESSAGE);
+            tooltip.add(TextFormatting.WHITE + GuiProxy.SHIFT_MESSAGE);
         }
 
     }

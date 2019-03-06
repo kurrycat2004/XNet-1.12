@@ -379,7 +379,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                 String id = tc.getString("type");
                 IChannelType type = XNet.xNetApi.findType(id);
                 if (type == null) {
-                    XNet.logger.warn("Unsupported type " + id + "!");
+                    XNet.setup.getLogger().warn("Unsupported type " + id + "!");
                     continue;
                 }
                 channels[i] = new ChannelInfo(type);
@@ -416,7 +416,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                 // Should always be the case. @todo error?
                 name = ((ConnectorTileEntity) te).getConnectorName();
             } else {
-                XNet.logger.warn("What? The connector at " + BlockPosTools.toString(consumerPos) + " is not a connector?");
+                XNet.setup.getLogger().warn("What? The connector at " + BlockPosTools.toString(consumerPos) + " is not a connector?");
             }
             for (EnumFacing facing : EnumFacing.VALUES) {
                 if (ConnectorBlock.isConnectable(getWorld(), consumerPos, facing)) {
@@ -443,7 +443,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                 // Should always be the case. @todo error?
                 name = ((ConnectorTileEntity) te).getConnectorName();
             } else {
-                XNet.logger.warn("What? The connector at " + BlockPosTools.toString(consumerPos) + " is not a connector?");
+                XNet.setup.getLogger().warn("What? The connector at " + BlockPosTools.toString(consumerPos) + " is not a connector?");
             }
             for (EnumFacing facing : EnumFacing.VALUES) {
                 if (ConnectorBlock.isConnectable(getWorld(), consumerPos, facing)) {
@@ -620,7 +620,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                 // Should always be the case. @todo error?
                 name = ((ConnectorTileEntity) te).getConnectorName();
             } else {
-                XNet.logger.warn("What? The connector at " + BlockPosTools.toString(consumerPos) + " is not a connector?");
+                XNet.setup.getLogger().warn("What? The connector at " + BlockPosTools.toString(consumerPos) + " is not a connector?");
             }
             for (EnumFacing facing : EnumFacing.VALUES) {
                 if (ConnectorBlock.isConnectable(world, consumerPos, facing)) {

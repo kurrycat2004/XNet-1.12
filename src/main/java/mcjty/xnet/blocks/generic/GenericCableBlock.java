@@ -104,7 +104,7 @@ public abstract class GenericCableBlock extends Block implements WailaInfoProvid
         setRegistryName(name);
         McJtyRegister.registerLater(this, XNet.instance, null);
         McJtyRegister.registerLater(createItemBlock().setRegistryName(name), XNet.instance);
-        setCreativeTab(XNet.tabXNet);
+        setCreativeTab(XNet.setup.getTab());
         setDefaultState(getDefaultState().withProperty(COLOR, CableColor.BLUE));
     }
 

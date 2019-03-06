@@ -37,7 +37,7 @@ public class RedstoneProxyBlock extends Block {
         setHarvestLevel("pickaxe", 0);
         McJtyRegister.registerLater(this, XNet.instance, null);
         McJtyRegister.registerLater(new ItemBlock(this).setRegistryName(getRegistryName()), XNet.instance);
-        setCreativeTab(XNet.tabXNet);
+        setCreativeTab(XNet.setup.getTab());
     }
 
     public RedstoneProxyBlock(Material materialIn) {

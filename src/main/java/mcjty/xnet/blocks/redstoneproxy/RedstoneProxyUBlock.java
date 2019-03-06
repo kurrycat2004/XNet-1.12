@@ -28,7 +28,7 @@ public class RedstoneProxyUBlock extends RedstoneProxyBlock {
         setRegistryName("redstone_proxy_upd");
         McJtyRegister.registerLater(this, XNet.instance, null);
         McJtyRegister.registerLater(new ItemBlock(this).setRegistryName(getRegistryName()), XNet.instance);
-        setCreativeTab(XNet.tabXNet);
+        setCreativeTab(XNet.setup.getTab());
     }
 
     @Override

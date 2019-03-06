@@ -1,13 +1,13 @@
 package mcjty.xnet.apiimpl.logic;
 
 import mcjty.lib.varia.FluidTools;
-import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.Color;
 import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.apiimpl.energy.EnergyChannelSettings;
 import mcjty.xnet.apiimpl.fluids.FluidChannelSettings;
 import mcjty.xnet.apiimpl.items.ItemChannelSettings;
 import mcjty.xnet.compat.RFToolsSupport;
+import mcjty.xnet.proxy.CommonSetup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -170,7 +170,7 @@ public class Sensor {
     public boolean test(@Nullable TileEntity te, @Nonnull World world, @Nonnull BlockPos pos, LogicConnectorSettings settings) {
         switch (sensorMode) {
             case ITEM: {
-                if (XNet.rftools && RFToolsSupport.isStorageScanner(te)) {
+                if (CommonSetup.rftools && RFToolsSupport.isStorageScanner(te)) {
                     int cnt = RFToolsSupport.countItems(te, filter, amount + 1);
                     return operator.match(cnt, amount);
                 } else {
