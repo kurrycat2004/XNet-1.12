@@ -1,10 +1,11 @@
 package mcjty.xnet.network;
 
+import io.netty.buffer.ByteBuf;
 import mcjty.lib.network.ICommandHandler;
-import mcjty.lib.network.PacketRequestListFromServer;
+import mcjty.lib.network.NetworkTools;
+import mcjty.lib.network.TypedMapTools;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
-import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.controller.TileEntityController;
 import mcjty.xnet.clientinfo.ConnectedBlockClientInfo;
 import net.minecraft.tileentity.TileEntity;
@@ -16,14 +17,30 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import java.util.List;
 
-public class PacketGetConnectedBlocks extends PacketRequestListFromServer<ConnectedBlockClientInfo, PacketGetConnectedBlocks, PacketConnectedBlocksReady> {
+public class PacketGetConnectedBlocks implements IMessage {
+
+    protected BlockPos pos;
+    protected TypedMap params;
 
     public PacketGetConnectedBlocks() {
 
     }
 
     public PacketGetConnectedBlocks(BlockPos pos) {
-        super(XNet.MODID, pos, TileEntityController.CMD_GETCONNECTEDBLOCKS, TypedMap.EMPTY);
+        this.pos = pos;
+        this.params = TypedMap.EMPTY;
+    }
+
+    @Override
+    public void fromBytes(ByteBuf buf) {
+        pos = NetworkTools.readPos(buf);
+        params = TypedMapTools.readArguments(buf);
+    }
+
+    @Override
+    public void toBytes(ByteBuf buf) {
+        NetworkTools.writePos(buf, pos);
+        TypedMapTools.writeArguments(buf, params);
     }
 
     public static class Handler implements IMessageHandler<PacketGetConnectedBlocks, IMessage> {
@@ -36,7 +53,7 @@ public class PacketGetConnectedBlocks extends PacketRequestListFromServer<Connec
         private void handle(PacketGetConnectedBlocks message, MessageContext ctx) {
             TileEntity te = ctx.getServerHandler().player.getEntityWorld().getTileEntity(message.pos);
             ICommandHandler commandHandler = (ICommandHandler) te;
-            List<ConnectedBlockClientInfo> list = commandHandler.executeWithResultList(message.command, message.params, Type.create(ConnectedBlockClientInfo.class));
+            List<ConnectedBlockClientInfo> list = commandHandler.executeWithResultList(TileEntityController.CMD_GETCONNECTEDBLOCKS, message.params, Type.create(ConnectedBlockClientInfo.class));
             XNetMessages.INSTANCE.sendTo(new PacketConnectedBlocksReady(message.pos, TileEntityController.CLIENTCMD_CONNECTEDBLOCKSREADY, list), ctx.getServerHandler().player);
         }
     }
