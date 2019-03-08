@@ -2,11 +2,11 @@ package mcjty.xnet.network;
 
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.network.NetworkTools;
-import mcjty.xnet.XNet;
+import mcjty.lib.thirteen.Context;
 import mcjty.xnet.blocks.controller.gui.GuiController;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+
+import java.util.function.Supplier;
 
 public class PacketJsonToClipboard implements IMessage {
 
@@ -25,19 +25,19 @@ public class PacketJsonToClipboard implements IMessage {
     public PacketJsonToClipboard() {
     }
 
+    public PacketJsonToClipboard(ByteBuf buf) {
+        fromBytes(buf);
+    }
+
     public PacketJsonToClipboard(String json) {
         this.json = json;
     }
 
-    public static class Handler implements IMessageHandler<PacketJsonToClipboard, IMessage> {
-        @Override
-        public IMessage onMessage(PacketJsonToClipboard message, MessageContext ctx) {
-            XNet.proxy.addScheduledTaskClient(() -> handle(message, ctx));
-            return null;
-        }
-
-        private void handle(PacketJsonToClipboard message, MessageContext ctx) {
-            GuiController.toClipboard(message.json);
-        }
+    public void handle(Supplier<Context> supplier) {
+        Context ctx = supplier.get();
+        ctx.enqueueWork(() -> {
+            GuiController.toClipboard(json);
+        });
+        ctx.setPacketHandled(true);
     }
 }

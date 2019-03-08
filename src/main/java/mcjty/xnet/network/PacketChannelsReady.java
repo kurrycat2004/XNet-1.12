@@ -3,21 +3,24 @@ package mcjty.xnet.network;
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.network.IClientCommandHandler;
 import mcjty.lib.network.PacketListFromServer;
-import mcjty.lib.varia.Logging;
+import mcjty.lib.thirteen.Context;
 import mcjty.lib.typed.Type;
+import mcjty.lib.varia.Logging;
 import mcjty.xnet.XNet;
 import mcjty.xnet.clientinfo.ChannelClientInfo;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 public class PacketChannelsReady extends PacketListFromServer<PacketChannelsReady, ChannelClientInfo> {
 
     public PacketChannelsReady() {
+    }
+
+    public PacketChannelsReady(ByteBuf buf) {
+        fromBytes(buf);
     }
 
     public PacketChannelsReady(BlockPos pos, String command, List<ChannelClientInfo> list) {
@@ -43,19 +46,15 @@ public class PacketChannelsReady extends PacketListFromServer<PacketChannelsRead
         }
     }
 
-    public static class Handler implements IMessageHandler<PacketChannelsReady, IMessage> {
-        @Override
-        public IMessage onMessage(PacketChannelsReady message, MessageContext ctx) {
-            XNet.proxy.addScheduledTaskClient(() -> handle(message, ctx));
-            return null;
-        }
-
-        private void handle(PacketChannelsReady message, MessageContext ctx) {
-            TileEntity te = XNet.proxy.getClientWorld().getTileEntity(message.pos);
+    public void handle(Supplier<Context> supplier) {
+        Context ctx = supplier.get();
+        ctx.enqueueWork(() -> {
+            TileEntity te = XNet.proxy.getClientWorld().getTileEntity(pos);
             IClientCommandHandler clientCommandHandler = (IClientCommandHandler) te;
-            if (!clientCommandHandler.receiveListFromServer(message.command, message.list, Type.create(ChannelClientInfo.class))) {
-                Logging.log("Command " + message.command + " was not handled!");
+            if (!clientCommandHandler.receiveListFromServer(command, list, Type.create(ChannelClientInfo.class))) {
+                Logging.log("Command " + command + " was not handled!");
             }
-        }
+        });
+        ctx.setPacketHandled(true);
     }
 }

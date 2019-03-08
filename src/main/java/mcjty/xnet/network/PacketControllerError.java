@@ -2,11 +2,11 @@ package mcjty.xnet.network;
 
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.network.NetworkTools;
-import mcjty.xnet.XNet;
+import mcjty.lib.thirteen.Context;
 import mcjty.xnet.blocks.controller.gui.GuiController;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+
+import java.util.function.Supplier;
 
 public class PacketControllerError implements IMessage {
 
@@ -25,19 +25,19 @@ public class PacketControllerError implements IMessage {
     public PacketControllerError() {
     }
 
+    public PacketControllerError(ByteBuf buf) {
+        fromBytes(buf);
+    }
+
     public PacketControllerError(String error) {
         this.error = error;
     }
 
-    public static class Handler implements IMessageHandler<PacketControllerError, IMessage> {
-        @Override
-        public IMessage onMessage(PacketControllerError message, MessageContext ctx) {
-            XNet.proxy.addScheduledTaskClient(() -> handle(message, ctx));
-            return null;
-        }
-
-        private void handle(PacketControllerError message, MessageContext ctx) {
-            GuiController.showError(message.error);
-        }
+    public void handle(Supplier<Context> supplier) {
+        Context ctx = supplier.get();
+        ctx.enqueueWork(() -> {
+            GuiController.showError(error);
+        });
+        ctx.setPacketHandled(true);
     }
 }

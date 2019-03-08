@@ -3,7 +3,6 @@ package mcjty.xnet.proxy;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.compat.MainCompatHandler;
-import mcjty.lib.network.PacketHandler;
 import mcjty.lib.setup.DefaultCommonSetup;
 import mcjty.lib.varia.WrenchChecker;
 import mcjty.xnet.CommandHandler;
@@ -29,7 +28,6 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;
@@ -53,8 +51,7 @@ public class CommonSetup extends DefaultCommonSetup {
 
         readMainConfig();
 
-        SimpleNetworkWrapper network = PacketHandler.registerMessages(XNet.MODID, "xnet");
-        XNetMessages.registerNetworkMessages(network);
+        XNetMessages.registerMessages("xnet");
 
         ModItems.init();
         ModBlocks.init();
