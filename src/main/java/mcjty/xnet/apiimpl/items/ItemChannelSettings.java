@@ -15,7 +15,7 @@ import mcjty.xnet.api.keys.ConsumerId;
 import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.compat.RFToolsSupport;
 import mcjty.xnet.config.ConfigSetup;
-import mcjty.xnet.setup.CommonSetup;
+import mcjty.xnet.setup.ModSetup;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
@@ -181,7 +181,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
 
                 TileEntity te = world.getTileEntity(pos);
 
-                if (CommonSetup.rftools && RFToolsSupport.isStorageScanner(te)) {
+                if (ModSetup.rftools && RFToolsSupport.isStorageScanner(te)) {
                     RFToolsSupport.tickStorageScanner(context, settings, te, this);
                 } else {
                     IItemHandler handler = getItemHandlerAt(te, settings.getFacing());
@@ -314,7 +314,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                     ItemStack remaining;
                     Integer count = settings.getCount();
 
-                    if (CommonSetup.rftools && RFToolsSupport.isStorageScanner(te)) {
+                    if (ModSetup.rftools && RFToolsSupport.isStorageScanner(te)) {
                         if (count != null) {
                             int amount = RFToolsSupport.countItems(te, settings.getMatcher(), count);
                             int caninsert = count - amount;
@@ -383,7 +383,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
             ItemConnectorSettings settings = entry.getValue();
             BlockPos pos = consumerPosition.offset(side);
             TileEntity te = context.getControllerWorld().getTileEntity(pos);
-            if (CommonSetup.rftools && RFToolsSupport.isStorageScanner(te)) {
+            if (ModSetup.rftools && RFToolsSupport.isStorageScanner(te)) {
                 int toinsert = total;
                 Integer count = settings.getCount();
                 if (count != null) {

@@ -2,7 +2,7 @@ package mcjty.xnet.setup;
 
 import mcjty.lib.McJtyLib;
 import mcjty.lib.compat.MainCompatHandler;
-import mcjty.lib.setup.DefaultCommonSetup;
+import mcjty.lib.setup.DefaultModSetup;
 import mcjty.xnet.CommandHandler;
 import mcjty.xnet.ForgeEventHandlers;
 import mcjty.xnet.XNet;
@@ -23,7 +23,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 
-public class CommonSetup extends DefaultCommonSetup {
+public class ModSetup extends DefaultModSetup {
 
     public static boolean rftools = false;
 

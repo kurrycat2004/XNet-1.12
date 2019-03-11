@@ -11,7 +11,7 @@ import mcjty.xnet.commands.CommandRebuild;
 import mcjty.xnet.compat.TOPSupport;
 import mcjty.xnet.compat.WAILASupport;
 import mcjty.xnet.items.manual.GuiXNetManual;
-import mcjty.xnet.setup.CommonSetup;
+import mcjty.xnet.setup.ModSetup;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -39,7 +39,7 @@ public class XNet implements ModBase {
 
     @SidedProxy(clientSide = "mcjty.xnet.setup.ClientProxy", serverSide = "mcjty.xnet.setup.ServerProxy")
     public static IProxy proxy;
-    public static CommonSetup setup = new CommonSetup();
+    public static ModSetup setup = new ModSetup();
 
     public ClientInfo clientInfo = new ClientInfo();
 
