@@ -7,9 +7,7 @@ import mcjty.xnet.RenderWorldLastEventHandler;
 import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.generic.BakedModelLoader;
 import mcjty.xnet.init.ModBlocks;
-import mcjty.xnet.init.ModItems;
 import net.minecraftforge.client.event.ColorHandlerEvent;
-import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.obj.OBJLoader;
@@ -30,12 +28,6 @@ public class ClientProxy extends DefaultClientProxy {
         OBJLoader.INSTANCE.addDomain(XNet.MODID);
         ModelLoaderRegistry.registerLoader(new BakedModelLoader());
         McJtyLibClient.preInit(e);
-    }
-
-    @SubscribeEvent
-    public void registerModels(ModelRegistryEvent event) {
-        ModItems.initModels();
-        ModBlocks.initModels();
     }
 
     @SubscribeEvent
