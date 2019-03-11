@@ -28,7 +28,7 @@ import mcjty.xnet.clientinfo.ChannelClientInfo;
 import mcjty.xnet.clientinfo.ConnectedBlockClientInfo;
 import mcjty.xnet.clientinfo.ConnectorClientInfo;
 import mcjty.xnet.clientinfo.ConnectorInfo;
-import mcjty.xnet.config.GeneralConfiguration;
+import mcjty.xnet.config.ConfigSetup;
 import mcjty.xnet.logic.ChannelInfo;
 import mcjty.xnet.logic.LogicTools;
 import mcjty.xnet.multiblock.*;
@@ -111,7 +111,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     private NetworkChecker networkChecker = null;
 
     public TileEntityController() {
-        super(GeneralConfiguration.controllerMaxRF, GeneralConfiguration.controllerRfPerTick);
+        super(ConfigSetup.controllerMaxRF, ConfigSetup.controllerRfPerTick);
         for (int i = 0; i < MAX_CHANNELS; i++) {
             channels[i] = null;
         }
@@ -238,7 +238,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
             checkNetwork(worldBlob);
 
-            if (!checkAndConsumeRF(GeneralConfiguration.controllerRFT)) {
+            if (!checkAndConsumeRF(ConfigSetup.controllerRFT)) {
                 return;
             }
 
@@ -246,7 +246,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             int newcolors = 0;
             for (int i = 0; i < MAX_CHANNELS; i++) {
                 if (channels[i] != null && channels[i].isEnabled()) {
-                    if (checkAndConsumeRF(GeneralConfiguration.controllerChannelRFT)) {
+                    if (checkAndConsumeRF(ConfigSetup.controllerChannelRFT)) {
                         channels[i].getChannelSettings().tick(i, this);
                     }
                     newcolors |= channels[i].getChannelSettings().getColors();

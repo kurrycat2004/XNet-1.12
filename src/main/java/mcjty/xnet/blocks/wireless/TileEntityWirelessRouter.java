@@ -17,7 +17,7 @@ import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.blocks.generic.CableColor;
 import mcjty.xnet.blocks.router.TileEntityRouter;
 import mcjty.xnet.clientinfo.ControllerChannelClientInfo;
-import mcjty.xnet.config.GeneralConfiguration;
+import mcjty.xnet.config.ConfigSetup;
 import mcjty.xnet.init.ModBlocks;
 import mcjty.xnet.logic.LogicTools;
 import mcjty.xnet.multiblock.*;
@@ -63,7 +63,7 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
     private int globalChannelVersion = -1;      // Used to detect if a wireless channel has been published and we might need to recheck
 
     public TileEntityWirelessRouter() {
-        super(GeneralConfiguration.wirelessRouterMaxRF, GeneralConfiguration.wirelessRouterRfPerTick);
+        super(ConfigSetup.wirelessRouterMaxRF, ConfigSetup.wirelessRouterRfPerTick);
     }
 
     @Override
@@ -144,9 +144,9 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
             case TIER_INVALID:
                 return -1;
             case TIER_1:
-                return GeneralConfiguration.antennaTier1Range;
+                return ConfigSetup.antennaTier1Range;
             case TIER_2:
-                return GeneralConfiguration.antennaTier2Range;
+                return ConfigSetup.antennaTier2Range;
             case TIER_INF:
                 return Integer.MAX_VALUE;
         }
@@ -229,8 +229,8 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
                     String name = pair.getKey();
                     IChannelType channelType = pair.getValue();
                     long energyStored = getStoredPower();
-                    if (GeneralConfiguration.wirelessRouterRfPerChannel[tier] <= energyStored) {
-                        consumeEnergy(GeneralConfiguration.wirelessRouterRfPerChannel[tier]);
+                    if (ConfigSetup.wirelessRouterRfPerChannel[tier] <= energyStored) {
+                        consumeEnergy(ConfigSetup.wirelessRouterRfPerChannel[tier]);
                         wirelessData.transmitChannel(name, channelType, ownerUUID, world.provider.getDimension(),
                                 pos, networkId);
                     }

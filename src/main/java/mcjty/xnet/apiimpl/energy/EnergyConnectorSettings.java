@@ -8,7 +8,7 @@ import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.helper.AbstractConnectorSettings;
 import mcjty.xnet.apiimpl.EnumStringTranslators;
-import mcjty.xnet.config.GeneralConfiguration;
+import mcjty.xnet.config.ConfigSetup;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -16,7 +16,6 @@ import net.minecraft.util.ResourceLocation;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 public class EnergyConnectorSettings extends AbstractConnectorSettings {
@@ -80,7 +79,7 @@ public class EnergyConnectorSettings extends AbstractConnectorSettings {
                 .label("Rate")
                 .integer(TAG_RATE,
                         (energyMode == EnergyMode.EXT ? "Max energy extraction rate" : "Max energy insertion rate") +
-                        "|(limited to " + (advanced ? GeneralConfiguration.maxRfRateAdvanced : GeneralConfiguration.maxRfRateNormal) + " per tick)", rate, 40)
+                        "|(limited to " + (advanced ? ConfigSetup.maxRfRateAdvanced : ConfigSetup.maxRfRateNormal) + " per tick)", rate, 40)
                 .shift(10)
                 .label(energyMode == EnergyMode.EXT ? "Min" : "Max")
                 .integer(TAG_MINMAX, energyMode == EnergyMode.EXT ? "Disable extraction if energy|is too low" : "Disable insertion if energy|is too high", minmax, 50);
@@ -136,7 +135,7 @@ public class EnergyConnectorSettings extends AbstractConnectorSettings {
         setIntegerSafe(object, "priority", priority);
         setIntegerSafe(object, "rate", rate);
         setIntegerSafe(object, "minmax", minmax);
-        if (rate != null && rate > GeneralConfiguration.maxRfRateNormal) {
+        if (rate != null && rate > ConfigSetup.maxRfRateNormal) {
             object.add("advancedneeded", new JsonPrimitive(true));
         }
         return object;

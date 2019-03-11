@@ -17,7 +17,7 @@ import mcjty.xnet.blocks.generic.GenericCableBlock;
 import mcjty.xnet.blocks.redstoneproxy.RedstoneProxyBlock;
 import mcjty.xnet.blocks.router.TileEntityRouter;
 import mcjty.xnet.blocks.wireless.TileEntityWirelessRouter;
-import mcjty.xnet.config.GeneralConfiguration;
+import mcjty.xnet.config.ConfigSetup;
 import mcjty.xnet.gui.GuiProxy;
 import mcjty.xnet.init.ModBlocks;
 import mcjty.xnet.multiblock.ColorId;
@@ -404,7 +404,7 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
             tooltip.add(TextFormatting.BLUE + "machine that should be connected");
             tooltip.add(TextFormatting.BLUE + "to the network");
             boolean advanced = this == NetCableSetup.advancedConnectorBlock;
-            int maxrf = advanced ? GeneralConfiguration.maxRfAdvancedConnector : GeneralConfiguration.maxRfConnector;
+            int maxrf = advanced ? ConfigSetup.maxRfAdvancedConnector : ConfigSetup.maxRfConnector;
             tooltip.add(TextFormatting.GRAY + "" + TextFormatting.BOLD + "Max RF: " + TextFormatting.WHITE + maxrf);
             if (advanced) {
                 tooltip.add(TextFormatting.GRAY + "Allow access to different sides");

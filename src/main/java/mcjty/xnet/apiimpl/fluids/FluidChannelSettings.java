@@ -12,7 +12,7 @@ import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.helper.DefaultChannelSettings;
 import mcjty.xnet.apiimpl.EnumStringTranslators;
 import mcjty.xnet.api.keys.SidedConsumer;
-import mcjty.xnet.config.GeneralConfiguration;
+import mcjty.xnet.config.ConfigSetup;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -140,7 +140,7 @@ public class FluidChannelSettings extends DefaultChannelSettings implements ICha
                         List<Pair<SidedConsumer, FluidConnectorSettings>> inserted = new ArrayList<>();
                         int remaining = insertFluidSimulate(inserted, context, stack);
                         if (!inserted.isEmpty()) {
-                            if (context.checkAndConsumeRF(GeneralConfiguration.controllerOperationRFT)) {
+                            if (context.checkAndConsumeRF(ConfigSetup.controllerOperationRFT)) {
                                 insertFluidReal(context, inserted, fetchFluid(handler, false, extractMatcher, stack.amount - remaining));
                             }
                         }

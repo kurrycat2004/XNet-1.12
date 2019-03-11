@@ -10,7 +10,7 @@ import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.helper.AbstractConnectorSettings;
 import mcjty.xnet.apiimpl.EnumStringTranslators;
-import mcjty.xnet.config.GeneralConfiguration;
+import mcjty.xnet.config.ConfigSetup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -67,7 +67,7 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
 
     @Nonnull
     public Integer getRate() {
-        return rate == null ? GeneralConfiguration.maxFluidRateNormal : rate;
+        return rate == null ? ConfigSetup.maxFluidRateNormal : rate;
     }
 
     @Nullable
@@ -100,10 +100,10 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
         int maxrate;
         if (advanced) {
             speeds = new String[] { "10", "20", "60", "100", "200" };
-            maxrate = GeneralConfiguration.maxFluidRateAdvanced;
+            maxrate = ConfigSetup.maxFluidRateAdvanced;
         } else {
             speeds = new String[] { "20", "60", "100", "200" };
-            maxrate = GeneralConfiguration.maxFluidRateNormal;
+            maxrate = ConfigSetup.maxFluidRateNormal;
         }
 
         sideGui(gui);
@@ -184,7 +184,7 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
         if (!filter.isEmpty()) {
             object.add("filter", ItemStackTools.itemStackToJson(filter));
         }
-        if (rate != null && rate > GeneralConfiguration.maxFluidRateNormal) {
+        if (rate != null && rate > ConfigSetup.maxFluidRateNormal) {
             object.add("advancedneeded", new JsonPrimitive(true));
         }
         if (speed == 1) {

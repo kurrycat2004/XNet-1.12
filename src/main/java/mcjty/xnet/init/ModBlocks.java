@@ -17,7 +17,7 @@ import mcjty.xnet.blocks.router.GuiRouter;
 import mcjty.xnet.blocks.router.TileEntityRouter;
 import mcjty.xnet.blocks.wireless.GuiWirelessRouter;
 import mcjty.xnet.blocks.wireless.TileEntityWirelessRouter;
-import mcjty.xnet.config.GeneralConfiguration;
+import mcjty.xnet.config.ConfigSetup;
 import mcjty.xnet.gui.GuiProxy;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraftforge.fml.relauncher.Side;
@@ -78,10 +78,10 @@ public class ModBlocks {
                 .creativeTabs(XNet.setup.getTab())
                 .info("message.xnet.shiftmessage")
                 .infoExtended("message.xnet.antenna")
-                .infoExtendedParameter(stack -> Integer.toString(GeneralConfiguration.antennaTier1Range))
-                .infoExtendedParameter(stack -> Integer.toString(GeneralConfiguration.wirelessRouterRfPerChannel[TileEntityWirelessRouter.TIER_1]))
-                .infoExtendedParameter(stack -> Integer.toString(GeneralConfiguration.antennaTier2Range))
-                .infoExtendedParameter(stack -> Integer.toString(GeneralConfiguration.wirelessRouterRfPerChannel[TileEntityWirelessRouter.TIER_2]))
+                .infoExtendedParameter(stack -> Integer.toString(ConfigSetup.antennaTier1Range))
+                .infoExtendedParameter(stack -> Integer.toString(ConfigSetup.wirelessRouterRfPerChannel[TileEntityWirelessRouter.TIER_1]))
+                .infoExtendedParameter(stack -> Integer.toString(ConfigSetup.antennaTier2Range))
+                .infoExtendedParameter(stack -> Integer.toString(ConfigSetup.wirelessRouterRfPerChannel[TileEntityWirelessRouter.TIER_2]))
                 .build();
         antennaBaseBlock = new BaseBlockBuilder<>(XNet.instance, "antenna_base")
                 .rotationType(BaseBlock.RotationType.NONE)
@@ -96,7 +96,7 @@ public class ModBlocks {
                 .creativeTabs(XNet.setup.getTab())
                 .info("message.xnet.shiftmessage")
                 .infoExtended("message.xnet.antenna_dish")
-                .infoExtendedParameter(stack -> Integer.toString(GeneralConfiguration.wirelessRouterRfPerChannel[TileEntityWirelessRouter.TIER_INF]))
+                .infoExtendedParameter(stack -> Integer.toString(ConfigSetup.wirelessRouterRfPerChannel[TileEntityWirelessRouter.TIER_INF]))
                 .build();
 
         NetCableSetup.init();

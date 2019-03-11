@@ -1,9 +1,14 @@
 package mcjty.xnet.config;
 
+import mcjty.xnet.XNet;
 import mcjty.xnet.blocks.wireless.TileEntityWirelessRouter;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.common.FMLLog;
+import org.apache.logging.log4j.Level;
 
-public class GeneralConfiguration {
+import java.io.File;
+
+public class ConfigSetup {
     public static final String CATEGORY_GENERAL = "general";
 
     public static int controllerMaxRF = 100000;
@@ -40,6 +45,7 @@ public class GeneralConfiguration {
             "rftools:storage_scanner",
             "rftools:pearl_injector",
     };
+    public static Configuration mainConfig;
 
     public static void init(Configuration cfg) {
 
@@ -90,5 +96,24 @@ public class GeneralConfiguration {
         antennaTier2Range = cfg.getInt("antennaTier2Range", CATEGORY_GENERAL, antennaTier2Range, 0, 1000000000,
                 "Range for a tier 2 antenna");
 
+    }
+
+    public static void init() {
+        mainConfig = new Configuration(new File(XNet.setup.getModConfigDir().getPath() + File.separator + "xnet", "xnet.cfg"));
+        Configuration cfg = mainConfig;
+        try {
+            cfg.load();
+            cfg.addCustomCategoryComment(CATEGORY_GENERAL, "General settings");
+
+            init(cfg);
+        } catch (Exception e1) {
+            FMLLog.log(Level.ERROR, e1, "Problem loading config file!");
+        }
+    }
+
+    public static void postInit() {
+        if (mainConfig.hasChanged()) {
+            mainConfig.save();
+        }
     }
 }

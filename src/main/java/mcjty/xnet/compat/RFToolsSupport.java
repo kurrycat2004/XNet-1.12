@@ -5,7 +5,7 @@ import mcjty.xnet.api.channels.IControllerContext;
 import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.apiimpl.items.ItemChannelSettings;
 import mcjty.xnet.apiimpl.items.ItemConnectorSettings;
-import mcjty.xnet.config.GeneralConfiguration;
+import mcjty.xnet.config.ConfigSetup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import org.apache.commons.lang3.tuple.Pair;
@@ -67,7 +67,7 @@ public class RFToolsSupport {
             List<Pair<SidedConsumer, ItemConnectorSettings>> inserted = new ArrayList<>();
             int remaining = channelSettings.insertStackSimulate(inserted, context, stack);
             if (!inserted.isEmpty()) {
-                if (context.checkAndConsumeRF(GeneralConfiguration.controllerOperationRFT)) {
+                if (context.checkAndConsumeRF(ConfigSetup.controllerOperationRFT)) {
                     channelSettings.insertStackReal(context, inserted, scanner.requestItem(extractMatcher, false, toextract - remaining, true));
                 }
             }

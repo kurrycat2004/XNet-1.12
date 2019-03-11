@@ -15,7 +15,7 @@ import mcjty.xnet.api.keys.NetworkId;
 import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.blocks.generic.CableColor;
 import mcjty.xnet.clientinfo.ControllerChannelClientInfo;
-import mcjty.xnet.config.GeneralConfiguration;
+import mcjty.xnet.config.ConfigSetup;
 import mcjty.xnet.logic.ChannelInfo;
 import mcjty.xnet.logic.LogicTools;
 import mcjty.xnet.multiblock.*;
@@ -80,7 +80,7 @@ public final class TileEntityRouter extends GenericTileEntity {
     }
 
     public boolean inError() {
-        return channelCount > GeneralConfiguration.maxPublishedChannels;
+        return channelCount > ConfigSetup.maxPublishedChannels;
     }
 
     public int getChannelCount() {

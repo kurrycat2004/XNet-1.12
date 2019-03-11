@@ -9,7 +9,7 @@ import mcjty.lib.typed.TypedMap;
 import mcjty.xnet.api.tiles.IConnectorTile;
 import mcjty.xnet.blocks.facade.IFacadeSupport;
 import mcjty.xnet.blocks.facade.MimicBlockSupport;
-import mcjty.xnet.config.GeneralConfiguration;
+import mcjty.xnet.config.ConfigSetup;
 import mcjty.xnet.multiblock.WorldBlob;
 import mcjty.xnet.multiblock.XNetBlobData;
 import net.minecraft.block.Block;
@@ -220,7 +220,7 @@ public class ConnectorTileEntity extends GenericTileEntity implements IFacadeSup
     }
 
     public int getMaxEnergy() {
-        return GeneralConfiguration.maxRfConnector;
+        return ConfigSetup.maxRfConnector;
     }
 
     private int receiveEnergyInternal(EnumFacing from, int maxReceive, boolean simulate) {

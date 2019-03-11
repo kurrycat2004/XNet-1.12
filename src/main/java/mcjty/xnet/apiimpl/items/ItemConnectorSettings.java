@@ -10,7 +10,6 @@ import mcjty.xnet.api.gui.IEditorGui;
 import mcjty.xnet.api.gui.IndicatorIcon;
 import mcjty.xnet.api.helper.AbstractConnectorSettings;
 import mcjty.xnet.apiimpl.EnumStringTranslators;
-import mcjty.xnet.config.GeneralConfiguration;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
