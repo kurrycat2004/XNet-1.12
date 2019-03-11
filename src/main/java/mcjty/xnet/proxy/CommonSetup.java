@@ -11,7 +11,6 @@ import mcjty.xnet.apiimpl.fluids.FluidChannelType;
 import mcjty.xnet.apiimpl.items.ItemChannelType;
 import mcjty.xnet.apiimpl.logic.LogicChannelType;
 import mcjty.xnet.config.ConfigSetup;
-import mcjty.xnet.gui.GuiProxy;
 import mcjty.xnet.init.ModBlocks;
 import mcjty.xnet.init.ModItems;
 import mcjty.xnet.network.XNetMessages;

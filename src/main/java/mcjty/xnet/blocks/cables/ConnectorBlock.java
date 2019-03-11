@@ -18,7 +18,7 @@ import mcjty.xnet.blocks.redstoneproxy.RedstoneProxyBlock;
 import mcjty.xnet.blocks.router.TileEntityRouter;
 import mcjty.xnet.blocks.wireless.TileEntityWirelessRouter;
 import mcjty.xnet.config.ConfigSetup;
-import mcjty.xnet.gui.GuiProxy;
+import mcjty.xnet.proxy.GuiProxy;
 import mcjty.xnet.init.ModBlocks;
 import mcjty.xnet.multiblock.ColorId;
 import mcjty.xnet.multiblock.WorldBlob;

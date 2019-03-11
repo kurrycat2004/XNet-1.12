@@ -11,7 +11,7 @@ import mcjty.lib.varia.BlockPosTools;
 import mcjty.xnet.XNet;
 import mcjty.xnet.api.channels.IChannelType;
 import mcjty.xnet.clientinfo.ControllerChannelClientInfo;
-import mcjty.xnet.gui.GuiProxy;
+import mcjty.xnet.proxy.GuiProxy;
 import mcjty.xnet.network.PacketGetLocalChannelsRouter;
 import mcjty.xnet.network.PacketGetRemoteChannelsRouter;
 import mcjty.xnet.network.XNetMessages;

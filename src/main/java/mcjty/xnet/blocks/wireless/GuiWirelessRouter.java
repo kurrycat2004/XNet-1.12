@@ -4,7 +4,7 @@ import mcjty.lib.container.GenericContainer;
 import mcjty.lib.gui.GenericGuiContainer;
 import mcjty.lib.gui.Window;
 import mcjty.xnet.XNet;
-import mcjty.xnet.gui.GuiProxy;
+import mcjty.xnet.proxy.GuiProxy;
 import mcjty.xnet.network.XNetMessages;
 import net.minecraft.util.ResourceLocation;
 

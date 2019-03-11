@@ -1,4 +1,4 @@
-package mcjty.xnet.gui;
+package mcjty.xnet.proxy;
 
 import mcjty.lib.container.EmptyContainer;
 import mcjty.lib.blocks.GenericBlock;
