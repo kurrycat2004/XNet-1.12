@@ -3,7 +3,6 @@ package mcjty.xnet.proxy;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.compat.MainCompatHandler;
 import mcjty.lib.setup.DefaultCommonSetup;
-import mcjty.lib.varia.WrenchChecker;
 import mcjty.xnet.CommandHandler;
 import mcjty.xnet.ForgeEventHandlers;
 import mcjty.xnet.XNet;
@@ -38,8 +37,6 @@ public class CommonSetup extends DefaultCommonSetup {
         MinecraftForge.EVENT_BUS.register(new ForgeEventHandlers());
         NetworkRegistry.INSTANCE.registerGuiHandler(XNet.instance, new GuiProxy());
 
-        setupModCompat();
-
         CommandHandler.registerCommands();
 
         XNetMessages.registerMessages("xnet");
@@ -55,7 +52,8 @@ public class CommonSetup extends DefaultCommonSetup {
         XNet.xNetApi.registerChannelType(new LogicChannelType());
     }
 
-    private void setupModCompat() {
+    @Override
+    protected void setupModCompat() {
         rftools = Loader.isModLoaded("rftools");
 
         MainCompatHandler.registerWaila();
@@ -71,6 +69,5 @@ public class CommonSetup extends DefaultCommonSetup {
     public void postInit(FMLPostInitializationEvent e) {
         super.postInit(e);
         ConfigSetup.postInit();
-        WrenchChecker.init();
     }
 }
