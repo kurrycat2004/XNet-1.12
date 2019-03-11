@@ -45,10 +45,6 @@ public class CommonSetup extends DefaultCommonSetup {
         MinecraftForge.EVENT_BUS.register(new ForgeEventHandlers());
         CommandHandler.registerCommands();
 
-        GeneralConfig.preInit(e);
-
-        mainConfig = new Configuration(new File(modConfigDir.getPath() + File.separator + "xnet", "xnet.cfg"));
-
         readMainConfig();
 
         XNetMessages.registerMessages("xnet");
@@ -73,7 +69,10 @@ public class CommonSetup extends DefaultCommonSetup {
         createTab("XNet", new ItemStack(Item.getItemFromBlock(Blocks.ANVIL)));
     }
 
+    private Configuration mainConfig;
+
     private void readMainConfig() {
+        mainConfig = new Configuration(new File(modConfigDir.getPath() + File.separator + "xnet", "xnet.cfg"));
         Configuration cfg = mainConfig;
         try {
             cfg.load();
