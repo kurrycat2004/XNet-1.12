@@ -37,7 +37,7 @@ public class XNet implements ModBase {
     public static final String MIN_MCJTYLIB_VER = "3.1.0";
     public static final String MIN_RFTOOLS_VER = "7.50";
 
-    @SidedProxy(clientSide = "mcjty.xnet.proxy.ClientProxy", serverSide = "mcjty.xnet.proxy.ServerProxy")
+    @SidedProxy(clientSide = "mcjty.xnet.setup.ClientProxy", serverSide = "mcjty.xnet.setup.ServerProxy")
     public static IProxy proxy;
     public static CommonSetup setup = new CommonSetup();
 
