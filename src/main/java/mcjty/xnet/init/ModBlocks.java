@@ -18,7 +18,7 @@ import mcjty.xnet.blocks.router.TileEntityRouter;
 import mcjty.xnet.blocks.wireless.GuiWirelessRouter;
 import mcjty.xnet.blocks.wireless.TileEntityWirelessRouter;
 import mcjty.xnet.config.ConfigSetup;
-import mcjty.xnet.proxy.GuiProxy;
+import mcjty.xnet.setup.GuiProxy;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;

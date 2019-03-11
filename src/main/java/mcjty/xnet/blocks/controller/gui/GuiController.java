@@ -27,7 +27,7 @@ import mcjty.xnet.blocks.controller.TileEntityController;
 import mcjty.xnet.clientinfo.ChannelClientInfo;
 import mcjty.xnet.clientinfo.ConnectedBlockClientInfo;
 import mcjty.xnet.clientinfo.ConnectorClientInfo;
-import mcjty.xnet.proxy.GuiProxy;
+import mcjty.xnet.setup.GuiProxy;
 import mcjty.xnet.network.PacketGetChannels;
 import mcjty.xnet.network.PacketGetConnectedBlocks;
 import mcjty.xnet.network.XNetMessages;

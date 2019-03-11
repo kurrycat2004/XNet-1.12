@@ -11,7 +11,7 @@ import mcjty.lib.gui.widgets.TextField;
 import mcjty.lib.gui.widgets.ToggleButton;
 import mcjty.lib.typed.TypedMap;
 import mcjty.xnet.XNet;
-import mcjty.xnet.proxy.GuiProxy;
+import mcjty.xnet.setup.GuiProxy;
 import mcjty.xnet.network.XNetMessages;
 import net.minecraft.util.EnumFacing;
 

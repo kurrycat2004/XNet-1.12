@@ -15,7 +15,7 @@ import mcjty.xnet.api.keys.ConsumerId;
 import mcjty.xnet.api.keys.SidedConsumer;
 import mcjty.xnet.compat.RFToolsSupport;
 import mcjty.xnet.config.ConfigSetup;
-import mcjty.xnet.proxy.CommonSetup;
+import mcjty.xnet.setup.CommonSetup;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;

@@ -7,7 +7,7 @@ import mcjty.xnet.apiimpl.energy.EnergyChannelSettings;
 import mcjty.xnet.apiimpl.fluids.FluidChannelSettings;
 import mcjty.xnet.apiimpl.items.ItemChannelSettings;
 import mcjty.xnet.compat.RFToolsSupport;
-import mcjty.xnet.proxy.CommonSetup;
+import mcjty.xnet.setup.CommonSetup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;

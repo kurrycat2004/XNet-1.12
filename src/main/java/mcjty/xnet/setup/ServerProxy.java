@@ -1,4 +1,4 @@
-package mcjty.xnet.proxy;
+package mcjty.xnet.setup;
 
 
 import mcjty.lib.setup.DefaultServerProxy;

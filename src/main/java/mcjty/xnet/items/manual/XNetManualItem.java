@@ -2,7 +2,7 @@ package mcjty.xnet.items.manual;
 
 import mcjty.lib.McJtyRegister;
 import mcjty.xnet.XNet;
-import mcjty.xnet.proxy.GuiProxy;
+import mcjty.xnet.setup.GuiProxy;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;

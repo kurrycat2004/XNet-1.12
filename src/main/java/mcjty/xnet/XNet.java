@@ -11,7 +11,7 @@ import mcjty.xnet.commands.CommandRebuild;
 import mcjty.xnet.compat.TOPSupport;
 import mcjty.xnet.compat.WAILASupport;
 import mcjty.xnet.items.manual.GuiXNetManual;
-import mcjty.xnet.proxy.CommonSetup;
+import mcjty.xnet.setup.CommonSetup;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
