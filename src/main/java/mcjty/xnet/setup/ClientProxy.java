@@ -1,6 +1,5 @@
 package mcjty.xnet.setup;
 
-import mcjty.lib.McJtyLibClient;
 import mcjty.lib.font.TrueTypeFont;
 import mcjty.lib.setup.DefaultClientProxy;
 import mcjty.xnet.RenderWorldLastEventHandler;
@@ -12,7 +11,6 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -27,17 +25,11 @@ public class ClientProxy extends DefaultClientProxy {
         MinecraftForge.EVENT_BUS.register(this);
         OBJLoader.INSTANCE.addDomain(XNet.MODID);
         ModelLoaderRegistry.registerLoader(new BakedModelLoader());
-        McJtyLibClient.preInit(e);
     }
 
     @SubscribeEvent
     public void colorHandlerEventBlock(ColorHandlerEvent.Block event) {
         ModBlocks.initColorHandlers(event.getBlockColors());
-    }
-
-    @Override
-    public void init(FMLInitializationEvent e) {
-        super.init(e);
     }
 
     @Override
