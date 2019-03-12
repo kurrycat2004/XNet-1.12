@@ -80,7 +80,7 @@ public final class TileEntityRouter extends GenericTileEntity {
     }
 
     public boolean inError() {
-        return channelCount > ConfigSetup.maxPublishedChannels;
+        return channelCount > ConfigSetup.maxPublishedChannels.get();
     }
 
     public int getChannelCount() {

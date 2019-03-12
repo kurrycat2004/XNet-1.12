@@ -404,7 +404,7 @@ public class ConnectorBlock extends GenericCableBlock implements ITileEntityProv
             tooltip.add(TextFormatting.BLUE + "machine that should be connected");
             tooltip.add(TextFormatting.BLUE + "to the network");
             boolean advanced = this == NetCableSetup.advancedConnectorBlock;
-            int maxrf = advanced ? ConfigSetup.maxRfAdvancedConnector : ConfigSetup.maxRfConnector;
+            int maxrf = advanced ? ConfigSetup.maxRfAdvancedConnector.get() : ConfigSetup.maxRfConnector.get();
             tooltip.add(TextFormatting.GRAY + "" + TextFormatting.BOLD + "Max RF: " + TextFormatting.WHITE + maxrf);
             if (advanced) {
                 tooltip.add(TextFormatting.GRAY + "Allow access to different sides");

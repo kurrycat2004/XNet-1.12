@@ -67,7 +67,7 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
 
     @Nonnull
     public Integer getRate() {
-        return rate == null ? ConfigSetup.maxFluidRateNormal : rate;
+        return rate == null ? ConfigSetup.maxFluidRateNormal.get() : rate;
     }
 
     @Nullable
@@ -100,10 +100,10 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
         int maxrate;
         if (advanced) {
             speeds = new String[] { "10", "20", "60", "100", "200" };
-            maxrate = ConfigSetup.maxFluidRateAdvanced;
+            maxrate = ConfigSetup.maxFluidRateAdvanced.get();
         } else {
             speeds = new String[] { "20", "60", "100", "200" };
-            maxrate = ConfigSetup.maxFluidRateNormal;
+            maxrate = ConfigSetup.maxFluidRateNormal.get();
         }
 
         sideGui(gui);
@@ -184,7 +184,7 @@ public class FluidConnectorSettings extends AbstractConnectorSettings {
         if (!filter.isEmpty()) {
             object.add("filter", ItemStackTools.itemStackToJson(filter));
         }
-        if (rate != null && rate > ConfigSetup.maxFluidRateNormal) {
+        if (rate != null && rate > ConfigSetup.maxFluidRateNormal.get()) {
             object.add("advancedneeded", new JsonPrimitive(true));
         }
         if (speed == 1) {

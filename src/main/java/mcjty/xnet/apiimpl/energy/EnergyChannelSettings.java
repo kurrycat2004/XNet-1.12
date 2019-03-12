@@ -110,7 +110,7 @@ public class EnergyChannelSettings extends DefaultChannelSettings implements ICh
                     Integer rate = settings.getRate();
                     if (rate == null) {
                         boolean advanced = ConnectorBlock.isAdvancedConnector(world, connectorPos);
-                        rate = advanced ? ConfigSetup.maxRfRateAdvanced : ConfigSetup.maxRfRateNormal;
+                        rate = advanced ? ConfigSetup.maxRfRateAdvanced.get() : ConfigSetup.maxRfRateNormal.get();
                     }
                     connectorTE.setEnergyInputFrom(side, rate);
 
@@ -137,7 +137,7 @@ public class EnergyChannelSettings extends DefaultChannelSettings implements ICh
             return;
         }
 
-        if (!context.checkAndConsumeRF(ConfigSetup.controllerOperationRFT)) {
+        if (!context.checkAndConsumeRF(ConfigSetup.controllerOperationRFT.get())) {
             // Not enough energy for this operation
             return;
         }
@@ -196,7 +196,7 @@ public class EnergyChannelSettings extends DefaultChannelSettings implements ICh
                     Integer rate = settings.getRate();
                     if (rate == null) {
                         boolean advanced = ConnectorBlock.isAdvancedConnector(world, extractorPos);
-                        rate = advanced ? ConfigSetup.maxRfRateAdvanced : ConfigSetup.maxRfRateNormal;
+                        rate = advanced ? ConfigSetup.maxRfRateAdvanced.get() : ConfigSetup.maxRfRateNormal.get();
                     }
                     int totransfer = Math.min(rate, energy);
                     long e = EnergyTools.receiveEnergy(te, settings.getFacing(), totransfer);

@@ -135,7 +135,7 @@ public class EnergyConnectorSettings extends AbstractConnectorSettings {
         setIntegerSafe(object, "priority", priority);
         setIntegerSafe(object, "rate", rate);
         setIntegerSafe(object, "minmax", minmax);
-        if (rate != null && rate > ConfigSetup.maxRfRateNormal) {
+        if (rate != null && rate > ConfigSetup.maxRfRateNormal.get()) {
             object.add("advancedneeded", new JsonPrimitive(true));
         }
         return object;

@@ -91,7 +91,7 @@ public class RenderWorldLastEventHandler {
                             extendedBlockState = (IExtendedBlockState) state.getBlock().getExtendedState(state, world, c);
                         }
                         FacadeBlockId facadeId = extendedBlockState.getValue(GenericCableBlock.FACADEID);
-                        if (((!ConfigSetup.showNonFacadedCablesWhileSneaking) || (!p.isSneaking())) && facadeId == null && !(block instanceof FacadeBlock)) {
+                        if (((!ConfigSetup.showNonFacadedCablesWhileSneaking.get()) || (!p.isSneaking())) && facadeId == null && !(block instanceof FacadeBlock)) {
                             continue;
                         }
                         CableColor color = extendedBlockState.getValue(GenericCableBlock.COLOR);

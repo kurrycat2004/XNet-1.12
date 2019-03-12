@@ -63,7 +63,7 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
     private int globalChannelVersion = -1;      // Used to detect if a wireless channel has been published and we might need to recheck
 
     public TileEntityWirelessRouter() {
-        super(ConfigSetup.wirelessRouterMaxRF, ConfigSetup.wirelessRouterRfPerTick);
+        super(ConfigSetup.wirelessRouterMaxRF.get(), ConfigSetup.wirelessRouterRfPerTick.get());
     }
 
     @Override
@@ -144,9 +144,9 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
             case TIER_INVALID:
                 return -1;
             case TIER_1:
-                return ConfigSetup.antennaTier1Range;
+                return ConfigSetup.antennaTier1Range.get();
             case TIER_2:
-                return ConfigSetup.antennaTier2Range;
+                return ConfigSetup.antennaTier2Range.get();
             case TIER_INF:
                 return Integer.MAX_VALUE;
         }
@@ -229,8 +229,8 @@ public final class TileEntityWirelessRouter extends GenericEnergyReceiverTileEnt
                     String name = pair.getKey();
                     IChannelType channelType = pair.getValue();
                     long energyStored = getStoredPower();
-                    if (ConfigSetup.wirelessRouterRfPerChannel[tier] <= energyStored) {
-                        consumeEnergy(ConfigSetup.wirelessRouterRfPerChannel[tier]);
+                    if (ConfigSetup.wirelessRouterRfPerChannel[tier].get() <= energyStored) {
+                        consumeEnergy(ConfigSetup.wirelessRouterRfPerChannel[tier].get());
                         wirelessData.transmitChannel(name, channelType, ownerUUID, world.provider.getDimension(),
                                 pos, networkId);
                     }

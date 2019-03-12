@@ -6,6 +6,6 @@ public class AdvancedConnectorTileEntity extends ConnectorTileEntity {
 
     @Override
     public int getMaxEnergy() {
-        return ConfigSetup.maxRfAdvancedConnector;
+        return ConfigSetup.maxRfAdvancedConnector.get();
     }
 }

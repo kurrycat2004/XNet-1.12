@@ -78,10 +78,10 @@ public class ModBlocks {
                 .creativeTabs(XNet.setup.getTab())
                 .info("message.xnet.shiftmessage")
                 .infoExtended("message.xnet.antenna")
-                .infoExtendedParameter(stack -> Integer.toString(ConfigSetup.antennaTier1Range))
-                .infoExtendedParameter(stack -> Integer.toString(ConfigSetup.wirelessRouterRfPerChannel[TileEntityWirelessRouter.TIER_1]))
-                .infoExtendedParameter(stack -> Integer.toString(ConfigSetup.antennaTier2Range))
-                .infoExtendedParameter(stack -> Integer.toString(ConfigSetup.wirelessRouterRfPerChannel[TileEntityWirelessRouter.TIER_2]))
+                .infoExtendedParameter(stack -> Integer.toString(ConfigSetup.antennaTier1Range.get()))
+                .infoExtendedParameter(stack -> Integer.toString(ConfigSetup.wirelessRouterRfPerChannel[TileEntityWirelessRouter.TIER_1].get()))
+                .infoExtendedParameter(stack -> Integer.toString(ConfigSetup.antennaTier2Range.get()))
+                .infoExtendedParameter(stack -> Integer.toString(ConfigSetup.wirelessRouterRfPerChannel[TileEntityWirelessRouter.TIER_2].get()))
                 .build();
         antennaBaseBlock = new BaseBlockBuilder<>(XNet.instance, "antenna_base")
                 .rotationType(BaseBlock.RotationType.NONE)
@@ -96,7 +96,7 @@ public class ModBlocks {
                 .creativeTabs(XNet.setup.getTab())
                 .info("message.xnet.shiftmessage")
                 .infoExtended("message.xnet.antenna_dish")
-                .infoExtendedParameter(stack -> Integer.toString(ConfigSetup.wirelessRouterRfPerChannel[TileEntityWirelessRouter.TIER_INF]))
+                .infoExtendedParameter(stack -> Integer.toString(ConfigSetup.wirelessRouterRfPerChannel[TileEntityWirelessRouter.TIER_INF].get()))
                 .build();
 
         NetCableSetup.init();

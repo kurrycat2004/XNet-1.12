@@ -111,7 +111,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
     private NetworkChecker networkChecker = null;
 
     public TileEntityController() {
-        super(ConfigSetup.controllerMaxRF, ConfigSetup.controllerRfPerTick);
+        super(ConfigSetup.controllerMaxRF.get(), ConfigSetup.controllerRfPerTick.get());
         for (int i = 0; i < MAX_CHANNELS; i++) {
             channels[i] = null;
         }
@@ -238,7 +238,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
 
             checkNetwork(worldBlob);
 
-            if (!checkAndConsumeRF(ConfigSetup.controllerRFT)) {
+            if (!checkAndConsumeRF(ConfigSetup.controllerRFT.get())) {
                 return;
             }
 
@@ -246,7 +246,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             int newcolors = 0;
             for (int i = 0; i < MAX_CHANNELS; i++) {
                 if (channels[i] != null && channels[i].isEnabled()) {
-                    if (checkAndConsumeRF(ConfigSetup.controllerChannelRFT)) {
+                    if (checkAndConsumeRF(ConfigSetup.controllerChannelRFT.get())) {
                         channels[i].getChannelSettings().tick(i, this);
                     }
                     newcolors |= channels[i].getChannelSettings().getColors();

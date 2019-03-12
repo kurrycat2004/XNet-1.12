@@ -140,7 +140,7 @@ public class FluidChannelSettings extends DefaultChannelSettings implements ICha
                         List<Pair<SidedConsumer, FluidConnectorSettings>> inserted = new ArrayList<>();
                         int remaining = insertFluidSimulate(inserted, context, stack);
                         if (!inserted.isEmpty()) {
-                            if (context.checkAndConsumeRF(ConfigSetup.controllerOperationRFT)) {
+                            if (context.checkAndConsumeRF(ConfigSetup.controllerOperationRFT.get())) {
                                 insertFluidReal(context, inserted, fetchFluid(handler, false, extractMatcher, stack.amount - remaining));
                             }
                         }

@@ -220,7 +220,7 @@ public class ConnectorTileEntity extends GenericTileEntity implements IFacadeSup
     }
 
     public int getMaxEnergy() {
-        return ConfigSetup.maxRfConnector;
+        return ConfigSetup.maxRfConnector.get();
     }
 
     private int receiveEnergyInternal(EnumFacing from, int maxReceive, boolean simulate) {

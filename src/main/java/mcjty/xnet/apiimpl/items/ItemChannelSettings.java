@@ -266,7 +266,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
                 List<Pair<SidedConsumer, ItemConnectorSettings>> inserted = new ArrayList<>();
                 int remaining = insertStackSimulate(inserted, context, stack);
                 if (!inserted.isEmpty()) {
-                    if (context.checkAndConsumeRF(ConfigSetup.controllerOperationRFT)) {
+                    if (context.checkAndConsumeRF(ConfigSetup.controllerOperationRFT.get())) {
                         insertStackReal(context, inserted, fetchItem(handler, false, extractMatcher, settings.getStackMode(), settings.getExtractAmount(), toextract-remaining, index, startIdx));
                     }
                     break;

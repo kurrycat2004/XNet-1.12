@@ -67,7 +67,7 @@ public class RFToolsSupport {
             List<Pair<SidedConsumer, ItemConnectorSettings>> inserted = new ArrayList<>();
             int remaining = channelSettings.insertStackSimulate(inserted, context, stack);
             if (!inserted.isEmpty()) {
-                if (context.checkAndConsumeRF(ConfigSetup.controllerOperationRFT)) {
+                if (context.checkAndConsumeRF(ConfigSetup.controllerOperationRFT.get())) {
                     channelSettings.insertStackReal(context, inserted, scanner.requestItem(extractMatcher, false, toextract - remaining, true));
                 }
             }
