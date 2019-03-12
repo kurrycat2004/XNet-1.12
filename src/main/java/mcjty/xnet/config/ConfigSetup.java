@@ -19,7 +19,7 @@ public class ConfigSetup {
 
     public static ConfigSpec.IntValue wirelessRouterMaxRF;
     public static ConfigSpec.IntValue wirelessRouterRfPerTick;
-    public static ConfigSpec.IntValue wirelessRouterRfPerChannel[];
+    public static ConfigSpec.IntValue wirelessRouterRfPerChannel[] = new ConfigSpec.IntValue[3];
 
     public static ConfigSpec.IntValue maxRfConnector;
     public static ConfigSpec.IntValue maxRfAdvancedConnector;
@@ -57,9 +57,6 @@ public class ConfigSetup {
         SERVER_BUILDER.comment("General settings").push(CATEGORY_GENERAL);
         CLIENT_BUILDER.comment("General settings").push(CATEGORY_GENERAL);
 
-//        ALERT_TIME = SERVER_BUILDER
-//                .comment("The amount of ticks (times 10) that the city will stay on alert after spotting a player. So 120 would be one minute")
-//                .defineInRange("alertTime", 400, 1, 100000000);
         unsidedBlocks = SERVER_BUILDER
                 .comment("This is a list of blocks that XNet considers to be 'unsided' meaning that it doesn't matter from what side you access things. This is currently only used to help with pasting channels")
                 .defineList("unsidedBlocks", Lists.newArrayList(unsidedBlocksAr), s -> s instanceof String);
