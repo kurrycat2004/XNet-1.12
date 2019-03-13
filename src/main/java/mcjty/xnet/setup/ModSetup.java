@@ -36,11 +36,12 @@ public class ModSetup extends DefaultModSetup {
         MinecraftForge.EVENT_BUS.register(new ForgeEventHandlers());
         NetworkRegistry.INSTANCE.registerGuiHandler(XNet.instance, new GuiProxy());
 
+        ConfigSetup.init();
+
         CommandHandler.registerCommands();
 
         XNetMessages.registerMessages("xnet");
 
-        ConfigSetup.init();
         ModItems.init();
         ModBlocks.init();
 
