@@ -36,8 +36,6 @@ public class ModSetup extends DefaultModSetup {
         MinecraftForge.EVENT_BUS.register(new ForgeEventHandlers());
         NetworkRegistry.INSTANCE.registerGuiHandler(XNet.instance, new GuiProxy());
 
-        ConfigSetup.init();
-
         CommandHandler.registerCommands();
 
         XNetMessages.registerMessages("xnet");
@@ -58,6 +56,11 @@ public class ModSetup extends DefaultModSetup {
 
         MainCompatHandler.registerWaila();
         MainCompatHandler.registerTOP();
+    }
+
+    @Override
+    protected void setupConfig() {
+        ConfigSetup.init();
     }
 
     @Override
