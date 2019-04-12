@@ -29,12 +29,9 @@ import java.util.List;
 public class RedstoneProxyBlock extends Block {
 
     public RedstoneProxyBlock() {
-        super(Material.IRON);
+        this(Material.IRON);
         setUnlocalizedName(XNet.MODID + ".redstone_proxy");
         setRegistryName("redstone_proxy");
-        setHardness(2.0f);
-        setSoundType(SoundType.METAL);
-        setHarvestLevel("pickaxe", 0);
         McJtyRegister.registerLater(this, XNet.instance, null);
         McJtyRegister.registerLater(new ItemBlock(this).setRegistryName(getRegistryName()), XNet.instance);
         setCreativeTab(XNet.setup.getTab());
@@ -42,6 +39,9 @@ public class RedstoneProxyBlock extends Block {
 
     public RedstoneProxyBlock(Material materialIn) {
         super(materialIn);
+        setHardness(2.0f);
+        setSoundType(SoundType.METAL);
+        setHarvestLevel("pickaxe", 0);
     }
 
     @SideOnly(Side.CLIENT)
