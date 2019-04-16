@@ -14,6 +14,10 @@ import mcjty.lib.gui.layout.HorizontalLayout;
 import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.gui.layout.VerticalLayout;
 import mcjty.lib.gui.widgets.*;
+import mcjty.lib.gui.widgets.Button;
+import mcjty.lib.gui.widgets.Label;
+import mcjty.lib.gui.widgets.Panel;
+import mcjty.lib.gui.widgets.TextField;
 import mcjty.lib.tileentity.GenericEnergyStorageTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.BlockPosTools;
@@ -27,10 +31,10 @@ import mcjty.xnet.blocks.controller.TileEntityController;
 import mcjty.xnet.clientinfo.ChannelClientInfo;
 import mcjty.xnet.clientinfo.ConnectedBlockClientInfo;
 import mcjty.xnet.clientinfo.ConnectorClientInfo;
-import mcjty.xnet.setup.GuiProxy;
 import mcjty.xnet.network.PacketGetChannels;
 import mcjty.xnet.network.PacketGetConnectedBlocks;
 import mcjty.xnet.network.XNetMessages;
+import mcjty.xnet.setup.GuiProxy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.resources.I18n;
@@ -38,14 +42,15 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
-import java.awt.Rectangle;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 import java.util.List;
 
 import static mcjty.xnet.blocks.controller.TileEntityController.*;
@@ -153,6 +158,44 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
             Logging.message(mc.player, "The block is now highlighted");
             mc.player.closeScreen();
         }
+    }
+
+    @Override
+    protected void keyTyped(char typedChar, int keyCode) throws IOException {
+        if (handleClipboard(keyCode)) {
+            return;
+        }
+        super.keyTyped(typedChar, keyCode);
+    }
+
+
+    @Override
+    public void keyTypedFromEvent(char typedChar, int keyCode) {
+        if (handleClipboard(keyCode)) {
+            return;
+        }
+        super.keyTypedFromEvent(typedChar, keyCode);
+    }
+
+    private boolean handleClipboard(int keyCode) {
+        if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)) {
+            if (keyCode == Keyboard.KEY_C) {
+                if (getSelectedChannel() != -1) {
+                    copyChannel();
+                } else {
+                    showMessage(mc, this, getWindowManager(), 50, 50, TextFormatting.RED + "Nothing selected!");
+                }
+                return true;
+            } else if (keyCode == Keyboard.KEY_V) {
+                if (getSelectedChannel() != -1) {
+                    pasteChannel();
+                } else {
+                    showMessage(mc, this, getWindowManager(), 50, 50, TextFormatting.RED + "Nothing selected!");
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     private void selectChannelEditor(int finalI) {
@@ -316,6 +359,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
 
     private void copyConnector() {
         if (editingConnector != null) {
+            showMessage(mc, this, getWindowManager(), 50, 50, TextFormatting.GREEN + "Copied connector");
             sendServerCommand(XNetMessages.INSTANCE, TileEntityController.CMD_COPYCONNECTOR,
                     TypedMap.builder()
                             .put(PARAM_INDEX, getSelectedChannel())
@@ -327,6 +371,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
 
 
     private void copyChannel() {
+        showMessage(mc, this, getWindowManager(), 50, 50, TextFormatting.GREEN + "Copied channel");
         sendServerCommand(XNetMessages.INSTANCE, TileEntityController.CMD_COPYCHANNEL,
                 TypedMap.builder()
                         .put(PARAM_INDEX, getSelectedChannel())
@@ -375,7 +420,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                             .build());
             refresh();
         } catch (UnsupportedFlavorException e) {
-            showMessage(mc, this, getWindowManager(), 50, 50, TextFormatting.RED + "Clipboard does not contain channel!");
+            showMessage(mc, this, getWindowManager(), 50, 50, TextFormatting.RED + "Clipboard does not contain connector!");
         } catch (Exception e) {
             showMessage(mc, this, getWindowManager(), 50, 50, TextFormatting.RED + "Error reading from clipboard!");
         }
