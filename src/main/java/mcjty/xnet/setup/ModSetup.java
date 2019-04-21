@@ -3,6 +3,7 @@ package mcjty.xnet.setup;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.compat.MainCompatHandler;
 import mcjty.lib.setup.DefaultModSetup;
+import mcjty.lib.varia.Logging;
 import mcjty.xnet.CommandHandler;
 import mcjty.xnet.ForgeEventHandlers;
 import mcjty.xnet.XNet;
@@ -19,6 +20,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -26,6 +28,7 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 public class ModSetup extends DefaultModSetup {
 
     public static boolean rftools = false;
+    public static boolean rftoolsControl = false;
 
     @Override
     public void preInit(FMLPreInitializationEvent e) {
@@ -53,6 +56,12 @@ public class ModSetup extends DefaultModSetup {
     @Override
     protected void setupModCompat() {
         rftools = Loader.isModLoaded("rftools");
+        rftoolsControl = Loader.isModLoaded("rftoolscontrol");
+
+        if (rftoolsControl) {
+            Logging.log("XNet Detected RFTools Control: enabling support");
+            FMLInterModComms.sendFunctionMessage("rftoolscontrol", "getOpcodeRegistry", "mcjty.xnet.compat.rftoolscontrol.RFToolsControlSupport$GetOpcodeRegistry");
+        }
 
         MainCompatHandler.registerWaila();
         MainCompatHandler.registerTOP();
