@@ -516,6 +516,10 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         String name = (String) data.get(GuiController.TAG_NAME);
         channels[channel].setChannelName(name);
 
+        markAsDirty();
+    }
+
+    public void markAsDirty() {
         networkDirty();
         markDirtyQuick();
     }
@@ -524,15 +528,13 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         channels[channel] = null;
         cachedConnectors[channel] = null;
         cachedRoutedConnectors[channel] = null;
-        networkDirty();
-        markDirtyQuick();
+        markAsDirty();
     }
 
     private void createChannel(int channel, String typeId) {
         IChannelType type = XNet.xNetApi.findType(typeId);
         channels[channel] = new ChannelInfo(type);
-        networkDirty();
-        markDirtyQuick();
+        markAsDirty();
     }
 
     private void updateConnector(int channel, SidedPos pos, TypedMap params) {
@@ -546,8 +548,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
                     data.put(k.getName(), params.get(k));
                 }
                 channels[channel].getConnectors().get(key).getConnectorSettings().update(data);
-                networkDirty();
-                markDirtyQuick();
+                markAsDirty();
                 return;
             }
         }
@@ -568,8 +569,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         }
         if (toremove != null) {
             channels[channel].getConnectors().remove(toremove);
-            networkDirty();
-            markDirtyQuick();
+            markAsDirty();
         }
     }
 
@@ -583,8 +583,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
         SidedConsumer id = new SidedConsumer(consumerId, pos.getSide().getOpposite());
         boolean advanced = getWorld().getBlockState(consumerPos).getBlock() == NetCableSetup.advancedConnectorBlock;
         ConnectorInfo info = channels[channel].createConnector(id, advanced);
-        networkDirty();
-        markDirtyQuick();
+        markAsDirty();
         return info;
     }
 
@@ -810,8 +809,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             XNetMessages.INSTANCE.sendTo(new PacketControllerError("Error pasting clipboard data!"), player);
         }
 
-        networkDirty();
-        markDirtyQuick();
+        markAsDirty();
 
     }
 
@@ -942,8 +940,7 @@ public final class TileEntityController extends GenericEnergyReceiverTileEntity 
             XNetMessages.INSTANCE.sendTo(new PacketControllerError("Error pasting clipboard data!"), player);
         }
 
-        networkDirty();
-        markDirtyQuick();
+        markAsDirty();
     }
 
 

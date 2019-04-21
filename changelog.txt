@@ -2,6 +2,7 @@ Upcoming:
 - Fixed a problem where the updated proxy would break instantly by hand and not drop anything
 - Added ctrl-c/ctrl-v support for copy/pasting channels
 - Added support for RFTools Control with a new opcode to enable/disable channels
+- Added another opcode to test if a color mask is true
 
 1.7.6:
 - API improvements to allow other mods to add connectors to a controller
