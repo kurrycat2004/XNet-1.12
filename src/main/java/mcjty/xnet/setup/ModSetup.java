@@ -74,7 +74,7 @@ public class ModSetup extends DefaultModSetup {
 
     @Override
     public void createTabs() {
-        createTab("XNet", new ItemStack(Item.getItemFromBlock(Blocks.ANVIL)));
+        createTab("XNet", () -> new ItemStack(Item.getItemFromBlock(Blocks.ANVIL)));
     }
 
     @Override
