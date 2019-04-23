@@ -3,6 +3,7 @@ Upcoming:
 - Added ctrl-c/ctrl-v support for copy/pasting channels
 - Added support for RFTools Control with a new opcode to enable/disable channels
 - Added another opcode to test if a color mask is true
+- Added better checks when inserting fluids in a tank to make sure it really worked. This avoids a crash in certain situations
 
 1.7.6:
 - API improvements to allow other mods to add connectors to a controller
