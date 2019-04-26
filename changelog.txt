@@ -1,4 +1,5 @@
-Upcoming:
+1.8.0:
+- Depends on McJtyLib 3.5.0!
 - Fixed a problem where the updated proxy would break instantly by hand and not drop anything
 - Added ctrl-c/ctrl-v support for copy/pasting channels
 - Added support for RFTools Control with a new opcode to enable/disable channels
