@@ -79,7 +79,7 @@ dependencies {
     if (!project.hasProperty("singleproject")) {
         deobfCompile "com.github.mcjty:mcjtylib:${mcjtylib_version}"
         deobfCompile "com.github.mcjty:rftools:1.12-7.70"
-        deobfCompile "com.github.mcjty:rftoolscontrol:1.12-2.00"
+        deobfCompile "com.github.mcjty:rftoolscontrol:1.12-2.0.0"
     } else {
 	compile project(':McJtyLib')
 	compile project(':RFTools')
@@ -221,6 +221,7 @@ curseforge {
             optionalLibrary 'the-one-probe'
             optionalLibrary 'rftools'
             optionalLibrary 'redstone-flux'
+            optionalLibrary 'rftools-control'
         }
     }
 }
