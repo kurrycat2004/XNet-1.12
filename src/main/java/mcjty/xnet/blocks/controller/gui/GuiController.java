@@ -51,6 +51,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static mcjty.xnet.blocks.controller.TileEntityController.*;
@@ -62,8 +63,13 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
     public static final String TAG_NAME = "name";
 
     private WidgetList connectorList;
+    private List<SidedPos> connectorPositions = new ArrayList<>();
     private int listDirty;
     private TextField searchBar;
+
+    private int delayedSelectedChannel = -1;
+    private int delayedSelectedLine = -1;
+    private SidedPos delayedSelectedConnector = null;
 
     private Panel channelEditPanel;
     private Panel connectorEditPanel;
@@ -165,30 +171,62 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         if (handleClipboard(keyCode)) {
             return;
         }
+        if (handleKeyUpDown(keyCode)) {
+            return;
+        }
         super.keyTyped(typedChar, keyCode);
     }
-
 
     @Override
     public void keyTypedFromEvent(char typedChar, int keyCode) {
         if (handleClipboard(keyCode)) {
             return;
         }
+        if (handleKeyUpDown(keyCode)) {
+            return;
+        }
         super.keyTypedFromEvent(typedChar, keyCode);
     }
+
+    private boolean handleKeyUpDown(int keyCode) {
+        if (getSelectedChannel() == -1) {
+            return false;
+        }
+        if (keyCode == Keyboard.KEY_UP) {
+            int sel = connectorList.getSelected();
+            if (sel > 0) {
+                sel--;
+                connectorList.setSelected(sel);
+                selectConnectorEditor(connectorPositions.get(sel), getSelectedChannel());
+            }
+            return true;
+        } else if (keyCode == Keyboard.KEY_DOWN) {
+            int sel = connectorList.getSelected();
+            if (sel != -1) {
+                if (sel < connectorList.getChildCount() - 1) {
+                    sel++;
+                    connectorList.setSelected(sel);
+                    selectConnectorEditor(connectorPositions.get(sel), getSelectedChannel());
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
 
     private boolean handleClipboard(int keyCode) {
         if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)) {
             if (keyCode == Keyboard.KEY_C) {
                 if (getSelectedChannel() != -1) {
-                    copyChannel();
+                    copyConnector();
                 } else {
                     showMessage(mc, this, getWindowManager(), 50, 50, TextFormatting.RED + "Nothing selected!");
                 }
                 return true;
             } else if (keyCode == Keyboard.KEY_V) {
                 if (getSelectedChannel() != -1) {
-                    pasteChannel();
+                    pasteConnector();
                 } else {
                     showMessage(mc, this, getWindowManager(), 50, 50, TextFormatting.RED + "Nothing selected!");
                 }
@@ -345,21 +383,24 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         Window askWindow = windowManager.createModalWindow(ask);
         ask.addChild(new Label(mc, gui).setText(title));
         Panel buttons = new Panel(mc, gui).setLayout(new HorizontalLayout()).setDesiredWidth(100).setDesiredHeight(18);
-        buttons.addChild(new Button(mc, gui).setText("Cancel").addButtonEvent((parent -> {
-            windowManager.closeWindow(askWindow);
-        })));
         if (okEvent != null) {
+            buttons.addChild(new Button(mc, gui).setText("Cancel").addButtonEvent((parent -> {
+                windowManager.closeWindow(askWindow);
+            })));
             buttons.addChild(new Button(mc, gui).setText("OK").addButtonEvent(parent -> {
                 windowManager.closeWindow(askWindow);
                 okEvent.buttonClicked(parent);
             }));
+        } else {
+            buttons.addChild(new Button(mc, gui).setText("OK").addButtonEvent((parent -> {
+                windowManager.closeWindow(askWindow);
+            })));
         }
         ask.addChild(buttons);
     }
 
     private void copyConnector() {
         if (editingConnector != null) {
-            showMessage(mc, this, getWindowManager(), 50, 50, TextFormatting.GREEN + "Copied connector");
             sendServerCommand(XNetMessages.INSTANCE, TileEntityController.CMD_COPYCONNECTOR,
                     TypedMap.builder()
                             .put(PARAM_INDEX, getSelectedChannel())
@@ -418,6 +459,11 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                             .put(PARAM_SIDE, editingConnector.getSide().ordinal())
                             .put(PARAM_JSON, json)
                             .build());
+            if (connectorList.getSelected() != -1) {
+                delayedSelectedChannel = getSelectedChannel();
+                delayedSelectedLine = connectorList.getSelected();
+                delayedSelectedConnector = connectorPositions.get(connectorList.getSelected());
+            }
             refresh();
         } catch (UnsupportedFlavorException e) {
             showMessage(mc, this, getWindowManager(), 50, 50, TextFormatting.RED + "Clipboard does not contain connector!");
@@ -546,6 +592,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
         needsRefresh = false;
 
         connectorList.removeChildren();
+        connectorPositions.clear();
 
         int sel = connectorList.getSelected();
         BlockPos prevPos = null;
@@ -607,9 +654,17 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
                 panel.addChild(but);
             }
             connectorList.addChild(panel);
+            connectorPositions.add(sidedPos);
         }
 
         connectorList.setSelected(sel);
+        if (delayedSelectedChannel != -1) {
+            connectorList.setSelected(delayedSelectedLine);
+            selectConnectorEditor(delayedSelectedConnector, delayedSelectedChannel);
+        }
+        delayedSelectedChannel = -1;
+        delayedSelectedLine = -1;
+        delayedSelectedConnector = null;
     }
 
     private boolean listsReady() {

@@ -1,3 +1,7 @@
+1.8.1:
+- The ctrl-c/ctrl-v hotkeys work on connectors now instead of channels
+- The up/down keys move up/down the selected connector
+
 1.8.0:
 - Depends on McJtyLib 3.5.0!
 - Fixed a problem where the updated proxy would break instantly by hand and not drop anything
