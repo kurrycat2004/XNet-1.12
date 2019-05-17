@@ -79,7 +79,7 @@ public class EnergyConnectorSettings extends AbstractConnectorSettings {
                 .label("Rate")
                 .integer(TAG_RATE,
                         (energyMode == EnergyMode.EXT ? "Max energy extraction rate" : "Max energy insertion rate") +
-                        "|(limited to " + (advanced ? ConfigSetup.maxRfRateAdvanced : ConfigSetup.maxRfRateNormal) + " per tick)", rate, 40)
+                        "|(limited to " + (advanced ? ConfigSetup.maxRfRateAdvanced.get() : ConfigSetup.maxRfRateNormal.get()) + " per tick)", rate, 40)
                 .shift(10)
                 .label(energyMode == EnergyMode.EXT ? "Min" : "Max")
                 .integer(TAG_MINMAX, energyMode == EnergyMode.EXT ? "Disable extraction if energy|is too low" : "Disable insertion if energy|is too high", minmax, 50);
