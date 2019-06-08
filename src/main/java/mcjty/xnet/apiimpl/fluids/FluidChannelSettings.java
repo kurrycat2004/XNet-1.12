@@ -96,6 +96,7 @@ public class FluidChannelSettings extends DefaultChannelSettings implements ICha
         updateCache(channel, context);
         // @todo optimize
         World world = context.getControllerWorld();
+        extractorsLoop:
         for (Map.Entry<SidedConsumer, FluidConnectorSettings> entry : fluidExtractors.entrySet()) {
             FluidConnectorSettings settings = entry.getValue();
             if (d % settings.getSpeed() != 0) {
@@ -135,18 +136,26 @@ public class FluidChannelSettings extends DefaultChannelSettings implements ICha
                         toextract = Math.min(toextract, canextract);
                     }
 
-                    FluidStack stack = fetchFluid(handler, true, extractMatcher, toextract);
-                    if (stack != null) {
-                        List<Pair<SidedConsumer, FluidConnectorSettings>> inserted = new ArrayList<>();
-                        int remaining = insertFluidSimulate(inserted, context, stack);
-                        if (!inserted.isEmpty() && remaining < stack.amount) {
-                            if (context.checkAndConsumeRF(ConfigSetup.controllerOperationRFT.get())) {
-                                FluidStack fetchedFluid = fetchFluid(handler, false, extractMatcher, stack.amount - remaining);
-                                if (fetchedFluid != null) {
-                                    insertFluidReal(context, inserted, fetchedFluid);
-                                }
-                            }
+                    List<Pair<SidedConsumer, FluidConnectorSettings>> inserted = new ArrayList<>();
+                    int remaining;
+                    do {
+                        // Imagine the pathological case where we're extracting from a container that works in 13mB
+                        // increments and inserting into a container that works in 17mB increments. We should end up
+                        // with toextract = 884 at the end of this loop, given that it started at 1000.
+                        FluidStack stack = fetchFluid(handler, true, extractMatcher, toextract);
+                        if (stack == null) continue extractorsLoop;
+                        toextract = stack.amount;
+                        inserted.clear();
+                        remaining = insertFluidSimulate(inserted, context, stack);
+                        toextract -= remaining;
+                        if (inserted.isEmpty() || toextract <= 0) continue extractorsLoop;
+                    } while(remaining > 0);
+                    if (context.checkAndConsumeRF(ConfigSetup.controllerOperationRFT.get())) {
+                        FluidStack stack = fetchFluid(handler, false, extractMatcher, toextract);
+                        if (stack == null) {
+                            throw new NullPointerException(handler.getClass().getName() + " misbehaved! handler.drain(" + toextract + ", true) returned null, even though handler.drain(" + toextract + ", false) did not");
                         }
+                        insertFluidReal(context, inserted, stack);
                     }
                 }
             }
