@@ -1,3 +1,6 @@
+Upcoming:
+- Joseph fixed a pathological case with fluid handling
+
 1.8.1:
 - The ctrl-c/ctrl-v hotkeys work on connectors now instead of channels
 - The up/down keys move up/down the selected connector
