@@ -159,7 +159,7 @@ public class ItemChannelSettings extends DefaultChannelSettings implements IChan
         World world = context.getControllerWorld();
         for (Map.Entry<SidedConsumer, ItemConnectorSettings> entry : itemExtractors.entrySet()) {
             ItemConnectorSettings settings = entry.getValue();
-            if (d % settings.getSpeed() != 0) {
+            if (settings.getSpeed() == 0 || d % settings.getSpeed() != 0) {
                 continue;
             }
 

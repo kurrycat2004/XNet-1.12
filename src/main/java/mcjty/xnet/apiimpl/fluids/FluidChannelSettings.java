@@ -99,7 +99,7 @@ public class FluidChannelSettings extends DefaultChannelSettings implements ICha
         extractorsLoop:
         for (Map.Entry<SidedConsumer, FluidConnectorSettings> entry : fluidExtractors.entrySet()) {
             FluidConnectorSettings settings = entry.getValue();
-            if (d % settings.getSpeed() != 0) {
+            if (settings.getSpeed() == 0 || d % settings.getSpeed() != 0) {
                 continue;
             }
 

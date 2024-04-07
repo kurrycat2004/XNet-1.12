@@ -122,6 +122,11 @@ public class ItemConnectorSettings extends AbstractConnectorSettings {
                     .integer(TAG_EXTRACT_AMOUNT, "Amount of items to extract|per operation", extractAmount, 30, 64);
         }
 
+        if (speed < 1) {
+            if (advanced) speed = 1;
+            else speed = 2;
+        }
+
         gui
                 .shift(10)
                 .choices(TAG_SPEED, "Number of ticks for each operation", Integer.toString(speed * 5), speeds)
