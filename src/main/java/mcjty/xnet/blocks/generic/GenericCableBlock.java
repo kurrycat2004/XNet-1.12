@@ -25,6 +25,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -178,11 +179,19 @@ public abstract class GenericCableBlock extends Block implements WailaInfoProvid
     @Override
     @SideOnly(Side.CLIENT)
     public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
-        return AABB_CENTER;
+        IBlockState mimicBlock = getMimicBlock(worldIn, pos);
+        return mimicBlock != null ? mimicBlock.getSelectedBoundingBox(worldIn, pos) : AABB_CENTER;
     }
 
     @Override
     public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
+        IBlockState mimicBlock = getMimicBlock(worldIn, pos);
+        if (mimicBlock != null) {
+            mimicBlock = mimicBlock.getActualState(worldIn, pos);
+            mimicBlock.getBlock().addCollisionBoxToList(mimicBlock, worldIn, pos, entityBox, collidingBoxes, entityIn, true);
+            return;
+        }
+
         addCollisionBoxToList(pos, entityBox, collidingBoxes, AABB_CENTER);
         CableColor color = state.getValue(COLOR);
         for (EnumFacing facing : EnumFacing.VALUES) {
@@ -196,13 +205,20 @@ public abstract class GenericCableBlock extends Block implements WailaInfoProvid
         }
     }
 
+    @Override
+    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
+        return BlockFaceShape.UNDEFINED;
+    }
+
     @Nullable
     @Override
     public RayTraceResult collisionRayTrace(IBlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {
-        if (getMimicBlock(world, pos) != null) {
+        IBlockState mimicBlock = getMimicBlock(world, pos);
+        if (mimicBlock != null) {
             // In mimic mode we use original raytrace mode
-            return originalCollisionRayTrace(blockState, world, pos, start, end);
+            return mimicBlock.getBlock().collisionRayTrace(mimicBlock, world, pos, start, end);
         }
+
         Vec3d vec3d = start.subtract(pos.getX(), pos.getY(), pos.getZ());
         Vec3d vec3d1 = end.subtract(pos.getX(), pos.getY(), pos.getZ());
         RayTraceResult rc = checkIntersect(pos, vec3d, vec3d1, AABB_CENTER);

@@ -60,13 +60,6 @@ public class FacadeBlock extends NetCableBlock implements ITileEntityProvider {
         GameRegistry.registerTileEntity(FacadeTileEntity.class, XNet.MODID + ":facade");
     }
 
-    @Nullable
-    @Override
-    public RayTraceResult collisionRayTrace(IBlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {
-        // We do not want the raytracing that happens in the GenericCableBlock
-        return super.originalCollisionRayTrace(blockState, world, pos, start, end);
-    }
-
     @Override
     public TileEntity createNewTileEntity(World world, int i) {
         return null;
@@ -77,6 +70,15 @@ public class FacadeBlock extends NetCableBlock implements ITileEntityProvider {
         return new FacadeTileEntity();
     }
 
+    @Nullable
+    @Override
+    public RayTraceResult collisionRayTrace(IBlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {
+        IBlockState mimicBlock = getMimicBlock(world, pos);
+        if (mimicBlock != null) {
+            return mimicBlock.collisionRayTrace(world, pos, start, end);
+        }
+        return originalCollisionRayTrace(blockState, world, pos, start, end);
+    }
 
     @Override
     public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity te, ItemStack stack) {
