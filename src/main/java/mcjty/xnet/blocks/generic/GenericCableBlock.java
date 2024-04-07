@@ -29,6 +29,7 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.color.BlockColors;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -73,7 +74,6 @@ public abstract class GenericCableBlock extends Block implements WailaInfoProvid
     public static final PropertyEnum<CableColor> COLOR = PropertyEnum.<CableColor>create("color", CableColor.class);
 
 
-    public static final AxisAlignedBB AABB_EMPTY = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
     public static final AxisAlignedBB AABB_CENTER = new AxisAlignedBB(.4, .4, .4, .6, .6, .6);
 
     public static final AxisAlignedBB AABBS[] = new AxisAlignedBB[]{
@@ -178,7 +178,22 @@ public abstract class GenericCableBlock extends Block implements WailaInfoProvid
     @Override
     @SideOnly(Side.CLIENT)
     public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
-        return AABB_EMPTY;
+        return AABB_CENTER;
+    }
+
+    @Override
+    public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
+        addCollisionBoxToList(pos, entityBox, collidingBoxes, AABB_CENTER);
+        CableColor color = state.getValue(COLOR);
+        for (EnumFacing facing : EnumFacing.VALUES) {
+            ConnectorType type = getConnectorType(color, worldIn, pos, facing);
+            if (type == ConnectorType.CABLE) {
+                addCollisionBoxToList(pos, entityBox, collidingBoxes, AABBS[facing.ordinal()]);
+            }
+            else if (type == ConnectorType.BLOCK) {
+                addCollisionBoxToList(pos, entityBox, collidingBoxes, AABBS_CONNECTOR[facing.ordinal()]);
+            }
+        }
     }
 
     @Nullable
