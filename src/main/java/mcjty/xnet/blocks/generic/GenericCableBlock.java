@@ -100,7 +100,7 @@ public abstract class GenericCableBlock extends Block implements WailaInfoProvid
         setHardness(1.0f);
         setSoundType(SoundType.METAL);
         setHarvestLevel("pickaxe", 0);
-        setUnlocalizedName(XNet.MODID + "." + name);
+        setTranslationKey(XNet.MODID + "." + name);
         setRegistryName(name);
         McJtyRegister.registerLater(this, XNet.instance, null);
         McJtyRegister.registerLater(createItemBlock().setRegistryName(name), XNet.instance);
@@ -128,7 +128,7 @@ public abstract class GenericCableBlock extends Block implements WailaInfoProvid
                 item.setTagCompound(new NBTTagCompound());
             }
             NBTTagCompound display = new NBTTagCompound();
-            String unlocname = getUnlocalizedName() + "_" + color.getName() + ".name";
+            String unlocname = getTranslationKey() + "_" + color.getName() + ".name";
             display.setString("LocName", unlocname);
             item.getTagCompound().setTag("display", display);
         }
@@ -149,7 +149,7 @@ public abstract class GenericCableBlock extends Block implements WailaInfoProvid
     public void initModel() {
         ResourceLocation name = getRegistryName();
         for (CableColor color : CableColor.VALUES) {
-            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), color.ordinal(), new ModelResourceLocation(new ResourceLocation(name.getResourceDomain(), name.getResourcePath()+"item"), "color=" + color.name()));
+            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), color.ordinal(), new ModelResourceLocation(new ResourceLocation(name.getNamespace(), name.getPath()+"item"), "color=" + color.name()));
         }
     }
 
@@ -216,7 +216,7 @@ public abstract class GenericCableBlock extends Block implements WailaInfoProvid
 
     private RayTraceResult checkIntersect(BlockPos pos, Vec3d vec3d, Vec3d vec3d1, AxisAlignedBB boundingBox) {
         RayTraceResult raytraceresult = boundingBox.calculateIntercept(vec3d, vec3d1);
-        return raytraceresult == null ? null : new RayTraceResult(raytraceresult.hitVec.addVector(pos.getX(), pos.getY(), pos.getZ()), raytraceresult.sideHit, pos);
+        return raytraceresult == null ? null : new RayTraceResult(raytraceresult.hitVec.add(pos.getX(), pos.getY(), pos.getZ()), raytraceresult.sideHit, pos);
     }
 
     protected RayTraceResult originalCollisionRayTrace(IBlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {

@@ -1,124 +1,92 @@
-buildscript {
-    repositories {
-        jcenter()
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
-        maven {
-            name = "sonatype"
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
-        }
-    }
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-    }
-}
-
 plugins {
-    id 'com.matthewprenger.cursegradle' version '1.1.0'
+    id 'java'
+    id 'java-library'
+    id 'org.jetbrains.gradle.plugin.idea-ext' version '1.1.7'
+    id 'com.gtnewhorizons.retrofuturagradle' version '1.3.33'
 }
 
-apply plugin: 'net.minecraftforge.gradle.forge'
+group= "com.github.mcjty"
+archivesBaseName = "xnet"
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+minecraft {
+    mcVersion = "1.12.2"
+    useDependencyAccessTransformers = true
+}
 
 repositories {
-    maven { // The repo from which to get waila
-        name "Mobius Repo"
-        url "https://tehnut.info/maven"
-        //url "http://mobiusstrip.eu/maven"
+    exclusiveContent {
+        forRepository {
+            maven {
+                url "https://cursemaven.com"
+            }
+        }
+        filter {
+            includeGroup "curse.maven"
+        }
     }
     maven { // JEI
-        url "http://dvs1.progwml6.com/files/maven"
+        url "https://dvs1.progwml6.com/files/maven"
     }
     maven {
         name 'OC Repo'
-        url "http://maven.cil.li/"
+        url "https://maven.cil.li/"
     }
     maven { // TOP
         name 'tterrag maven'
         url "https://maven.tterrag.com/"
     }
     maven { // McJtyLib
-        url "http://maven.k-4u.nl"
+        url "https://maven.k-4u.nl"
     }
     maven {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/repositories/snapshots/"
     }
-    maven {
-        name = "CoFH Maven"
-        url = "http://maven.covers1624.net"
-    }
-    maven {
-        name = "TESLA"
-        url = "https://maven.mcmoddev.com"
-    }
-}
-
-group= "com.github.mcjty"
-archivesBaseName = "xnet"
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-minecraft {
-    version = "${minecraft_version}-${forge_version}"
-    runDir = "run"
-    mappings = mcp_mappings
-    useDepAts = true
 }
 
 dependencies {
-    deobfCompile "mezz.jei:jei_${jei_version}"
-    deobfCompile "mcp.mobius.waila:Hwyla:${waila_version}"
-    deobfCompile "mcjty.theoneprobe:TheOneProbe-${top_version}"
-    deobfCompile "cofh:RedstoneFlux:${redstoneflux_version}"
-    deobfCompile "net.darkhax.tesla:Tesla-${tesla_version}"
+    implementation rfg.deobf("mezz.jei:jei_${jei_version}")
+    implementation rfg.deobf("curse.maven:hwyla-253449:2568751")
+    implementation rfg.deobf("curse.maven:top-245211:2667280")
+    implementation rfg.deobf("com.github.mcjty:intwheel:${intwheel_version}")
 
-    deobfCompile "com.github.mcjty:intwheel:${intwheel_version}"
     if (!project.hasProperty("singleproject")) {
-        deobfCompile "com.github.mcjty:mcjtylib:${mcjtylib_version}"
-        deobfCompile "com.github.mcjty:rftools:1.12-7.70"
+        implementation rfg.deobf("com.github.mcjty:mcjtylib:${mcjtylib_version}")
+        implementation (rfg.deobf("com.github.mcjty:rftools:1.12-7.70")) {
+            transitive = false
+        }
     } else {
-	compile project(':McJtyLib')
-	compile project(':RFTools')
+	    implementation project(':McJtyLib')
+	    implementation project(':RFTools')
     }
-    compile "li.cil.oc:OpenComputers:${oc_version}"
+
+    compileOnly "curse.maven:tesla-244651:2487959"
+    compileOnly "li.cil.oc:OpenComputers:${oc_version}"
 }
 
-//jar {
-//    manifest {
-//        attributes 'FMLAT': 'xnet_at.cfg'
-//    }
-//}
+processResources {
+    inputs.property 'version', project.version
+    inputs.property 'mcversion', project.minecraft.version
 
-processResources
-{
-    // this will ensure that this task is redone when the versions change.
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
-
-    // replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-
-        // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
-    }
-
-    // copy everything else, thats not the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
+    filesMatching(['mcmod.info', 'pack.mcmeta']) { fcd ->
+        fcd.expand (
+                'version': project.version,
+                'mcversion': project.minecraft.version
+        )
     }
 }
 
 task deobfJar(type: Jar) {
     from sourceSets.main.output
-    classifier = 'dev'
+    archiveClassifier = 'dev'
 }
 
 artifacts {
-    archives sourceJar
+    //archives sourcesJar
     archives deobfJar
 }
 
@@ -199,7 +167,7 @@ String getChangelogText() {
     return str
 }
 
-tasks.curseforge.enabled = project.hasProperty('curseforge_key')
+/*tasks.curseforge.enabled = project.hasProperty('curseforge_key')
 
 curseforge {
     if (project.hasProperty('curseforge_key')) {
@@ -223,4 +191,4 @@ curseforge {
             optionalLibrary 'rftools-control'
         }
     }
-}
+}*/
