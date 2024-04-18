@@ -76,12 +76,6 @@ public class GuiXNetManual extends GuiScreen {
     }
 
     @Override
-    public boolean doesGuiPauseGame() {
-        return false;
-    }
-
-
-    @Override
     protected void mouseClicked(int x, int y, int button) throws IOException {
         super.mouseClicked(x, y, button);
         window.mouseClicked(x, y, button);

@@ -23,9 +23,7 @@ import java.util.function.Function;
 
 @Mod(modid = XNet.MODID, name = XNet.MODNAME,
         dependencies =
-                        "required-after:mcjtylib_ng@[" + XNet.MIN_MCJTYLIB_VER + ",);" +
-                        "after:rftools@[" + XNet.MIN_RFTOOLS_VER + ",);" +
-                        "after:forge@[" + XNet.MIN_FORGE11_VER + ",)",
+                        "required-after:mcjtylib_ng@[" + XNet.MIN_MCJTYLIB_VER + ",);after:rftools@[" + XNet.MIN_RFTOOLS_VER + ",)",
         acceptedMinecraftVersions = "[1.12,1.13)",
         version = Tags.MOD_VERSION)
 public class XNet implements ModBase {
@@ -33,7 +31,6 @@ public class XNet implements ModBase {
     public static final String MODID = "xnet";
     public static final String MODNAME = "XNet";
 
-    public static final String MIN_FORGE11_VER = "13.19.0.2176";
     public static final String MIN_MCJTYLIB_VER = "3.5.0";
     public static final String MIN_RFTOOLS_VER = "7.50";
 

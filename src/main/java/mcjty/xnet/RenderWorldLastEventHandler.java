@@ -323,14 +323,14 @@ public class RenderWorldLastEventHandler {
 
 
     private static void renderHilightedBlock(RenderWorldLastEvent evt) {
-        BlockPos c = XNet.instance.clientInfo.getHilightedBlock();
+        BlockPos c = XNet.instance.clientInfo.getHighlightedBlock();
         if (c == null) {
             return;
         }
         Minecraft mc = Minecraft.getMinecraft();
         long time = System.currentTimeMillis();
 
-        if (time > XNet.instance.clientInfo.getExpireHilight()) {
+        if (time > XNet.instance.clientInfo.getExpireHighlight()) {
             XNet.instance.clientInfo.hilightBlock(null, -1);
             return;
         }

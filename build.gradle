@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.github.mcjty"
-version = "1.12-" + project.modversion
+version = "1.12-" + project.modversion + "-ynet"
 archivesBaseName = "xnet"
 
 tasks.withType(JavaCompile).configureEach {

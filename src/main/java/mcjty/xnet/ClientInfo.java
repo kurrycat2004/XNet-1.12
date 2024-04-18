@@ -10,20 +10,20 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * This class holds information on client-side only which are global to the mod.
  */
 public class ClientInfo {
-    private BlockPos hilightedBlock = null;
-    private long expireHilight = 0;
+    private BlockPos highlightedBlock = null;
+    private long expireHighlight = 0;
 
     public void hilightBlock(BlockPos c, long expireHilight) {
-        hilightedBlock = c;
-        this.expireHilight = expireHilight;
+        highlightedBlock = c;
+        this.expireHighlight = expireHilight;
     }
 
-    public BlockPos getHilightedBlock() {
-        return hilightedBlock;
+    public BlockPos getHighlightedBlock() {
+        return highlightedBlock;
     }
 
-    public long getExpireHilight() {
-        return expireHilight;
+    public long getExpireHighlight() {
+        return expireHighlight;
     }
 
     @SideOnly(Side.CLIENT)
