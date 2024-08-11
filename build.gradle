@@ -11,6 +11,8 @@ archivesBaseName = "xnet"
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+    targetCompatibility = 8
+    sourceCompatibility = 8
 }
 
 minecraft {
@@ -49,14 +51,10 @@ repositories {
     maven { // McJtyLib
         url "https://maven.k-4u.nl"
     }
-    maven {
-        name = "sonatype"
-        url = "https://oss.sonatype.org/content/repositories/snapshots/"
-    }
 }
 
 dependencies {
-    implementation rfg.deobf("mezz.jei:jei_${jei_version}")
+    implementation rfg.deobf("curse.maven:hei-557549:5471944")
     implementation rfg.deobf("curse.maven:hwyla-253449:2568751")
     implementation rfg.deobf("curse.maven:top-245211:2667280")
     implementation rfg.deobf("com.github.mcjty:intwheel:${intwheel_version}")
