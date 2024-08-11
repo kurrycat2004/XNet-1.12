@@ -171,7 +171,7 @@ public class FluidChannelSettings extends DefaultChannelSettings implements ICha
     }
 
     private FluidStack fetchFluid(IFluidHandler handler, boolean simulate, @Nullable FluidStack matcher, int rate) {
-        return handler.drain(rate, !simulate);
+        return matcher == null ? handler.drain(rate, !simulate) : handler.drain(new FluidStack(matcher, rate), !simulate);
     }
 
     // Returns what could not be filled
