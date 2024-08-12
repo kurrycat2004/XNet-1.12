@@ -603,6 +603,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
             SidedPos sidedPos = connectedBlock.getPos();
             BlockPos coordinate = sidedPos.getPos();
             String name = connectedBlock.getName();
+            String controllerName = connectedBlock.getName();
             String blockUnlocName = connectedBlock.getBlockUnlocName();
             String blockName = I18n.format(blockUnlocName).trim();
 
@@ -610,7 +611,7 @@ public class GuiController extends GenericGuiContainer<TileEntityController> {
 
             Panel panel = new Panel(mc, this).setLayout(new HorizontalLayout().setHorizontalMargin(0).setSpacing(0));
             if (!selectedText.isEmpty()) {
-                if (blockName.toLowerCase().contains(selectedText)) {
+                if (controllerName.isEmpty() && blockName.toLowerCase().contains(selectedText) || controllerName.toLowerCase().contains(selectedText)) {
                     panel.setFilledBackground(0xffddeeaa);
                 }
             }
