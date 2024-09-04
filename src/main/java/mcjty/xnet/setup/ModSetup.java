@@ -15,8 +15,6 @@ import mcjty.xnet.config.ConfigSetup;
 import mcjty.xnet.init.ModBlocks;
 import mcjty.xnet.init.ModItems;
 import mcjty.xnet.network.XNetMessages;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
@@ -74,7 +72,7 @@ public class ModSetup extends DefaultModSetup {
 
     @Override
     public void createTabs() {
-        createTab("XNet", () -> new ItemStack(Item.getItemFromBlock(Blocks.ANVIL)));
+        createTab("XNet", () -> new ItemStack(ModItems.xNetManualItem));
     }
 
     @Override
