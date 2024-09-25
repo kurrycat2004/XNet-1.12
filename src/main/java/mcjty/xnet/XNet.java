@@ -1,7 +1,6 @@
 package mcjty.xnet;
 
 
-import com.github.mcjty.xnet.Tags;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.proxy.IProxy;
 import mcjty.xnet.api.IXNet;
@@ -25,7 +24,7 @@ import java.util.function.Function;
         dependencies =
                         "required-after:mcjtylib_ng@[" + XNet.MIN_MCJTYLIB_VER + ",);after:rftools@[" + XNet.MIN_RFTOOLS_VER + ",)",
         acceptedMinecraftVersions = "[1.12,1.13)",
-        version = Tags.MOD_VERSION)
+        version = Tags.VERSION)
 public class XNet implements ModBase {
 
     public static final String MODID = "xnet";
