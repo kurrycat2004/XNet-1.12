@@ -325,6 +325,10 @@ public abstract class AbstractEditorPanel implements IEditorGui {
 
             }
         });
+        blockRender.setGhostIngredientHandler(ingredient -> {
+            update(tag, ingredient);
+            blockRender.setRenderItem(ingredient);
+        });
         blockRender.setLayoutHint(new PositionalLayout.PositionalHint(x, y-1, 17, 17));
         data.put(tag, stack);
         panel.addChild(blockRender);
